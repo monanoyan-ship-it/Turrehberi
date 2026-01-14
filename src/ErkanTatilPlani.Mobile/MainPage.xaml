@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="ErkanTatilPlani.Mobile.MainPage"
+             Title="Ana Sayfa">
+
+    <ScrollView>
+        <VerticalStackLayout Padding="20" Spacing="20">
+
+            <Frame BackgroundColor="#1976D2" Padding="30" CornerRadius="15">
+                <VerticalStackLayout Spacing="10">
+                    <Label Text="Erkan Tatil Planı"
+                           FontSize="28"
+                           FontAttributes="Bold"
+                           TextColor="White"
+                           HorizontalOptions="Center" />
+                    <Label Text="Tur Kiralama Sistemi"
+                           FontSize="16"
+                           TextColor="White"
+                           HorizontalOptions="Center" />
+                </VerticalStackLayout>
+            </Frame>
+
+            <Label Text="Serbest Katılımlı Turlar"
+                   FontSize="20"
+                   FontAttributes="Bold"
+                   HorizontalOptions="Center"
+                   Margin="0,10,0,0" />
+
+            <Grid ColumnDefinitions="*,*" RowDefinitions="Auto,Auto" ColumnSpacing="15" RowSpacing="15">
+
+                <Frame Grid.Row="0" Grid.Column="0" Padding="20" CornerRadius="10" HasShadow="True">
+                    <VerticalStackLayout Spacing="10" HorizontalOptions="Center">
+                        <Label Text="🌍" FontSize="40" HorizontalOptions="Center" />
+                        <Label Text="Turlar" FontAttributes="Bold" HorizontalOptions="Center" />
+                        <Button Text="Görüntüle"
+                                BackgroundColor="#1976D2"
+                                TextColor="White"
+                                Clicked="OnToursClicked" />
+                    </VerticalStackLayout>
+                </Frame>
+
+                <Frame Grid.Row="0" Grid.Column="1" Padding="20" CornerRadius="10" HasShadow="True">
+                    <VerticalStackLayout Spacing="10" HorizontalOptions="Center">
+                        <Label Text="📅" FontSize="40" HorizontalOptions="Center" />
+                        <Label Text="Rezervasyonlar" FontAttributes="Bold" HorizontalOptions="Center" />
+                        <Button Text="Görüntüle"
+                                BackgroundColor="#388E3C"
+                                TextColor="White"
+                                Clicked="OnReservationsClicked" />
+                    </VerticalStackLayout>
+                </Frame>
+
+                <Frame Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2" Padding="20" CornerRadius="10" HasShadow="True">
+                    <VerticalStackLayout Spacing="10">
+                        <Label Text="Online Sözleşme" FontSize="18" FontAttributes="Bold" HorizontalOptions="Center" />
+                        <Label Text="Hızlı ve güvenli online sözleşme ile tur rezervasyonu yapın."
+                               HorizontalTextAlignment="Center"
+                               TextColor="Gray" />
+                    </VerticalStackLayout>
+                </Frame>
+
+            </Grid>
+
+        </VerticalStackLayout>
+    </ScrollView>
+
+</ContentPage>

@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:viewmodels="clr-namespace:ErkanTatilPlani.Mobile.ViewModels"
+             x:Class="ErkanTatilPlani.Mobile.Views.ToursPage"
+             Title="Turlar">
+
+    <ContentPage.BindingContext>
+        <viewmodels:ToursViewModel />
+    </ContentPage.BindingContext>
+
+    <RefreshView IsRefreshing="{Binding IsBusy}" Command="{Binding RefreshCommand}">
+        <CollectionView ItemsSource="{Binding Tours}" EmptyView="Tur bulunamadı">
+            <CollectionView.ItemTemplate>
+                <DataTemplate>
+                    <Frame Margin="10" Padding="15" CornerRadius="10" HasShadow="True">
+                        <VerticalStackLayout Spacing="5">
+                            <Label Text="{Binding Name}" FontSize="18" FontAttributes="Bold" />
+                            <Label Text="{Binding Destination}" TextColor="Gray" />
+                            <HorizontalStackLayout Spacing="10">
+                                <Label Text="{Binding DurationDays, StringFormat='{0} Gün'}" />
+                                <Label Text="{Binding Price, StringFormat='{0:C}'}" TextColor="Green" FontAttributes="Bold" />
+                            </HorizontalStackLayout>
+                            <Label Text="{Binding Description}" MaxLines="2" />
+                        </VerticalStackLayout>
+                    </Frame>
+                </DataTemplate>
+            </CollectionView.ItemTemplate>
+        </CollectionView>
+    </RefreshView>
+
+</ContentPage>

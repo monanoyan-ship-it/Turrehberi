@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - Erkan Tatil Plani</title>
+    <link rel="stylesheet" href="~/lib/bootstrap/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="~/lib/bootstrap-icons/font/bootstrap-icons.css" />
+    <link rel="stylesheet" href="~/lib/toastr/toastr.min.css" />
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+    <style>
+        .top-ad-banner {
+            background: linear-gradient(90deg, #ff6b6b 0%, #ffa500 50%, #ff6b6b 100%);
+            background-size: 200% 100%;
+            animation: gradientMove 3s ease infinite;
+            padding: 8px 0;
+            font-weight: 500;
+        }
+        @@keyframes gradientMove {
+            0%, 100% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+        }
+        .modern-navbar {
+            background: rgba(255, 255, 255, 0.95) !important;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 2px 20px rgba(0,0,0,0.1);
+        }
+        .modern-navbar .navbar-brand {
+            font-weight: 700;
+            font-size: 1.4rem;
+        }
+        .modern-navbar .nav-link {
+            font-weight: 500;
+            padding: 0.5rem 1rem !important;
+            border-radius: 8px;
+            margin: 0 2px;
+            transition: all 0.3s ease;
+        }
+        .modern-navbar .nav-link:hover {
+            background: rgba(13, 110, 253, 0.1);
+        }
+        .modern-navbar .nav-link.active {
+            background: #0d6efd;
+            color: white !important;
+        }
+    </style>
+</head>
+<body>
+    <!-- Top Advertisement Banner -->
+    <div id="topAdBanner" class="top-ad-banner text-white text-center">
+        <div class="container">
+            <a href="/Tours" class="text-white text-decoration-none">
+                <i class="bi bi-megaphone-fill me-2"></i>
+                <span id="adText">Ozel firsatlar icin turlari inceleyin! <i class="bi bi-arrow-right"></i></span>
+            </a>
+        </div>
+    </div>
+
+    <header class="sticky-top">
+        <nav class="navbar navbar-expand-lg modern-navbar">
+            <div class="container">
+                <a class="navbar-brand text-primary" href="/">
+                    <i class="bi bi-airplane-engines"></i> Erkan Tatil Plani
+                </a>
+                <button class="navbar-toggler border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <div class="collapse navbar-collapse justify-content-center" id="navbarNav">
+                    <ul class="navbar-nav">
+                        <li class="nav-item">
+                            <a class="nav-link text-dark" href="/"><i class="bi bi-house-door me-1"></i>Ana Sayfa</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link text-dark" href="/Companies"><i class="bi bi-building me-1"></i>Firmalar</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link text-dark" href="/Tours"><i class="bi bi-geo-alt me-1"></i>Turlar</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link text-dark" href="/Visitors"><i class="bi bi-people me-1"></i>Ziyaretciler</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link text-dark" href="/Reservations"><i class="bi bi-calendar-check me-1"></i>Rezervasyonlar</a>
+                        </li>
+                    </ul>
+                </div>
+                <div class="d-none d-lg-block">
+                    <a href="/Reservations" class="btn btn-primary btn-sm">
+                        <i class="bi bi-plus-circle me-1"></i>Rezervasyon Yap
+                    </a>
+                </div>
+            </div>
+        </nav>
+    </header>
+
+    <div class="container mt-4">
+        <main role="main" class="pb-3">
+            @RenderBody()
+        </main>
+    </div>
+
+    <footer class="border-top footer text-muted py-4 mt-5 bg-dark text-white">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-4 mb-3">
+                    <h5><i class="bi bi-airplane-engines"></i> Erkan Tatil Plani</h5>
+                    <p class="text-muted small">Turkiye'nin en guvenilir tur rezervasyon sistemi. En iyi firmalarin en uygun turlarini kesfedin.</p>
+                </div>
+                <div class="col-md-4 mb-3">
+                    <h6>Hizli Erisim</h6>
+                    <ul class="list-unstyled small">
+                        <li><a href="/Tours" class="text-muted text-decoration-none">Turlar</a></li>
+                        <li><a href="/Companies" class="text-muted text-decoration-none">Firmalar</a></li>
+                        <li><a href="/Reservations" class="text-muted text-decoration-none">Rezervasyonlar</a></li>
+                    </ul>
+                </div>
+                <div class="col-md-4 mb-3">
+                    <h6>Iletisim</h6>
+                    <p class="text-muted small mb-1"><i class="bi bi-envelope me-2"></i>info@erkantatilplani.com</p>
+                    <p class="text-muted small"><i class="bi bi-telephone me-2"></i>+90 555 123 4567</p>
+                </div>
+            </div>
+            <hr class="my-3 border-secondary">
+            <div class="text-center text-muted small">
+                &copy; 2026 - Erkan Tatil Plani - Tum Haklari Saklidir
+            </div>
+        </div>
+    </footer>
+
+    <script src="~/lib/jquery/jquery.min.js"></script>
+    <script src="~/lib/bootstrap/js/bootstrap.bundle.min.js"></script>
+    <script src="~/lib/knockout/knockout-latest.min.js"></script>
+    <script src="~/lib/toastr/toastr.min.js"></script>
+    <script>
+        // Toastr default ayarlari
+        toastr.options = {
+            "closeButton": true,
+            "progressBar": true,
+            "positionClass": "toast-top-right",
+            "timeOut": "3000"
+        };
+
+        // API Base URL
+        var apiBaseUrl = '@Html.Raw(ViewBag.ApiBaseUrl ?? "https://localhost:7001")';
+
+        // Top Ad Banner - Fetch featured tour for ad
+        $(document).ready(function() {
+            $.ajax({
+                url: apiBaseUrl + '/api/tours/featured',
+                method: 'GET',
+                success: function(tours) {
+                    if (tours && tours.length > 0) {
+                        var randomTour = tours[Math.floor(Math.random() * tours.length)];
+                        var adText = '<i class="bi bi-fire me-1"></i> <strong>' + randomTour.name + '</strong> - ' + randomTour.destination + ' sadece ' + randomTour.price.toLocaleString('tr-TR', {style: 'currency', currency: 'TRY'}) + '! <i class="bi bi-arrow-right"></i>';
+                        $('#adText').html(adText);
+                    }
+                }
+            });
+
+            // Active nav link
+            var path = window.location.pathname;
+            $('.navbar-nav .nav-link').each(function() {
+                if ($(this).attr('href') === path) {
+                    $(this).addClass('active');
+                }
+            });
+        });
+    </script>
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>

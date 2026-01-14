@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<Shell
+    x:Class="ErkanTatilPlani.Mobile.AppShell"
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:local="clr-namespace:ErkanTatilPlani.Mobile"
+    xmlns:views="clr-namespace:ErkanTatilPlani.Mobile.Views"
+    Title="Erkan Tatil Planı"
+    Shell.FlyoutBehavior="Disabled">
+
+    <TabBar>
+        <ShellContent
+            Title="Ana Sayfa"
+            Icon="home.png"
+            ContentTemplate="{DataTemplate local:MainPage}"
+            Route="MainPage" />
+
+        <ShellContent
+            Title="Turlar"
+            Icon="tour.png"
+            ContentTemplate="{DataTemplate views:ToursPage}"
+            Route="ToursPage" />
+
+        <ShellContent
+            Title="Rezervasyonlar"
+            Icon="calendar.png"
+            ContentTemplate="{DataTemplate views:ReservationsPage}"
+            Route="ReservationsPage" />
+    </TabBar>
+
+</Shell>

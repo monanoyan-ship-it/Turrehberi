@@ -1,0 +1,334 @@
+@{
+    ViewData["Title"] = "Ziyaretciler";
+}
+
+<div id="visitorsApp">
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h1><i class="bi bi-people"></i> Ziyaretciler</h1>
+    <button class="btn btn-primary" data-bind="click: openCreateModal">
+        <i class="bi bi-plus-circle"></i> Yeni Ziyaretci
+    </button>
+</div>
+
+<!-- Loading -->
+<div data-bind="visible: isLoading" class="text-center py-5">
+    <div class="spinner-border text-primary" role="status">
+        <span class="visually-hidden">Yukleniyor...</span>
+    </div>
+</div>
+
+<!-- Liste -->
+<div class="row g-4" data-bind="visible: !isLoading(), foreach: visitors">
+    <div class="col-md-4">
+        <div class="card h-100 shadow-sm">
+            <div class="card-body">
+                <div class="d-flex align-items-center mb-3">
+                    <div class="bg-info text-white rounded-circle d-flex align-items-center justify-content-center me-3" style="width: 60px; height: 60px;">
+                        <i class="bi bi-person" style="font-size: 1.5rem;"></i>
+                    </div>
+                    <div>
+                        <h5 class="card-title mb-0" data-bind="text: firstName + ' ' + lastName"></h5>
+                        <small class="text-muted" data-bind="text: email"></small>
+                    </div>
+                </div>
+                <div class="mb-2">
+                    <i class="bi bi-telephone"></i> <span data-bind="text: phone || '-'"></span>
+                </div>
+                <div class="mb-2">
+                    <i class="bi bi-geo-alt"></i> <span data-bind="text: address || '-'"></span>
+                </div>
+                <div class="mb-2" data-bind="visible: identityNumber">
+                    <i class="bi bi-card-text"></i> <span data-bind="text: identityNumber"></span>
+                </div>
+            </div>
+            <div class="card-footer bg-transparent">
+                <div class="btn-group w-100">
+                    <button class="btn btn-outline-info" data-bind="click: $parent.showDetails">
+                        <i class="bi bi-eye"></i> Detay
+                    </button>
+                    <button class="btn btn-outline-warning" data-bind="click: $parent.openEditModal">
+                        <i class="bi bi-pencil"></i> Duzenle
+                    </button>
+                    <button class="btn btn-outline-danger" data-bind="click: $parent.openDeleteModal">
+                        <i class="bi bi-trash"></i> Sil
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Bos Liste -->
+<div data-bind="visible: !isLoading() && visitors().length === 0" class="alert alert-info text-center">
+    <i class="bi bi-info-circle"></i> Henuz ziyaretci bulunmamaktadir.
+    <a href="#" data-bind="click: openCreateModal" class="alert-link">Ilk ziyaretciyi ekleyin</a>
+</div>
+
+<!-- Create/Edit Modal -->
+<div class="modal fade" id="formModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" data-bind="text: isEditing() ? 'Ziyaretci Duzenle' : 'Yeni Ziyaretci'"></h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <form id="visitorForm">
+                    <input type="hidden" data-bind="value: formData().id" />
+
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Ad *</label>
+                            <input type="text" class="form-control" data-bind="value: formData().firstName" required />
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Soyad *</label>
+                            <input type="text" class="form-control" data-bind="value: formData().lastName" required />
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">E-posta *</label>
+                            <input type="email" class="form-control" data-bind="value: formData().email" required />
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Telefon</label>
+                            <input type="tel" class="form-control" data-bind="value: formData().phone" />
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">TC Kimlik No</label>
+                        <input type="text" class="form-control" maxlength="11" data-bind="value: formData().identityNumber" />
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Adres</label>
+                        <textarea class="form-control" rows="2" data-bind="value: formData().address"></textarea>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Dogum Tarihi</label>
+                        <input type="date" class="form-control" data-bind="value: formData().birthDate" />
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Iptal</button>
+                <button type="button" class="btn btn-primary" data-bind="click: saveVisitor, disable: isSaving">
+                    <span data-bind="visible: isSaving" class="spinner-border spinner-border-sm me-1"></span>
+                    <span data-bind="text: isEditing() ? 'Guncelle' : 'Kaydet'"></span>
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Details Modal -->
+<div class="modal fade" id="detailsModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Ziyaretci Detayi</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body" data-bind="with: selectedVisitor">
+                <dl class="row">
+                    <dt class="col-sm-4">Ad Soyad</dt>
+                    <dd class="col-sm-8" data-bind="text: firstName + ' ' + lastName"></dd>
+
+                    <dt class="col-sm-4">E-posta</dt>
+                    <dd class="col-sm-8" data-bind="text: email"></dd>
+
+                    <dt class="col-sm-4">Telefon</dt>
+                    <dd class="col-sm-8" data-bind="text: phone || '-'"></dd>
+
+                    <dt class="col-sm-4">TC Kimlik No</dt>
+                    <dd class="col-sm-8" data-bind="text: identityNumber || '-'"></dd>
+
+                    <dt class="col-sm-4">Adres</dt>
+                    <dd class="col-sm-8" data-bind="text: address || '-'"></dd>
+
+                    <dt class="col-sm-4">Dogum Tarihi</dt>
+                    <dd class="col-sm-8" data-bind="text: birthDate ? new Date(birthDate).toLocaleDateString('tr-TR') : '-'"></dd>
+                </dl>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Kapat</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Delete Modal -->
+<div class="modal fade" id="deleteModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title text-danger">Ziyaretci Sil</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <div class="alert alert-warning">
+                    <i class="bi bi-exclamation-triangle"></i>
+                    <strong>Dikkat!</strong> Bu ziyaretciyi silmek istediginizden emin misiniz?
+                </div>
+                <p data-bind="with: selectedVisitor">
+                    <strong data-bind="text: firstName + ' ' + lastName"></strong> ziyaretcisini silmek uzeresiniz.
+                </p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Iptal</button>
+                <button type="button" class="btn btn-danger" data-bind="click: deleteVisitor, disable: isSaving">
+                    <span data-bind="visible: isSaving" class="spinner-border spinner-border-sm me-1"></span>
+                    Evet, Sil
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+</div>
+
+@section Scripts {
+<script>
+function VisitorsViewModel() {
+    var self = this;
+
+    self.visitors = ko.observableArray([]);
+    self.isLoading = ko.observable(true);
+    self.isSaving = ko.observable(false);
+    self.isEditing = ko.observable(false);
+    self.selectedVisitor = ko.observable(null);
+
+    self.formData = ko.observable({
+        id: 0,
+        firstName: '',
+        lastName: '',
+        email: '',
+        phone: '',
+        address: '',
+        identityNumber: '',
+        birthDate: ''
+    });
+
+    var formModal, detailsModal, deleteModal;
+
+    self.loadVisitors = function() {
+        self.isLoading(true);
+        $.ajax({
+            url: apiBaseUrl + '/api/visitors',
+            method: 'GET',
+            success: function(data) {
+                self.visitors(data);
+                self.isLoading(false);
+            },
+            error: function() {
+                toastr.error('Ziyaretciler yuklenirken hata olustu');
+                self.isLoading(false);
+            }
+        });
+    };
+
+    self.openCreateModal = function() {
+        self.isEditing(false);
+        self.formData({
+            id: 0,
+            firstName: '',
+            lastName: '',
+            email: '',
+            phone: '',
+            address: '',
+            identityNumber: '',
+            birthDate: ''
+        });
+        formModal.show();
+    };
+
+    self.openEditModal = function(visitor) {
+        self.isEditing(true);
+        self.formData({
+            id: visitor.id,
+            firstName: visitor.firstName,
+            lastName: visitor.lastName,
+            email: visitor.email,
+            phone: visitor.phone,
+            address: visitor.address,
+            identityNumber: visitor.identityNumber,
+            birthDate: visitor.birthDate ? visitor.birthDate.split('T')[0] : '',
+            createdAt: visitor.createdAt,
+            isActive: visitor.isActive
+        });
+        formModal.show();
+    };
+
+    self.showDetails = function(visitor) {
+        self.selectedVisitor(visitor);
+        detailsModal.show();
+    };
+
+    self.openDeleteModal = function(visitor) {
+        self.selectedVisitor(visitor);
+        deleteModal.show();
+    };
+
+    self.saveVisitor = function() {
+        var form = document.getElementById('visitorForm');
+        if (!form.checkValidity()) {
+            form.reportValidity();
+            return;
+        }
+
+        self.isSaving(true);
+        var data = self.formData();
+        var isEdit = self.isEditing();
+
+        $.ajax({
+            url: apiBaseUrl + '/api/visitors' + (isEdit ? '/' + data.id : ''),
+            method: isEdit ? 'PUT' : 'POST',
+            contentType: 'application/json',
+            data: JSON.stringify(data),
+            success: function() {
+                formModal.hide();
+                self.loadVisitors();
+                toastr.success(isEdit ? 'Ziyaretci guncellendi' : 'Ziyaretci eklendi');
+                self.isSaving(false);
+            },
+            error: function() {
+                toastr.error('Islem sirasinda hata olustu');
+                self.isSaving(false);
+            }
+        });
+    };
+
+    self.deleteVisitor = function() {
+        self.isSaving(true);
+        var visitor = self.selectedVisitor();
+
+        $.ajax({
+            url: apiBaseUrl + '/api/visitors/' + visitor.id,
+            method: 'DELETE',
+            success: function() {
+                deleteModal.hide();
+                self.loadVisitors();
+                toastr.success('Ziyaretci silindi');
+                self.isSaving(false);
+            },
+            error: function() {
+                toastr.error('Silme sirasinda hata olustu');
+                self.isSaving(false);
+            }
+        });
+    };
+
+    $(document).ready(function() {
+        formModal = new bootstrap.Modal(document.getElementById('formModal'));
+        detailsModal = new bootstrap.Modal(document.getElementById('detailsModal'));
+        deleteModal = new bootstrap.Modal(document.getElementById('deleteModal'));
+        self.loadVisitors();
+    });
+}
+
+ko.applyBindings(new VisitorsViewModel(), document.getElementById('visitorsApp'));
+</script>
+}

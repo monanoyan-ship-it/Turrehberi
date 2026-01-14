@@ -1,0 +1,6 @@
+@ErkanTatilPlani.API_HostAddress = http://localhost:5021
+
+GET {{ErkanTatilPlani.API_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###

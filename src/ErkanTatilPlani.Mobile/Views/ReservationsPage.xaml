@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:viewmodels="clr-namespace:ErkanTatilPlani.Mobile.ViewModels"
+             x:Class="ErkanTatilPlani.Mobile.Views.ReservationsPage"
+             Title="Rezervasyonlar">
+
+    <ContentPage.BindingContext>
+        <viewmodels:ReservationsViewModel />
+    </ContentPage.BindingContext>
+
+    <RefreshView IsRefreshing="{Binding IsBusy}" Command="{Binding RefreshCommand}">
+        <CollectionView ItemsSource="{Binding Reservations}" EmptyView="Rezervasyon bulunamadı">
+            <CollectionView.ItemTemplate>
+                <DataTemplate>
+                    <Frame Margin="10" Padding="15" CornerRadius="10" HasShadow="True">
+                        <VerticalStackLayout Spacing="5">
+                            <Label Text="{Binding Tour.Name}" FontSize="18" FontAttributes="Bold" />
+                            <Label Text="{Binding Customer.FirstName}" TextColor="Gray" />
+                            <HorizontalStackLayout Spacing="10">
+                                <Label Text="{Binding StartDate, StringFormat='{0:dd.MM.yyyy}'}" />
+                                <Label Text="-" />
+                                <Label Text="{Binding EndDate, StringFormat='{0:dd.MM.yyyy}'}" />
+                            </HorizontalStackLayout>
+                            <HorizontalStackLayout Spacing="10">
+                                <Label Text="{Binding NumberOfPeople, StringFormat='{0} Kişi'}" />
+                                <Label Text="{Binding TotalPrice, StringFormat='{0:C}'}" TextColor="Green" FontAttributes="Bold" />
+                            </HorizontalStackLayout>
+                            <Label Text="{Binding Status}" TextColor="Blue" />
+                        </VerticalStackLayout>
+                    </Frame>
+                </DataTemplate>
+            </CollectionView.ItemTemplate>
+        </CollectionView>
+    </RefreshView>
+
+</ContentPage>
