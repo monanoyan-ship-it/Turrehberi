@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - Admin Panel</title>
+    <link rel="stylesheet" href="~/lib/bootstrap/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="~/lib/bootstrap-icons/font/bootstrap-icons.css" />
+    <link rel="stylesheet" href="~/lib/toastr/toastr.min.css" />
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+    <style>
+        :root {
+            --sidebar-width: 260px;
+            --sidebar-bg: #1e293b;
+            --sidebar-hover: #334155;
+            --sidebar-active: #3b82f6;
+        }
+        body {
+            min-height: 100vh;
+            background: #f1f5f9;
+        }
+        .admin-sidebar {
+            width: var(--sidebar-width);
+            background: var(--sidebar-bg);
+            min-height: 100vh;
+            position: fixed;
+            left: 0;
+            top: 0;
+            z-index: 1000;
+            transition: transform 0.3s ease;
+        }
+        .admin-sidebar .brand {
+            padding: 1.5rem;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+        .admin-sidebar .brand a {
+            color: white;
+            text-decoration: none;
+            font-size: 1.25rem;
+            font-weight: 700;
+        }
+        .admin-sidebar .nav-section {
+            padding: 1rem 0;
+        }
+        .admin-sidebar .nav-section-title {
+            color: #64748b;
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            padding: 0 1.5rem;
+            margin-bottom: 0.5rem;
+        }
+        .admin-sidebar .nav-link {
+            color: #94a3b8;
+            padding: 0.75rem 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            transition: all 0.2s ease;
+            border-left: 3px solid transparent;
+        }
+        .admin-sidebar .nav-link:hover {
+            color: white;
+            background: var(--sidebar-hover);
+        }
+        .admin-sidebar .nav-link.active {
+            color: white;
+            background: var(--sidebar-hover);
+            border-left-color: var(--sidebar-active);
+        }
+        .admin-sidebar .nav-link i {
+            font-size: 1.1rem;
+            width: 24px;
+        }
+        .admin-sidebar .user-section {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            padding: 1rem 1.5rem;
+            border-top: 1px solid rgba(255,255,255,0.1);
+            background: rgba(0,0,0,0.2);
+        }
+        .admin-content {
+            margin-left: var(--sidebar-width);
+            min-height: 100vh;
+        }
+        .admin-header {
+            background: white;
+            padding: 1rem 2rem;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .admin-main {
+            padding: 2rem;
+        }
+        .stat-card {
+            background: white;
+            border-radius: 12px;
+            padding: 1.5rem;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+        .stat-card .stat-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+        }
+        .admin-card {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+        .admin-card .card-header {
+            background: transparent;
+            border-bottom: 1px solid #e2e8f0;
+            padding: 1rem 1.5rem;
+            font-weight: 600;
+        }
+        .admin-card .card-body {
+            padding: 1.5rem;
+        }
+        @@media (max-width: 991.98px) {
+            .admin-sidebar {
+                transform: translateX(-100%);
+            }
+            .admin-sidebar.show {
+                transform: translateX(0);
+            }
+            .admin-content {
+                margin-left: 0;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Sidebar -->
+    <aside class="admin-sidebar" id="adminSidebar">
+        <div class="brand">
+            <a href="/Admin"><i class="bi bi-airplane-engines me-2"></i>Admin Panel</a>
+        </div>
+
+        <nav class="nav-section">
+            <div class="nav-section-title">Ana Menu</div>
+            <a href="/Admin" class="nav-link @(ViewData["ActiveMenu"]?.ToString() == "Dashboard" ? "active" : "")">
+                <i class="bi bi-speedometer2"></i> Dashboard
+            </a>
+        </nav>
+
+        <nav class="nav-section" id="companyOwnerMenu">
+            <div class="nav-section-title">Firma Yonetimi</div>
+            <a href="/Admin/MyTours" class="nav-link @(ViewData["ActiveMenu"]?.ToString() == "MyTours" ? "active" : "")">
+                <i class="bi bi-geo-alt"></i> Turlarim
+            </a>
+            <a href="/Admin/MyReservations" class="nav-link @(ViewData["ActiveMenu"]?.ToString() == "MyReservations" ? "active" : "")">
+                <i class="bi bi-calendar-check"></i> Rezervasyonlarim
+            </a>
+        </nav>
+
+        <nav class="nav-section" id="staffMenu">
+            <div class="nav-section-title">Kayit Yonetimi</div>
+            <a href="/Admin/Tours" class="nav-link @(ViewData["ActiveMenu"]?.ToString() == "Tours" ? "active" : "")">
+                <i class="bi bi-geo-alt"></i> Turlar
+            </a>
+            <a href="/Admin/Companies" class="nav-link @(ViewData["ActiveMenu"]?.ToString() == "Companies" ? "active" : "")">
+                <i class="bi bi-building"></i> Firmalar
+            </a>
+            <a href="/Admin/Visitors" class="nav-link @(ViewData["ActiveMenu"]?.ToString() == "Visitors" ? "active" : "")">
+                <i class="bi bi-people"></i> Kullanicilar
+            </a>
+            <a href="/Admin/Reservations" class="nav-link @(ViewData["ActiveMenu"]?.ToString() == "Reservations" ? "active" : "")">
+                <i class="bi bi-calendar-check"></i> Rezervasyonlar
+            </a>
+        </nav>
+
+        <nav class="nav-section" id="adminMenu">
+            <div class="nav-section-title">Sistem</div>
+            <a href="/Admin/Settings" class="nav-link @(ViewData["ActiveMenu"]?.ToString() == "Settings" ? "active" : "")">
+                <i class="bi bi-gear"></i> Ayarlar
+            </a>
+        </nav>
+
+        <div class="user-section">
+            <div class="d-flex align-items-center gap-2 text-white">
+                <div class="rounded-circle bg-primary d-flex align-items-center justify-content-center" style="width: 40px; height: 40px;">
+                    <i class="bi bi-person"></i>
+                </div>
+                <div>
+                    <div class="small fw-semibold" id="currentUserName">Admin Kullanici</div>
+                    <div class="small text-muted" id="currentUserRole">Sistem Yoneticisi</div>
+                </div>
+            </div>
+            <a href="/" class="btn btn-outline-light btn-sm w-100 mt-3">
+                <i class="bi bi-box-arrow-left me-1"></i> Siteye Don
+            </a>
+        </div>
+    </aside>
+
+    <!-- Main Content -->
+    <div class="admin-content">
+        <header class="admin-header">
+            <div class="d-flex align-items-center gap-3">
+                <button class="btn btn-link d-lg-none p-0 text-dark" onclick="toggleSidebar()">
+                    <i class="bi bi-list fs-4"></i>
+                </button>
+                <h5 class="mb-0">@ViewData["Title"]</h5>
+            </div>
+            <div class="d-flex align-items-center gap-3">
+                <span class="text-muted small"><i class="bi bi-clock me-1"></i><span id="currentTime"></span></span>
+            </div>
+        </header>
+
+        <main class="admin-main">
+            @RenderBody()
+        </main>
+    </div>
+
+    <script src="~/lib/jquery/jquery.min.js"></script>
+    <script src="~/lib/bootstrap/js/bootstrap.bundle.min.js"></script>
+    <script src="~/lib/knockout/knockout-latest.min.js"></script>
+    <script src="~/lib/toastr/toastr.min.js"></script>
+    <script>
+        // Toastr default ayarlari
+        toastr.options = {
+            "closeButton": true,
+            "progressBar": true,
+            "positionClass": "toast-top-right",
+            "timeOut": "3000"
+        };
+
+        // API Base URL
+        var apiBaseUrl = '@Html.Raw(ViewBag.ApiBaseUrl ?? "https://localhost:7078")';
+
+        // Current time
+        function updateTime() {
+            var now = new Date();
+            document.getElementById('currentTime').textContent = now.toLocaleTimeString('tr-TR');
+        }
+        updateTime();
+        setInterval(updateTime, 1000);
+
+        // Toggle sidebar on mobile
+        function toggleSidebar() {
+            document.getElementById('adminSidebar').classList.toggle('show');
+        }
+
+        // Menu visibility based on user role (simulated - will be replaced with real auth)
+        var currentUserRole = '@(ViewBag.UserRole ?? "Admin")';
+
+        $(document).ready(function() {
+            // Show/hide menus based on role
+            if (currentUserRole === 'CompanyOwner') {
+                $('#staffMenu, #adminMenu').hide();
+            } else if (currentUserRole === 'Staff') {
+                $('#companyOwnerMenu, #adminMenu').hide();
+            } else if (currentUserRole === 'Admin') {
+                $('#companyOwnerMenu').hide();
+            }
+
+            // Set user info
+            var roleNames = {
+                'Visitor': 'Ziyaretci',
+                'CompanyOwner': 'Firma Sahibi',
+                'Staff': 'Personel',
+                'Admin': 'Sistem Yoneticisi'
+            };
+            $('#currentUserRole').text(roleNames[currentUserRole] || currentUserRole);
+        });
+    </script>
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>

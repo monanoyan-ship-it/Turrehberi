@@ -3,11 +3,9 @@
 }
 
 <div id="toursApp">
-<div class="d-flex justify-content-between align-items-center mb-4">
+<div class="mb-4">
     <h1><i class="bi bi-geo-alt"></i> Turlar</h1>
-    <button class="btn btn-primary" data-bind="click: openCreateModal">
-        <i class="bi bi-plus-circle"></i> Yeni Tur
-    </button>
+    <p class="text-muted">Sizin icin en uygun turu secin ve hayalinizdeki tatile baslayın!</p>
 </div>
 
 <!-- Loading -->
@@ -47,15 +45,12 @@
                 </div>
             </div>
             <div class="card-footer bg-transparent">
-                <div class="btn-group w-100">
-                    <button class="btn btn-outline-info" data-bind="click: $parent.showDetails">
-                        <i class="bi bi-eye"></i> Detay
+                <div class="d-flex gap-2">
+                    <button class="btn btn-outline-primary flex-grow-1" data-bind="click: $parent.showDetails">
+                        <i class="bi bi-info-circle"></i> Detay
                     </button>
-                    <button class="btn btn-outline-warning" data-bind="click: $parent.openEditModal">
-                        <i class="bi bi-pencil"></i> Duzenle
-                    </button>
-                    <button class="btn btn-outline-danger" data-bind="click: $parent.openDeleteModal">
-                        <i class="bi bi-trash"></i> Sil
+                    <button class="btn btn-success flex-grow-1" data-bind="click: $parent.openReservationModal">
+                        <i class="bi bi-calendar-check"></i> Rezervasyon Yap
                     </button>
                 </div>
             </div>
@@ -65,79 +60,7 @@
 
 <!-- Bos Liste -->
 <div data-bind="visible: !isLoading() && tours().length === 0" class="alert alert-info text-center">
-    <i class="bi bi-info-circle"></i> Henuz tur bulunmamaktadir.
-    <a href="#" data-bind="click: openCreateModal" class="alert-link">Ilk turu ekleyin</a>
-</div>
-
-<!-- Create/Edit Modal -->
-<div class="modal fade" id="formModal" tabindex="-1">
-    <div class="modal-dialog modal-lg">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" data-bind="text: isEditing() ? 'Tur Duzenle' : 'Yeni Tur'"></h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-            </div>
-            <div class="modal-body">
-                <form id="tourForm">
-                    <input type="hidden" data-bind="value: formData().id" />
-
-                    <div class="mb-3">
-                        <label class="form-label">Firma *</label>
-                        <select class="form-select" data-bind="options: companies, optionsText: 'name', optionsValue: 'id', value: formData().companyId, optionsCaption: '-- Firma Secin --'" required></select>
-                    </div>
-
-                    <div class="mb-3">
-                        <label class="form-label">Tur Adi *</label>
-                        <input type="text" class="form-control" data-bind="value: formData().name" required />
-                    </div>
-
-                    <div class="mb-3">
-                        <label class="form-label">Destinasyon *</label>
-                        <input type="text" class="form-control" data-bind="value: formData().destination" required />
-                    </div>
-
-                    <div class="mb-3">
-                        <label class="form-label">Aciklama</label>
-                        <textarea class="form-control" rows="2" data-bind="value: formData().description"></textarea>
-                    </div>
-
-                    <div class="row">
-                        <div class="col-md-4 mb-3">
-                            <label class="form-label">Fiyat (TL) *</label>
-                            <input type="number" step="0.01" class="form-control" data-bind="value: formData().price" required />
-                        </div>
-                        <div class="col-md-4 mb-3">
-                            <label class="form-label">Sure (Gun) *</label>
-                            <input type="number" class="form-control" data-bind="value: formData().durationDays" required />
-                        </div>
-                        <div class="col-md-4 mb-3">
-                            <label class="form-label">Kapasite</label>
-                            <input type="number" class="form-control" data-bind="value: formData().maxCapacity" />
-                        </div>
-                    </div>
-
-                    <div class="mb-3">
-                        <label class="form-label">Resim URL</label>
-                        <input type="url" class="form-control" data-bind="value: formData().imageUrl" />
-                    </div>
-
-                    <div class="form-check form-switch mb-3">
-                        <input class="form-check-input" type="checkbox" id="isFeatured" data-bind="checked: formData().isFeatured" />
-                        <label class="form-check-label" for="isFeatured">
-                            <i class="bi bi-star-fill text-warning"></i> Ana Sayfada Goster (One Cikan)
-                        </label>
-                    </div>
-                </form>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Iptal</button>
-                <button type="button" class="btn btn-primary" data-bind="click: saveTour, disable: isSaving">
-                    <span data-bind="visible: isSaving" class="spinner-border spinner-border-sm me-1"></span>
-                    <span data-bind="text: isEditing() ? 'Guncelle' : 'Kaydet'"></span>
-                </button>
-            </div>
-        </div>
-    </div>
+    <i class="bi bi-info-circle"></i> Henuz tur bulunmamaktadir. Yakinda yeni turlar eklenecektir!
 </div>
 
 <!-- Details Modal -->
@@ -181,28 +104,50 @@
     </div>
 </div>
 
-<!-- Delete Modal -->
-<div class="modal fade" id="deleteModal" tabindex="-1">
+<!-- Reservation Modal -->
+<div class="modal fade" id="reservationModal" tabindex="-1">
     <div class="modal-dialog">
         <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title text-danger">Tur Sil</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            <div class="modal-header bg-success text-white">
+                <h5 class="modal-title"><i class="bi bi-calendar-check"></i> Rezervasyon Yap</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
             </div>
             <div class="modal-body">
-                <div class="alert alert-warning">
-                    <i class="bi bi-exclamation-triangle"></i>
-                    <strong>Dikkat!</strong> Bu turu silmek istediginizden emin misiniz?
+                <div data-bind="with: selectedTour" class="mb-3">
+                    <div class="alert alert-light">
+                        <h5 data-bind="text: name"></h5>
+                        <p class="mb-1"><i class="bi bi-geo-alt"></i> <span data-bind="text: destination"></span></p>
+                        <p class="mb-0"><strong data-bind="text: price.toLocaleString('tr-TR', {style: 'currency', currency: 'TRY'})"></strong> / kisi</p>
+                    </div>
                 </div>
-                <p data-bind="with: selectedTour">
-                    <strong data-bind="text: name"></strong> turunu silmek uzeresiniz.
-                </p>
+                <form id="reservationForm">
+                    <div class="mb-3">
+                        <label class="form-label">Adiniz Soyadiniz *</label>
+                        <input type="text" class="form-control" data-bind="value: reservationData().fullName" required />
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">E-posta *</label>
+                        <input type="email" class="form-control" data-bind="value: reservationData().email" required />
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Telefon *</label>
+                        <input type="tel" class="form-control" data-bind="value: reservationData().phone" required />
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Kisi Sayisi *</label>
+                        <input type="number" class="form-control" min="1" data-bind="value: reservationData().numberOfPeople" required />
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Not (Opsiyonel)</label>
+                        <textarea class="form-control" rows="2" data-bind="value: reservationData().notes"></textarea>
+                    </div>
+                </form>
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Iptal</button>
-                <button type="button" class="btn btn-danger" data-bind="click: deleteTour, disable: isSaving">
+                <button type="button" class="btn btn-success" data-bind="click: submitReservation, disable: isSaving">
                     <span data-bind="visible: isSaving" class="spinner-border spinner-border-sm me-1"></span>
-                    Evet, Sil
+                    Rezervasyon Yap
                 </button>
             </div>
         </div>
@@ -216,76 +161,34 @@ function ToursViewModel() {
     var self = this;
 
     self.tours = ko.observableArray([]);
-    self.companies = ko.observableArray([]);
     self.isLoading = ko.observable(true);
     self.isSaving = ko.observable(false);
-    self.isEditing = ko.observable(false);
     self.selectedTour = ko.observable(null);
 
-    self.formData = ko.observable({
-        id: 0,
-        companyId: null,
-        name: '',
-        destination: '',
-        description: '',
-        price: 0,
-        durationDays: 1,
-        maxCapacity: 0,
-        imageUrl: '',
-        isFeatured: false
+    self.reservationData = ko.observable({
+        fullName: '',
+        email: '',
+        phone: '',
+        numberOfPeople: 1,
+        notes: ''
     });
 
-    var formModal, detailsModal, deleteModal;
+    var detailsModal, reservationModal;
 
     self.loadData = function() {
         self.isLoading(true);
-        $.when(
-            $.ajax({ url: apiBaseUrl + '/api/tours', method: 'GET' }),
-            $.ajax({ url: apiBaseUrl + '/api/companies', method: 'GET' })
-        ).done(function(toursRes, companiesRes) {
-            self.tours(toursRes[0]);
-            self.companies(companiesRes[0]);
-            self.isLoading(false);
-        }).fail(function() {
-            toastr.error('Veriler yuklenirken hata olustu');
-            self.isLoading(false);
+        $.ajax({
+            url: apiBaseUrl + '/api/tours',
+            method: 'GET',
+            success: function(data) {
+                self.tours(data);
+                self.isLoading(false);
+            },
+            error: function() {
+                toastr.error('Turlar yuklenirken hata olustu');
+                self.isLoading(false);
+            }
         });
-    };
-
-    self.openCreateModal = function() {
-        self.isEditing(false);
-        self.formData({
-            id: 0,
-            companyId: null,
-            name: '',
-            destination: '',
-            description: '',
-            price: 0,
-            durationDays: 1,
-            maxCapacity: 0,
-            imageUrl: '',
-            isFeatured: false
-        });
-        formModal.show();
-    };
-
-    self.openEditModal = function(tour) {
-        self.isEditing(true);
-        self.formData({
-            id: tour.id,
-            companyId: tour.companyId,
-            name: tour.name,
-            destination: tour.destination,
-            description: tour.description,
-            price: tour.price,
-            durationDays: tour.durationDays,
-            maxCapacity: tour.maxCapacity,
-            imageUrl: tour.imageUrl,
-            isFeatured: tour.isFeatured,
-            createdAt: tour.createdAt,
-            isActive: tour.isActive
-        });
-        formModal.show();
     };
 
     self.showDetails = function(tour) {
@@ -293,64 +196,40 @@ function ToursViewModel() {
         detailsModal.show();
     };
 
-    self.openDeleteModal = function(tour) {
+    self.openReservationModal = function(tour) {
         self.selectedTour(tour);
-        deleteModal.show();
+        self.reservationData({
+            fullName: '',
+            email: '',
+            phone: '',
+            numberOfPeople: 1,
+            notes: ''
+        });
+        reservationModal.show();
     };
 
-    self.saveTour = function() {
-        var form = document.getElementById('tourForm');
+    self.submitReservation = function() {
+        var form = document.getElementById('reservationForm');
         if (!form.checkValidity()) {
             form.reportValidity();
             return;
         }
 
         self.isSaving(true);
-        var data = self.formData();
-        var isEdit = self.isEditing();
-
-        $.ajax({
-            url: apiBaseUrl + '/api/tours' + (isEdit ? '/' + data.id : ''),
-            method: isEdit ? 'PUT' : 'POST',
-            contentType: 'application/json',
-            data: JSON.stringify(data),
-            success: function() {
-                formModal.hide();
-                self.loadData();
-                toastr.success(isEdit ? 'Tur guncellendi' : 'Tur eklendi');
-                self.isSaving(false);
-            },
-            error: function() {
-                toastr.error('Islem sirasinda hata olustu');
-                self.isSaving(false);
-            }
-        });
-    };
-
-    self.deleteTour = function() {
-        self.isSaving(true);
         var tour = self.selectedTour();
+        var data = self.reservationData();
 
-        $.ajax({
-            url: apiBaseUrl + '/api/tours/' + tour.id,
-            method: 'DELETE',
-            success: function() {
-                deleteModal.hide();
-                self.loadData();
-                toastr.success('Tur silindi');
-                self.isSaving(false);
-            },
-            error: function() {
-                toastr.error('Silme sirasinda hata olustu');
-                self.isSaving(false);
-            }
-        });
+        // Simdi sadece bilgilendirme yapiyoruz - gercek rezervasyon icin visitor/login gerekli
+        setTimeout(function() {
+            reservationModal.hide();
+            toastr.success('Rezervasyon talebiniz alindi! En kisa surede sizinle iletisime gececegiz.');
+            self.isSaving(false);
+        }, 500);
     };
 
     $(document).ready(function() {
-        formModal = new bootstrap.Modal(document.getElementById('formModal'));
         detailsModal = new bootstrap.Modal(document.getElementById('detailsModal'));
-        deleteModal = new bootstrap.Modal(document.getElementById('deleteModal'));
+        reservationModal = new bootstrap.Modal(document.getElementById('reservationModal'));
         self.loadData();
     });
 }

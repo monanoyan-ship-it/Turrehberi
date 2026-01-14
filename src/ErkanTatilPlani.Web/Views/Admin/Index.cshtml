@@ -1,0 +1,214 @@
+@{
+    Layout = "_AdminLayout";
+}
+
+<div id="dashboardApp">
+    <!-- Stat Cards -->
+    <div class="row g-4 mb-4">
+        <div class="col-md-3">
+            <div class="stat-card">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <div class="text-muted small">Toplam Tur</div>
+                        <div class="fs-3 fw-bold" data-bind="text: stats().totalTours">-</div>
+                    </div>
+                    <div class="stat-icon bg-primary bg-opacity-10 text-primary">
+                        <i class="bi bi-geo-alt"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="stat-card">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <div class="text-muted small">Toplam Firma</div>
+                        <div class="fs-3 fw-bold" data-bind="text: stats().totalCompanies">-</div>
+                    </div>
+                    <div class="stat-icon bg-success bg-opacity-10 text-success">
+                        <i class="bi bi-building"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="stat-card">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <div class="text-muted small">Toplam Kullanici</div>
+                        <div class="fs-3 fw-bold" data-bind="text: stats().totalVisitors">-</div>
+                    </div>
+                    <div class="stat-icon bg-info bg-opacity-10 text-info">
+                        <i class="bi bi-people"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="stat-card">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <div class="text-muted small">Bekleyen Rezervasyon</div>
+                        <div class="fs-3 fw-bold text-warning" data-bind="text: stats().pendingReservations">-</div>
+                    </div>
+                    <div class="stat-icon bg-warning bg-opacity-10 text-warning">
+                        <i class="bi bi-calendar-check"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row g-4">
+        <!-- Son Rezervasyonlar -->
+        <div class="col-lg-8">
+            <div class="admin-card">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <span><i class="bi bi-calendar-check me-2"></i>Son Rezervasyonlar</span>
+                    <a href="/Admin/Reservations" class="btn btn-sm btn-outline-primary">Tumunu Gor</a>
+                </div>
+                <div class="card-body p-0">
+                    <div class="table-responsive">
+                        <table class="table table-hover mb-0">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>Misafir</th>
+                                    <th>Tur</th>
+                                    <th>Tarih</th>
+                                    <th>Kisi</th>
+                                    <th>Durum</th>
+                                </tr>
+                            </thead>
+                            <tbody data-bind="foreach: recentReservations">
+                                <tr>
+                                    <td data-bind="text: visitor ? visitor.firstName + ' ' + visitor.lastName : '-'"></td>
+                                    <td data-bind="text: tour ? tour.name : '-'"></td>
+                                    <td data-bind="text: new Date(startDate).toLocaleDateString('tr-TR')"></td>
+                                    <td data-bind="text: numberOfPeople"></td>
+                                    <td>
+                                        <span class="badge" data-bind="css: getStatusBadge(status), text: getStatusText(status)"></span>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div data-bind="visible: recentReservations().length === 0" class="text-center text-muted py-4">
+                        <i class="bi bi-inbox fs-1"></i>
+                        <p class="mt-2">Henuz rezervasyon bulunmuyor</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Populer Turlar -->
+        <div class="col-lg-4">
+            <div class="admin-card">
+                <div class="card-header">
+                    <i class="bi bi-star me-2"></i>One Cikan Turlar
+                </div>
+                <div class="card-body p-0">
+                    <div class="list-group list-group-flush" data-bind="foreach: featuredTours">
+                        <div class="list-group-item d-flex align-items-center gap-3">
+                            <div class="rounded bg-light d-flex align-items-center justify-content-center" style="width: 50px; height: 50px;">
+                                <!-- ko if: imageUrl -->
+                                <img data-bind="attr: { src: imageUrl }" class="rounded" style="width: 50px; height: 50px; object-fit: cover;" />
+                                <!-- /ko -->
+                                <!-- ko ifnot: imageUrl -->
+                                <i class="bi bi-image text-muted"></i>
+                                <!-- /ko -->
+                            </div>
+                            <div class="flex-grow-1">
+                                <div class="fw-semibold" data-bind="text: name"></div>
+                                <small class="text-muted" data-bind="text: destination"></small>
+                            </div>
+                            <div class="text-end">
+                                <div class="fw-bold text-primary" data-bind="text: price.toLocaleString('tr-TR', {style: 'currency', currency: 'TRY'})"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div data-bind="visible: featuredTours().length === 0" class="text-center text-muted py-4">
+                        <i class="bi bi-star fs-1"></i>
+                        <p class="mt-2">One cikan tur bulunmuyor</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+<script>
+function DashboardViewModel() {
+    var self = this;
+
+    self.stats = ko.observable({
+        totalTours: 0,
+        totalCompanies: 0,
+        totalVisitors: 0,
+        pendingReservations: 0
+    });
+
+    self.recentReservations = ko.observableArray([]);
+    self.featuredTours = ko.observableArray([]);
+
+    self.getStatusBadge = function(status) {
+        var badges = {
+            0: 'bg-warning text-dark', // Pending
+            1: 'bg-success',           // Confirmed
+            2: 'bg-danger',            // Cancelled
+            3: 'bg-primary'            // Completed
+        };
+        return badges[status] || 'bg-secondary';
+    };
+
+    self.getStatusText = function(status) {
+        var texts = {
+            0: 'Beklemede',
+            1: 'Onaylandi',
+            2: 'Iptal',
+            3: 'Tamamlandi'
+        };
+        return texts[status] || 'Bilinmiyor';
+    };
+
+    self.loadData = function() {
+        // Paralel istekler
+        $.when(
+            $.ajax({ url: apiBaseUrl + '/api/tours', method: 'GET' }),
+            $.ajax({ url: apiBaseUrl + '/api/companies', method: 'GET' }),
+            $.ajax({ url: apiBaseUrl + '/api/visitors', method: 'GET' }),
+            $.ajax({ url: apiBaseUrl + '/api/reservations', method: 'GET' })
+        ).done(function(toursRes, companiesRes, visitorsRes, reservationsRes) {
+            var tours = toursRes[0];
+            var companies = companiesRes[0];
+            var visitors = visitorsRes[0];
+            var reservations = reservationsRes[0];
+
+            // Istatistikler
+            self.stats({
+                totalTours: tours.length,
+                totalCompanies: companies.length,
+                totalVisitors: visitors.length,
+                pendingReservations: reservations.filter(function(r) { return r.status === 0; }).length
+            });
+
+            // Son 5 rezervasyon
+            var sorted = reservations.sort(function(a, b) {
+                return new Date(b.createdAt) - new Date(a.createdAt);
+            });
+            self.recentReservations(sorted.slice(0, 5));
+
+            // One cikan turlar
+            var featured = tours.filter(function(t) { return t.isFeatured; });
+            self.featuredTours(featured.slice(0, 5));
+        }).fail(function() {
+            toastr.error('Veriler yuklenirken hata olustu');
+        });
+    };
+
+    self.loadData();
+}
+
+ko.applyBindings(new DashboardViewModel(), document.getElementById('dashboardApp'));
+</script>
+}

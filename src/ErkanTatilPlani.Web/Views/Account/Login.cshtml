@@ -1,0 +1,130 @@
+@{
+    ViewData["Title"] = "Giris Yap";
+}
+
+<div class="row justify-content-center mt-5">
+    <div class="col-md-5">
+        <div class="card shadow-lg border-0">
+            <div class="card-body p-5">
+                <div class="text-center mb-4">
+                    <i class="bi bi-person-circle text-primary" style="font-size: 4rem;"></i>
+                    <h3 class="mt-3">Giris Yap</h3>
+                    <p class="text-muted">Hesabiniza giris yapin</p>
+                </div>
+
+                <div id="loginApp">
+                    <div class="mb-3">
+                        <label class="form-label">E-posta</label>
+                        <div class="input-group">
+                            <span class="input-group-text"><i class="bi bi-envelope"></i></span>
+                            <input type="email" class="form-control" placeholder="ornek@email.com" data-bind="value: email" />
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Sifre</label>
+                        <div class="input-group">
+                            <span class="input-group-text"><i class="bi bi-lock"></i></span>
+                            <input type="password" class="form-control" placeholder="******" data-bind="value: password" />
+                        </div>
+                    </div>
+
+                    <div class="alert alert-danger" data-bind="visible: errorMessage, text: errorMessage"></div>
+
+                    <button class="btn btn-primary w-100 py-2 mb-3" data-bind="click: login, disable: isLoading">
+                        <span data-bind="visible: isLoading" class="spinner-border spinner-border-sm me-2"></span>
+                        <i class="bi bi-box-arrow-in-right me-1" data-bind="visible: !isLoading()"></i>
+                        Giris Yap
+                    </button>
+
+                    <div class="text-center">
+                        <p class="mb-0">Hesabiniz yok mu? <a href="/Account/Register" class="text-decoration-none">Kayit Ol</a></p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card mt-4 border-0 bg-light">
+            <div class="card-body">
+                <h6 class="text-muted mb-3"><i class="bi bi-info-circle me-1"></i> Test Hesaplari</h6>
+                <div class="row small">
+                    <div class="col-4">
+                        <strong>Admin:</strong><br>
+                        admin@erkantatilplani.com<br>
+                        <code>123456</code>
+                    </div>
+                    <div class="col-4">
+                        <strong>Firma Sahibi:</strong><br>
+                        ahmet@egetur.com<br>
+                        <code>123456</code>
+                    </div>
+                    <div class="col-4">
+                        <strong>Kullanici:</strong><br>
+                        zeynep@gmail.com<br>
+                        <code>123456</code>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+<script>
+function LoginViewModel() {
+    var self = this;
+    self.email = ko.observable('');
+    self.password = ko.observable('');
+    self.errorMessage = ko.observable('');
+    self.isLoading = ko.observable(false);
+
+    self.login = function() {
+        self.errorMessage('');
+
+        if (!self.email() || !self.password()) {
+            self.errorMessage('Email ve sifre zorunludur');
+            return;
+        }
+
+        self.isLoading(true);
+
+        $.ajax({
+            url: apiBaseUrl + '/api/auth/login',
+            method: 'POST',
+            contentType: 'application/json',
+            data: JSON.stringify({
+                email: self.email(),
+                password: self.password()
+            }),
+            success: function(response) {
+                localStorage.setItem('token', response.token);
+                localStorage.setItem('user', JSON.stringify(response.user));
+                toastr.success('Giris basarili!');
+
+                // Redirect based on user type
+                var userTypeId = response.user.userTypeId;
+                if (userTypeId >= 2) { // Staff or Admin
+                    window.location.href = '/Admin';
+                } else if (userTypeId === 1) { // CompanyOwner
+                    window.location.href = '/Admin/MyTours';
+                } else {
+                    window.location.href = '/';
+                }
+            },
+            error: function(xhr) {
+                var msg = xhr.responseJSON?.error || 'Giris basarisiz';
+                self.errorMessage(msg);
+                self.isLoading(false);
+            }
+        });
+    };
+
+    // Enter key support
+    $(document).keypress(function(e) {
+        if (e.which === 13) self.login();
+    });
+}
+
+ko.applyBindings(new LoginViewModel(), document.getElementById('loginApp'));
+</script>
+}

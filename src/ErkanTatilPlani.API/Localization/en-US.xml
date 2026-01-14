@@ -1,0 +1,207 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Language Name="English" Culture="en-US">
+  <!-- ============================================== -->
+  <!-- USER TYPES -->
+  <!-- ============================================== -->
+  <LocaleResource Name="UserType.Visitor">Visitor</LocaleResource>
+  <LocaleResource Name="UserType.CompanyOwner">Company Owner</LocaleResource>
+  <LocaleResource Name="UserType.Staff">Staff</LocaleResource>
+  <LocaleResource Name="UserType.Admin">System Administrator</LocaleResource>
+
+  <!-- ============================================== -->
+  <!-- RESERVATION STATUSES -->
+  <!-- ============================================== -->
+  <LocaleResource Name="ReservationStatus.Pending">Pending</LocaleResource>
+  <LocaleResource Name="ReservationStatus.Confirmed">Confirmed</LocaleResource>
+  <LocaleResource Name="ReservationStatus.Cancelled">Cancelled</LocaleResource>
+  <LocaleResource Name="ReservationStatus.Completed">Completed</LocaleResource>
+
+  <!-- ============================================== -->
+  <!-- TOUR STATUSES -->
+  <!-- ============================================== -->
+  <LocaleResource Name="TourStatus.Draft">Draft</LocaleResource>
+  <LocaleResource Name="TourStatus.Active">Active</LocaleResource>
+  <LocaleResource Name="TourStatus.Paused">Paused</LocaleResource>
+  <LocaleResource Name="TourStatus.Cancelled">Cancelled</LocaleResource>
+  <LocaleResource Name="TourStatus.Completed">Completed</LocaleResource>
+
+  <!-- ============================================== -->
+  <!-- COMMON -->
+  <!-- ============================================== -->
+  <LocaleResource Name="Common.Save">Save</LocaleResource>
+  <LocaleResource Name="Common.Cancel">Cancel</LocaleResource>
+  <LocaleResource Name="Common.Delete">Delete</LocaleResource>
+  <LocaleResource Name="Common.Edit">Edit</LocaleResource>
+  <LocaleResource Name="Common.Add">Add</LocaleResource>
+  <LocaleResource Name="Common.Search">Search</LocaleResource>
+  <LocaleResource Name="Common.Filter">Filter</LocaleResource>
+  <LocaleResource Name="Common.Export">Export</LocaleResource>
+  <LocaleResource Name="Common.Import">Import</LocaleResource>
+  <LocaleResource Name="Common.Yes">Yes</LocaleResource>
+  <LocaleResource Name="Common.No">No</LocaleResource>
+  <LocaleResource Name="Common.Active">Active</LocaleResource>
+  <LocaleResource Name="Common.Inactive">Inactive</LocaleResource>
+  <LocaleResource Name="Common.All">All</LocaleResource>
+  <LocaleResource Name="Common.Loading">Loading...</LocaleResource>
+  <LocaleResource Name="Common.NoData">No data found</LocaleResource>
+  <LocaleResource Name="Common.Actions">Actions</LocaleResource>
+  <LocaleResource Name="Common.Details">Details</LocaleResource>
+  <LocaleResource Name="Common.Back">Back</LocaleResource>
+  <LocaleResource Name="Common.Next">Next</LocaleResource>
+  <LocaleResource Name="Common.Previous">Previous</LocaleResource>
+  <LocaleResource Name="Common.Close">Close</LocaleResource>
+  <LocaleResource Name="Common.Confirm">Confirm</LocaleResource>
+  <LocaleResource Name="Common.Warning">Warning</LocaleResource>
+  <LocaleResource Name="Common.Error">Error</LocaleResource>
+  <LocaleResource Name="Common.Success">Success</LocaleResource>
+  <LocaleResource Name="Common.Info">Info</LocaleResource>
+
+  <!-- ============================================== -->
+  <!-- MENU -->
+  <!-- ============================================== -->
+  <LocaleResource Name="Menu.Home">Home</LocaleResource>
+  <LocaleResource Name="Menu.Tours">Tours</LocaleResource>
+  <LocaleResource Name="Menu.Companies">Companies</LocaleResource>
+  <LocaleResource Name="Menu.About">About Us</LocaleResource>
+  <LocaleResource Name="Menu.Contact">Contact</LocaleResource>
+  <LocaleResource Name="Menu.Profile">Profile</LocaleResource>
+  <LocaleResource Name="Menu.Login">Login</LocaleResource>
+  <LocaleResource Name="Menu.Logout">Logout</LocaleResource>
+  <LocaleResource Name="Menu.Register">Register</LocaleResource>
+
+  <!-- ============================================== -->
+  <!-- ADMIN MENU -->
+  <!-- ============================================== -->
+  <LocaleResource Name="Admin.Menu.Dashboard">Dashboard</LocaleResource>
+  <LocaleResource Name="Admin.Menu.MyTours">My Tours</LocaleResource>
+  <LocaleResource Name="Admin.Menu.MyReservations">My Reservations</LocaleResource>
+  <LocaleResource Name="Admin.Menu.Tours">Tours</LocaleResource>
+  <LocaleResource Name="Admin.Menu.Companies">Companies</LocaleResource>
+  <LocaleResource Name="Admin.Menu.Visitors">Users</LocaleResource>
+  <LocaleResource Name="Admin.Menu.Reservations">Reservations</LocaleResource>
+  <LocaleResource Name="Admin.Menu.Settings">Settings</LocaleResource>
+  <LocaleResource Name="Admin.Menu.Languages">Languages</LocaleResource>
+  <LocaleResource Name="Admin.Menu.BackToSite">Back to Site</LocaleResource>
+
+  <!-- ============================================== -->
+  <!-- ADMIN TITLES -->
+  <!-- ============================================== -->
+  <LocaleResource Name="Admin.Dashboard.Title">Dashboard</LocaleResource>
+  <LocaleResource Name="Admin.Tours.Title">Tour Management</LocaleResource>
+  <LocaleResource Name="Admin.Companies.Title">Company Management</LocaleResource>
+  <LocaleResource Name="Admin.Visitors.Title">User Management</LocaleResource>
+  <LocaleResource Name="Admin.Reservations.Title">Reservation Management</LocaleResource>
+  <LocaleResource Name="Admin.Settings.Title">System Settings</LocaleResource>
+  <LocaleResource Name="Admin.Languages.Title">Language Management</LocaleResource>
+
+  <!-- ============================================== -->
+  <!-- DASHBOARD -->
+  <!-- ============================================== -->
+  <LocaleResource Name="Admin.Dashboard.TotalTours">Total Tours</LocaleResource>
+  <LocaleResource Name="Admin.Dashboard.TotalCompanies">Total Companies</LocaleResource>
+  <LocaleResource Name="Admin.Dashboard.TotalVisitors">Total Users</LocaleResource>
+  <LocaleResource Name="Admin.Dashboard.TotalReservations">Total Reservations</LocaleResource>
+  <LocaleResource Name="Admin.Dashboard.PendingReservations">Pending Reservations</LocaleResource>
+  <LocaleResource Name="Admin.Dashboard.RecentReservations">Recent Reservations</LocaleResource>
+  <LocaleResource Name="Admin.Dashboard.PopularTours">Popular Tours</LocaleResource>
+
+  <!-- ============================================== -->
+  <!-- TOURS -->
+  <!-- ============================================== -->
+  <LocaleResource Name="Tour.Name">Tour Name</LocaleResource>
+  <LocaleResource Name="Tour.Description">Description</LocaleResource>
+  <LocaleResource Name="Tour.Destination">Destination</LocaleResource>
+  <LocaleResource Name="Tour.Price">Price</LocaleResource>
+  <LocaleResource Name="Tour.Duration">Duration (Days)</LocaleResource>
+  <LocaleResource Name="Tour.Capacity">Capacity</LocaleResource>
+  <LocaleResource Name="Tour.Company">Company</LocaleResource>
+  <LocaleResource Name="Tour.Featured">Featured</LocaleResource>
+  <LocaleResource Name="Tour.Image">Image</LocaleResource>
+  <LocaleResource Name="Tour.AddNew">Add New Tour</LocaleResource>
+  <LocaleResource Name="Tour.Edit">Edit Tour</LocaleResource>
+  <LocaleResource Name="Tour.Delete">Delete Tour</LocaleResource>
+  <LocaleResource Name="Tour.DeleteConfirm">Are you sure you want to delete this tour?</LocaleResource>
+  <LocaleResource Name="Tour.MakeReservation">Make Reservation</LocaleResource>
+
+  <!-- ============================================== -->
+  <!-- COMPANIES -->
+  <!-- ============================================== -->
+  <LocaleResource Name="Company.Name">Company Name</LocaleResource>
+  <LocaleResource Name="Company.Description">Description</LocaleResource>
+  <LocaleResource Name="Company.Email">Email</LocaleResource>
+  <LocaleResource Name="Company.Phone">Phone</LocaleResource>
+  <LocaleResource Name="Company.Address">Address</LocaleResource>
+  <LocaleResource Name="Company.Website">Website</LocaleResource>
+  <LocaleResource Name="Company.TaxNumber">Tax Number</LocaleResource>
+  <LocaleResource Name="Company.Logo">Logo</LocaleResource>
+  <LocaleResource Name="Company.AddNew">Add New Company</LocaleResource>
+  <LocaleResource Name="Company.Edit">Edit Company</LocaleResource>
+  <LocaleResource Name="Company.Delete">Delete Company</LocaleResource>
+  <LocaleResource Name="Company.DeleteConfirm">Are you sure you want to delete this company?</LocaleResource>
+
+  <!-- ============================================== -->
+  <!-- USERS -->
+  <!-- ============================================== -->
+  <LocaleResource Name="Visitor.FirstName">First Name</LocaleResource>
+  <LocaleResource Name="Visitor.LastName">Last Name</LocaleResource>
+  <LocaleResource Name="Visitor.FullName">Full Name</LocaleResource>
+  <LocaleResource Name="Visitor.Email">Email</LocaleResource>
+  <LocaleResource Name="Visitor.Phone">Phone</LocaleResource>
+  <LocaleResource Name="Visitor.IdentityNumber">ID Number</LocaleResource>
+  <LocaleResource Name="Visitor.Password">Password</LocaleResource>
+  <LocaleResource Name="Visitor.UserType">User Type</LocaleResource>
+  <LocaleResource Name="Visitor.Company">Company</LocaleResource>
+  <LocaleResource Name="Visitor.AddNew">Add New User</LocaleResource>
+  <LocaleResource Name="Visitor.Edit">Edit User</LocaleResource>
+  <LocaleResource Name="Visitor.Delete">Delete User</LocaleResource>
+  <LocaleResource Name="Visitor.DeleteConfirm">Are you sure you want to delete this user?</LocaleResource>
+
+  <!-- ============================================== -->
+  <!-- RESERVATIONS -->
+  <!-- ============================================== -->
+  <LocaleResource Name="Reservation.Tour">Tour</LocaleResource>
+  <LocaleResource Name="Reservation.Visitor">Guest</LocaleResource>
+  <LocaleResource Name="Reservation.StartDate">Start Date</LocaleResource>
+  <LocaleResource Name="Reservation.EndDate">End Date</LocaleResource>
+  <LocaleResource Name="Reservation.NumberOfPeople">Number of People</LocaleResource>
+  <LocaleResource Name="Reservation.TotalPrice">Total Price</LocaleResource>
+  <LocaleResource Name="Reservation.Status">Status</LocaleResource>
+  <LocaleResource Name="Reservation.Notes">Notes</LocaleResource>
+  <LocaleResource Name="Reservation.AddNew">New Reservation</LocaleResource>
+  <LocaleResource Name="Reservation.Edit">Edit Reservation</LocaleResource>
+  <LocaleResource Name="Reservation.Delete">Delete Reservation</LocaleResource>
+  <LocaleResource Name="Reservation.DeleteConfirm">Are you sure you want to delete this reservation?</LocaleResource>
+  <LocaleResource Name="Reservation.Approve">Approve</LocaleResource>
+  <LocaleResource Name="Reservation.Reject">Reject</LocaleResource>
+
+  <!-- ============================================== -->
+  <!-- SETTINGS -->
+  <!-- ============================================== -->
+  <LocaleResource Name="Settings.General">General Settings</LocaleResource>
+  <LocaleResource Name="Settings.Localization">Language Settings</LocaleResource>
+  <LocaleResource Name="Settings.ImportLanguage">Import Language File</LocaleResource>
+  <LocaleResource Name="Settings.ExportLanguage">Export Language File</LocaleResource>
+  <LocaleResource Name="Settings.SelectFile">Select File</LocaleResource>
+  <LocaleResource Name="Settings.ImportSuccess">Language file imported successfully</LocaleResource>
+  <LocaleResource Name="Settings.ImportError">Error importing language file</LocaleResource>
+
+  <!-- ============================================== -->
+  <!-- VALIDATION MESSAGES -->
+  <!-- ============================================== -->
+  <LocaleResource Name="Validation.Required">This field is required</LocaleResource>
+  <LocaleResource Name="Validation.Email">Please enter a valid email address</LocaleResource>
+  <LocaleResource Name="Validation.Phone">Please enter a valid phone number</LocaleResource>
+  <LocaleResource Name="Validation.MinLength">Must be at least {0} characters</LocaleResource>
+  <LocaleResource Name="Validation.MaxLength">Must be at most {0} characters</LocaleResource>
+  <LocaleResource Name="Validation.Range">Value must be between {0} and {1}</LocaleResource>
+
+  <!-- ============================================== -->
+  <!-- NOTIFICATION MESSAGES -->
+  <!-- ============================================== -->
+  <LocaleResource Name="Notification.SaveSuccess">Record saved successfully</LocaleResource>
+  <LocaleResource Name="Notification.SaveError">Error saving record</LocaleResource>
+  <LocaleResource Name="Notification.DeleteSuccess">Record deleted successfully</LocaleResource>
+  <LocaleResource Name="Notification.DeleteError">Error deleting record</LocaleResource>
+  <LocaleResource Name="Notification.UpdateSuccess">Record updated successfully</LocaleResource>
+  <LocaleResource Name="Notification.UpdateError">Error updating record</LocaleResource>
+</Language>

@@ -1,0 +1,147 @@
+@{
+    Layout = "_AdminLayout";
+}
+
+<div id="languagesApp">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <p class="text-muted mb-0">Sistem dillerini ve cevirilerini yonetin</p>
+        <div>
+            <button class="btn btn-success me-2" data-bind="click: importAll, disable: isImporting">
+                <span data-bind="visible: isImporting" class="spinner-border spinner-border-sm me-1"></span>
+                <i class="bi bi-cloud-upload me-1" data-bind="visible: !isImporting()"></i> Tum Dilleri Yukle
+            </button>
+            <button class="btn btn-primary" data-bind="click: openAddModal">
+                <i class="bi bi-plus-circle me-1"></i> Yeni Dil
+            </button>
+        </div>
+    </div>
+
+    <div class="admin-card">
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-hover mb-0">
+                    <thead class="table-light">
+                        <tr>
+                            <th>Bayrak</th>
+                            <th>Dil Adi</th>
+                            <th>Kultur Kodu</th>
+                            <th>SEO Kodu</th>
+                            <th>Ceviri Sayisi</th>
+                            <th>Varsayilan</th>
+                            <th>Durum</th>
+                            <th>Islemler</th>
+                        </tr>
+                    </thead>
+                    <tbody data-bind="foreach: languages">
+                        <tr>
+                            <td>
+                                <span style="font-size: 1.5rem;" data-bind="attr: { class: flagIcon }"></span>
+                            </td>
+                            <td class="fw-semibold" data-bind="text: name"></td>
+                            <td><code data-bind="text: languageCulture"></code></td>
+                            <td><code data-bind="text: uniqueSeoCode"></code></td>
+                            <td>
+                                <span class="badge bg-light text-dark" data-bind="text: resourceCount || 0"></span>
+                            </td>
+                            <td>
+                                <!-- ko if: isDefault -->
+                                <span class="badge bg-primary"><i class="bi bi-check"></i> Varsayilan</span>
+                                <!-- /ko -->
+                                <!-- ko ifnot: isDefault -->
+                                <button class="btn btn-sm btn-outline-secondary" data-bind="click: $parent.setDefault">Varsayilan Yap</button>
+                                <!-- /ko -->
+                            </td>
+                            <td>
+                                <span class="badge" data-bind="css: isActive ? 'bg-success' : 'bg-secondary', text: isActive ? 'Aktif' : 'Pasif'"></span>
+                            </td>
+                            <td>
+                                <div class="btn-group btn-group-sm">
+                                    <button class="btn btn-outline-success" data-bind="click: $parent.importFromFolder, disable: $parent.isImporting" title="Klasorden Yukle">
+                                        <i class="bi bi-folder-symlink"></i>
+                                    </button>
+                                    <button class="btn btn-outline-primary" data-bind="click: $parent.exportXml" title="XML Indir">
+                                        <i class="bi bi-download"></i>
+                                    </button>
+                                    <button class="btn btn-outline-warning" data-bind="click: $parent.editResources" title="Cevirileri Duzenle">
+                                        <i class="bi bi-translate"></i>
+                                    </button>
+                                </div>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+@section Scripts {
+<script>
+function LanguagesViewModel() {
+    var self = this;
+    self.languages = ko.observableArray([]);
+    self.isImporting = ko.observable(false);
+
+    self.loadData = function() {
+        $.ajax({ url: apiBaseUrl + '/api/languages', method: 'GET' })
+            .done(function(data) { self.languages(data); })
+            .fail(function() { toastr.error('Diller yuklenemedi'); });
+    };
+
+    self.openAddModal = function() { toastr.info('Dil ekleme ozelligi yakin zamanda eklenecek'); };
+
+    self.setDefault = function(lang) {
+        $.ajax({ url: apiBaseUrl + '/api/languages/' + lang.id + '/set-default', method: 'PUT' })
+            .done(function() { toastr.success(lang.name + ' varsayilan dil yapildi'); self.loadData(); })
+            .fail(function() { toastr.error('Hata olustu'); });
+    };
+
+    self.editResources = function(lang) { toastr.info('Ceviri duzenleme ozelligi yakin zamanda eklenecek'); };
+
+    self.importFromFolder = function(lang) {
+        self.isImporting(true);
+        $.ajax({
+            url: apiBaseUrl + '/api/languages/' + lang.id + '/import-from-folder',
+            method: 'POST',
+            success: function(result) {
+                toastr.success(lang.name + ': ' + result.importedCount + ' yeni, ' + result.updatedCount + ' guncellendi');
+                self.loadData();
+                self.isImporting(false);
+            },
+            error: function(xhr) {
+                var msg = xhr.responseJSON?.error || 'Yukleme hatasi';
+                toastr.error(lang.name + ': ' + msg);
+                self.isImporting(false);
+            }
+        });
+    };
+
+    self.importAll = function() {
+        self.isImporting(true);
+        $.ajax({
+            url: apiBaseUrl + '/api/languages/import-all',
+            method: 'POST',
+            success: function(data) {
+                var success = data.results.filter(function(r) { return r.success; }).length;
+                var failed = data.results.filter(function(r) { return !r.success; }).length;
+                toastr.success(success + ' dil yuklendi' + (failed > 0 ? ', ' + failed + ' basarisiz' : ''));
+                self.loadData();
+                self.isImporting(false);
+            },
+            error: function() {
+                toastr.error('Toplu yukleme hatasi');
+                self.isImporting(false);
+            }
+        });
+    };
+
+    self.exportXml = function(lang) {
+        window.location.href = apiBaseUrl + '/api/languages/' + lang.id + '/export';
+    };
+
+    $(document).ready(function() { self.loadData(); });
+}
+ko.applyBindings(new LanguagesViewModel(), document.getElementById('languagesApp'));
+</script>
+}

@@ -3,6 +3,7 @@ using System;
 using ErkanTatilPlani.Data.Context;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -11,9 +12,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace ErkanTatilPlani.Data.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260114150956_InitialCreate")]
+    partial class InitialCreate
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -804,7 +807,7 @@ namespace ErkanTatilPlani.Data.Migrations
                             IdentityNumber = "11111111111",
                             IsActive = true,
                             LastName = "Admin",
-                            PasswordHash = "jZae725q0zKaOmKSgOaGzww/XVqGr/PKEgIMkjrcbJI=",
+                            PasswordHash = "AQAAAAIAAYagAAAAELbJmz5DIWnN7p8HA8VQl8dZl5qQBqCmHr5gw0wEj7FdhFfP3g==",
                             Phone = "0532 111 1111",
                             UserTypeId = 3
                         },
@@ -817,7 +820,7 @@ namespace ErkanTatilPlani.Data.Migrations
                             IdentityNumber = "22222222222",
                             IsActive = true,
                             LastName = "Kullanici",
-                            PasswordHash = "jZae725q0zKaOmKSgOaGzww/XVqGr/PKEgIMkjrcbJI=",
+                            PasswordHash = "AQAAAAIAAYagAAAAELbJmz5DIWnN7p8HA8VQl8dZl5qQBqCmHr5gw0wEj7FdhFfP3g==",
                             Phone = "0533 222 2222",
                             UserTypeId = 2
                         },
@@ -831,7 +834,7 @@ namespace ErkanTatilPlani.Data.Migrations
                             IdentityNumber = "33333333333",
                             IsActive = true,
                             LastName = "Yilmaz",
-                            PasswordHash = "jZae725q0zKaOmKSgOaGzww/XVqGr/PKEgIMkjrcbJI=",
+                            PasswordHash = "AQAAAAIAAYagAAAAELbJmz5DIWnN7p8HA8VQl8dZl5qQBqCmHr5gw0wEj7FdhFfP3g==",
                             Phone = "0534 333 3333",
                             UserTypeId = 1
                         },
@@ -845,7 +848,7 @@ namespace ErkanTatilPlani.Data.Migrations
                             IdentityNumber = "44444444444",
                             IsActive = true,
                             LastName = "Kaya",
-                            PasswordHash = "jZae725q0zKaOmKSgOaGzww/XVqGr/PKEgIMkjrcbJI=",
+                            PasswordHash = "AQAAAAIAAYagAAAAELbJmz5DIWnN7p8HA8VQl8dZl5qQBqCmHr5gw0wEj7FdhFfP3g==",
                             Phone = "0535 444 4444",
                             UserTypeId = 1
                         },
@@ -859,7 +862,7 @@ namespace ErkanTatilPlani.Data.Migrations
                             IdentityNumber = "55555555555",
                             IsActive = true,
                             LastName = "Demir",
-                            PasswordHash = "jZae725q0zKaOmKSgOaGzww/XVqGr/PKEgIMkjrcbJI=",
+                            PasswordHash = "AQAAAAIAAYagAAAAELbJmz5DIWnN7p8HA8VQl8dZl5qQBqCmHr5gw0wEj7FdhFfP3g==",
                             Phone = "0536 555 5555",
                             UserTypeId = 1
                         },
@@ -873,7 +876,7 @@ namespace ErkanTatilPlani.Data.Migrations
                             IdentityNumber = "66666666666",
                             IsActive = true,
                             LastName = "Celik",
-                            PasswordHash = "jZae725q0zKaOmKSgOaGzww/XVqGr/PKEgIMkjrcbJI=",
+                            PasswordHash = "AQAAAAIAAYagAAAAELbJmz5DIWnN7p8HA8VQl8dZl5qQBqCmHr5gw0wEj7FdhFfP3g==",
                             Phone = "0537 666 6666",
                             UserTypeId = 1
                         },
@@ -887,7 +890,7 @@ namespace ErkanTatilPlani.Data.Migrations
                             IdentityNumber = "77777777777",
                             IsActive = true,
                             LastName = "Ozturk",
-                            PasswordHash = "jZae725q0zKaOmKSgOaGzww/XVqGr/PKEgIMkjrcbJI=",
+                            PasswordHash = "AQAAAAIAAYagAAAAELbJmz5DIWnN7p8HA8VQl8dZl5qQBqCmHr5gw0wEj7FdhFfP3g==",
                             Phone = "0538 777 7777",
                             UserTypeId = 1
                         },
@@ -900,7 +903,7 @@ namespace ErkanTatilPlani.Data.Migrations
                             IdentityNumber = "88888888888",
                             IsActive = true,
                             LastName = "Arslan",
-                            PasswordHash = "jZae725q0zKaOmKSgOaGzww/XVqGr/PKEgIMkjrcbJI=",
+                            PasswordHash = "AQAAAAIAAYagAAAAELbJmz5DIWnN7p8HA8VQl8dZl5qQBqCmHr5gw0wEj7FdhFfP3g==",
                             Phone = "0539 888 8888",
                             UserTypeId = 0
                         },
@@ -913,7 +916,7 @@ namespace ErkanTatilPlani.Data.Migrations
                             IdentityNumber = "99999999999",
                             IsActive = true,
                             LastName = "Sahin",
-                            PasswordHash = "jZae725q0zKaOmKSgOaGzww/XVqGr/PKEgIMkjrcbJI=",
+                            PasswordHash = "AQAAAAIAAYagAAAAELbJmz5DIWnN7p8HA8VQl8dZl5qQBqCmHr5gw0wEj7FdhFfP3g==",
                             Phone = "0530 999 9999",
                             UserTypeId = 0
                         },
@@ -926,7 +929,7 @@ namespace ErkanTatilPlani.Data.Migrations
                             IdentityNumber = "10101010101",
                             IsActive = true,
                             LastName = "Yildiz",
-                            PasswordHash = "jZae725q0zKaOmKSgOaGzww/XVqGr/PKEgIMkjrcbJI=",
+                            PasswordHash = "AQAAAAIAAYagAAAAELbJmz5DIWnN7p8HA8VQl8dZl5qQBqCmHr5gw0wEj7FdhFfP3g==",
                             Phone = "0531 000 0000",
                             UserTypeId = 0
                         },
@@ -939,7 +942,7 @@ namespace ErkanTatilPlani.Data.Migrations
                             IdentityNumber = "12121212121",
                             IsActive = true,
                             LastName = "Koc",
-                            PasswordHash = "jZae725q0zKaOmKSgOaGzww/XVqGr/PKEgIMkjrcbJI=",
+                            PasswordHash = "AQAAAAIAAYagAAAAELbJmz5DIWnN7p8HA8VQl8dZl5qQBqCmHr5gw0wEj7FdhFfP3g==",
                             Phone = "0541 111 1111",
                             UserTypeId = 0
                         },
@@ -952,7 +955,7 @@ namespace ErkanTatilPlani.Data.Migrations
                             IdentityNumber = "13131313131",
                             IsActive = true,
                             LastName = "Aydin",
-                            PasswordHash = "jZae725q0zKaOmKSgOaGzww/XVqGr/PKEgIMkjrcbJI=",
+                            PasswordHash = "AQAAAAIAAYagAAAAELbJmz5DIWnN7p8HA8VQl8dZl5qQBqCmHr5gw0wEj7FdhFfP3g==",
                             Phone = "0542 222 2222",
                             UserTypeId = 0
                         });

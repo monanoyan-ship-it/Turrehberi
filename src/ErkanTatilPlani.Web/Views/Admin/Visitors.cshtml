@@ -1,0 +1,201 @@
+@{
+    Layout = "_AdminLayout";
+}
+
+<div id="adminVisitorsApp">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <p class="text-muted mb-0">Kullanicilari yonetin</p>
+        <button class="btn btn-primary" data-bind="click: openCreateModal">
+            <i class="bi bi-plus-circle me-1"></i> Yeni Kullanici
+        </button>
+    </div>
+
+    <!-- Filters -->
+    <div class="admin-card mb-4">
+        <div class="card-body">
+            <div class="row g-3">
+                <div class="col-md-4">
+                    <input type="text" class="form-control" placeholder="Ara..." data-bind="value: searchTerm, valueUpdate: 'afterkeydown'" />
+                </div>
+                <div class="col-md-3">
+                    <select class="form-select" data-bind="value: filterUserType">
+                        <option value="">Tum Tipler</option>
+                        <option value="0">Ziyaretci</option>
+                        <option value="1">Firma Sahibi</option>
+                        <option value="2">Personel</option>
+                        <option value="3">Admin</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="admin-card">
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-hover mb-0">
+                    <thead class="table-light">
+                        <tr>
+                            <th>Ad Soyad</th>
+                            <th>E-posta</th>
+                            <th>Telefon</th>
+                            <th>Tip</th>
+                            <th>Firma</th>
+                            <th>Durum</th>
+                            <th>Islemler</th>
+                        </tr>
+                    </thead>
+                    <tbody data-bind="foreach: filteredVisitors">
+                        <tr>
+                            <td>
+                                <div class="fw-semibold" data-bind="text: firstName + ' ' + lastName"></div>
+                            </td>
+                            <td data-bind="text: email"></td>
+                            <td data-bind="text: phone"></td>
+                            <td>
+                                <span class="badge" data-bind="css: $parent.getUserTypeBadge(userTypeId), text: $parent.getUserTypeText(userTypeId)"></span>
+                            </td>
+                            <td data-bind="text: company ? company.name : '-'"></td>
+                            <td>
+                                <span class="badge" data-bind="css: isActive ? 'bg-success' : 'bg-secondary', text: isActive ? 'Aktif' : 'Pasif'"></span>
+                            </td>
+                            <td>
+                                <div class="btn-group btn-group-sm">
+                                    <button class="btn btn-outline-primary" data-bind="click: $parent.openEditModal"><i class="bi bi-pencil"></i></button>
+                                    <button class="btn btn-outline-danger" data-bind="click: $parent.openDeleteModal"><i class="bi bi-trash"></i></button>
+                                </div>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal -->
+    <div class="modal fade" id="formModal" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" data-bind="text: isEditing() ? 'Kullanici Duzenle' : 'Yeni Kullanici'"></h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="visitorForm">
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Ad *</label>
+                                <input type="text" class="form-control" data-bind="value: formData().firstName" required />
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Soyad *</label>
+                                <input type="text" class="form-control" data-bind="value: formData().lastName" required />
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">E-posta *</label>
+                                <input type="email" class="form-control" data-bind="value: formData().email" required />
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Telefon</label>
+                                <input type="tel" class="form-control" data-bind="value: formData().phone" />
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">TC Kimlik No</label>
+                                <input type="text" class="form-control" data-bind="value: formData().identityNumber" />
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Kullanici Tipi *</label>
+                                <select class="form-select" data-bind="value: formData().userTypeId" required>
+                                    <option value="0">Ziyaretci</option>
+                                    <option value="1">Firma Sahibi</option>
+                                    <option value="2">Personel</option>
+                                    <option value="3">Admin</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="mb-3" data-bind="visible: formData().userTypeId == 1">
+                            <label class="form-label">Firma</label>
+                            <select class="form-select" data-bind="options: companies, optionsText: 'name', optionsValue: 'id', value: formData().companyId, optionsCaption: '-- Firma Secin --'"></select>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Iptal</button>
+                    <button type="button" class="btn btn-primary" data-bind="click: saveVisitor, disable: isSaving">Kaydet</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="deleteModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header"><h5 class="modal-title text-danger">Kullanici Sil</h5><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div>
+                <div class="modal-body"><p>Bu kullaniciyi silmek istediginizden emin misiniz?</p></div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Iptal</button>
+                    <button type="button" class="btn btn-danger" data-bind="click: deleteVisitor">Evet, Sil</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+<script>
+function AdminVisitorsViewModel() {
+    var self = this;
+    self.visitors = ko.observableArray([]);
+    self.companies = ko.observableArray([]);
+    self.isSaving = ko.observable(false);
+    self.isEditing = ko.observable(false);
+    self.selectedVisitor = ko.observable(null);
+    self.searchTerm = ko.observable('');
+    self.filterUserType = ko.observable('');
+    self.formData = ko.observable({ id: 0, firstName: '', lastName: '', email: '', phone: '', identityNumber: '', userTypeId: 0, companyId: null, isActive: true });
+    var formModal, deleteModal;
+
+    self.getUserTypeBadge = function(type) { return ['bg-secondary', 'bg-info', 'bg-warning text-dark', 'bg-danger'][type] || 'bg-secondary'; };
+    self.getUserTypeText = function(type) { return ['Ziyaretci', 'Firma Sahibi', 'Personel', 'Admin'][type] || 'Bilinmiyor'; };
+
+    self.filteredVisitors = ko.computed(function() {
+        var search = self.searchTerm().toLowerCase();
+        var type = self.filterUserType();
+        return self.visitors().filter(function(v) {
+            var matchSearch = !search || (v.firstName + ' ' + v.lastName + ' ' + v.email).toLowerCase().indexOf(search) > -1;
+            var matchType = type === '' || v.userTypeId.toString() === type;
+            return matchSearch && matchType;
+        });
+    });
+
+    self.loadData = function() {
+        $.when($.ajax({ url: apiBaseUrl + '/api/visitors' }), $.ajax({ url: apiBaseUrl + '/api/companies' }))
+            .done(function(v, c) { self.visitors(v[0]); self.companies(c[0]); });
+    };
+
+    self.openCreateModal = function() { self.isEditing(false); self.formData({ id: 0, firstName: '', lastName: '', email: '', phone: '', identityNumber: '', userTypeId: 0, companyId: null, isActive: true }); formModal.show(); };
+    self.openEditModal = function(v) { self.isEditing(true); self.formData(Object.assign({}, v)); formModal.show(); };
+    self.openDeleteModal = function(v) { self.selectedVisitor(v); deleteModal.show(); };
+
+    self.saveVisitor = function() {
+        self.isSaving(true);
+        var data = self.formData();
+        $.ajax({ url: apiBaseUrl + '/api/visitors' + (self.isEditing() ? '/' + data.id : ''), method: self.isEditing() ? 'PUT' : 'POST', contentType: 'application/json', data: JSON.stringify(data) })
+            .done(function() { formModal.hide(); self.loadData(); toastr.success('Kaydedildi'); self.isSaving(false); })
+            .fail(function() { toastr.error('Hata'); self.isSaving(false); });
+    };
+
+    self.deleteVisitor = function() {
+        $.ajax({ url: apiBaseUrl + '/api/visitors/' + self.selectedVisitor().id, method: 'DELETE' })
+            .done(function() { deleteModal.hide(); self.loadData(); toastr.success('Silindi'); });
+    };
+
+    $(document).ready(function() { formModal = new bootstrap.Modal(document.getElementById('formModal')); deleteModal = new bootstrap.Modal(document.getElementById('deleteModal')); self.loadData(); });
+}
+ko.applyBindings(new AdminVisitorsViewModel(), document.getElementById('adminVisitorsApp'));
+</script>
+}

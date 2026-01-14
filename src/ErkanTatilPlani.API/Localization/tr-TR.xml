@@ -1,0 +1,207 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Language Name="Turkce" Culture="tr-TR">
+  <!-- ============================================== -->
+  <!-- KULLANICI TIPLERI -->
+  <!-- ============================================== -->
+  <LocaleResource Name="UserType.Visitor">Ziyaretci</LocaleResource>
+  <LocaleResource Name="UserType.CompanyOwner">Firma Sahibi</LocaleResource>
+  <LocaleResource Name="UserType.Staff">Personel</LocaleResource>
+  <LocaleResource Name="UserType.Admin">Sistem Yoneticisi</LocaleResource>
+
+  <!-- ============================================== -->
+  <!-- REZERVASYON DURUMLARI -->
+  <!-- ============================================== -->
+  <LocaleResource Name="ReservationStatus.Pending">Beklemede</LocaleResource>
+  <LocaleResource Name="ReservationStatus.Confirmed">Onaylandi</LocaleResource>
+  <LocaleResource Name="ReservationStatus.Cancelled">Iptal Edildi</LocaleResource>
+  <LocaleResource Name="ReservationStatus.Completed">Tamamlandi</LocaleResource>
+
+  <!-- ============================================== -->
+  <!-- TUR DURUMLARI -->
+  <!-- ============================================== -->
+  <LocaleResource Name="TourStatus.Draft">Taslak</LocaleResource>
+  <LocaleResource Name="TourStatus.Active">Aktif</LocaleResource>
+  <LocaleResource Name="TourStatus.Paused">Duraklatildi</LocaleResource>
+  <LocaleResource Name="TourStatus.Cancelled">Iptal Edildi</LocaleResource>
+  <LocaleResource Name="TourStatus.Completed">Tamamlandi</LocaleResource>
+
+  <!-- ============================================== -->
+  <!-- GENEL -->
+  <!-- ============================================== -->
+  <LocaleResource Name="Common.Save">Kaydet</LocaleResource>
+  <LocaleResource Name="Common.Cancel">Iptal</LocaleResource>
+  <LocaleResource Name="Common.Delete">Sil</LocaleResource>
+  <LocaleResource Name="Common.Edit">Duzenle</LocaleResource>
+  <LocaleResource Name="Common.Add">Ekle</LocaleResource>
+  <LocaleResource Name="Common.Search">Ara</LocaleResource>
+  <LocaleResource Name="Common.Filter">Filtrele</LocaleResource>
+  <LocaleResource Name="Common.Export">Disari Aktar</LocaleResource>
+  <LocaleResource Name="Common.Import">Iceri Aktar</LocaleResource>
+  <LocaleResource Name="Common.Yes">Evet</LocaleResource>
+  <LocaleResource Name="Common.No">Hayir</LocaleResource>
+  <LocaleResource Name="Common.Active">Aktif</LocaleResource>
+  <LocaleResource Name="Common.Inactive">Pasif</LocaleResource>
+  <LocaleResource Name="Common.All">Tumu</LocaleResource>
+  <LocaleResource Name="Common.Loading">Yukleniyor...</LocaleResource>
+  <LocaleResource Name="Common.NoData">Veri bulunamadi</LocaleResource>
+  <LocaleResource Name="Common.Actions">Islemler</LocaleResource>
+  <LocaleResource Name="Common.Details">Detay</LocaleResource>
+  <LocaleResource Name="Common.Back">Geri</LocaleResource>
+  <LocaleResource Name="Common.Next">Ileri</LocaleResource>
+  <LocaleResource Name="Common.Previous">Onceki</LocaleResource>
+  <LocaleResource Name="Common.Close">Kapat</LocaleResource>
+  <LocaleResource Name="Common.Confirm">Onayla</LocaleResource>
+  <LocaleResource Name="Common.Warning">Uyari</LocaleResource>
+  <LocaleResource Name="Common.Error">Hata</LocaleResource>
+  <LocaleResource Name="Common.Success">Basarili</LocaleResource>
+  <LocaleResource Name="Common.Info">Bilgi</LocaleResource>
+
+  <!-- ============================================== -->
+  <!-- MENU -->
+  <!-- ============================================== -->
+  <LocaleResource Name="Menu.Home">Ana Sayfa</LocaleResource>
+  <LocaleResource Name="Menu.Tours">Turlar</LocaleResource>
+  <LocaleResource Name="Menu.Companies">Firmalar</LocaleResource>
+  <LocaleResource Name="Menu.About">Hakkimizda</LocaleResource>
+  <LocaleResource Name="Menu.Contact">Iletisim</LocaleResource>
+  <LocaleResource Name="Menu.Profile">Profil</LocaleResource>
+  <LocaleResource Name="Menu.Login">Giris Yap</LocaleResource>
+  <LocaleResource Name="Menu.Logout">Cikis Yap</LocaleResource>
+  <LocaleResource Name="Menu.Register">Kayit Ol</LocaleResource>
+
+  <!-- ============================================== -->
+  <!-- ADMIN MENU -->
+  <!-- ============================================== -->
+  <LocaleResource Name="Admin.Menu.Dashboard">Kontrol Paneli</LocaleResource>
+  <LocaleResource Name="Admin.Menu.MyTours">Turlarim</LocaleResource>
+  <LocaleResource Name="Admin.Menu.MyReservations">Rezervasyonlarim</LocaleResource>
+  <LocaleResource Name="Admin.Menu.Tours">Turlar</LocaleResource>
+  <LocaleResource Name="Admin.Menu.Companies">Firmalar</LocaleResource>
+  <LocaleResource Name="Admin.Menu.Visitors">Kullanicilar</LocaleResource>
+  <LocaleResource Name="Admin.Menu.Reservations">Rezervasyonlar</LocaleResource>
+  <LocaleResource Name="Admin.Menu.Settings">Ayarlar</LocaleResource>
+  <LocaleResource Name="Admin.Menu.Languages">Diller</LocaleResource>
+  <LocaleResource Name="Admin.Menu.BackToSite">Siteye Don</LocaleResource>
+
+  <!-- ============================================== -->
+  <!-- ADMIN BASLIKLAR -->
+  <!-- ============================================== -->
+  <LocaleResource Name="Admin.Dashboard.Title">Kontrol Paneli</LocaleResource>
+  <LocaleResource Name="Admin.Tours.Title">Tur Yonetimi</LocaleResource>
+  <LocaleResource Name="Admin.Companies.Title">Firma Yonetimi</LocaleResource>
+  <LocaleResource Name="Admin.Visitors.Title">Kullanici Yonetimi</LocaleResource>
+  <LocaleResource Name="Admin.Reservations.Title">Rezervasyon Yonetimi</LocaleResource>
+  <LocaleResource Name="Admin.Settings.Title">Sistem Ayarlari</LocaleResource>
+  <LocaleResource Name="Admin.Languages.Title">Dil Yonetimi</LocaleResource>
+
+  <!-- ============================================== -->
+  <!-- DASHBOARD -->
+  <!-- ============================================== -->
+  <LocaleResource Name="Admin.Dashboard.TotalTours">Toplam Tur</LocaleResource>
+  <LocaleResource Name="Admin.Dashboard.TotalCompanies">Toplam Firma</LocaleResource>
+  <LocaleResource Name="Admin.Dashboard.TotalVisitors">Toplam Kullanici</LocaleResource>
+  <LocaleResource Name="Admin.Dashboard.TotalReservations">Toplam Rezervasyon</LocaleResource>
+  <LocaleResource Name="Admin.Dashboard.PendingReservations">Bekleyen Rezervasyon</LocaleResource>
+  <LocaleResource Name="Admin.Dashboard.RecentReservations">Son Rezervasyonlar</LocaleResource>
+  <LocaleResource Name="Admin.Dashboard.PopularTours">Populer Turlar</LocaleResource>
+
+  <!-- ============================================== -->
+  <!-- TURLAR -->
+  <!-- ============================================== -->
+  <LocaleResource Name="Tour.Name">Tur Adi</LocaleResource>
+  <LocaleResource Name="Tour.Description">Aciklama</LocaleResource>
+  <LocaleResource Name="Tour.Destination">Destinasyon</LocaleResource>
+  <LocaleResource Name="Tour.Price">Fiyat</LocaleResource>
+  <LocaleResource Name="Tour.Duration">Sure (Gun)</LocaleResource>
+  <LocaleResource Name="Tour.Capacity">Kapasite</LocaleResource>
+  <LocaleResource Name="Tour.Company">Firma</LocaleResource>
+  <LocaleResource Name="Tour.Featured">One Cikan</LocaleResource>
+  <LocaleResource Name="Tour.Image">Resim</LocaleResource>
+  <LocaleResource Name="Tour.AddNew">Yeni Tur Ekle</LocaleResource>
+  <LocaleResource Name="Tour.Edit">Tur Duzenle</LocaleResource>
+  <LocaleResource Name="Tour.Delete">Tur Sil</LocaleResource>
+  <LocaleResource Name="Tour.DeleteConfirm">Bu turu silmek istediginizden emin misiniz?</LocaleResource>
+  <LocaleResource Name="Tour.MakeReservation">Rezervasyon Yap</LocaleResource>
+
+  <!-- ============================================== -->
+  <!-- FIRMALAR -->
+  <!-- ============================================== -->
+  <LocaleResource Name="Company.Name">Firma Adi</LocaleResource>
+  <LocaleResource Name="Company.Description">Aciklama</LocaleResource>
+  <LocaleResource Name="Company.Email">E-posta</LocaleResource>
+  <LocaleResource Name="Company.Phone">Telefon</LocaleResource>
+  <LocaleResource Name="Company.Address">Adres</LocaleResource>
+  <LocaleResource Name="Company.Website">Web Sitesi</LocaleResource>
+  <LocaleResource Name="Company.TaxNumber">Vergi Numarasi</LocaleResource>
+  <LocaleResource Name="Company.Logo">Logo</LocaleResource>
+  <LocaleResource Name="Company.AddNew">Yeni Firma Ekle</LocaleResource>
+  <LocaleResource Name="Company.Edit">Firma Duzenle</LocaleResource>
+  <LocaleResource Name="Company.Delete">Firma Sil</LocaleResource>
+  <LocaleResource Name="Company.DeleteConfirm">Bu firmayi silmek istediginizden emin misiniz?</LocaleResource>
+
+  <!-- ============================================== -->
+  <!-- KULLANICILAR -->
+  <!-- ============================================== -->
+  <LocaleResource Name="Visitor.FirstName">Ad</LocaleResource>
+  <LocaleResource Name="Visitor.LastName">Soyad</LocaleResource>
+  <LocaleResource Name="Visitor.FullName">Ad Soyad</LocaleResource>
+  <LocaleResource Name="Visitor.Email">E-posta</LocaleResource>
+  <LocaleResource Name="Visitor.Phone">Telefon</LocaleResource>
+  <LocaleResource Name="Visitor.IdentityNumber">TC Kimlik No</LocaleResource>
+  <LocaleResource Name="Visitor.Password">Sifre</LocaleResource>
+  <LocaleResource Name="Visitor.UserType">Kullanici Tipi</LocaleResource>
+  <LocaleResource Name="Visitor.Company">Firma</LocaleResource>
+  <LocaleResource Name="Visitor.AddNew">Yeni Kullanici Ekle</LocaleResource>
+  <LocaleResource Name="Visitor.Edit">Kullanici Duzenle</LocaleResource>
+  <LocaleResource Name="Visitor.Delete">Kullanici Sil</LocaleResource>
+  <LocaleResource Name="Visitor.DeleteConfirm">Bu kullaniciyi silmek istediginizden emin misiniz?</LocaleResource>
+
+  <!-- ============================================== -->
+  <!-- REZERVASYONLAR -->
+  <!-- ============================================== -->
+  <LocaleResource Name="Reservation.Tour">Tur</LocaleResource>
+  <LocaleResource Name="Reservation.Visitor">Misafir</LocaleResource>
+  <LocaleResource Name="Reservation.StartDate">Baslangic Tarihi</LocaleResource>
+  <LocaleResource Name="Reservation.EndDate">Bitis Tarihi</LocaleResource>
+  <LocaleResource Name="Reservation.NumberOfPeople">Kisi Sayisi</LocaleResource>
+  <LocaleResource Name="Reservation.TotalPrice">Toplam Fiyat</LocaleResource>
+  <LocaleResource Name="Reservation.Status">Durum</LocaleResource>
+  <LocaleResource Name="Reservation.Notes">Notlar</LocaleResource>
+  <LocaleResource Name="Reservation.AddNew">Yeni Rezervasyon</LocaleResource>
+  <LocaleResource Name="Reservation.Edit">Rezervasyon Duzenle</LocaleResource>
+  <LocaleResource Name="Reservation.Delete">Rezervasyon Sil</LocaleResource>
+  <LocaleResource Name="Reservation.DeleteConfirm">Bu rezervasyonu silmek istediginizden emin misiniz?</LocaleResource>
+  <LocaleResource Name="Reservation.Approve">Onayla</LocaleResource>
+  <LocaleResource Name="Reservation.Reject">Reddet</LocaleResource>
+
+  <!-- ============================================== -->
+  <!-- AYARLAR -->
+  <!-- ============================================== -->
+  <LocaleResource Name="Settings.General">Genel Ayarlar</LocaleResource>
+  <LocaleResource Name="Settings.Localization">Dil Ayarlari</LocaleResource>
+  <LocaleResource Name="Settings.ImportLanguage">Dil Dosyasi Yukle</LocaleResource>
+  <LocaleResource Name="Settings.ExportLanguage">Dil Dosyasi Indir</LocaleResource>
+  <LocaleResource Name="Settings.SelectFile">Dosya Sec</LocaleResource>
+  <LocaleResource Name="Settings.ImportSuccess">Dil dosyasi basariyla yuklendi</LocaleResource>
+  <LocaleResource Name="Settings.ImportError">Dil dosyasi yuklenirken hata olustu</LocaleResource>
+
+  <!-- ============================================== -->
+  <!-- VALIDASYON MESAJLARI -->
+  <!-- ============================================== -->
+  <LocaleResource Name="Validation.Required">Bu alan zorunludur</LocaleResource>
+  <LocaleResource Name="Validation.Email">Gecerli bir e-posta adresi giriniz</LocaleResource>
+  <LocaleResource Name="Validation.Phone">Gecerli bir telefon numarasi giriniz</LocaleResource>
+  <LocaleResource Name="Validation.MinLength">En az {0} karakter olmalidir</LocaleResource>
+  <LocaleResource Name="Validation.MaxLength">En fazla {0} karakter olmalidir</LocaleResource>
+  <LocaleResource Name="Validation.Range">Deger {0} ile {1} arasinda olmalidir</LocaleResource>
+
+  <!-- ============================================== -->
+  <!-- BILDIRIM MESAJLARI -->
+  <!-- ============================================== -->
+  <LocaleResource Name="Notification.SaveSuccess">Kayit basariyla kaydedildi</LocaleResource>
+  <LocaleResource Name="Notification.SaveError">Kayit sirasinda hata olustu</LocaleResource>
+  <LocaleResource Name="Notification.DeleteSuccess">Kayit basariyla silindi</LocaleResource>
+  <LocaleResource Name="Notification.DeleteError">Silme sirasinda hata olustu</LocaleResource>
+  <LocaleResource Name="Notification.UpdateSuccess">Kayit basariyla guncellendi</LocaleResource>
+  <LocaleResource Name="Notification.UpdateError">Guncelleme sirasinda hata olustu</LocaleResource>
+</Language>

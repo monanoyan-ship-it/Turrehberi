@@ -132,8 +132,8 @@ Firmalar tarafindan sunulan turlar.
 | Company | Company | Firma (navigation) |
 | Reservations | ICollection | Tura ait rezervasyonlar |
 
-### Visitor (Ziyaretci)
-Tur rezervasyonu yapan ziyaretciler.
+### Visitor (Ziyaretci/Kullanici)
+Hem tur rezervasyonu yapan ziyaretciler hem de firma sahipleri icin kullanilir.
 
 | Alan | Tip | Aciklama |
 |------|-----|----------|
@@ -143,7 +143,20 @@ Tur rezervasyonu yapan ziyaretciler.
 | Email | string | E-posta (unique) |
 | Phone | string | Telefon |
 | IdentityNumber | string | TC Kimlik No |
+| PasswordHash | string | Sifre hash |
+| **UserType** | **UserType** | **Kullanici tipi (Visitor/CompanyOwner)** |
+| **CompanyId** | **int?** | **Firma sahibi ise firma ID** |
+| Company | Company | Firma (navigation, opsiyonel) |
 | Reservations | ICollection | Ziyaretciye ait rezervasyonlar |
+
+### UserType (Kullanici Tipi)
+```csharp
+public enum UserType
+{
+    Visitor = 0,        // Ziyaretci (tur rezervasyonu yapan)
+    CompanyOwner = 1    // Firma sahibi/temsilcisi
+}
+```
 
 ### Reservation (Rezervasyon)
 Ziyaretcilerin turlara yaptigi rezervasyonlar.
@@ -303,6 +316,24 @@ function ExampleViewModel() {
 
 ### Sayfa Yapilari
 
+#### Ziyaret Sayfalari (Ust Menude Gorunur)
+| Sayfa | URL | Aciklama |
+|-------|-----|----------|
+| Ana Sayfa | / | Featured turlar, istatistikler |
+| Turlar | /Tours | Tur listesi ve detaylari |
+| Firmalar | /Companies | Firma listesi |
+| Hakkimizda | /About | Site hakkinda bilgi |
+| Iletisim | /Contact | Iletisim formu |
+| Profil | /Profile | Kullanici girisi/profili |
+
+#### Yonetim Sayfalari (Admin icin Gizli URL)
+| Sayfa | URL | Aciklama |
+|-------|-----|----------|
+| Firma Yonetimi | /Admin/Companies | CRUD islemleri |
+| Ziyaretci Yonetimi | /Admin/Visitors | CRUD islemleri |
+| Rezervasyon Yonetimi | /Admin/Reservations | CRUD islemleri |
+
+#### KnockoutJS Container ID'leri
 | Sayfa | Container ID | ViewModel |
 |-------|--------------|-----------|
 | Ana Sayfa | homeApp | HomeViewModel |
@@ -435,14 +466,14 @@ dotnet ef migrations add MigrationName --startup-project ../ErkanTatilPlani.API
 ```bash
 cd src/ErkanTatilPlani.API
 dotnet run
-# https://localhost:7001
+# https://localhost:7078
 ```
 
 ### Web Baslatma
 ```bash
 cd src/ErkanTatilPlani.Web
 dotnet run
-# https://localhost:5001
+# https://localhost:5020
 ```
 
 ### Client Kutuphanelerini Yukleme
@@ -451,6 +482,26 @@ cd src/ErkanTatilPlani.Web
 dotnet tool install -g Microsoft.Web.LibraryManager.Cli
 libman restore
 ```
+
+---
+
+## Seed Data
+
+Veritabani ilk olusturuldiginda asagidaki veriler otomatik eklenir:
+
+### Firmalar (5 adet)
+- Ege Tur, Karadeniz Gezileri, Akdeniz Turizm, Kapadokya Balonlari, Istanbul Turlari
+
+### Turlar (15 adet)
+- Her firma icin 3 tur
+- Featured turlar: Efes, Pamukkale, Uzungol, Sumela, Kas-Kekova, Kapadokya Balon, Kapadokya Kultur, Tarihi Yarimada, Bogaz Turu
+
+### Kullanicilar (10 adet)
+- 5 Firma Sahibi (her firmaya 1 tane)
+- 5 Normal Ziyaretci
+
+### Rezervasyonlar (6 adet)
+- Ornek rezervasyonlar cesitli turlar icin
 
 ---
 
@@ -463,6 +514,9 @@ libman restore
 - Her sayfa icin ayri KO container div kullanilir (binding cakismasini onler)
 - Featured turlar admin tarafindan `IsFeatured` alani ile belirlenir
 - Publish'te otomatik migration calisir
+- Ayri User tablosu yok, Visitor tablosu kullanici tablosu olarak kullanilir
+- UserType enum ile ziyaretci/firma sahibi ayirt edilir
+- Resimler picsum.photos'tan dinamik olarak yuklenir
 
 ---
 

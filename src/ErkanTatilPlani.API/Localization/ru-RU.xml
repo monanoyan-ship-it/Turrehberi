@@ -1,0 +1,207 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Language Name="Русский" Culture="ru-RU">
+  <!-- ============================================== -->
+  <!-- ТИПЫ ПОЛЬЗОВАТЕЛЕЙ -->
+  <!-- ============================================== -->
+  <LocaleResource Name="UserType.Visitor">Посетитель</LocaleResource>
+  <LocaleResource Name="UserType.CompanyOwner">Владелец компании</LocaleResource>
+  <LocaleResource Name="UserType.Staff">Сотрудник</LocaleResource>
+  <LocaleResource Name="UserType.Admin">Системный администратор</LocaleResource>
+
+  <!-- ============================================== -->
+  <!-- СТАТУСЫ БРОНИРОВАНИЯ -->
+  <!-- ============================================== -->
+  <LocaleResource Name="ReservationStatus.Pending">Ожидание</LocaleResource>
+  <LocaleResource Name="ReservationStatus.Confirmed">Подтверждено</LocaleResource>
+  <LocaleResource Name="ReservationStatus.Cancelled">Отменено</LocaleResource>
+  <LocaleResource Name="ReservationStatus.Completed">Завершено</LocaleResource>
+
+  <!-- ============================================== -->
+  <!-- СТАТУСЫ ТУРА -->
+  <!-- ============================================== -->
+  <LocaleResource Name="TourStatus.Draft">Черновик</LocaleResource>
+  <LocaleResource Name="TourStatus.Active">Активный</LocaleResource>
+  <LocaleResource Name="TourStatus.Paused">Приостановлен</LocaleResource>
+  <LocaleResource Name="TourStatus.Cancelled">Отменен</LocaleResource>
+  <LocaleResource Name="TourStatus.Completed">Завершен</LocaleResource>
+
+  <!-- ============================================== -->
+  <!-- ОБЩЕЕ -->
+  <!-- ============================================== -->
+  <LocaleResource Name="Common.Save">Сохранить</LocaleResource>
+  <LocaleResource Name="Common.Cancel">Отмена</LocaleResource>
+  <LocaleResource Name="Common.Delete">Удалить</LocaleResource>
+  <LocaleResource Name="Common.Edit">Редактировать</LocaleResource>
+  <LocaleResource Name="Common.Add">Добавить</LocaleResource>
+  <LocaleResource Name="Common.Search">Поиск</LocaleResource>
+  <LocaleResource Name="Common.Filter">Фильтр</LocaleResource>
+  <LocaleResource Name="Common.Export">Экспорт</LocaleResource>
+  <LocaleResource Name="Common.Import">Импорт</LocaleResource>
+  <LocaleResource Name="Common.Yes">Да</LocaleResource>
+  <LocaleResource Name="Common.No">Нет</LocaleResource>
+  <LocaleResource Name="Common.Active">Активный</LocaleResource>
+  <LocaleResource Name="Common.Inactive">Неактивный</LocaleResource>
+  <LocaleResource Name="Common.All">Все</LocaleResource>
+  <LocaleResource Name="Common.Loading">Загрузка...</LocaleResource>
+  <LocaleResource Name="Common.NoData">Данные не найдены</LocaleResource>
+  <LocaleResource Name="Common.Actions">Действия</LocaleResource>
+  <LocaleResource Name="Common.Details">Подробности</LocaleResource>
+  <LocaleResource Name="Common.Back">Назад</LocaleResource>
+  <LocaleResource Name="Common.Next">Далее</LocaleResource>
+  <LocaleResource Name="Common.Previous">Предыдущий</LocaleResource>
+  <LocaleResource Name="Common.Close">Закрыть</LocaleResource>
+  <LocaleResource Name="Common.Confirm">Подтвердить</LocaleResource>
+  <LocaleResource Name="Common.Warning">Предупреждение</LocaleResource>
+  <LocaleResource Name="Common.Error">Ошибка</LocaleResource>
+  <LocaleResource Name="Common.Success">Успех</LocaleResource>
+  <LocaleResource Name="Common.Info">Информация</LocaleResource>
+
+  <!-- ============================================== -->
+  <!-- МЕНЮ -->
+  <!-- ============================================== -->
+  <LocaleResource Name="Menu.Home">Главная</LocaleResource>
+  <LocaleResource Name="Menu.Tours">Туры</LocaleResource>
+  <LocaleResource Name="Menu.Companies">Компании</LocaleResource>
+  <LocaleResource Name="Menu.About">О нас</LocaleResource>
+  <LocaleResource Name="Menu.Contact">Контакты</LocaleResource>
+  <LocaleResource Name="Menu.Profile">Профиль</LocaleResource>
+  <LocaleResource Name="Menu.Login">Войти</LocaleResource>
+  <LocaleResource Name="Menu.Logout">Выйти</LocaleResource>
+  <LocaleResource Name="Menu.Register">Регистрация</LocaleResource>
+
+  <!-- ============================================== -->
+  <!-- МЕНЮ АДМИНА -->
+  <!-- ============================================== -->
+  <LocaleResource Name="Admin.Menu.Dashboard">Панель управления</LocaleResource>
+  <LocaleResource Name="Admin.Menu.MyTours">Мои туры</LocaleResource>
+  <LocaleResource Name="Admin.Menu.MyReservations">Мои бронирования</LocaleResource>
+  <LocaleResource Name="Admin.Menu.Tours">Туры</LocaleResource>
+  <LocaleResource Name="Admin.Menu.Companies">Компании</LocaleResource>
+  <LocaleResource Name="Admin.Menu.Visitors">Пользователи</LocaleResource>
+  <LocaleResource Name="Admin.Menu.Reservations">Бронирования</LocaleResource>
+  <LocaleResource Name="Admin.Menu.Settings">Настройки</LocaleResource>
+  <LocaleResource Name="Admin.Menu.Languages">Языки</LocaleResource>
+  <LocaleResource Name="Admin.Menu.BackToSite">На сайт</LocaleResource>
+
+  <!-- ============================================== -->
+  <!-- ЗАГОЛОВКИ АДМИНА -->
+  <!-- ============================================== -->
+  <LocaleResource Name="Admin.Dashboard.Title">Панель управления</LocaleResource>
+  <LocaleResource Name="Admin.Tours.Title">Управление турами</LocaleResource>
+  <LocaleResource Name="Admin.Companies.Title">Управление компаниями</LocaleResource>
+  <LocaleResource Name="Admin.Visitors.Title">Управление пользователями</LocaleResource>
+  <LocaleResource Name="Admin.Reservations.Title">Управление бронированиями</LocaleResource>
+  <LocaleResource Name="Admin.Settings.Title">Системные настройки</LocaleResource>
+  <LocaleResource Name="Admin.Languages.Title">Управление языками</LocaleResource>
+
+  <!-- ============================================== -->
+  <!-- ПАНЕЛЬ УПРАВЛЕНИЯ -->
+  <!-- ============================================== -->
+  <LocaleResource Name="Admin.Dashboard.TotalTours">Всего туров</LocaleResource>
+  <LocaleResource Name="Admin.Dashboard.TotalCompanies">Всего компаний</LocaleResource>
+  <LocaleResource Name="Admin.Dashboard.TotalVisitors">Всего пользователей</LocaleResource>
+  <LocaleResource Name="Admin.Dashboard.TotalReservations">Всего бронирований</LocaleResource>
+  <LocaleResource Name="Admin.Dashboard.PendingReservations">Ожидающие бронирования</LocaleResource>
+  <LocaleResource Name="Admin.Dashboard.RecentReservations">Последние бронирования</LocaleResource>
+  <LocaleResource Name="Admin.Dashboard.PopularTours">Популярные туры</LocaleResource>
+
+  <!-- ============================================== -->
+  <!-- ТУРЫ -->
+  <!-- ============================================== -->
+  <LocaleResource Name="Tour.Name">Название тура</LocaleResource>
+  <LocaleResource Name="Tour.Description">Описание</LocaleResource>
+  <LocaleResource Name="Tour.Destination">Направление</LocaleResource>
+  <LocaleResource Name="Tour.Price">Цена</LocaleResource>
+  <LocaleResource Name="Tour.Duration">Продолжительность (дни)</LocaleResource>
+  <LocaleResource Name="Tour.Capacity">Вместимость</LocaleResource>
+  <LocaleResource Name="Tour.Company">Компания</LocaleResource>
+  <LocaleResource Name="Tour.Featured">Рекомендуемый</LocaleResource>
+  <LocaleResource Name="Tour.Image">Изображение</LocaleResource>
+  <LocaleResource Name="Tour.AddNew">Добавить новый тур</LocaleResource>
+  <LocaleResource Name="Tour.Edit">Редактировать тур</LocaleResource>
+  <LocaleResource Name="Tour.Delete">Удалить тур</LocaleResource>
+  <LocaleResource Name="Tour.DeleteConfirm">Вы уверены, что хотите удалить этот тур?</LocaleResource>
+  <LocaleResource Name="Tour.MakeReservation">Забронировать</LocaleResource>
+
+  <!-- ============================================== -->
+  <!-- КОМПАНИИ -->
+  <!-- ============================================== -->
+  <LocaleResource Name="Company.Name">Название компании</LocaleResource>
+  <LocaleResource Name="Company.Description">Описание</LocaleResource>
+  <LocaleResource Name="Company.Email">Эл. почта</LocaleResource>
+  <LocaleResource Name="Company.Phone">Телефон</LocaleResource>
+  <LocaleResource Name="Company.Address">Адрес</LocaleResource>
+  <LocaleResource Name="Company.Website">Веб-сайт</LocaleResource>
+  <LocaleResource Name="Company.TaxNumber">ИНН</LocaleResource>
+  <LocaleResource Name="Company.Logo">Логотип</LocaleResource>
+  <LocaleResource Name="Company.AddNew">Добавить новую компанию</LocaleResource>
+  <LocaleResource Name="Company.Edit">Редактировать компанию</LocaleResource>
+  <LocaleResource Name="Company.Delete">Удалить компанию</LocaleResource>
+  <LocaleResource Name="Company.DeleteConfirm">Вы уверены, что хотите удалить эту компанию?</LocaleResource>
+
+  <!-- ============================================== -->
+  <!-- ПОЛЬЗОВАТЕЛИ -->
+  <!-- ============================================== -->
+  <LocaleResource Name="Visitor.FirstName">Имя</LocaleResource>
+  <LocaleResource Name="Visitor.LastName">Фамилия</LocaleResource>
+  <LocaleResource Name="Visitor.FullName">Полное имя</LocaleResource>
+  <LocaleResource Name="Visitor.Email">Эл. почта</LocaleResource>
+  <LocaleResource Name="Visitor.Phone">Телефон</LocaleResource>
+  <LocaleResource Name="Visitor.IdentityNumber">Номер паспорта</LocaleResource>
+  <LocaleResource Name="Visitor.Password">Пароль</LocaleResource>
+  <LocaleResource Name="Visitor.UserType">Тип пользователя</LocaleResource>
+  <LocaleResource Name="Visitor.Company">Компания</LocaleResource>
+  <LocaleResource Name="Visitor.AddNew">Добавить нового пользователя</LocaleResource>
+  <LocaleResource Name="Visitor.Edit">Редактировать пользователя</LocaleResource>
+  <LocaleResource Name="Visitor.Delete">Удалить пользователя</LocaleResource>
+  <LocaleResource Name="Visitor.DeleteConfirm">Вы уверены, что хотите удалить этого пользователя?</LocaleResource>
+
+  <!-- ============================================== -->
+  <!-- БРОНИРОВАНИЯ -->
+  <!-- ============================================== -->
+  <LocaleResource Name="Reservation.Tour">Тур</LocaleResource>
+  <LocaleResource Name="Reservation.Visitor">Гость</LocaleResource>
+  <LocaleResource Name="Reservation.StartDate">Дата начала</LocaleResource>
+  <LocaleResource Name="Reservation.EndDate">Дата окончания</LocaleResource>
+  <LocaleResource Name="Reservation.NumberOfPeople">Количество человек</LocaleResource>
+  <LocaleResource Name="Reservation.TotalPrice">Общая стоимость</LocaleResource>
+  <LocaleResource Name="Reservation.Status">Статус</LocaleResource>
+  <LocaleResource Name="Reservation.Notes">Заметки</LocaleResource>
+  <LocaleResource Name="Reservation.AddNew">Новое бронирование</LocaleResource>
+  <LocaleResource Name="Reservation.Edit">Редактировать бронирование</LocaleResource>
+  <LocaleResource Name="Reservation.Delete">Удалить бронирование</LocaleResource>
+  <LocaleResource Name="Reservation.DeleteConfirm">Вы уверены, что хотите удалить это бронирование?</LocaleResource>
+  <LocaleResource Name="Reservation.Approve">Одобрить</LocaleResource>
+  <LocaleResource Name="Reservation.Reject">Отклонить</LocaleResource>
+
+  <!-- ============================================== -->
+  <!-- НАСТРОЙКИ -->
+  <!-- ============================================== -->
+  <LocaleResource Name="Settings.General">Общие настройки</LocaleResource>
+  <LocaleResource Name="Settings.Localization">Языковые настройки</LocaleResource>
+  <LocaleResource Name="Settings.ImportLanguage">Импорт языкового файла</LocaleResource>
+  <LocaleResource Name="Settings.ExportLanguage">Экспорт языкового файла</LocaleResource>
+  <LocaleResource Name="Settings.SelectFile">Выбрать файл</LocaleResource>
+  <LocaleResource Name="Settings.ImportSuccess">Языковой файл успешно импортирован</LocaleResource>
+  <LocaleResource Name="Settings.ImportError">Ошибка при импорте языкового файла</LocaleResource>
+
+  <!-- ============================================== -->
+  <!-- СООБЩЕНИЯ ВАЛИДАЦИИ -->
+  <!-- ============================================== -->
+  <LocaleResource Name="Validation.Required">Это поле обязательно</LocaleResource>
+  <LocaleResource Name="Validation.Email">Введите корректный адрес электронной почты</LocaleResource>
+  <LocaleResource Name="Validation.Phone">Введите корректный номер телефона</LocaleResource>
+  <LocaleResource Name="Validation.MinLength">Минимум {0} символов</LocaleResource>
+  <LocaleResource Name="Validation.MaxLength">Максимум {0} символов</LocaleResource>
+  <LocaleResource Name="Validation.Range">Значение должно быть между {0} и {1}</LocaleResource>
+
+  <!-- ============================================== -->
+  <!-- УВЕДОМЛЕНИЯ -->
+  <!-- ============================================== -->
+  <LocaleResource Name="Notification.SaveSuccess">Запись успешно сохранена</LocaleResource>
+  <LocaleResource Name="Notification.SaveError">Ошибка при сохранении записи</LocaleResource>
+  <LocaleResource Name="Notification.DeleteSuccess">Запись успешно удалена</LocaleResource>
+  <LocaleResource Name="Notification.DeleteError">Ошибка при удалении записи</LocaleResource>
+  <LocaleResource Name="Notification.UpdateSuccess">Запись успешно обновлена</LocaleResource>
+  <LocaleResource Name="Notification.UpdateError">Ошибка при обновлении записи</LocaleResource>
+</Language>

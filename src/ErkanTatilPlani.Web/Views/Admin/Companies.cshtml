@@ -1,0 +1,189 @@
+@{
+    Layout = "_AdminLayout";
+}
+
+<div id="adminCompaniesApp">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <p class="text-muted mb-0">Firmalari yonetin ve yeni firmalar ekleyin</p>
+        <button class="btn btn-primary" data-bind="click: openCreateModal">
+            <i class="bi bi-plus-circle me-1"></i> Yeni Firma
+        </button>
+    </div>
+
+    <div class="admin-card">
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-hover mb-0">
+                    <thead class="table-light">
+                        <tr>
+                            <th style="width: 60px;"></th>
+                            <th>Firma Adi</th>
+                            <th>E-posta</th>
+                            <th>Telefon</th>
+                            <th>Vergi No</th>
+                            <th>Durum</th>
+                            <th style="width: 150px;">Islemler</th>
+                        </tr>
+                    </thead>
+                    <tbody data-bind="foreach: companies">
+                        <tr>
+                            <td>
+                                <!-- ko if: logoUrl -->
+                                <img data-bind="attr: { src: logoUrl }" class="rounded" style="width: 40px; height: 40px; object-fit: cover;" />
+                                <!-- /ko -->
+                                <!-- ko ifnot: logoUrl -->
+                                <div class="bg-light rounded d-flex align-items-center justify-content-center" style="width: 40px; height: 40px;">
+                                    <i class="bi bi-building text-muted"></i>
+                                </div>
+                                <!-- /ko -->
+                            </td>
+                            <td>
+                                <div class="fw-semibold" data-bind="text: name"></div>
+                                <small class="text-muted" data-bind="text: address"></small>
+                            </td>
+                            <td data-bind="text: email"></td>
+                            <td data-bind="text: phone"></td>
+                            <td><code data-bind="text: taxNumber"></code></td>
+                            <td>
+                                <span class="badge" data-bind="css: isActive ? 'bg-success' : 'bg-secondary', text: isActive ? 'Aktif' : 'Pasif'"></span>
+                            </td>
+                            <td>
+                                <div class="btn-group btn-group-sm">
+                                    <button class="btn btn-outline-primary" data-bind="click: $parent.openEditModal" title="Duzenle">
+                                        <i class="bi bi-pencil"></i>
+                                    </button>
+                                    <button class="btn btn-outline-danger" data-bind="click: $parent.openDeleteModal" title="Sil">
+                                        <i class="bi bi-trash"></i>
+                                    </button>
+                                </div>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Create/Edit Modal -->
+    <div class="modal fade" id="formModal" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" data-bind="text: isEditing() ? 'Firma Duzenle' : 'Yeni Firma'"></h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="companyForm">
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Firma Adi *</label>
+                                <input type="text" class="form-control" data-bind="value: formData().name" required />
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Vergi Numarasi *</label>
+                                <input type="text" class="form-control" data-bind="value: formData().taxNumber" required />
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">E-posta *</label>
+                                <input type="email" class="form-control" data-bind="value: formData().email" required />
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Telefon</label>
+                                <input type="tel" class="form-control" data-bind="value: formData().phone" />
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Adres</label>
+                            <input type="text" class="form-control" data-bind="value: formData().address" />
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Website</label>
+                                <input type="url" class="form-control" data-bind="value: formData().website" />
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Logo URL</label>
+                                <input type="url" class="form-control" data-bind="value: formData().logoUrl" />
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Aciklama</label>
+                            <textarea class="form-control" rows="2" data-bind="value: formData().description"></textarea>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Iptal</button>
+                    <button type="button" class="btn btn-primary" data-bind="click: saveCompany, disable: isSaving">
+                        <span data-bind="visible: isSaving" class="spinner-border spinner-border-sm me-1"></span>
+                        Kaydet
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Delete Modal -->
+    <div class="modal fade" id="deleteModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title text-danger">Firma Sil</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <p>Bu firmayi silmek istediginizden emin misiniz?</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Iptal</button>
+                    <button type="button" class="btn btn-danger" data-bind="click: deleteCompany, disable: isSaving">Evet, Sil</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+<script>
+function AdminCompaniesViewModel() {
+    var self = this;
+    self.companies = ko.observableArray([]);
+    self.isLoading = ko.observable(true);
+    self.isSaving = ko.observable(false);
+    self.isEditing = ko.observable(false);
+    self.selectedCompany = ko.observable(null);
+    self.formData = ko.observable({ id: 0, name: '', email: '', phone: '', address: '', website: '', taxNumber: '', logoUrl: '', description: '', isActive: true });
+    var formModal, deleteModal;
+
+    self.loadData = function() {
+        $.ajax({ url: apiBaseUrl + '/api/companies', method: 'GET' })
+            .done(function(data) { self.companies(data); self.isLoading(false); })
+            .fail(function() { toastr.error('Veriler yuklenemedi'); self.isLoading(false); });
+    };
+
+    self.openCreateModal = function() { self.isEditing(false); self.formData({ id: 0, name: '', email: '', phone: '', address: '', website: '', taxNumber: '', logoUrl: '', description: '', isActive: true }); formModal.show(); };
+    self.openEditModal = function(c) { self.isEditing(true); self.formData(Object.assign({}, c)); formModal.show(); };
+    self.openDeleteModal = function(c) { self.selectedCompany(c); deleteModal.show(); };
+
+    self.saveCompany = function() {
+        self.isSaving(true);
+        var data = self.formData();
+        $.ajax({ url: apiBaseUrl + '/api/companies' + (self.isEditing() ? '/' + data.id : ''), method: self.isEditing() ? 'PUT' : 'POST', contentType: 'application/json', data: JSON.stringify(data) })
+            .done(function() { formModal.hide(); self.loadData(); toastr.success('Kaydedildi'); self.isSaving(false); })
+            .fail(function() { toastr.error('Hata olustu'); self.isSaving(false); });
+    };
+
+    self.deleteCompany = function() {
+        self.isSaving(true);
+        $.ajax({ url: apiBaseUrl + '/api/companies/' + self.selectedCompany().id, method: 'DELETE' })
+            .done(function() { deleteModal.hide(); self.loadData(); toastr.success('Silindi'); self.isSaving(false); })
+            .fail(function() { toastr.error('Hata olustu'); self.isSaving(false); });
+    };
+
+    $(document).ready(function() { formModal = new bootstrap.Modal(document.getElementById('formModal')); deleteModal = new bootstrap.Modal(document.getElementById('deleteModal')); self.loadData(); });
+}
+ko.applyBindings(new AdminCompaniesViewModel(), document.getElementById('adminCompaniesApp'));
+</script>
+}
