@@ -14,5 +14,24 @@ public class Tour : BaseEntity
     public int CompanyId { get; set; }
     public virtual Company Company { get; set; } = null!;
 
+    // ===============================================
+    // YORUM ISTATISTIKLERI (Cache - performans icin)
+    // ===============================================
+
+    /// <summary>
+    /// Toplam onaylanmis yorum sayisi
+    /// </summary>
+    public int ReviewCount { get; set; }
+
+    /// <summary>
+    /// Ortalama puan (1.0 - 5.0)
+    /// </summary>
+    public decimal AverageRating { get; set; }
+
+    // ===============================================
+    // ILISKILER
+    // ===============================================
+
     public virtual ICollection<Reservation> Reservations { get; set; } = new List<Reservation>();
+    public virtual ICollection<TourReview> Reviews { get; set; } = new List<TourReview>();
 }

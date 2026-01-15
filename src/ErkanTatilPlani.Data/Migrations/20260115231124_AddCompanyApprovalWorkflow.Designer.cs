@@ -3,6 +3,7 @@ using System;
 using ErkanTatilPlani.Data.Context;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -11,9 +12,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace ErkanTatilPlani.Data.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260115231124_AddCompanyApprovalWorkflow")]
+    partial class AddCompanyApprovalWorkflow
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -526,247 +529,6 @@ namespace ErkanTatilPlani.Data.Migrations
                         });
                 });
 
-            modelBuilder.Entity("ErkanTatilPlani.Core.Entities.ReviewHelpful", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("integer");
-
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
-
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<string>("IpAddress")
-                        .IsRequired()
-                        .HasMaxLength(45)
-                        .HasColumnType("character varying(45)");
-
-                    b.Property<bool>("IsActive")
-                        .HasColumnType("boolean");
-
-                    b.Property<bool>("IsHelpful")
-                        .HasColumnType("boolean");
-
-                    b.Property<int>("ReviewId")
-                        .HasColumnType("integer");
-
-                    b.Property<DateTime?>("UpdatedAt")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<int>("VisitorId")
-                        .HasColumnType("integer");
-
-                    b.Property<DateTime>("VotedAt")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("VisitorId");
-
-                    b.HasIndex("ReviewId", "VisitorId")
-                        .IsUnique();
-
-                    b.ToTable("ReviewHelpfuls");
-                });
-
-            modelBuilder.Entity("ErkanTatilPlani.Core.Entities.ReviewImage", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("integer");
-
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
-
-                    b.Property<string>("AltText")
-                        .IsRequired()
-                        .HasMaxLength(200)
-                        .HasColumnType("character varying(200)");
-
-                    b.Property<string>("Caption")
-                        .IsRequired()
-                        .HasMaxLength(500)
-                        .HasColumnType("character varying(500)");
-
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<int>("DisplayOrder")
-                        .HasColumnType("integer");
-
-                    b.Property<long>("FileSize")
-                        .HasColumnType("bigint");
-
-                    b.Property<int>("Height")
-                        .HasColumnType("integer");
-
-                    b.Property<string>("ImageUrl")
-                        .IsRequired()
-                        .HasMaxLength(500)
-                        .HasColumnType("character varying(500)");
-
-                    b.Property<bool>("IsActive")
-                        .HasColumnType("boolean");
-
-                    b.Property<string>("MimeType")
-                        .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("character varying(50)");
-
-                    b.Property<int>("ReviewId")
-                        .HasColumnType("integer");
-
-                    b.Property<string>("ThumbnailUrl")
-                        .IsRequired()
-                        .HasMaxLength(500)
-                        .HasColumnType("character varying(500)");
-
-                    b.Property<DateTime?>("UpdatedAt")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<int>("Width")
-                        .HasColumnType("integer");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("ReviewId");
-
-                    b.ToTable("ReviewImages");
-                });
-
-            modelBuilder.Entity("ErkanTatilPlani.Core.Entities.ReviewReply", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("integer");
-
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
-
-                    b.Property<string>("Comment")
-                        .IsRequired()
-                        .HasMaxLength(2000)
-                        .HasColumnType("character varying(2000)");
-
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<string>("IpAddress")
-                        .IsRequired()
-                        .HasMaxLength(45)
-                        .HasColumnType("character varying(45)");
-
-                    b.Property<bool>("IsActive")
-                        .HasColumnType("boolean");
-
-                    b.Property<bool>("IsFromCompany")
-                        .HasColumnType("boolean");
-
-                    b.Property<int>("LikeCount")
-                        .HasColumnType("integer");
-
-                    b.Property<DateTime?>("ModeratedAt")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<int?>("ModeratedById")
-                        .HasColumnType("integer");
-
-                    b.Property<int?>("ParentReplyId")
-                        .HasColumnType("integer");
-
-                    b.Property<int>("ReportCount")
-                        .HasColumnType("integer");
-
-                    b.Property<int>("ReviewId")
-                        .HasColumnType("integer");
-
-                    b.Property<int>("StatusId")
-                        .HasColumnType("integer");
-
-                    b.Property<DateTime?>("UpdatedAt")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<int>("VisitorId")
-                        .HasColumnType("integer");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("ModeratedById");
-
-                    b.HasIndex("ParentReplyId");
-
-                    b.HasIndex("ReviewId");
-
-                    b.HasIndex("VisitorId");
-
-                    b.ToTable("ReviewReplies");
-                });
-
-            modelBuilder.Entity("ErkanTatilPlani.Core.Entities.ReviewReport", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("integer");
-
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
-
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<string>("Description")
-                        .IsRequired()
-                        .HasMaxLength(1000)
-                        .HasColumnType("character varying(1000)");
-
-                    b.Property<string>("IpAddress")
-                        .IsRequired()
-                        .HasMaxLength(45)
-                        .HasColumnType("character varying(45)");
-
-                    b.Property<bool>("IsActive")
-                        .HasColumnType("boolean");
-
-                    b.Property<int>("ReasonId")
-                        .HasColumnType("integer");
-
-                    b.Property<int?>("ReplyId")
-                        .HasColumnType("integer");
-
-                    b.Property<int?>("ReviewId")
-                        .HasColumnType("integer");
-
-                    b.Property<string>("ReviewNote")
-                        .IsRequired()
-                        .HasMaxLength(1000)
-                        .HasColumnType("character varying(1000)");
-
-                    b.Property<DateTime?>("ReviewedAt")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<int?>("ReviewedById")
-                        .HasColumnType("integer");
-
-                    b.Property<int>("StatusId")
-                        .HasColumnType("integer");
-
-                    b.Property<DateTime?>("UpdatedAt")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<int>("VisitorId")
-                        .HasColumnType("integer");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("ReplyId");
-
-                    b.HasIndex("ReviewId");
-
-                    b.HasIndex("ReviewedById");
-
-                    b.HasIndex("VisitorId");
-
-                    b.ToTable("ReviewReports");
-                });
-
             modelBuilder.Entity("ErkanTatilPlani.Core.Entities.Tour", b =>
                 {
                     b.Property<int>("Id")
@@ -774,9 +536,6 @@ namespace ErkanTatilPlani.Data.Migrations
                         .HasColumnType("integer");
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
-
-                    b.Property<decimal>("AverageRating")
-                        .HasColumnType("numeric");
 
                     b.Property<int>("CompanyId")
                         .HasColumnType("integer");
@@ -817,9 +576,6 @@ namespace ErkanTatilPlani.Data.Migrations
                         .HasPrecision(18, 2)
                         .HasColumnType("numeric(18,2)");
 
-                    b.Property<int>("ReviewCount")
-                        .HasColumnType("integer");
-
                     b.Property<DateTime?>("UpdatedAt")
                         .HasColumnType("timestamp with time zone");
 
@@ -833,7 +589,6 @@ namespace ErkanTatilPlani.Data.Migrations
                         new
                         {
                             Id = 1,
-                            AverageRating = 0m,
                             CompanyId = 1,
                             CreatedAt = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             Description = "Efes antik kenti ve Meryem Ana evi gezisi",
@@ -844,13 +599,11 @@ namespace ErkanTatilPlani.Data.Migrations
                             IsFeatured = true,
                             MaxCapacity = 40,
                             Name = "Efes Antik Kent Turu",
-                            Price = 750m,
-                            ReviewCount = 0
+                            Price = 750m
                         },
                         new
                         {
                             Id = 2,
-                            AverageRating = 0m,
                             CompanyId = 1,
                             CreatedAt = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             Description = "Cesme ve Alacati sokaklarinda keyifli bir gun",
@@ -861,13 +614,11 @@ namespace ErkanTatilPlani.Data.Migrations
                             IsFeatured = false,
                             MaxCapacity = 30,
                             Name = "Cesme-Alacati Turu",
-                            Price = 500m,
-                            ReviewCount = 0
+                            Price = 500m
                         },
                         new
                         {
                             Id = 3,
-                            AverageRating = 0m,
                             CompanyId = 1,
                             CreatedAt = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             Description = "Beyaz travertenler ve Hierapolis antik kenti",
@@ -878,13 +629,11 @@ namespace ErkanTatilPlani.Data.Migrations
                             IsFeatured = true,
                             MaxCapacity = 35,
                             Name = "Pamukkale Turu",
-                            Price = 900m,
-                            ReviewCount = 0
+                            Price = 900m
                         },
                         new
                         {
                             Id = 4,
-                            AverageRating = 0m,
                             CompanyId = 2,
                             CreatedAt = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             Description = "Uzungol ve cevresindeki yaylalar",
@@ -895,13 +644,11 @@ namespace ErkanTatilPlani.Data.Migrations
                             IsFeatured = true,
                             MaxCapacity = 25,
                             Name = "Uzungol Turu",
-                            Price = 1200m,
-                            ReviewCount = 0
+                            Price = 1200m
                         },
                         new
                         {
                             Id = 5,
-                            AverageRating = 0m,
                             CompanyId = 2,
                             CreatedAt = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             Description = "Ayder yaylasi ve sicak su kaynaklari",
@@ -912,13 +659,11 @@ namespace ErkanTatilPlani.Data.Migrations
                             IsFeatured = false,
                             MaxCapacity = 20,
                             Name = "Ayder Yaylasi Turu",
-                            Price = 1400m,
-                            ReviewCount = 0
+                            Price = 1400m
                         },
                         new
                         {
                             Id = 6,
-                            AverageRating = 0m,
                             CompanyId = 2,
                             CreatedAt = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             Description = "Sumela Manastiri ve Trabzon gezisi",
@@ -929,13 +674,11 @@ namespace ErkanTatilPlani.Data.Migrations
                             IsFeatured = true,
                             MaxCapacity = 30,
                             Name = "Sumela Manastiri",
-                            Price = 800m,
-                            ReviewCount = 0
+                            Price = 800m
                         },
                         new
                         {
                             Id = 7,
-                            AverageRating = 0m,
                             CompanyId = 3,
                             CreatedAt = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             Description = "Kemer koylarinda tekne turu",
@@ -946,13 +689,11 @@ namespace ErkanTatilPlani.Data.Migrations
                             IsFeatured = false,
                             MaxCapacity = 50,
                             Name = "Kemer Tekne Turu",
-                            Price = 600m,
-                            ReviewCount = 0
+                            Price = 600m
                         },
                         new
                         {
                             Id = 8,
-                            AverageRating = 0m,
                             CompanyId = 3,
                             CreatedAt = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             Description = "Batan sehir Kekova ve Kas",
@@ -963,13 +704,11 @@ namespace ErkanTatilPlani.Data.Migrations
                             IsFeatured = true,
                             MaxCapacity = 25,
                             Name = "Kas-Kekova Turu",
-                            Price = 1100m,
-                            ReviewCount = 0
+                            Price = 1100m
                         },
                         new
                         {
                             Id = 9,
-                            AverageRating = 0m,
                             CompanyId = 3,
                             CreatedAt = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             Description = "Olimpos antik kenti ve Yanaras alevi",
@@ -980,13 +719,11 @@ namespace ErkanTatilPlani.Data.Migrations
                             IsFeatured = false,
                             MaxCapacity = 30,
                             Name = "Olimpos-Yanaras Turu",
-                            Price = 850m,
-                            ReviewCount = 0
+                            Price = 850m
                         },
                         new
                         {
                             Id = 10,
-                            AverageRating = 0m,
                             CompanyId = 4,
                             CreatedAt = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             Description = "Peri bacalari uzerinde balon deneyimi",
@@ -997,13 +734,11 @@ namespace ErkanTatilPlani.Data.Migrations
                             IsFeatured = true,
                             MaxCapacity = 16,
                             Name = "Kapadokya Balon Turu",
-                            Price = 3500m,
-                            ReviewCount = 0
+                            Price = 3500m
                         },
                         new
                         {
                             Id = 11,
-                            AverageRating = 0m,
                             CompanyId = 4,
                             CreatedAt = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             Description = "Yeralti sehirleri ve vadiler",
@@ -1014,13 +749,11 @@ namespace ErkanTatilPlani.Data.Migrations
                             IsFeatured = true,
                             MaxCapacity = 30,
                             Name = "Kapadokya Kultur Turu",
-                            Price = 1800m,
-                            ReviewCount = 0
+                            Price = 1800m
                         },
                         new
                         {
                             Id = 12,
-                            AverageRating = 0m,
                             CompanyId = 4,
                             CreatedAt = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             Description = "Kapadokya vadilerinde ATV macerasi",
@@ -1031,13 +764,11 @@ namespace ErkanTatilPlani.Data.Migrations
                             IsFeatured = false,
                             MaxCapacity = 20,
                             Name = "ATV Safari",
-                            Price = 700m,
-                            ReviewCount = 0
+                            Price = 700m
                         },
                         new
                         {
                             Id = 13,
-                            AverageRating = 0m,
                             CompanyId = 5,
                             CreatedAt = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             Description = "Sultanahmet, Ayasofya, Topkapi",
@@ -1048,13 +779,11 @@ namespace ErkanTatilPlani.Data.Migrations
                             IsFeatured = true,
                             MaxCapacity = 40,
                             Name = "Tarihi Yarimada Turu",
-                            Price = 450m,
-                            ReviewCount = 0
+                            Price = 450m
                         },
                         new
                         {
                             Id = 14,
-                            AverageRating = 0m,
                             CompanyId = 5,
                             CreatedAt = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             Description = "Istanbul Bogazinda tekne gezisi",
@@ -1065,13 +794,11 @@ namespace ErkanTatilPlani.Data.Migrations
                             IsFeatured = true,
                             MaxCapacity = 60,
                             Name = "Bogaz Turu",
-                            Price = 350m,
-                            ReviewCount = 0
+                            Price = 350m
                         },
                         new
                         {
                             Id = 15,
-                            AverageRating = 0m,
                             CompanyId = 5,
                             CreatedAt = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             Description = "Buyukada ve Heybeliada gezisi",
@@ -1082,135 +809,8 @@ namespace ErkanTatilPlani.Data.Migrations
                             IsFeatured = false,
                             MaxCapacity = 45,
                             Name = "Prensesler Adalari",
-                            Price = 400m,
-                            ReviewCount = 0
+                            Price = 400m
                         });
-                });
-
-            modelBuilder.Entity("ErkanTatilPlani.Core.Entities.TourReview", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("integer");
-
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
-
-                    b.Property<string>("Comment")
-                        .IsRequired()
-                        .HasMaxLength(5000)
-                        .HasColumnType("character varying(5000)");
-
-                    b.Property<string>("Cons")
-                        .IsRequired()
-                        .HasMaxLength(2000)
-                        .HasColumnType("character varying(2000)");
-
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<int?>("GuideRating")
-                        .HasColumnType("integer");
-
-                    b.Property<int>("HelpfulCount")
-                        .HasColumnType("integer");
-
-                    b.Property<string>("IpAddress")
-                        .IsRequired()
-                        .HasMaxLength(45)
-                        .HasColumnType("character varying(45)");
-
-                    b.Property<bool>("IsActive")
-                        .HasColumnType("boolean");
-
-                    b.Property<bool>("IsVerified")
-                        .HasColumnType("boolean");
-
-                    b.Property<int?>("LocationRating")
-                        .HasColumnType("integer");
-
-                    b.Property<DateTime?>("ModeratedAt")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<int?>("ModeratedById")
-                        .HasColumnType("integer");
-
-                    b.Property<string>("ModerationNote")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<int>("NotHelpfulCount")
-                        .HasColumnType("integer");
-
-                    b.Property<int?>("OrganizationRating")
-                        .HasColumnType("integer");
-
-                    b.Property<int>("OverallRating")
-                        .HasColumnType("integer");
-
-                    b.Property<string>("Pros")
-                        .IsRequired()
-                        .HasMaxLength(2000)
-                        .HasColumnType("character varying(2000)");
-
-                    b.Property<string>("RejectionReason")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<int>("ReportCount")
-                        .HasColumnType("integer");
-
-                    b.Property<int?>("ReservationId")
-                        .HasColumnType("integer");
-
-                    b.Property<int?>("ServiceRating")
-                        .HasColumnType("integer");
-
-                    b.Property<int>("StatusId")
-                        .HasColumnType("integer");
-
-                    b.Property<string>("Title")
-                        .IsRequired()
-                        .HasMaxLength(200)
-                        .HasColumnType("character varying(200)");
-
-                    b.Property<int>("TourId")
-                        .HasColumnType("integer");
-
-                    b.Property<int>("TravelTypeId")
-                        .HasColumnType("integer");
-
-                    b.Property<DateTime?>("UpdatedAt")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<string>("UserAgent")
-                        .IsRequired()
-                        .HasMaxLength(500)
-                        .HasColumnType("character varying(500)");
-
-                    b.Property<int?>("ValueRating")
-                        .HasColumnType("integer");
-
-                    b.Property<DateTime?>("VisitDate")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<int>("VisitorId")
-                        .HasColumnType("integer");
-
-                    b.Property<bool>("WouldRecommend")
-                        .HasColumnType("boolean");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("ModeratedById");
-
-                    b.HasIndex("ReservationId");
-
-                    b.HasIndex("VisitorId");
-
-                    b.HasIndex("TourId", "VisitorId")
-                        .IsUnique();
-
-                    b.ToTable("TourReviews");
                 });
 
             modelBuilder.Entity("ErkanTatilPlani.Core.Entities.Visitor", b =>
@@ -1490,101 +1090,6 @@ namespace ErkanTatilPlani.Data.Migrations
                     b.Navigation("Visitor");
                 });
 
-            modelBuilder.Entity("ErkanTatilPlani.Core.Entities.ReviewHelpful", b =>
-                {
-                    b.HasOne("ErkanTatilPlani.Core.Entities.TourReview", "Review")
-                        .WithMany("HelpfulVotes")
-                        .HasForeignKey("ReviewId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("ErkanTatilPlani.Core.Entities.Visitor", "Visitor")
-                        .WithMany("HelpfulVotes")
-                        .HasForeignKey("VisitorId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Review");
-
-                    b.Navigation("Visitor");
-                });
-
-            modelBuilder.Entity("ErkanTatilPlani.Core.Entities.ReviewImage", b =>
-                {
-                    b.HasOne("ErkanTatilPlani.Core.Entities.TourReview", "Review")
-                        .WithMany("Images")
-                        .HasForeignKey("ReviewId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Review");
-                });
-
-            modelBuilder.Entity("ErkanTatilPlani.Core.Entities.ReviewReply", b =>
-                {
-                    b.HasOne("ErkanTatilPlani.Core.Entities.Visitor", "ModeratedBy")
-                        .WithMany()
-                        .HasForeignKey("ModeratedById")
-                        .OnDelete(DeleteBehavior.SetNull);
-
-                    b.HasOne("ErkanTatilPlani.Core.Entities.ReviewReply", "ParentReply")
-                        .WithMany("ChildReplies")
-                        .HasForeignKey("ParentReplyId")
-                        .OnDelete(DeleteBehavior.Restrict);
-
-                    b.HasOne("ErkanTatilPlani.Core.Entities.TourReview", "Review")
-                        .WithMany("Replies")
-                        .HasForeignKey("ReviewId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("ErkanTatilPlani.Core.Entities.Visitor", "Visitor")
-                        .WithMany("ReviewReplies")
-                        .HasForeignKey("VisitorId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("ModeratedBy");
-
-                    b.Navigation("ParentReply");
-
-                    b.Navigation("Review");
-
-                    b.Navigation("Visitor");
-                });
-
-            modelBuilder.Entity("ErkanTatilPlani.Core.Entities.ReviewReport", b =>
-                {
-                    b.HasOne("ErkanTatilPlani.Core.Entities.ReviewReply", "Reply")
-                        .WithMany()
-                        .HasForeignKey("ReplyId")
-                        .OnDelete(DeleteBehavior.Cascade);
-
-                    b.HasOne("ErkanTatilPlani.Core.Entities.TourReview", "Review")
-                        .WithMany()
-                        .HasForeignKey("ReviewId")
-                        .OnDelete(DeleteBehavior.Cascade);
-
-                    b.HasOne("ErkanTatilPlani.Core.Entities.Visitor", "ReviewedBy")
-                        .WithMany()
-                        .HasForeignKey("ReviewedById")
-                        .OnDelete(DeleteBehavior.SetNull);
-
-                    b.HasOne("ErkanTatilPlani.Core.Entities.Visitor", "Visitor")
-                        .WithMany()
-                        .HasForeignKey("VisitorId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Reply");
-
-                    b.Navigation("Review");
-
-                    b.Navigation("ReviewedBy");
-
-                    b.Navigation("Visitor");
-                });
-
             modelBuilder.Entity("ErkanTatilPlani.Core.Entities.Tour", b =>
                 {
                     b.HasOne("ErkanTatilPlani.Core.Entities.Company", "Company")
@@ -1594,39 +1099,6 @@ namespace ErkanTatilPlani.Data.Migrations
                         .IsRequired();
 
                     b.Navigation("Company");
-                });
-
-            modelBuilder.Entity("ErkanTatilPlani.Core.Entities.TourReview", b =>
-                {
-                    b.HasOne("ErkanTatilPlani.Core.Entities.Visitor", "ModeratedBy")
-                        .WithMany()
-                        .HasForeignKey("ModeratedById")
-                        .OnDelete(DeleteBehavior.SetNull);
-
-                    b.HasOne("ErkanTatilPlani.Core.Entities.Reservation", "Reservation")
-                        .WithMany()
-                        .HasForeignKey("ReservationId")
-                        .OnDelete(DeleteBehavior.SetNull);
-
-                    b.HasOne("ErkanTatilPlani.Core.Entities.Tour", "Tour")
-                        .WithMany("Reviews")
-                        .HasForeignKey("TourId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("ErkanTatilPlani.Core.Entities.Visitor", "Visitor")
-                        .WithMany("Reviews")
-                        .HasForeignKey("VisitorId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("ModeratedBy");
-
-                    b.Navigation("Reservation");
-
-                    b.Navigation("Tour");
-
-                    b.Navigation("Visitor");
                 });
 
             modelBuilder.Entity("ErkanTatilPlani.Core.Entities.Visitor", b =>
@@ -1648,36 +1120,14 @@ namespace ErkanTatilPlani.Data.Migrations
                     b.Navigation("LocaleStringResources");
                 });
 
-            modelBuilder.Entity("ErkanTatilPlani.Core.Entities.ReviewReply", b =>
-                {
-                    b.Navigation("ChildReplies");
-                });
-
             modelBuilder.Entity("ErkanTatilPlani.Core.Entities.Tour", b =>
                 {
                     b.Navigation("Reservations");
-
-                    b.Navigation("Reviews");
-                });
-
-            modelBuilder.Entity("ErkanTatilPlani.Core.Entities.TourReview", b =>
-                {
-                    b.Navigation("HelpfulVotes");
-
-                    b.Navigation("Images");
-
-                    b.Navigation("Replies");
                 });
 
             modelBuilder.Entity("ErkanTatilPlani.Core.Entities.Visitor", b =>
                 {
-                    b.Navigation("HelpfulVotes");
-
                     b.Navigation("Reservations");
-
-                    b.Navigation("ReviewReplies");
-
-                    b.Navigation("Reviews");
                 });
 #pragma warning restore 612, 618
         }

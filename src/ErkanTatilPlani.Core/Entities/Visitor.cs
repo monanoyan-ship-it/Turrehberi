@@ -17,9 +17,18 @@ public class Visitor : BaseEntity
     /// </summary>
     public int UserTypeId { get; set; } = UserTypes.Ids.Visitor;
 
+    /// <summary>
+    /// Kullanicinin tercih ettigi dil kodu (tr, en, de, vb.)
+    /// </summary>
+    public string PreferredLanguage { get; set; } = "tr";
+
     // Firma sahibi ise iliskili firma
     public int? CompanyId { get; set; }
     public virtual Company? Company { get; set; }
 
+    // Iliskiler
     public virtual ICollection<Reservation> Reservations { get; set; } = new List<Reservation>();
+    public virtual ICollection<TourReview> Reviews { get; set; } = new List<TourReview>();
+    public virtual ICollection<ReviewHelpful> HelpfulVotes { get; set; } = new List<ReviewHelpful>();
+    public virtual ICollection<ReviewReply> ReviewReplies { get; set; } = new List<ReviewReply>();
 }

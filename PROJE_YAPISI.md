@@ -99,7 +99,7 @@ public abstract class BaseEntity
 ```
 
 ### Company (Firma)
-Tur saglayici firmalar. Sadece admin tarafindan eklenir.
+Tur saglayici firmalar. Basvuru yaparlar, Admin veya Staff tarafindan onaylanir.
 
 | Alan | Tip | Aciklama |
 |------|-----|----------|
@@ -112,7 +112,26 @@ Tur saglayici firmalar. Sadece admin tarafindan eklenir.
 | Website | string | Web sitesi |
 | LogoUrl | string | Logo URL |
 | TaxNumber | string | Vergi numarasi (unique) |
+| **StatusId** | **int** | **Firma durumu (CompanyStatuses)** |
+| **ApplicationDate** | **DateTime** | **Basvuru tarihi** |
+| **ApplicationNotes** | **string** | **Firma basvuru notu** |
+| **ReviewedAt** | **DateTime?** | **Onay/Red tarihi** |
+| **ReviewedById** | **int?** | **Onay yapan yetkili ID** |
+| **ReviewNotes** | **string** | **Dahili notlar** |
+| **RejectionReason** | **string** | **Red sebebi** |
+| **ContractFileUrl** | **string** | **Sozlesme dosyasi** |
 | Tours | ICollection | Firmaya ait turlar |
+
+### CompanyStatuses (Firma Durumlari)
+```csharp
+public static class Ids
+{
+    public const int Pending = 0;      // Basvuru yapildi, onay bekliyor
+    public const int Approved = 1;     // Onaylandi, aktif
+    public const int Rejected = 2;     // Reddedildi
+    public const int Suspended = 3;    // Askiya alindi (sonradan)
+}
+```
 
 ### Tour (Tur)
 Firmalar tarafindan sunulan turlar.
@@ -128,9 +147,12 @@ Firmalar tarafindan sunulan turlar.
 | MaxCapacity | int | Maksimum kapasite |
 | ImageUrl | string | Resim URL |
 | **IsFeatured** | **bool** | **Ana sayfada gosterilsin mi** |
+| **ReviewCount** | **int** | **Toplam yorum sayisi (cache)** |
+| **AverageRating** | **decimal** | **Ortalama puan (cache)** |
 | CompanyId | int | Firma ID (FK) |
 | Company | Company | Firma (navigation) |
 | Reservations | ICollection | Tura ait rezervasyonlar |
+| Reviews | ICollection | Tura ait yorumlar |
 
 ### Visitor (Ziyaretci/Kullanici)
 Hem tur rezervasyonu yapan ziyaretciler hem de firma sahipleri icin kullanilir.
@@ -183,6 +205,126 @@ public enum ReservationStatus
     Confirmed = 1,    // Onaylandi
     Cancelled = 2,    // Iptal
     Completed = 3     // Tamamlandi
+}
+```
+
+---
+
+## Yorum ve Puanlama Sistemi
+
+### TourReview (Tur Yorumu)
+Ziyaretcilerin turlara verdigi yorumlar ve puanlar.
+
+| Alan | Tip | Aciklama |
+|------|-----|----------|
+| Id | int | Benzersiz kimlik |
+| TourId | int | Yorum yapilan tur |
+| VisitorId | int | Yorumu yazan ziyaretci |
+| ReservationId | int? | Bagli rezervasyon (dogrulanmis yorum) |
+| **Puanlama** | | |
+| OverallRating | int | Genel puan (1-5) |
+| ServiceRating | int? | Hizmet kalitesi (1-5) |
+| ValueRating | int? | Fiyat/deger (1-5) |
+| LocationRating | int? | Lokasyon (1-5) |
+| OrganizationRating | int? | Organizasyon (1-5) |
+| GuideRating | int? | Rehber/personel (1-5) |
+| **Yorum Icerigi** | | |
+| Title | string | Yorum basligi |
+| Pros | string | Olumlu yonler |
+| Cons | string | Olumsuz yonler |
+| Comment | string | Detayli yorum |
+| **Seyahat** | | |
+| VisitDate | DateTime? | Seyahat tarihi |
+| TravelTypeId | int | Seyahat tipi (TravelTypes) |
+| WouldRecommend | bool | Tavsiye eder mi? |
+| **Moderasyon** | | |
+| StatusId | int | Yorum durumu (ReviewStatuses) |
+| IsVerified | bool | Dogrulanmis yorum mu? |
+| ModeratedAt | DateTime? | Moderasyon tarihi |
+| ModeratedById | int? | Moderasyon yapan |
+| **Istatistikler** | | |
+| HelpfulCount | int | Yardimci bulunma sayisi |
+| NotHelpfulCount | int | Yardimci bulunmama sayisi |
+| ReportCount | int | Sikayet sayisi |
+
+### ReviewStatuses (Yorum Durumlari)
+```csharp
+public static class Ids
+{
+    public const int Pending = 0;    // Onay bekliyor
+    public const int Approved = 1;   // Onaylandi, gorunur
+    public const int Rejected = 2;   // Reddedildi
+    public const int Flagged = 3;    // Sikayet edildi
+}
+```
+
+### TravelTypes (Seyahat Tipleri)
+```csharp
+public static class Ids
+{
+    public const int Solo = 0;       // Yalniz
+    public const int Couple = 1;     // Cift
+    public const int Family = 2;     // Aile
+    public const int Friends = 3;    // Arkadaslar
+    public const int Business = 4;   // Is seyahati
+}
+```
+
+### ReviewImage (Yorum Fotografi)
+Yorumlara eklenen fotograflar.
+
+| Alan | Tip | Aciklama |
+|------|-----|----------|
+| ReviewId | int | Bagli yorum |
+| ImageUrl | string | Resim URL |
+| ThumbnailUrl | string | Kucuk resim URL |
+| Caption | string | Resim aciklamasi |
+| DisplayOrder | int | Siralama |
+
+### ReviewHelpful (Yardimci Oylama)
+Kullanicilarin yorumlari "yardimci/yardimci degil" oylamasi.
+
+| Alan | Tip | Aciklama |
+|------|-----|----------|
+| ReviewId | int | Oylanan yorum |
+| VisitorId | int | Oylayan kullanici |
+| IsHelpful | bool | Yardimci bulundu mu? |
+
+### ReviewReply (Yorum Yaniti)
+Yorumlara verilen yanitlar (firma veya kullanicilar).
+
+| Alan | Tip | Aciklama |
+|------|-----|----------|
+| ReviewId | int | Yanitlanan yorum |
+| VisitorId | int | Yaniti yazan |
+| ParentReplyId | int? | Ust yanit (ic ice yanitlar) |
+| Comment | string | Yanit icerigi |
+| IsFromCompany | bool | Firmadan mi? |
+| LikeCount | int | Begeni sayisi |
+
+### ReviewReport (Yorum Sikayeti)
+Uygunsuz yorumlarin bildirimi.
+
+| Alan | Tip | Aciklama |
+|------|-----|----------|
+| ReviewId | int? | Sikayet edilen yorum |
+| ReplyId | int? | Sikayet edilen yanit |
+| VisitorId | int | Sikayet eden |
+| ReasonId | int | Sikayet sebebi (ReportReasons) |
+| Description | string | Ek aciklama |
+
+### ReportReasons (Sikayet Sebepleri)
+```csharp
+public static class Ids
+{
+    public const int Spam = 0;
+    public const int Inappropriate = 1;
+    public const int FakeReview = 2;
+    public const int Harassment = 3;
+    public const int PersonalInfo = 4;
+    public const int OffTopic = 5;
+    public const int CopyrightViolation = 6;
+    public const int Other = 99;
 }
 ```
 
@@ -505,6 +647,80 @@ Veritabani ilk olusturuldiginda asagidaki veriler otomatik eklenir:
 
 ---
 
+## Localization (Coklu Dil Destegi)
+
+### Desteklenen Diller
+| Kod | Dil | RTL |
+|-----|-----|-----|
+| tr | Turkce | Hayir |
+| en | Ingilizce | Hayir |
+| ru | Rusca | Hayir |
+| de | Almanca | Hayir |
+| es | Ispanyolca | Hayir |
+| fr | Fransizca | Hayir |
+| ar | Arapca | Evet |
+| fa | Farsca | Evet |
+| pt | Portekizce | Hayir |
+
+### Dosya Yapisi
+```
+src/ErkanTatilPlani.Core/Localization/
+    ILocalizationService.cs      # Interface
+    LocalizationService.cs       # JSON-based implementation
+
+src/ErkanTatilPlani.API/Localization/
+    tr.json                      # Turkce string'ler
+    en.json                      # Ingilizce string'ler
+    ...                          # Diger diller
+```
+
+### API Endpoints
+| Method | Endpoint | Aciklama |
+|--------|----------|----------|
+| GET | /api/localization/languages | Tum desteklenen diller |
+| GET | /api/localization/{culture} | Bir dilin tum string'leri |
+| PUT | /api/auth/language | Kullanici dil tercihini guncelle |
+
+### Kullanim
+
+#### JavaScript (Web - Client Side)
+```javascript
+// T() fonksiyonu ile ceviri
+T('Register.Title')                    // "Kayit Ol"
+T('Register.Success', 'Ahmet')         // "Kayit basarili! Hosgeldiniz Ahmet"
+
+// HTML'de data-t attribute ile otomatik ceviri
+<span data-t="Menu.Home">Ana Sayfa</span>
+<input data-t="Placeholder.Email" />   // placeholder icin
+```
+
+#### C# (API - Server Side)
+```csharp
+// DI ile inject et
+private readonly ILocalizationService _localizer;
+
+// Kullanim
+_localizer.T("Register.Title")         // "Kayit Ol"
+_localizer.T("Error.MinLength", 6)     // "En az 6 karakter olmalidir"
+```
+
+### Dil Tercihi Saklama
+- **Ziyaretci (giris yok)**: localStorage'da saklanir
+- **Kullanici (giris var)**: localStorage + Visitor.PreferredLanguage (DB)
+- **Farkli cihazdan giris**: DB'deki tercih yuklenir
+
+### Yeni String Ekleme
+1. `src/ErkanTatilPlani.API/Localization/tr.json` dosyasina Turkce ekle
+2. Diger dil dosyalarina ceviriyi ekle
+3. Kullan: `T('YeniKey.AltKey')` veya `data-t="YeniKey.AltKey"`
+
+### RTL (Sagdan Sola) Destegi
+Arapca ve Farsca secildiginde:
+- `<html dir="rtl">` otomatik ayarlanir
+- Bootstrap margin/padding class'lari ters cevirilir
+
+---
+
 ## Notlar
 
 - Web projesi API uzerinden veri alir (jQuery AJAX)
@@ -517,6 +733,7 @@ Veritabani ilk olusturuldiginda asagidaki veriler otomatik eklenir:
 - Ayri User tablosu yok, Visitor tablosu kullanici tablosu olarak kullanilir
 - UserType enum ile ziyaretci/firma sahibi ayirt edilir
 - Resimler picsum.photos'tan dinamik olarak yuklenir
+- Localization JSON tabanli, 9 dil destekli (RTL dahil)
 
 ---
 

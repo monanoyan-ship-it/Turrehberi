@@ -1,3 +1,4 @@
+using ErkanTatilPlani.Core.Localization;
 using ErkanTatilPlani.Data.Context;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
@@ -5,6 +6,10 @@ using Microsoft.IdentityModel.Tokens;
 using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
+
+// Localization Service
+var localesPath = Path.Combine(builder.Environment.ContentRootPath, "Localization");
+builder.Services.AddSingleton<ILocalizationService>(new LocalizationService(localesPath));
 
 // Add services to the container.
 builder.Services.AddDbContext<AppDbContext>(options =>

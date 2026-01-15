@@ -17,6 +17,13 @@ public class AppDbContext : DbContext
     public DbSet<Language> Languages => Set<Language>();
     public DbSet<LocaleStringResource> LocaleStringResources => Set<LocaleStringResource>();
 
+    // Review System
+    public DbSet<TourReview> TourReviews => Set<TourReview>();
+    public DbSet<ReviewImage> ReviewImages => Set<ReviewImage>();
+    public DbSet<ReviewHelpful> ReviewHelpfuls => Set<ReviewHelpful>();
+    public DbSet<ReviewReply> ReviewReplies => Set<ReviewReply>();
+    public DbSet<ReviewReport> ReviewReports => Set<ReviewReport>();
+
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         base.OnModelCreating(modelBuilder);
@@ -28,6 +35,13 @@ public class AppDbContext : DbContext
             entity.Property(e => e.Email).IsRequired().HasMaxLength(100);
             entity.HasIndex(e => e.Email).IsUnique();
             entity.HasIndex(e => e.TaxNumber).IsUnique();
+
+            // Onay yapan yetkili iliskisi
+            entity.HasOne(e => e.ReviewedBy)
+                  .WithMany()
+                  .HasForeignKey(e => e.ReviewedById)
+                  .IsRequired(false)
+                  .OnDelete(DeleteBehavior.SetNull);
         });
 
         modelBuilder.Entity<Tour>(entity =>
@@ -85,6 +99,140 @@ public class AppDbContext : DbContext
                   .OnDelete(DeleteBehavior.Cascade);
         });
 
+        // ===============================================
+        // YORUM SISTEMI
+        // ===============================================
+
+        modelBuilder.Entity<TourReview>(entity =>
+        {
+            entity.HasKey(e => e.Id);
+            entity.Property(e => e.Title).HasMaxLength(200);
+            entity.Property(e => e.Pros).HasMaxLength(2000);
+            entity.Property(e => e.Cons).HasMaxLength(2000);
+            entity.Property(e => e.Comment).HasMaxLength(5000);
+            entity.Property(e => e.IpAddress).HasMaxLength(45);
+            entity.Property(e => e.UserAgent).HasMaxLength(500);
+
+            // Bir kullanici bir tura bir kez yorum yapabilir
+            entity.HasIndex(e => new { e.TourId, e.VisitorId }).IsUnique();
+
+            entity.HasOne(e => e.Tour)
+                  .WithMany(t => t.Reviews)
+                  .HasForeignKey(e => e.TourId)
+                  .OnDelete(DeleteBehavior.Cascade);
+
+            entity.HasOne(e => e.Visitor)
+                  .WithMany(v => v.Reviews)
+                  .HasForeignKey(e => e.VisitorId)
+                  .OnDelete(DeleteBehavior.Cascade);
+
+            entity.HasOne(e => e.Reservation)
+                  .WithMany()
+                  .HasForeignKey(e => e.ReservationId)
+                  .IsRequired(false)
+                  .OnDelete(DeleteBehavior.SetNull);
+
+            entity.HasOne(e => e.ModeratedBy)
+                  .WithMany()
+                  .HasForeignKey(e => e.ModeratedById)
+                  .IsRequired(false)
+                  .OnDelete(DeleteBehavior.SetNull);
+        });
+
+        modelBuilder.Entity<ReviewImage>(entity =>
+        {
+            entity.HasKey(e => e.Id);
+            entity.Property(e => e.ImageUrl).IsRequired().HasMaxLength(500);
+            entity.Property(e => e.ThumbnailUrl).HasMaxLength(500);
+            entity.Property(e => e.Caption).HasMaxLength(500);
+            entity.Property(e => e.MimeType).HasMaxLength(50);
+            entity.Property(e => e.AltText).HasMaxLength(200);
+
+            entity.HasOne(e => e.Review)
+                  .WithMany(r => r.Images)
+                  .HasForeignKey(e => e.ReviewId)
+                  .OnDelete(DeleteBehavior.Cascade);
+        });
+
+        modelBuilder.Entity<ReviewHelpful>(entity =>
+        {
+            entity.HasKey(e => e.Id);
+            entity.Property(e => e.IpAddress).HasMaxLength(45);
+
+            // Bir kullanici bir yoruma bir kez oy verebilir
+            entity.HasIndex(e => new { e.ReviewId, e.VisitorId }).IsUnique();
+
+            entity.HasOne(e => e.Review)
+                  .WithMany(r => r.HelpfulVotes)
+                  .HasForeignKey(e => e.ReviewId)
+                  .OnDelete(DeleteBehavior.Cascade);
+
+            entity.HasOne(e => e.Visitor)
+                  .WithMany(v => v.HelpfulVotes)
+                  .HasForeignKey(e => e.VisitorId)
+                  .OnDelete(DeleteBehavior.Cascade);
+        });
+
+        modelBuilder.Entity<ReviewReply>(entity =>
+        {
+            entity.HasKey(e => e.Id);
+            entity.Property(e => e.Comment).IsRequired().HasMaxLength(2000);
+            entity.Property(e => e.IpAddress).HasMaxLength(45);
+
+            entity.HasOne(e => e.Review)
+                  .WithMany(r => r.Replies)
+                  .HasForeignKey(e => e.ReviewId)
+                  .OnDelete(DeleteBehavior.Cascade);
+
+            entity.HasOne(e => e.Visitor)
+                  .WithMany(v => v.ReviewReplies)
+                  .HasForeignKey(e => e.VisitorId)
+                  .OnDelete(DeleteBehavior.Cascade);
+
+            entity.HasOne(e => e.ParentReply)
+                  .WithMany(r => r.ChildReplies)
+                  .HasForeignKey(e => e.ParentReplyId)
+                  .IsRequired(false)
+                  .OnDelete(DeleteBehavior.Restrict);
+
+            entity.HasOne(e => e.ModeratedBy)
+                  .WithMany()
+                  .HasForeignKey(e => e.ModeratedById)
+                  .IsRequired(false)
+                  .OnDelete(DeleteBehavior.SetNull);
+        });
+
+        modelBuilder.Entity<ReviewReport>(entity =>
+        {
+            entity.HasKey(e => e.Id);
+            entity.Property(e => e.Description).HasMaxLength(1000);
+            entity.Property(e => e.ReviewNote).HasMaxLength(1000);
+            entity.Property(e => e.IpAddress).HasMaxLength(45);
+
+            entity.HasOne(e => e.Review)
+                  .WithMany()
+                  .HasForeignKey(e => e.ReviewId)
+                  .IsRequired(false)
+                  .OnDelete(DeleteBehavior.Cascade);
+
+            entity.HasOne(e => e.Reply)
+                  .WithMany()
+                  .HasForeignKey(e => e.ReplyId)
+                  .IsRequired(false)
+                  .OnDelete(DeleteBehavior.Cascade);
+
+            entity.HasOne(e => e.Visitor)
+                  .WithMany()
+                  .HasForeignKey(e => e.VisitorId)
+                  .OnDelete(DeleteBehavior.Cascade);
+
+            entity.HasOne(e => e.ReviewedBy)
+                  .WithMany()
+                  .HasForeignKey(e => e.ReviewedById)
+                  .IsRequired(false)
+                  .OnDelete(DeleteBehavior.SetNull);
+        });
+
         // Seed Data
         SeedData(modelBuilder);
     }
@@ -93,14 +241,14 @@ public class AppDbContext : DbContext
     {
         var now = new DateTime(2026, 1, 1, 0, 0, 0, DateTimeKind.Utc);
 
-        // Firmalar
+        // Firmalar (StatusId = Approved, mevcut firmalar zaten onaylanmis)
         var companies = new[]
         {
-            new Company { Id = 1, Name = "Ege Tur", Description = "Ege bolgesi turlari", Email = "info@egetur.com", Phone = "0232 555 1234", Address = "Izmir, Alsancak", Website = "www.egetur.com", TaxNumber = "1234567890", LogoUrl = "https://picsum.photos/seed/egetur/200", CreatedAt = now, IsActive = true },
-            new Company { Id = 2, Name = "Karadeniz Gezileri", Description = "Karadeniz yayla turlari", Email = "info@karadenizgezileri.com", Phone = "0462 555 5678", Address = "Trabzon, Meydan", Website = "www.karadenizgezileri.com", TaxNumber = "2345678901", LogoUrl = "https://picsum.photos/seed/karadeniz/200", CreatedAt = now, IsActive = true },
-            new Company { Id = 3, Name = "Akdeniz Turizm", Description = "Akdeniz sahil turlari", Email = "info@akdenizturizm.com", Phone = "0242 555 9012", Address = "Antalya, Konyaalti", Website = "www.akdenizturizm.com", TaxNumber = "3456789012", LogoUrl = "https://picsum.photos/seed/akdeniz/200", CreatedAt = now, IsActive = true },
-            new Company { Id = 4, Name = "Kapadokya Balonlari", Description = "Kapadokya balon ve kultur turlari", Email = "info@kapadokyabalonlari.com", Phone = "0384 555 3456", Address = "Nevsehir, Goreme", Website = "www.kapadokyabalonlari.com", TaxNumber = "4567890123", LogoUrl = "https://picsum.photos/seed/kapadokya/200", CreatedAt = now, IsActive = true },
-            new Company { Id = 5, Name = "Istanbul Turlari", Description = "Istanbul sehir ve bogazici turlari", Email = "info@istanbulturlari.com", Phone = "0212 555 7890", Address = "Istanbul, Sultanahmet", Website = "www.istanbulturlari.com", TaxNumber = "5678901234", LogoUrl = "https://picsum.photos/seed/istanbul/200", CreatedAt = now, IsActive = true }
+            new Company { Id = 1, Name = "Ege Tur", Description = "Ege bolgesi turlari", Email = "info@egetur.com", Phone = "0232 555 1234", Address = "Izmir, Alsancak", Website = "www.egetur.com", TaxNumber = "1234567890", LogoUrl = "https://picsum.photos/seed/egetur/200", StatusId = CompanyStatuses.Ids.Approved, ApplicationDate = now, ReviewedAt = now, ReviewedById = 1, CreatedAt = now, IsActive = true },
+            new Company { Id = 2, Name = "Karadeniz Gezileri", Description = "Karadeniz yayla turlari", Email = "info@karadenizgezileri.com", Phone = "0462 555 5678", Address = "Trabzon, Meydan", Website = "www.karadenizgezileri.com", TaxNumber = "2345678901", LogoUrl = "https://picsum.photos/seed/karadeniz/200", StatusId = CompanyStatuses.Ids.Approved, ApplicationDate = now, ReviewedAt = now, ReviewedById = 1, CreatedAt = now, IsActive = true },
+            new Company { Id = 3, Name = "Akdeniz Turizm", Description = "Akdeniz sahil turlari", Email = "info@akdenizturizm.com", Phone = "0242 555 9012", Address = "Antalya, Konyaalti", Website = "www.akdenizturizm.com", TaxNumber = "3456789012", LogoUrl = "https://picsum.photos/seed/akdeniz/200", StatusId = CompanyStatuses.Ids.Approved, ApplicationDate = now, ReviewedAt = now, ReviewedById = 1, CreatedAt = now, IsActive = true },
+            new Company { Id = 4, Name = "Kapadokya Balonlari", Description = "Kapadokya balon ve kultur turlari", Email = "info@kapadokyabalonlari.com", Phone = "0384 555 3456", Address = "Nevsehir, Goreme", Website = "www.kapadokyabalonlari.com", TaxNumber = "4567890123", LogoUrl = "https://picsum.photos/seed/kapadokya/200", StatusId = CompanyStatuses.Ids.Approved, ApplicationDate = now, ReviewedAt = now, ReviewedById = 1, CreatedAt = now, IsActive = true },
+            new Company { Id = 5, Name = "Istanbul Turlari", Description = "Istanbul sehir ve bogazici turlari", Email = "info@istanbulturlari.com", Phone = "0212 555 7890", Address = "Istanbul, Sultanahmet", Website = "www.istanbulturlari.com", TaxNumber = "5678901234", LogoUrl = "https://picsum.photos/seed/istanbul/200", StatusId = CompanyStatuses.Ids.Approved, ApplicationDate = now, ReviewedAt = now, ReviewedById = 1, CreatedAt = now, IsActive = true }
         };
         modelBuilder.Entity<Company>().HasData(companies);
 

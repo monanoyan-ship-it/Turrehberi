@@ -45,9 +45,9 @@ Projenin detayli yapisini anlamak icin `PROJE_YAPISI.md` dosyasini oku.
 - Veritabani: PostgreSQL + Entity Framework Core
 
 ### Mimari
-- **Core** katmaninda sadece Entity'ler bulunur
+- **Core** katmaninda Entity'ler ve Localization servisi bulunur
 - **Data** katmaninda DbContext ve Migration'lar bulunur
-- **API** katmaninda REST Controller'lar bulunur
+- **API** katmaninda REST Controller'lar ve Localization JSON dosyalari bulunur
 - **Web** katmaninda MVC + KnockoutJS SPA bulunur
 - **Mobile** katmaninda MAUI uygulamasi bulunur
 
@@ -88,6 +88,26 @@ cd src/ErkanTatilPlani.Data
 dotnet ef migrations add MigrationName --startup-project ../ErkanTatilPlani.API
 ```
 
+### Localization Kurallari
+- **9 dil destegi**: tr, en, ru, de, es, fr, ar, fa, pt
+- **RTL destegi**: ar ve fa icin otomatik sagdan sola
+- **JSON tabanli**: `src/ErkanTatilPlani.API/Localization/*.json`
+- **Yeni string eklerken**: Tum 9 dil dosyasina ekle!
+
+**JavaScript'te kullanim:**
+```javascript
+T('Register.Title')                    // "Kayit Ol"
+T('Register.Success', 'Ahmet')         // Placeholder ile
+<span data-t="Menu.Home">Fallback</span>  // HTML attribute
+```
+
+**C#'ta kullanim:**
+```csharp
+_localizer.T("Register.Title")
+```
+
+**Dil tercihi:** Kullanici giris yaptiysa `Visitor.PreferredLanguage` DB'de saklanir.
+
 ---
 
 ## Onemli Notlar
@@ -96,6 +116,7 @@ dotnet ef migrations add MigrationName --startup-project ../ErkanTatilPlani.API
 - Kutuphaneler libman.json ile yonetilir
 - Seed data mevcut: 5 firma, 15 tur, 10 kullanici (5 firma sahibi + 5 ziyaretci), 6 rezervasyon
 - Resimler picsum.photos'tan dinamik olarak yuklenir
+- Localization: JSON tabanli, 9 dil, RTL destekli. Yeni string eklerken TUM dil dosyalarini guncelle!
 
 ---
 

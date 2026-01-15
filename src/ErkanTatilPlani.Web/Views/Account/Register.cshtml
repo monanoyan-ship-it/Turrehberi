@@ -3,56 +3,138 @@
 }
 
 <div class="row justify-content-center mt-5">
-    <div class="col-md-6">
+    <div class="col-md-8 col-lg-6">
         <div class="card shadow-lg border-0">
             <div class="card-body p-5">
                 <div class="text-center mb-4">
                     <i class="bi bi-person-plus text-primary" style="font-size: 4rem;"></i>
-                    <h3 class="mt-3">Kayit Ol</h3>
-                    <p class="text-muted">Yeni hesap olusturun</p>
+                    <h3 class="mt-3" data-t="Register.Title">Kayit Ol</h3>
+                    <p class="text-muted" data-t="Register.Subtitle">Yeni hesap olusturun</p>
                 </div>
 
                 <div id="registerApp">
+                    <!-- Hesap Tipi Secimi -->
+                    <div class="mb-4">
+                        <label class="form-label fw-bold" data-t="Register.AccountType">Hesap Tipi</label>
+                        <div class="d-flex gap-2">
+                            <div class="form-check flex-fill">
+                                <input class="form-check-input" type="radio" name="userType" id="typeVisitor"
+                                       value="0" data-bind="checked: userType">
+                                <label class="form-check-label d-block p-3 border rounded cursor-pointer" for="typeVisitor"
+                                       data-bind="css: { 'border-primary bg-primary bg-opacity-10': userType() === '0' }">
+                                    <i class="bi bi-person me-2"></i>
+                                    <strong data-t="Register.TypeVisitor">Ben bir Ziyaretciyim</strong>
+                                    <small class="d-block text-muted mt-1" data-t="Register.TypeVisitorDesc">Tur rezervasyonu yapmak istiyorum</small>
+                                </label>
+                            </div>
+                            <div class="form-check flex-fill">
+                                <input class="form-check-input" type="radio" name="userType" id="typeCompany"
+                                       value="1" data-bind="checked: userType">
+                                <label class="form-check-label d-block p-3 border rounded cursor-pointer" for="typeCompany"
+                                       data-bind="css: { 'border-primary bg-primary bg-opacity-10': userType() === '1' }">
+                                    <i class="bi bi-building me-2"></i>
+                                    <strong data-t="Register.TypeCompany">Ben bir Tur Sirketiyim</strong>
+                                    <small class="d-block text-muted mt-1" data-t="Register.TypeCompanyDesc">Turlarimi yayinlamak istiyorum</small>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <hr class="my-4">
+
+                    <!-- Kisisel Bilgiler -->
+                    <h6 class="text-muted mb-3"><i class="bi bi-person-badge me-2"></i><span data-t="Register.PersonalInfo">Kisisel Bilgiler</span></h6>
+
                     <div class="row">
                         <div class="col-md-6 mb-3">
-                            <label class="form-label">Ad <span class="text-danger">*</span></label>
-                            <input type="text" class="form-control" placeholder="Adiniz" data-bind="value: firstName" />
+                            <label class="form-label"><span data-t="Register.FirstName">Ad</span> <span class="text-danger">*</span></label>
+                            <input type="text" class="form-control" data-t="Placeholder.FirstName" data-bind="value: firstName, attr: { placeholder: T('Placeholder.FirstName') }" />
                         </div>
                         <div class="col-md-6 mb-3">
-                            <label class="form-label">Soyad <span class="text-danger">*</span></label>
-                            <input type="text" class="form-control" placeholder="Soyadiniz" data-bind="value: lastName" />
+                            <label class="form-label"><span data-t="Register.LastName">Soyad</span> <span class="text-danger">*</span></label>
+                            <input type="text" class="form-control" data-bind="value: lastName, attr: { placeholder: T('Placeholder.LastName') }" />
                         </div>
                     </div>
 
                     <div class="mb-3">
-                        <label class="form-label">E-posta <span class="text-danger">*</span></label>
+                        <label class="form-label"><span data-t="Register.Email">E-posta</span> <span class="text-danger">*</span></label>
                         <div class="input-group">
                             <span class="input-group-text"><i class="bi bi-envelope"></i></span>
-                            <input type="email" class="form-control" placeholder="ornek@email.com" data-bind="value: email" />
+                            <input type="email" class="form-control" data-bind="value: email, attr: { placeholder: T('Placeholder.Email') }" />
                         </div>
                     </div>
 
                     <div class="mb-3">
-                        <label class="form-label">Telefon</label>
+                        <label class="form-label" data-t="Register.Phone">Telefon</label>
                         <div class="input-group">
                             <span class="input-group-text"><i class="bi bi-phone"></i></span>
-                            <input type="tel" class="form-control" placeholder="05XX XXX XX XX" data-bind="value: phone" />
+                            <input type="tel" class="form-control" data-bind="value: phone, attr: { placeholder: T('Placeholder.Phone') }" />
                         </div>
                     </div>
 
                     <div class="row">
                         <div class="col-md-6 mb-3">
-                            <label class="form-label">Sifre <span class="text-danger">*</span></label>
+                            <label class="form-label"><span data-t="Register.Password">Sifre</span> <span class="text-danger">*</span></label>
                             <div class="input-group">
                                 <span class="input-group-text"><i class="bi bi-lock"></i></span>
-                                <input type="password" class="form-control" placeholder="En az 6 karakter" data-bind="value: password" />
+                                <input type="password" class="form-control" data-bind="value: password, attr: { placeholder: T('Register.PasswordHint') }" />
                             </div>
                         </div>
                         <div class="col-md-6 mb-3">
-                            <label class="form-label">Sifre Tekrar <span class="text-danger">*</span></label>
+                            <label class="form-label"><span data-t="Register.PasswordConfirm">Sifre Tekrar</span> <span class="text-danger">*</span></label>
                             <div class="input-group">
                                 <span class="input-group-text"><i class="bi bi-lock-fill"></i></span>
-                                <input type="password" class="form-control" placeholder="Sifrenizi tekrarlayin" data-bind="value: passwordConfirm" />
+                                <input type="password" class="form-control" data-bind="value: passwordConfirm, attr: { placeholder: T('Register.PasswordConfirmHint') }" />
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Firma Bilgileri (Sadece Tur Sirketi icin) -->
+                    <div data-bind="visible: userType() === '1'">
+                        <hr class="my-4">
+                        <h6 class="text-muted mb-3"><i class="bi bi-building me-2"></i><span data-t="Register.CompanyInfo">Firma Bilgileri</span></h6>
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label"><span data-t="Register.CompanyName">Firma Adi</span> <span class="text-danger">*</span></label>
+                                <input type="text" class="form-control" data-bind="value: companyName, attr: { placeholder: T('Placeholder.CompanyName') }" />
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label"><span data-t="Register.TaxNumber">Vergi Numarasi</span> <span class="text-danger">*</span></label>
+                                <input type="text" class="form-control" data-bind="value: companyTaxNumber, attr: { placeholder: T('Placeholder.TaxNumber') }" />
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label" data-t="Register.CompanyEmail">Firma E-posta</label>
+                                <div class="input-group">
+                                    <span class="input-group-text"><i class="bi bi-envelope"></i></span>
+                                    <input type="email" class="form-control" data-bind="value: companyEmail, attr: { placeholder: T('Placeholder.Email') }" />
+                                </div>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label" data-t="Register.CompanyPhone">Firma Telefonu</label>
+                                <div class="input-group">
+                                    <span class="input-group-text"><i class="bi bi-telephone"></i></span>
+                                    <input type="tel" class="form-control" data-bind="value: companyPhone, attr: { placeholder: T('Placeholder.CompanyPhone') }" />
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label" data-t="Register.CompanyAddress">Firma Adresi</label>
+                            <div class="input-group">
+                                <span class="input-group-text"><i class="bi bi-geo-alt"></i></span>
+                                <input type="text" class="form-control" data-bind="value: companyAddress, attr: { placeholder: T('Placeholder.Address') }" />
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label" data-t="Register.Website">Website</label>
+                            <div class="input-group">
+                                <span class="input-group-text"><i class="bi bi-globe"></i></span>
+                                <input type="url" class="form-control" data-bind="value: companyWebsite, attr: { placeholder: T('Placeholder.Website') }" />
                             </div>
                         </div>
                     </div>
@@ -62,19 +144,19 @@
                     <div class="form-check mb-3">
                         <input class="form-check-input" type="checkbox" id="termsCheck" data-bind="checked: acceptTerms">
                         <label class="form-check-label small" for="termsCheck">
-                            <a href="#" class="text-decoration-none">Kullanim Kosullarini</a> ve
-                            <a href="#" class="text-decoration-none">Gizlilik Politikasini</a> kabul ediyorum.
+                            <a href="#" class="text-decoration-none" data-t="Register.TermsOfUse">Kullanim Kosullari</a> ve
+                            <a href="#" class="text-decoration-none" data-t="Register.PrivacyPolicy">Gizlilik Politikasi</a>
                         </label>
                     </div>
 
                     <button class="btn btn-primary w-100 py-2 mb-3" data-bind="click: register, disable: isLoading">
                         <span data-bind="visible: isLoading" class="spinner-border spinner-border-sm me-2"></span>
                         <i class="bi bi-person-plus me-1" data-bind="visible: !isLoading()"></i>
-                        Kayit Ol
+                        <span data-t="Register.Submit">Kayit Ol</span>
                     </button>
 
                     <div class="text-center">
-                        <p class="mb-0">Zaten hesabiniz var mi? <a href="/Account/Login" class="text-decoration-none">Giris Yap</a></p>
+                        <p class="mb-0"><span data-t="Register.HasAccount">Zaten hesabiniz var mi?</span> <a href="/Account/Login" class="text-decoration-none" data-t="Menu.Login">Giris Yap</a></p>
                     </div>
                 </div>
             </div>
@@ -83,15 +165,41 @@
 </div>
 
 @section Scripts {
+<style>
+    .form-check-input:checked + .form-check-label {
+        border-color: var(--bs-primary) !important;
+    }
+    .cursor-pointer {
+        cursor: pointer;
+    }
+    .form-check-input[type="radio"] {
+        display: none;
+    }
+</style>
 <script>
 function RegisterViewModel() {
     var self = this;
+
+    // Hesap tipi (0 = Ziyaretci, 1 = Tur Sirketi)
+    self.userType = ko.observable('0');
+
+    // Kisisel bilgiler
     self.firstName = ko.observable('');
     self.lastName = ko.observable('');
     self.email = ko.observable('');
     self.phone = ko.observable('');
     self.password = ko.observable('');
     self.passwordConfirm = ko.observable('');
+
+    // Firma bilgileri
+    self.companyName = ko.observable('');
+    self.companyTaxNumber = ko.observable('');
+    self.companyEmail = ko.observable('');
+    self.companyPhone = ko.observable('');
+    self.companyAddress = ko.observable('');
+    self.companyWebsite = ko.observable('');
+
+    // Form durumu
     self.acceptTerms = ko.observable(false);
     self.errorMessage = ko.observable('');
     self.isLoading = ko.observable(false);
@@ -99,49 +207,94 @@ function RegisterViewModel() {
     self.register = function() {
         self.errorMessage('');
 
-        // Validation
+        // Genel validasyonlar
         if (!self.firstName() || !self.lastName()) {
-            self.errorMessage('Ad ve soyad zorunludur');
+            self.errorMessage(T('Register.Error.NameRequired'));
             return;
         }
         if (!self.email()) {
-            self.errorMessage('Email zorunludur');
+            self.errorMessage(T('Register.Error.EmailRequired'));
             return;
         }
         if (!self.password() || self.password().length < 6) {
-            self.errorMessage('Sifre en az 6 karakter olmalidir');
+            self.errorMessage(T('Register.Error.PasswordMin'));
             return;
         }
         if (self.password() !== self.passwordConfirm()) {
-            self.errorMessage('Sifreler eslesmyor');
+            self.errorMessage(T('Register.Error.PasswordMismatch'));
             return;
         }
         if (!self.acceptTerms()) {
-            self.errorMessage('Kullanim kosullarini kabul etmelisiniz');
+            self.errorMessage(T('Register.Error.TermsRequired'));
             return;
+        }
+
+        // Tur Sirketi icin ek validasyonlar
+        if (self.userType() === '1') {
+            if (!self.companyName()) {
+                self.errorMessage(T('Register.Error.CompanyNameRequired'));
+                return;
+            }
+            if (!self.companyTaxNumber()) {
+                self.errorMessage(T('Register.Error.TaxNumberRequired'));
+                return;
+            }
         }
 
         self.isLoading(true);
 
-        $.ajax({
-            url: apiBaseUrl + '/api/auth/register',
-            method: 'POST',
-            contentType: 'application/json',
-            data: JSON.stringify({
+        // Hesap tipine gore farkli endpoint
+        var url, data;
+
+        if (self.userType() === '1') {
+            // Tur Sirketi kaydi
+            url = apiBaseUrl + '/api/auth/register-company';
+            data = {
+                firstName: self.firstName(),
+                lastName: self.lastName(),
+                email: self.email(),
+                phone: self.phone(),
+                password: self.password(),
+                company: {
+                    name: self.companyName(),
+                    taxNumber: self.companyTaxNumber(),
+                    email: self.companyEmail(),
+                    phone: self.companyPhone(),
+                    address: self.companyAddress(),
+                    website: self.companyWebsite()
+                }
+            };
+        } else {
+            // Ziyaretci kaydi
+            url = apiBaseUrl + '/api/auth/register';
+            data = {
                 firstName: self.firstName(),
                 lastName: self.lastName(),
                 email: self.email(),
                 phone: self.phone(),
                 password: self.password()
-            }),
+            };
+        }
+
+        $.ajax({
+            url: url,
+            method: 'POST',
+            contentType: 'application/json',
+            data: JSON.stringify(data),
             success: function(response) {
                 localStorage.setItem('token', response.token);
                 localStorage.setItem('user', JSON.stringify(response.user));
-                toastr.success('Kayit basarili! Hosgeldiniz ' + response.user.firstName);
-                window.location.href = '/';
+                toastr.success(T('Register.Success', response.user.firstName));
+
+                // Kullanici tipine gore yonlendir
+                if (response.user.userTypeId === 1) {
+                    window.location.href = '/Admin/MyTours';
+                } else {
+                    window.location.href = '/';
+                }
             },
             error: function(xhr) {
-                var msg = xhr.responseJSON?.error || 'Kayit basarisiz';
+                var msg = xhr.responseJSON?.error || T('Register.Error.Failed');
                 self.errorMessage(msg);
                 self.isLoading(false);
             }
@@ -149,6 +302,22 @@ function RegisterViewModel() {
     };
 }
 
-ko.applyBindings(new RegisterViewModel(), document.getElementById('registerApp'));
+// Wait for locale to load before applying bindings
+$(document).ready(function() {
+    // Check if locale is loaded, if not wait for it
+    function initRegister() {
+        if (Object.keys(locale).length > 0) {
+            ko.applyBindings(new RegisterViewModel(), document.getElementById('registerApp'));
+        } else {
+            setTimeout(initRegister, 100);
+        }
+    }
+    initRegister();
+});
+
+// Re-apply translations when language changes
+$(document).on('languageChanged', function() {
+    applyTranslations();
+});
 </script>
 }
