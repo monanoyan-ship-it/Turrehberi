@@ -1,0 +1,580 @@
+@{
+    Layout = "_AdminLayout";
+}
+
+<div id="adminReviewsApp">
+    <!-- Filtre Butonlari -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div class="btn-group" role="group">
+            <button type="button" class="btn"
+                    data-bind="click: function() { filterStatus(null) }, css: filterStatus() === null ? 'btn-primary' : 'btn-outline-primary'">
+                Tumu <span class="badge bg-light text-dark ms-1" data-bind="text: stats().pending + stats().approved + stats().rejected + stats().flagged"></span>
+            </button>
+            <button type="button" class="btn"
+                    data-bind="click: function() { filterStatus(0) }, css: filterStatus() === 0 ? 'btn-warning' : 'btn-outline-warning'">
+                <i class="bi bi-hourglass-split me-1"></i> Bekleyen
+                <span class="badge bg-light text-dark ms-1" data-bind="text: stats().pending"></span>
+            </button>
+            <button type="button" class="btn"
+                    data-bind="click: function() { filterStatus(1) }, css: filterStatus() === 1 ? 'btn-success' : 'btn-outline-success'">
+                <i class="bi bi-check-circle me-1"></i> Onaylanan
+            </button>
+            <button type="button" class="btn"
+                    data-bind="click: function() { filterStatus(2) }, css: filterStatus() === 2 ? 'btn-danger' : 'btn-outline-danger'">
+                <i class="bi bi-x-circle me-1"></i> Reddedilen
+            </button>
+            <button type="button" class="btn"
+                    data-bind="click: function() { filterStatus(3) }, css: filterStatus() === 3 ? 'btn-flag' : 'btn-outline-secondary'">
+                <i class="bi bi-flag me-1"></i> Sikayet Edilen
+                <span class="badge bg-light text-dark ms-1" data-bind="text: stats().flagged, visible: stats().flagged > 0"></span>
+            </button>
+        </div>
+        <div class="input-group" style="width: 300px;">
+            <input type="text" class="form-control" placeholder="Ara..." data-bind="value: searchTerm, valueUpdate: 'afterkeydown'">
+            <button class="btn btn-outline-secondary" data-bind="click: loadData">
+                <i class="bi bi-search"></i>
+            </button>
+        </div>
+    </div>
+
+    <!-- Bekleyen Yorum Uyarisi -->
+    <div class="alert alert-warning d-flex align-items-center mb-4" data-bind="visible: stats().pending > 0">
+        <i class="bi bi-exclamation-triangle-fill me-2 fs-5"></i>
+        <div>
+            <strong data-bind="text: stats().pending"></strong> yorum onay bekliyor.
+            <a href="#" class="alert-link" data-bind="click: function() { filterStatus(0) }">Goruntule</a>
+        </div>
+    </div>
+
+    <div class="admin-card">
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-hover mb-0">
+                    <thead class="table-light">
+                        <tr>
+                            <th style="width: 50px;">Puan</th>
+                            <th>Yorum</th>
+                            <th>Tur / Firma</th>
+                            <th>Kullanici</th>
+                            <th>Tarih</th>
+                            <th>Durum</th>
+                            <th style="width: 180px;">Islemler</th>
+                        </tr>
+                    </thead>
+                    <tbody data-bind="foreach: reviews">
+                        <tr>
+                            <td>
+                                <div class="d-flex align-items-center">
+                                    <i class="bi bi-star-fill text-warning me-1"></i>
+                                    <span class="fw-bold" data-bind="text: overallRating"></span>
+                                </div>
+                                <!-- ko if: isVerified -->
+                                <small class="text-success"><i class="bi bi-patch-check-fill"></i></small>
+                                <!-- /ko -->
+                            </td>
+                            <td>
+                                <div class="fw-semibold text-truncate" style="max-width: 250px;" data-bind="text: title || '(Basliksiz)'"></div>
+                                <small class="text-muted text-truncate d-block" style="max-width: 250px;" data-bind="text: comment ? comment.substring(0, 80) + (comment.length > 80 ? '...' : '') : '-'"></small>
+                                <!-- ko if: reportCount > 0 -->
+                                <span class="badge bg-danger"><i class="bi bi-flag me-1"></i><span data-bind="text: reportCount"></span> sikayet</span>
+                                <!-- /ko -->
+                            </td>
+                            <td>
+                                <div class="fw-semibold" data-bind="text: tourName"></div>
+                                <small class="text-muted" data-bind="text: companyName"></small>
+                            </td>
+                            <td>
+                                <div data-bind="text: visitorName"></div>
+                                <small class="text-muted" data-bind="text: visitorEmail"></small>
+                            </td>
+                            <td>
+                                <small data-bind="text: $parent.formatDate(createdAt)"></small>
+                            </td>
+                            <td>
+                                <span class="badge" data-bind="css: $parent.getStatusBadgeClass(statusId), html: $parent.getStatusBadge(statusId)"></span>
+                            </td>
+                            <td>
+                                <div class="btn-group btn-group-sm">
+                                    <!-- Bekleyen icin Onayla/Reddet -->
+                                    <!-- ko if: statusId === 0 || statusId === 3 -->
+                                    <button class="btn btn-success" data-bind="click: $parent.openApproveModal" title="Onayla">
+                                        <i class="bi bi-check-lg"></i>
+                                    </button>
+                                    <button class="btn btn-danger" data-bind="click: $parent.openRejectModal" title="Reddet">
+                                        <i class="bi bi-x-lg"></i>
+                                    </button>
+                                    <!-- /ko -->
+                                    <!-- Onaylanan icin Incelemeye Al -->
+                                    <!-- ko if: statusId === 1 -->
+                                    <button class="btn btn-outline-warning" data-bind="click: $parent.openFlagModal" title="Incelemeye Al">
+                                        <i class="bi bi-flag"></i>
+                                    </button>
+                                    <!-- /ko -->
+                                    <!-- Detay butonu -->
+                                    <button class="btn btn-outline-info" data-bind="click: $parent.openDetailsModal" title="Detay">
+                                        <i class="bi bi-eye"></i>
+                                    </button>
+                                </div>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Bos durum -->
+            <div class="text-center py-5" data-bind="visible: reviews().length === 0 && !isLoading()">
+                <i class="bi bi-chat-square-text text-muted" style="font-size: 3rem;"></i>
+                <p class="text-muted mt-2">Bu kategoride yorum bulunmuyor</p>
+            </div>
+
+            <!-- Yukleniyor -->
+            <div class="text-center py-5" data-bind="visible: isLoading">
+                <div class="spinner-border text-primary" role="status"></div>
+                <p class="text-muted mt-2">Yuklenin...</p>
+            </div>
+        </div>
+
+        <!-- Sayfalama -->
+        <div class="card-footer bg-white d-flex justify-content-between align-items-center" data-bind="visible: totalPages() > 1">
+            <div class="text-muted small">
+                Toplam <strong data-bind="text: totalCount"></strong> yorum
+            </div>
+            <nav>
+                <ul class="pagination pagination-sm mb-0">
+                    <li class="page-item" data-bind="css: { disabled: currentPage() === 1 }">
+                        <a class="page-link" href="#" data-bind="click: function() { if(currentPage() > 1) { currentPage(currentPage() - 1); loadData(); } }">Onceki</a>
+                    </li>
+                    <li class="page-item active">
+                        <span class="page-link" data-bind="text: currentPage() + ' / ' + totalPages()"></span>
+                    </li>
+                    <li class="page-item" data-bind="css: { disabled: currentPage() >= totalPages() }">
+                        <a class="page-link" href="#" data-bind="click: function() { if(currentPage() < totalPages()) { currentPage(currentPage() + 1); loadData(); } }">Sonraki</a>
+                    </li>
+                </ul>
+            </nav>
+        </div>
+    </div>
+
+    <!-- Approve Modal -->
+    <div class="modal fade" id="approveModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header bg-success text-white">
+                    <h5 class="modal-title"><i class="bi bi-check-circle me-2"></i>Yorum Onayla</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <p>Bu yorumu onaylamak istediginizden emin misiniz?</p>
+                    <div class="bg-light p-3 rounded mb-3">
+                        <div class="d-flex align-items-center mb-2">
+                            <i class="bi bi-star-fill text-warning me-1"></i>
+                            <strong data-bind="text: selectedReview() ? selectedReview().overallRating : ''"></strong>
+                            <span class="mx-2">-</span>
+                            <span data-bind="text: selectedReview() ? selectedReview().title || '(Basliksiz)' : ''"></span>
+                        </div>
+                        <small class="text-muted" data-bind="text: selectedReview() ? selectedReview().comment : ''"></small>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Not (Opsiyonel)</label>
+                        <textarea class="form-control" rows="2" data-bind="value: moderationNote" placeholder="Dahili not ekleyebilirsiniz..."></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Iptal</button>
+                    <button type="button" class="btn btn-success" data-bind="click: approveReview, disable: isSaving">
+                        <span data-bind="visible: isSaving" class="spinner-border spinner-border-sm me-1"></span>
+                        <i class="bi bi-check-lg me-1"></i> Onayla
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Reject Modal -->
+    <div class="modal fade" id="rejectModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header bg-danger text-white">
+                    <h5 class="modal-title"><i class="bi bi-x-circle me-2"></i>Yorum Reddet</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <p>Bu yorumu reddetmek istediginizden emin misiniz?</p>
+                    <div class="bg-light p-3 rounded mb-3">
+                        <div class="d-flex align-items-center mb-2">
+                            <i class="bi bi-star-fill text-warning me-1"></i>
+                            <strong data-bind="text: selectedReview() ? selectedReview().overallRating : ''"></strong>
+                            <span class="mx-2">-</span>
+                            <span data-bind="text: selectedReview() ? selectedReview().title || '(Basliksiz)' : ''"></span>
+                        </div>
+                        <small class="text-muted" data-bind="text: selectedReview() ? selectedReview().comment : ''"></small>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Red Sebebi *</label>
+                        <textarea class="form-control" rows="3" data-bind="value: rejectionReason" placeholder="Red sebebini yazin..." required></textarea>
+                        <div class="form-text text-danger" data-bind="visible: !rejectionReason()">Red sebebi zorunludur</div>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Dahili Not (Opsiyonel)</label>
+                        <textarea class="form-control" rows="2" data-bind="value: moderationNote" placeholder="Dahili not ekleyebilirsiniz..."></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Iptal</button>
+                    <button type="button" class="btn btn-danger" data-bind="click: rejectReview, disable: isSaving() || !rejectionReason()">
+                        <span data-bind="visible: isSaving" class="spinner-border spinner-border-sm me-1"></span>
+                        <i class="bi bi-x-lg me-1"></i> Reddet
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Flag Modal -->
+    <div class="modal fade" id="flagModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header bg-warning">
+                    <h5 class="modal-title"><i class="bi bi-flag me-2"></i>Incelemeye Al</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <p>Bu yorumu incelemeye almak istediginizden emin misiniz?</p>
+                    <div class="alert alert-warning">
+                        <i class="bi bi-exclamation-triangle me-1"></i>
+                        Incelemeye alinan yorumlar sitede gorunmez.
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Not (Opsiyonel)</label>
+                        <textarea class="form-control" rows="2" data-bind="value: moderationNote" placeholder="Neden incelemeye aliyorsunuz..."></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Iptal</button>
+                    <button type="button" class="btn btn-warning" data-bind="click: flagReview, disable: isSaving">
+                        <span data-bind="visible: isSaving" class="spinner-border spinner-border-sm me-1"></span>
+                        <i class="bi bi-flag me-1"></i> Incelemeye Al
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Details Modal -->
+    <div class="modal fade" id="detailsModal" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title"><i class="bi bi-chat-square-text me-2"></i>Yorum Detaylari</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body" data-bind="with: selectedReview">
+                    <div class="row mb-3">
+                        <div class="col-md-8">
+                            <h5 data-bind="text: title || '(Basliksiz)'"></h5>
+                            <div class="d-flex align-items-center gap-2">
+                                <!-- ko foreach: [1,2,3,4,5] -->
+                                <i class="bi" data-bind="css: $data <= $parent.overallRating ? 'bi-star-fill text-warning' : 'bi-star text-muted'"></i>
+                                <!-- /ko -->
+                                <span class="fw-bold ms-2" data-bind="text: overallRating + '/5'"></span>
+                                <!-- ko if: isVerified -->
+                                <span class="badge bg-success"><i class="bi bi-patch-check-fill me-1"></i>Dogrulanmis</span>
+                                <!-- /ko -->
+                            </div>
+                        </div>
+                        <div class="col-md-4 text-end">
+                            <span class="badge fs-6" data-bind="css: $parent.getStatusBadgeClass(statusId), html: $parent.getStatusBadge(statusId)"></span>
+                        </div>
+                    </div>
+
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <strong>Tur:</strong> <span data-bind="text: tourName"></span><br>
+                            <strong>Firma:</strong> <span data-bind="text: companyName"></span>
+                        </div>
+                        <div class="col-md-6">
+                            <strong>Kullanici:</strong> <span data-bind="text: visitorName"></span><br>
+                            <strong>E-posta:</strong> <span data-bind="text: visitorEmail"></span>
+                        </div>
+                    </div>
+
+                    <hr>
+
+                    <!-- ko if: pros -->
+                    <div class="mb-3">
+                        <h6 class="text-success"><i class="bi bi-hand-thumbs-up me-1"></i>Olumlu Yonler</h6>
+                        <p data-bind="text: pros"></p>
+                    </div>
+                    <!-- /ko -->
+
+                    <!-- ko if: cons -->
+                    <div class="mb-3">
+                        <h6 class="text-danger"><i class="bi bi-hand-thumbs-down me-1"></i>Olumsuz Yonler</h6>
+                        <p data-bind="text: cons"></p>
+                    </div>
+                    <!-- /ko -->
+
+                    <!-- ko if: comment -->
+                    <div class="mb-3">
+                        <h6><i class="bi bi-chat-left-text me-1"></i>Yorum</h6>
+                        <p data-bind="text: comment"></p>
+                    </div>
+                    <!-- /ko -->
+
+                    <hr>
+
+                    <div class="row text-muted small">
+                        <div class="col-md-4">
+                            <i class="bi bi-calendar me-1"></i> <span data-bind="text: $parent.formatDate(createdAt)"></span>
+                        </div>
+                        <div class="col-md-4">
+                            <i class="bi bi-hand-thumbs-up me-1"></i> <span data-bind="text: helpfulCount"></span> yardimci
+                        </div>
+                        <div class="col-md-4">
+                            <i class="bi bi-flag me-1"></i> <span data-bind="text: reportCount"></span> sikayet
+                        </div>
+                    </div>
+
+                    <!-- ko if: moderatedAt -->
+                    <hr>
+                    <div class="bg-light p-3 rounded">
+                        <h6 class="text-muted">Moderasyon Bilgisi</h6>
+                        <p class="mb-1"><strong>Tarih:</strong> <span data-bind="text: $parent.formatDate(moderatedAt)"></span></p>
+                        <!-- ko if: moderationNote -->
+                        <p class="mb-1"><strong>Not:</strong> <span data-bind="text: moderationNote"></span></p>
+                        <!-- /ko -->
+                        <!-- ko if: rejectionReason -->
+                        <p class="mb-0 text-danger"><strong>Red Sebebi:</strong> <span data-bind="text: rejectionReason"></span></p>
+                        <!-- /ko -->
+                    </div>
+                    <!-- /ko -->
+
+                    <!-- ko if: ipAddress -->
+                    <div class="mt-3 text-muted small">
+                        <i class="bi bi-globe me-1"></i> IP: <span data-bind="text: ipAddress"></span>
+                    </div>
+                    <!-- /ko -->
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Kapat</button>
+                    <!-- ko if: selectedReview() && (selectedReview().statusId === 0 || selectedReview().statusId === 3) -->
+                    <button type="button" class="btn btn-success" data-bind="click: function() { detailsModal.hide(); openApproveModal(selectedReview()); }">
+                        <i class="bi bi-check-lg me-1"></i> Onayla
+                    </button>
+                    <button type="button" class="btn btn-danger" data-bind="click: function() { detailsModal.hide(); openRejectModal(selectedReview()); }">
+                        <i class="bi bi-x-lg me-1"></i> Reddet
+                    </button>
+                    <!-- /ko -->
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+<script>
+function AdminReviewsViewModel() {
+    var self = this;
+
+    // Veriler
+    self.reviews = ko.observableArray([]);
+    self.isLoading = ko.observable(true);
+    self.isSaving = ko.observable(false);
+    self.selectedReview = ko.observable(null);
+    self.filterStatus = ko.observable(null);
+    self.searchTerm = ko.observable('');
+
+    // Sayfalama
+    self.currentPage = ko.observable(1);
+    self.totalPages = ko.observable(1);
+    self.totalCount = ko.observable(0);
+
+    // Istatistikler
+    self.stats = ko.observable({ pending: 0, approved: 0, rejected: 0, flagged: 0 });
+
+    // Moderasyon form verileri
+    self.moderationNote = ko.observable('');
+    self.rejectionReason = ko.observable('');
+
+    // Modal referanslari
+    var approveModal, rejectModal, flagModal, detailsModal;
+
+    // Durum badge'i
+    self.getStatusBadge = function(statusId) {
+        var statuses = {
+            0: '<i class="bi bi-hourglass-split me-1"></i>Bekliyor',
+            1: '<i class="bi bi-check-circle me-1"></i>Onaylandi',
+            2: '<i class="bi bi-x-circle me-1"></i>Reddedildi',
+            3: '<i class="bi bi-flag me-1"></i>Inceleniyor'
+        };
+        return statuses[statusId] || 'Bilinmiyor';
+    };
+
+    self.getStatusBadgeClass = function(statusId) {
+        var classes = {
+            0: 'bg-warning text-dark',
+            1: 'bg-success',
+            2: 'bg-danger',
+            3: 'bg-secondary'
+        };
+        return classes[statusId] || 'bg-secondary';
+    };
+
+    // Tarih formatlama
+    self.formatDate = function(dateStr) {
+        if (!dateStr) return '-';
+        var date = new Date(dateStr);
+        return date.toLocaleDateString('tr-TR', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' });
+    };
+
+    // Filtre degistiginde
+    self.filterStatus.subscribe(function() {
+        self.currentPage(1);
+        self.loadData();
+    });
+
+    // Veri yukleme
+    self.loadData = function() {
+        self.isLoading(true);
+        var params = {
+            page: self.currentPage(),
+            pageSize: 20
+        };
+        if (self.filterStatus() !== null) {
+            params.statusId = self.filterStatus();
+        }
+        if (self.searchTerm()) {
+            params.search = self.searchTerm();
+        }
+
+        $.ajax({
+            url: apiBaseUrl + '/api/admin/reviews',
+            method: 'GET',
+            data: params
+        })
+        .done(function(data) {
+            self.reviews(data.reviews);
+            self.totalCount(data.pagination.totalCount);
+            self.totalPages(data.pagination.totalPages);
+            self.stats(data.stats);
+            self.isLoading(false);
+        })
+        .fail(function() {
+            toastr.error('Veriler yuklenemedi');
+            self.isLoading(false);
+        });
+    };
+
+    // Modal acma fonksiyonlari
+    self.openApproveModal = function(r) {
+        self.selectedReview(r);
+        self.moderationNote('');
+        approveModal.show();
+    };
+
+    self.openRejectModal = function(r) {
+        self.selectedReview(r);
+        self.rejectionReason('');
+        self.moderationNote('');
+        rejectModal.show();
+    };
+
+    self.openFlagModal = function(r) {
+        self.selectedReview(r);
+        self.moderationNote('');
+        flagModal.show();
+    };
+
+    self.openDetailsModal = function(r) {
+        self.selectedReview(r);
+        detailsModal.show();
+    };
+
+    // Moderasyon islemleri
+    self.approveReview = function() {
+        self.isSaving(true);
+        var userId = window.currentUser ? window.currentUser.id : null;
+        $.ajax({
+            url: apiBaseUrl + '/api/reviews/' + self.selectedReview().id + '/approve',
+            method: 'POST',
+            contentType: 'application/json',
+            data: JSON.stringify({ moderatedById: userId, note: self.moderationNote() })
+        })
+        .done(function(response) {
+            approveModal.hide();
+            self.loadData();
+            toastr.success(response.message || 'Yorum onaylandi');
+            self.isSaving(false);
+        })
+        .fail(function(xhr) {
+            var msg = xhr.responseJSON ? xhr.responseJSON.message : 'Hata olustu';
+            toastr.error(msg);
+            self.isSaving(false);
+        });
+    };
+
+    self.rejectReview = function() {
+        if (!self.rejectionReason()) {
+            toastr.warning('Red sebebi zorunludur');
+            return;
+        }
+        self.isSaving(true);
+        var userId = window.currentUser ? window.currentUser.id : null;
+        $.ajax({
+            url: apiBaseUrl + '/api/reviews/' + self.selectedReview().id + '/reject',
+            method: 'POST',
+            contentType: 'application/json',
+            data: JSON.stringify({
+                moderatedById: userId,
+                rejectionReason: self.rejectionReason(),
+                note: self.moderationNote()
+            })
+        })
+        .done(function(response) {
+            rejectModal.hide();
+            self.loadData();
+            toastr.success(response.message || 'Yorum reddedildi');
+            self.isSaving(false);
+        })
+        .fail(function(xhr) {
+            var msg = xhr.responseJSON ? xhr.responseJSON.message : 'Hata olustu';
+            toastr.error(msg);
+            self.isSaving(false);
+        });
+    };
+
+    self.flagReview = function() {
+        self.isSaving(true);
+        var userId = window.currentUser ? window.currentUser.id : null;
+        $.ajax({
+            url: apiBaseUrl + '/api/reviews/' + self.selectedReview().id + '/flag',
+            method: 'POST',
+            contentType: 'application/json',
+            data: JSON.stringify({ moderatedById: userId, note: self.moderationNote() })
+        })
+        .done(function(response) {
+            flagModal.hide();
+            self.loadData();
+            toastr.success(response.message || 'Yorum incelemeye alindi');
+            self.isSaving(false);
+        })
+        .fail(function(xhr) {
+            var msg = xhr.responseJSON ? xhr.responseJSON.message : 'Hata olustu';
+            toastr.error(msg);
+            self.isSaving(false);
+        });
+    };
+
+    // Sayfa yuklendiginde
+    $(document).ready(function() {
+        approveModal = new bootstrap.Modal(document.getElementById('approveModal'));
+        rejectModal = new bootstrap.Modal(document.getElementById('rejectModal'));
+        flagModal = new bootstrap.Modal(document.getElementById('flagModal'));
+        detailsModal = new bootstrap.Modal(document.getElementById('detailsModal'));
+        self.loadData();
+    });
+}
+
+ko.applyBindings(new AdminReviewsViewModel(), document.getElementById('adminReviewsApp'));
+</script>
+}

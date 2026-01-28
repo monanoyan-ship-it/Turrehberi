@@ -1,28 +1,58 @@
 # Erkan Tatil Plani - Yapilacaklar
 
+## Kontrol Edilecek
+
+### Cift Startup Projesi (API + Web)
+- [ ] Visual Studio'yu yeniden ac ve toolbar'daki startup dropdown'da **"API + Web"** profilini kontrol et
+- [ ] `ErkanTatilPlani.slnLaunch` dosyasi solution dizininde mevcut
+- [ ] Profil gorunuyorsa sec ve F5 ile calistir (API: 7078, Web: 7080)
+- [ ] **Profil gorunmuyorsa elle ayarla:**
+  1. Solution Explorer'da **Solution** satirina sag tikla
+  2. **"Configure Startup Projects..."** sec
+  3. **"Multiple startup projects"** secenegini isaretle
+  4. `ErkanTatilPlani.API` → Action: **Start**
+  5. `ErkanTatilPlani.Web` → Action: **Start**
+  6. Diger projeler (Core, Data) → Action: **None**
+  7. **OK**'a bas
+  8. Not: Bu ozellik VS 2022 17.11+ gerektirir. Eski surumde Preview Features'tan "Enable Multi-Project Launch Profiles" acilmali
+
+---
+
 ## Oncelikli (Yuksek)
 
 ### Firma Onay Is Akisi
-- [ ] Admin panelinde firma basvurularini listeleyen sayfa
-- [ ] Firma onaylama/reddetme UI
-- [ ] Firma sahiplerine onay durumu bildirimi (toast mesajlari)
-- [ ] Onay bekleyen firmalar icin kisitlamalar (tur ekleyememe)
-- [ ] Sozlesme yukleme alani ve yonetimi
+- [x] Admin panelinde firma basvurularini listeleyen sayfa
+- [x] Firma onaylama/reddetme UI
+- [x] Firma sahiplerine onay durumu bildirimi (toast mesajlari)
+- [x] Onay bekleyen firmalar icin kisitlamalar (tur ekleyememe)
+- [x] Sozlesme yukleme alani ve yonetimi
 
 ### Tur Yorum Sistemi
-- [ ] ReviewsController API endpoint'leri olustur
-  - [ ] GET /api/tours/{id}/reviews - Tur yorumlarini listele
-  - [ ] POST /api/tours/{id}/reviews - Yeni yorum ekle
-  - [ ] PUT /api/reviews/{id} - Yorum guncelle
-  - [ ] DELETE /api/reviews/{id} - Yorum sil
-  - [ ] POST /api/reviews/{id}/helpful - Yardimci oyla
-  - [ ] POST /api/reviews/{id}/report - Sikayet et
-  - [ ] POST /api/reviews/{id}/reply - Yanit ekle
-- [ ] Tur detay sayfasinda yorum listesi KnockoutJS komponenti
-- [ ] Yorum yazma formu (puan secimi, pros/cons, fotograf yukleme)
-- [ ] Yorum filtreleme ve siralama
-- [ ] Firma yaniti ozelligi
-- [ ] Yorum moderasyon paneli (Admin)
+- [x] ReviewsController API endpoint'leri olustur
+  - [x] GET /api/tours/{id}/reviews - Tur yorumlarini listele
+  - [x] POST /api/tours/{id}/reviews - Yeni yorum ekle
+  - [x] PUT /api/reviews/{id} - Yorum guncelle
+  - [x] DELETE /api/reviews/{id} - Yorum sil
+  - [x] POST /api/reviews/{id}/helpful - Yardimci oyla
+  - [x] POST /api/reviews/{id}/report - Sikayet et
+  - [x] POST /api/reviews/{id}/reply - Yanit ekle
+- [x] Tur detay sayfasinda yorum listesi KnockoutJS komponenti
+- [x] Yorum yazma formu (puan secimi, pros/cons)
+- [x] Yorum filtreleme ve siralama
+- [x] Firma yaniti ozelligi
+- [ ] Fotograf yukleme (sonraki asamada)
+- [x] Yorum moderasyon paneli (Admin)
+
+### Firma Profil Sayfasi (SEO + Web Sitesi)
+- [x] Public firma profil sayfasi (/Firmalar/{slug} veya /Companies/{id})
+- [x] SEO meta tag'leri (title, description, Open Graph, Twitter Card)
+- [x] Firma hakkinda tam bilgi (logo, aciklama, iletisim, adres)
+- [x] Firmanin turlari listesi
+- [x] Firmanin yorumlari ve ortalama puani
+- [ ] Galeri/Fotograf bolumu (sonraki asamada)
+- [ ] Iletisim formu (sonraki asamada)
+- [x] Schema.org yapilandirmasi (TravelAgency, AggregateRating)
+- [x] Google indekslenebilir URL yapisi (slug tabanli)
 
 ### Rezervasyon Iyilestirmeleri
 - [ ] Rezervasyon onay/red email bildirimleri

@@ -16,4 +16,17 @@ public class CompaniesController : Controller
         ViewBag.ApiBaseUrl = _configuration["ApiBaseUrl"];
         return View();
     }
+
+    /// <summary>
+    /// Firma profil sayfasi - SEO-friendly URL
+    /// /Firmalar/{slug} veya /Companies/Details/{slug}
+    /// </summary>
+    [Route("Firmalar/{slug}")]
+    [Route("Companies/Details/{slug}")]
+    public IActionResult Details(string slug)
+    {
+        ViewBag.ApiBaseUrl = _configuration["ApiBaseUrl"];
+        ViewBag.Slug = slug;
+        return View();
+    }
 }

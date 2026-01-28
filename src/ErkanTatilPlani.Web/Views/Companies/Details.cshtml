@@ -1,0 +1,490 @@
+@{
+    Layout = "_Layout";
+    ViewData["Title"] = "Firma Profili";
+    var slug = ViewBag.Slug as string;
+}
+
+<div id="companyProfileApp">
+    <!-- Loading State -->
+    <div data-bind="visible: isLoading" class="text-center py-5">
+        <div class="spinner-border text-primary" role="status"></div>
+        <p class="mt-2 text-muted">Yukleniyor...</p>
+    </div>
+
+    <!-- Error State -->
+    <div data-bind="visible: !isLoading() && error()" class="alert alert-danger text-center">
+        <i class="bi bi-exclamation-triangle-fill fs-1 d-block mb-3"></i>
+        <h4>Firma Bulunamadi</h4>
+        <p data-bind="text: error"></p>
+        <a href="/Companies" class="btn btn-primary mt-2">Tum Firmalara Don</a>
+    </div>
+
+    <!-- Company Profile -->
+    <div data-bind="visible: !isLoading() && !error() && company()">
+        <!-- SEO Meta Tags (JavaScript ile dinamik) -->
+
+        <!-- Cover Image & Header -->
+        <div class="position-relative mb-4">
+            <div class="rounded-3 overflow-hidden" style="height: 250px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
+                <!-- ko if: company().coverImageUrl -->
+                <img data-bind="attr: { src: company().coverImageUrl, alt: company().name + ' Kapak Fotografi' }"
+                     class="w-100 h-100" style="object-fit: cover; opacity: 0.8;" />
+                <!-- /ko -->
+            </div>
+            <div class="position-absolute bottom-0 start-0 end-0 p-4" style="background: linear-gradient(transparent, rgba(0,0,0,0.7));">
+                <div class="container">
+                    <div class="d-flex align-items-end gap-4">
+                        <!-- Logo -->
+                        <div class="bg-white rounded-3 p-2 shadow" style="margin-bottom: -50px;">
+                            <!-- ko if: company().logoUrl -->
+                            <img data-bind="attr: { src: company().logoUrl, alt: company().name + ' Logo' }"
+                                 class="rounded" style="width: 100px; height: 100px; object-fit: cover;" />
+                            <!-- /ko -->
+                            <!-- ko ifnot: company().logoUrl -->
+                            <div class="bg-primary text-white rounded d-flex align-items-center justify-content-center"
+                                 style="width: 100px; height: 100px;">
+                                <i class="bi bi-building fs-1"></i>
+                            </div>
+                            <!-- /ko -->
+                        </div>
+                        <!-- Title -->
+                        <div class="text-white pb-2">
+                            <h1 class="mb-1" data-bind="text: company().name"></h1>
+                            <!-- ko if: company().tagline -->
+                            <p class="mb-0 opacity-75" data-bind="text: company().tagline"></p>
+                            <!-- /ko -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="container">
+            <!-- Stats Bar -->
+            <div class="row g-3 mb-4" style="margin-top: 40px;">
+                <div class="col-md-3">
+                    <div class="bg-white rounded-3 p-3 shadow-sm text-center">
+                        <div class="fs-3 fw-bold text-primary" data-bind="text: tourCount"></div>
+                        <div class="text-muted small">Aktif Tur</div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="bg-white rounded-3 p-3 shadow-sm text-center">
+                        <div class="fs-3 fw-bold text-warning">
+                            <i class="bi bi-star-fill"></i>
+                            <span data-bind="text: stats().averageRating || '-'"></span>
+                        </div>
+                        <div class="text-muted small">Ortalama Puan</div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="bg-white rounded-3 p-3 shadow-sm text-center">
+                        <div class="fs-3 fw-bold text-success" data-bind="text: stats().totalReviews || 0"></div>
+                        <div class="text-muted small">Yorum</div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="bg-white rounded-3 p-3 shadow-sm text-center">
+                        <!-- ko if: company().foundedYear -->
+                        <div class="fs-3 fw-bold text-info" data-bind="text: new Date().getFullYear() - company().foundedYear"></div>
+                        <div class="text-muted small">Yillik Deneyim</div>
+                        <!-- /ko -->
+                        <!-- ko ifnot: company().foundedYear -->
+                        <div class="fs-3 fw-bold text-info"><i class="bi bi-patch-check-fill"></i></div>
+                        <div class="text-muted small">Onayli Firma</div>
+                        <!-- /ko -->
+                    </div>
+                </div>
+            </div>
+
+            <div class="row g-4">
+                <!-- Left Column - Main Content -->
+                <div class="col-lg-8">
+                    <!-- About Section -->
+                    <div class="bg-white rounded-3 shadow-sm p-4 mb-4">
+                        <h2 class="h5 mb-3"><i class="bi bi-info-circle me-2"></i>Hakkimizda</h2>
+                        <p class="mb-0" data-bind="text: company().description"></p>
+                    </div>
+
+                    <!-- Tours Section -->
+                    <div class="bg-white rounded-3 shadow-sm p-4 mb-4">
+                        <div class="d-flex justify-content-between align-items-center mb-3">
+                            <h2 class="h5 mb-0"><i class="bi bi-geo-alt me-2"></i>Turlarimiz</h2>
+                            <span class="badge bg-primary" data-bind="text: tourCount() + ' Tur'"></span>
+                        </div>
+
+                        <div class="row g-3" data-bind="foreach: tours">
+                            <div class="col-md-6">
+                                <div class="card h-100 border-0 shadow-sm">
+                                    <div class="position-relative">
+                                        <img data-bind="attr: { src: imageUrl || 'https://picsum.photos/400/250', alt: name }"
+                                             class="card-img-top" style="height: 150px; object-fit: cover;" />
+                                        <!-- ko if: isFeatured -->
+                                        <span class="position-absolute top-0 end-0 m-2 badge bg-warning text-dark">
+                                            <i class="bi bi-star-fill"></i> One Cikan
+                                        </span>
+                                        <!-- /ko -->
+                                    </div>
+                                    <div class="card-body">
+                                        <h6 class="card-title mb-1" data-bind="text: name"></h6>
+                                        <p class="text-muted small mb-2">
+                                            <i class="bi bi-geo-alt me-1"></i><span data-bind="text: destination"></span>
+                                        </p>
+                                        <div class="d-flex justify-content-between align-items-center">
+                                            <div>
+                                                <span class="fw-bold text-primary" data-bind="text: price.toLocaleString('tr-TR', {style: 'currency', currency: 'TRY'})"></span>
+                                                <small class="text-muted" data-bind="text: '/ ' + durationDays + ' Gun'"></small>
+                                            </div>
+                                            <!-- ko if: averageRating > 0 -->
+                                            <div class="text-warning small">
+                                                <i class="bi bi-star-fill"></i>
+                                                <span data-bind="text: averageRating"></span>
+                                                <span class="text-muted" data-bind="text: '(' + reviewCount + ')'"></span>
+                                            </div>
+                                            <!-- /ko -->
+                                        </div>
+                                    </div>
+                                    <div class="card-footer bg-transparent border-0">
+                                        <a class="btn btn-outline-primary btn-sm w-100" data-bind="attr: { href: '/Tours/Details/' + id }">
+                                            <i class="bi bi-eye me-1"></i> Detay Gor
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- No Tours -->
+                        <div data-bind="visible: tours().length === 0" class="text-center py-4 text-muted">
+                            <i class="bi bi-calendar-x fs-1"></i>
+                            <p class="mt-2">Henuz aktif tur bulunmuyor</p>
+                        </div>
+                    </div>
+
+                    <!-- Reviews Section -->
+                    <div class="bg-white rounded-3 shadow-sm p-4">
+                        <div class="d-flex justify-content-between align-items-center mb-3">
+                            <h2 class="h5 mb-0"><i class="bi bi-chat-square-text me-2"></i>Son Yorumlar</h2>
+                            <span class="badge bg-success" data-bind="text: stats().totalReviews + ' Yorum'"></span>
+                        </div>
+
+                        <!-- Rating Distribution -->
+                        <div class="mb-4" data-bind="visible: stats().totalReviews > 0">
+                            <div class="row align-items-center">
+                                <div class="col-md-3 text-center">
+                                    <div class="display-4 fw-bold text-warning" data-bind="text: stats().averageRating"></div>
+                                    <div class="text-warning mb-1">
+                                        <!-- ko foreach: [1,2,3,4,5] -->
+                                        <i class="bi" data-bind="css: $data <= Math.round($parent.stats().averageRating) ? 'bi-star-fill' : 'bi-star'"></i>
+                                        <!-- /ko -->
+                                    </div>
+                                    <small class="text-muted" data-bind="text: stats().totalReviews + ' degerlendirme'"></small>
+                                </div>
+                                <div class="col-md-9">
+                                    <!-- 5 Star -->
+                                    <div class="d-flex align-items-center gap-2 mb-1">
+                                        <span class="text-muted" style="width: 20px;">5</span>
+                                        <div class="progress flex-grow-1" style="height: 8px;">
+                                            <div class="progress-bar bg-success" data-bind="style: { width: (stats().ratingDistribution.fiveStar / stats().totalReviews * 100) + '%' }"></div>
+                                        </div>
+                                        <span class="text-muted small" style="width: 30px;" data-bind="text: stats().ratingDistribution.fiveStar"></span>
+                                    </div>
+                                    <!-- 4 Star -->
+                                    <div class="d-flex align-items-center gap-2 mb-1">
+                                        <span class="text-muted" style="width: 20px;">4</span>
+                                        <div class="progress flex-grow-1" style="height: 8px;">
+                                            <div class="progress-bar bg-success" data-bind="style: { width: (stats().ratingDistribution.fourStar / stats().totalReviews * 100) + '%' }"></div>
+                                        </div>
+                                        <span class="text-muted small" style="width: 30px;" data-bind="text: stats().ratingDistribution.fourStar"></span>
+                                    </div>
+                                    <!-- 3 Star -->
+                                    <div class="d-flex align-items-center gap-2 mb-1">
+                                        <span class="text-muted" style="width: 20px;">3</span>
+                                        <div class="progress flex-grow-1" style="height: 8px;">
+                                            <div class="progress-bar bg-warning" data-bind="style: { width: (stats().ratingDistribution.threeStar / stats().totalReviews * 100) + '%' }"></div>
+                                        </div>
+                                        <span class="text-muted small" style="width: 30px;" data-bind="text: stats().ratingDistribution.threeStar"></span>
+                                    </div>
+                                    <!-- 2 Star -->
+                                    <div class="d-flex align-items-center gap-2 mb-1">
+                                        <span class="text-muted" style="width: 20px;">2</span>
+                                        <div class="progress flex-grow-1" style="height: 8px;">
+                                            <div class="progress-bar bg-danger" data-bind="style: { width: (stats().ratingDistribution.twoStar / stats().totalReviews * 100) + '%' }"></div>
+                                        </div>
+                                        <span class="text-muted small" style="width: 30px;" data-bind="text: stats().ratingDistribution.twoStar"></span>
+                                    </div>
+                                    <!-- 1 Star -->
+                                    <div class="d-flex align-items-center gap-2">
+                                        <span class="text-muted" style="width: 20px;">1</span>
+                                        <div class="progress flex-grow-1" style="height: 8px;">
+                                            <div class="progress-bar bg-danger" data-bind="style: { width: (stats().ratingDistribution.oneStar / stats().totalReviews * 100) + '%' }"></div>
+                                        </div>
+                                        <span class="text-muted small" style="width: 30px;" data-bind="text: stats().ratingDistribution.oneStar"></span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Review List -->
+                        <div data-bind="foreach: recentReviews">
+                            <div class="border-bottom pb-3 mb-3">
+                                <div class="d-flex justify-content-between align-items-start mb-2">
+                                    <div>
+                                        <div class="fw-semibold" data-bind="text: visitorName"></div>
+                                        <small class="text-muted" data-bind="text: tourName"></small>
+                                    </div>
+                                    <div class="text-end">
+                                        <div class="text-warning">
+                                            <!-- ko foreach: [1,2,3,4,5] -->
+                                            <i class="bi" data-bind="css: $data <= $parent.overallRating ? 'bi-star-fill' : 'bi-star'"></i>
+                                            <!-- /ko -->
+                                        </div>
+                                        <small class="text-muted" data-bind="text: new Date(createdAt).toLocaleDateString('tr-TR')"></small>
+                                    </div>
+                                </div>
+                                <!-- ko if: title -->
+                                <h6 class="mb-1" data-bind="text: title"></h6>
+                                <!-- /ko -->
+                                <p class="mb-1 text-muted" data-bind="text: comment"></p>
+                                <div class="d-flex gap-2">
+                                    <!-- ko if: isVerified -->
+                                    <span class="badge bg-success"><i class="bi bi-patch-check-fill me-1"></i>Dogrulanmis</span>
+                                    <!-- /ko -->
+                                    <!-- ko if: wouldRecommend -->
+                                    <span class="badge bg-info"><i class="bi bi-hand-thumbs-up me-1"></i>Tavsiye Ediyor</span>
+                                    <!-- /ko -->
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- No Reviews -->
+                        <div data-bind="visible: recentReviews().length === 0" class="text-center py-4 text-muted">
+                            <i class="bi bi-chat-square fs-1"></i>
+                            <p class="mt-2">Henuz yorum yapilmamis</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Right Column - Contact Info -->
+                <div class="col-lg-4">
+                    <!-- Contact Card -->
+                    <div class="bg-white rounded-3 shadow-sm p-4 mb-4 sticky-top" style="top: 100px;">
+                        <h3 class="h5 mb-3"><i class="bi bi-telephone me-2"></i>Iletisim</h3>
+
+                        <!-- ko if: company().phone -->
+                        <div class="d-flex align-items-center mb-3">
+                            <div class="bg-primary bg-opacity-10 rounded-circle p-2 me-3">
+                                <i class="bi bi-telephone text-primary"></i>
+                            </div>
+                            <div>
+                                <small class="text-muted d-block">Telefon</small>
+                                <a class="text-decoration-none" data-bind="attr: { href: 'tel:' + company().phone }, text: company().phone"></a>
+                            </div>
+                        </div>
+                        <!-- /ko -->
+
+                        <!-- ko if: company().email -->
+                        <div class="d-flex align-items-center mb-3">
+                            <div class="bg-success bg-opacity-10 rounded-circle p-2 me-3">
+                                <i class="bi bi-envelope text-success"></i>
+                            </div>
+                            <div>
+                                <small class="text-muted d-block">E-posta</small>
+                                <a class="text-decoration-none" data-bind="attr: { href: 'mailto:' + company().email }, text: company().email"></a>
+                            </div>
+                        </div>
+                        <!-- /ko -->
+
+                        <!-- ko if: company().website -->
+                        <div class="d-flex align-items-center mb-3">
+                            <div class="bg-info bg-opacity-10 rounded-circle p-2 me-3">
+                                <i class="bi bi-globe text-info"></i>
+                            </div>
+                            <div>
+                                <small class="text-muted d-block">Web Sitesi</small>
+                                <a class="text-decoration-none" target="_blank" data-bind="attr: { href: 'https://' + company().website }, text: company().website"></a>
+                            </div>
+                        </div>
+                        <!-- /ko -->
+
+                        <!-- ko if: company().address -->
+                        <div class="d-flex align-items-start mb-3">
+                            <div class="bg-warning bg-opacity-10 rounded-circle p-2 me-3">
+                                <i class="bi bi-geo-alt text-warning"></i>
+                            </div>
+                            <div>
+                                <small class="text-muted d-block">Adres</small>
+                                <span data-bind="text: company().address"></span>
+                                <!-- ko if: company().city -->
+                                <span class="badge bg-secondary ms-1" data-bind="text: company().city"></span>
+                                <!-- /ko -->
+                            </div>
+                        </div>
+                        <!-- /ko -->
+
+                        <!-- ko if: company().foundedYear -->
+                        <div class="d-flex align-items-center">
+                            <div class="bg-secondary bg-opacity-10 rounded-circle p-2 me-3">
+                                <i class="bi bi-calendar-check text-secondary"></i>
+                            </div>
+                            <div>
+                                <small class="text-muted d-block">Kurulus Yili</small>
+                                <span data-bind="text: company().foundedYear"></span>
+                            </div>
+                        </div>
+                        <!-- /ko -->
+
+                        <hr class="my-3">
+
+                        <!-- CTA Buttons -->
+                        <a href="/Contact" class="btn btn-primary w-100 mb-2">
+                            <i class="bi bi-envelope me-1"></i> Mesaj Gonder
+                        </a>
+                        <!-- ko if: company().phone -->
+                        <a class="btn btn-outline-success w-100" data-bind="attr: { href: 'tel:' + company().phone }">
+                            <i class="bi bi-telephone me-1"></i> Hemen Ara
+                        </a>
+                        <!-- /ko -->
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Schema.org JSON-LD (SEO) -->
+        <script type="application/ld+json" data-bind="html: schemaOrgJson"></script>
+    </div>
+</div>
+
+@section Scripts {
+<script>
+function CompanyProfileViewModel() {
+    var self = this;
+    var slug = '@Html.Raw(slug)';
+
+    self.isLoading = ko.observable(true);
+    self.error = ko.observable(null);
+    self.company = ko.observable(null);
+    self.tours = ko.observableArray([]);
+    self.tourCount = ko.observable(0);
+    self.stats = ko.observable({ totalReviews: 0, averageRating: 0, ratingDistribution: { fiveStar: 0, fourStar: 0, threeStar: 0, twoStar: 0, oneStar: 0 } });
+    self.recentReviews = ko.observableArray([]);
+
+    // Schema.org JSON-LD for SEO
+    self.schemaOrgJson = ko.computed(function() {
+        if (!self.company()) return '{}';
+        var c = self.company();
+        var schema = {
+            "@@context": "https://schema.org",
+            "@@type": "TravelAgency",
+            "name": c.name,
+            "description": c.description,
+            "url": window.location.href,
+            "logo": c.logoUrl,
+            "image": c.coverImageUrl,
+            "telephone": c.phone,
+            "email": c.email,
+            "address": {
+                "@@type": "PostalAddress",
+                "streetAddress": c.address,
+                "addressLocality": c.city,
+                "addressCountry": "TR"
+            }
+        };
+        if (c.foundedYear) schema.foundingDate = c.foundedYear.toString();
+        if (self.stats().totalReviews > 0) {
+            schema.aggregateRating = {
+                "@@type": "AggregateRating",
+                "ratingValue": self.stats().averageRating,
+                "reviewCount": self.stats().totalReviews,
+                "bestRating": 5,
+                "worstRating": 1
+            };
+        }
+        return JSON.stringify(schema);
+    });
+
+    // Update page meta tags
+    self.updateMetaTags = function() {
+        if (!self.company()) return;
+        var c = self.company();
+
+        // Title
+        document.title = (c.metaTitle || c.name) + ' - Erkan Tatil Plani';
+
+        // Meta Description
+        var metaDesc = document.querySelector('meta[name="description"]');
+        if (!metaDesc) {
+            metaDesc = document.createElement('meta');
+            metaDesc.name = 'description';
+            document.head.appendChild(metaDesc);
+        }
+        metaDesc.content = c.metaDescription || c.description.substring(0, 160);
+
+        // Open Graph
+        self.setMetaTag('og:title', c.metaTitle || c.name);
+        self.setMetaTag('og:description', c.metaDescription || c.description.substring(0, 160));
+        self.setMetaTag('og:image', c.coverImageUrl || c.logoUrl);
+        self.setMetaTag('og:url', window.location.href);
+        self.setMetaTag('og:type', 'business.business');
+
+        // Twitter Card
+        self.setMetaTag('twitter:card', 'summary_large_image');
+        self.setMetaTag('twitter:title', c.metaTitle || c.name);
+        self.setMetaTag('twitter:description', c.metaDescription || c.description.substring(0, 160));
+        self.setMetaTag('twitter:image', c.coverImageUrl || c.logoUrl);
+    };
+
+    self.setMetaTag = function(property, content) {
+        var meta = document.querySelector('meta[property="' + property + '"]') ||
+                   document.querySelector('meta[name="' + property + '"]');
+        if (!meta) {
+            meta = document.createElement('meta');
+            if (property.startsWith('og:')) {
+                meta.setAttribute('property', property);
+            } else {
+                meta.name = property;
+            }
+            document.head.appendChild(meta);
+        }
+        meta.content = content || '';
+    };
+
+    // Load company profile
+    self.loadProfile = function() {
+        self.isLoading(true);
+        self.error(null);
+
+        $.ajax({
+            url: apiBaseUrl + '/api/companies/profile/' + slug,
+            method: 'GET'
+        })
+        .done(function(data) {
+            self.company(data.company);
+            self.tours(data.tours);
+            self.tourCount(data.tourCount);
+            self.stats(data.stats);
+            self.recentReviews(data.recentReviews);
+            self.isLoading(false);
+
+            // Update meta tags after data loads
+            self.updateMetaTags();
+        })
+        .fail(function(xhr) {
+            self.error(xhr.responseJSON ? xhr.responseJSON.message : 'Firma bulunamadi');
+            self.isLoading(false);
+        });
+    };
+
+    // Initialize
+    $(document).ready(function() {
+        if (slug) {
+            self.loadProfile();
+        } else {
+            self.error('Gecersiz firma adresi');
+            self.isLoading(false);
+        }
+    });
+}
+
+ko.applyBindings(new CompanyProfileViewModel(), document.getElementById('companyProfileApp'));
+</script>
+}

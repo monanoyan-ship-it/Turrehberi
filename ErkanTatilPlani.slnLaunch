@@ -1,0 +1,15 @@
+[
+  {
+    "Name": "API + Web",
+    "Projects": [
+      {
+        "Path": "src\\ErkanTatilPlani.API\\ErkanTatilPlani.API.csproj",
+        "Action": "Start"
+      },
+      {
+        "Path": "src\\ErkanTatilPlani.Web\\ErkanTatilPlani.Web.csproj",
+        "Action": "Start"
+      }
+    ]
+  }
+]

@@ -32,8 +32,13 @@
 
 ---
 
-## Proje Yapisi
-Projenin detayli yapisini anlamak icin `PROJE_YAPISI.md` dosyasini oku.
+## Proje Dokumanlari
+
+**Onemli:** Projeye baslarken asagidaki dosyalari oku:
+
+1. **PROJE_YAPISI.md** - Detayli proje yapisi, entity'ler, API endpoint'leri, mimari
+2. **TODO.md** - Yapilacaklar listesi (oncelikli gorevler)
+3. **COMPLETED.md** - Tamamlanan isler ve mevcut durum
 
 ---
 

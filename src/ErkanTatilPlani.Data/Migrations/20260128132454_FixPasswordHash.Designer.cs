@@ -3,6 +3,7 @@ using System;
 using ErkanTatilPlani.Data.Context;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -11,9 +12,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace ErkanTatilPlani.Data.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260128132454_FixPasswordHash")]
+    partial class FixPasswordHash
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -41,21 +44,12 @@ namespace ErkanTatilPlani.Data.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
-                    b.Property<string>("City")
-                        .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("character varying(100)");
-
                     b.Property<string>("ContractFileUrl")
                         .IsRequired()
                         .HasColumnType("text");
 
                     b.Property<DateTime?>("ContractUploadedAt")
                         .HasColumnType("timestamp with time zone");
-
-                    b.Property<string>("CoverImageUrl")
-                        .IsRequired()
-                        .HasColumnType("text");
 
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("timestamp with time zone");
@@ -69,25 +63,12 @@ namespace ErkanTatilPlani.Data.Migrations
                         .HasMaxLength(100)
                         .HasColumnType("character varying(100)");
 
-                    b.Property<int?>("FoundedYear")
-                        .HasColumnType("integer");
-
                     b.Property<bool>("IsActive")
                         .HasColumnType("boolean");
 
                     b.Property<string>("LogoUrl")
                         .IsRequired()
                         .HasColumnType("text");
-
-                    b.Property<string>("MetaDescription")
-                        .IsRequired()
-                        .HasMaxLength(300)
-                        .HasColumnType("character varying(300)");
-
-                    b.Property<string>("MetaTitle")
-                        .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("character varying(100)");
 
                     b.Property<string>("Name")
                         .IsRequired()
@@ -112,22 +93,8 @@ namespace ErkanTatilPlani.Data.Migrations
                     b.Property<int?>("ReviewedById")
                         .HasColumnType("integer");
 
-                    b.Property<string>("Slug")
-                        .IsRequired()
-                        .HasMaxLength(200)
-                        .HasColumnType("character varying(200)");
-
-                    b.Property<string>("SocialLinks")
-                        .IsRequired()
-                        .HasColumnType("text");
-
                     b.Property<int>("StatusId")
                         .HasColumnType("integer");
-
-                    b.Property<string>("Tagline")
-                        .IsRequired()
-                        .HasMaxLength(200)
-                        .HasColumnType("character varying(200)");
 
                     b.Property<string>("TaxNumber")
                         .IsRequired()
@@ -147,9 +114,6 @@ namespace ErkanTatilPlani.Data.Migrations
 
                     b.HasIndex("ReviewedById");
 
-                    b.HasIndex("Slug")
-                        .IsUnique();
-
                     b.HasIndex("TaxNumber")
                         .IsUnique();
 
@@ -159,150 +123,110 @@ namespace ErkanTatilPlani.Data.Migrations
                         new
                         {
                             Id = 1,
-                            Address = "Izmir, Alsancak Mah. Kordon Cad. No:123",
+                            Address = "Izmir, Alsancak",
                             ApplicationDate = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             ApplicationNotes = "",
-                            City = "Izmir",
                             ContractFileUrl = "",
-                            CoverImageUrl = "https://picsum.photos/seed/egetur-cover/1200/400",
                             CreatedAt = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
-                            Description = "Ege bolgesi turlari konusunda uzman seyahat acentasi. 15 yillik deneyimimizle Efes, Pamukkale, Cesme ve daha fazlasini kesfetmenizi sagliyoruz.",
+                            Description = "Ege bolgesi turlari",
                             Email = "info@egetur.com",
-                            FoundedYear = 2010,
                             IsActive = true,
                             LogoUrl = "https://picsum.photos/seed/egetur/200",
-                            MetaDescription = "Efes, Pamukkale, Cesme ve tum Ege turlarinda uzman acenta. Gunubirlik ve konaklamali turlar.",
-                            MetaTitle = "Ege Tur - Izmir Cikisli Ege Turlari",
                             Name = "Ege Tur",
                             Phone = "0232 555 1234",
                             RejectionReason = "",
                             ReviewNotes = "",
                             ReviewedAt = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             ReviewedById = 1,
-                            Slug = "ege-tur",
-                            SocialLinks = "",
                             StatusId = 1,
-                            Tagline = "Ege'nin Guzelliklerini Kesfedin",
                             TaxNumber = "1234567890",
                             Website = "www.egetur.com"
                         },
                         new
                         {
                             Id = 2,
-                            Address = "Trabzon, Meydan Mah. Ataturk Cad. No:45",
+                            Address = "Trabzon, Meydan",
                             ApplicationDate = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             ApplicationNotes = "",
-                            City = "Trabzon",
                             ContractFileUrl = "",
-                            CoverImageUrl = "https://picsum.photos/seed/karadeniz-cover/1200/400",
                             CreatedAt = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
-                            Description = "Karadeniz'in essiz dogasini ve yaylalarini profesyonel rehberler esliginde kesfetmenizi saglayan tur firmasi. Uzungol, Ayder ve daha fazlasi.",
+                            Description = "Karadeniz yayla turlari",
                             Email = "info@karadenizgezileri.com",
-                            FoundedYear = 2015,
                             IsActive = true,
                             LogoUrl = "https://picsum.photos/seed/karadeniz/200",
-                            MetaDescription = "Uzungol, Ayder, Sumela ve tum Karadeniz yaylalarini kesfedin. Dogayla ic ice tatil firsatlari.",
-                            MetaTitle = "Karadeniz Gezileri - Yayla ve Doga Turlari",
                             Name = "Karadeniz Gezileri",
                             Phone = "0462 555 5678",
                             RejectionReason = "",
                             ReviewNotes = "",
                             ReviewedAt = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             ReviewedById = 1,
-                            Slug = "karadeniz-gezileri",
-                            SocialLinks = "",
                             StatusId = 1,
-                            Tagline = "Yesil Cennetin Kapisi",
                             TaxNumber = "2345678901",
                             Website = "www.karadenizgezileri.com"
                         },
                         new
                         {
                             Id = 3,
-                            Address = "Antalya, Konyaalti Mah. Liman Cad. No:78",
+                            Address = "Antalya, Konyaalti",
                             ApplicationDate = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             ApplicationNotes = "",
-                            City = "Antalya",
                             ContractFileUrl = "",
-                            CoverImageUrl = "https://picsum.photos/seed/akdeniz-cover/1200/400",
                             CreatedAt = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
-                            Description = "Turkiye'nin en guzel sahillerinde unutulmaz deneyimler. Tekne turlari, dalıs aktiviteleri ve kultur gezileri duzenliyoruz.",
+                            Description = "Akdeniz sahil turlari",
                             Email = "info@akdenizturizm.com",
-                            FoundedYear = 2008,
                             IsActive = true,
                             LogoUrl = "https://picsum.photos/seed/akdeniz/200",
-                            MetaDescription = "Kemer, Kas, Kekova tekne turlari. Akdeniz'in en guzel koylarini ve antik kentleri kesfedin.",
-                            MetaTitle = "Akdeniz Turizm - Antalya Tekne ve Kultur Turlari",
                             Name = "Akdeniz Turizm",
                             Phone = "0242 555 9012",
                             RejectionReason = "",
                             ReviewNotes = "",
                             ReviewedAt = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             ReviewedById = 1,
-                            Slug = "akdeniz-turizm",
-                            SocialLinks = "",
                             StatusId = 1,
-                            Tagline = "Akdeniz'in Mavisiyle Tanisin",
                             TaxNumber = "3456789012",
                             Website = "www.akdenizturizm.com"
                         },
                         new
                         {
                             Id = 4,
-                            Address = "Nevsehir, Goreme Kasabasi Merkez No:12",
+                            Address = "Nevsehir, Goreme",
                             ApplicationDate = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             ApplicationNotes = "",
-                            City = "Nevsehir",
                             ContractFileUrl = "",
-                            CoverImageUrl = "https://picsum.photos/seed/kapadokya-cover/1200/400",
                             CreatedAt = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
-                            Description = "Kapadokya'nin buleyuci peri bacalari uzerinde balon deneyimi ve kultur turlari. Yeralti sehirleri, vadiler ve daha fazlasi.",
+                            Description = "Kapadokya balon ve kultur turlari",
                             Email = "info@kapadokyabalonlari.com",
-                            FoundedYear = 2012,
                             IsActive = true,
                             LogoUrl = "https://picsum.photos/seed/kapadokya/200",
-                            MetaDescription = "Kapadokya balon turu, yeralti sehirleri, ATV safari. Peri bacalari uzerinde unutulmaz deneyim.",
-                            MetaTitle = "Kapadokya Balonlari - Sicak Hava Balonu ve Tur",
                             Name = "Kapadokya Balonlari",
                             Phone = "0384 555 3456",
                             RejectionReason = "",
                             ReviewNotes = "",
                             ReviewedAt = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             ReviewedById = 1,
-                            Slug = "kapadokya-balonlari",
-                            SocialLinks = "",
                             StatusId = 1,
-                            Tagline = "Gokyuzunden Kapadokya",
                             TaxNumber = "4567890123",
                             Website = "www.kapadokyabalonlari.com"
                         },
                         new
                         {
                             Id = 5,
-                            Address = "Istanbul, Sultanahmet Mah. Divanyolu Cad. No:56",
+                            Address = "Istanbul, Sultanahmet",
                             ApplicationDate = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             ApplicationNotes = "",
-                            City = "Istanbul",
                             ContractFileUrl = "",
-                            CoverImageUrl = "https://picsum.photos/seed/istanbul-cover/1200/400",
                             CreatedAt = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
-                            Description = "Dunyanin en etkileyici sehrinde tarihi ve kulturel turlarin adresi. Sultanahmet, Bogaz turlari ve ozel organizasyonlar.",
+                            Description = "Istanbul sehir ve bogazici turlari",
                             Email = "info@istanbulturlari.com",
-                            FoundedYear = 2005,
                             IsActive = true,
                             LogoUrl = "https://picsum.photos/seed/istanbul/200",
-                            MetaDescription = "Sultanahmet, Ayasofya, Topkapi Sarayi, Bogaz turu. Istanbul'un tum guzelliklerini kesfedin.",
-                            MetaTitle = "Istanbul Turlari - Tarihi Yarimada ve Bogaz Turu",
                             Name = "Istanbul Turlari",
                             Phone = "0212 555 7890",
                             RejectionReason = "",
                             ReviewNotes = "",
                             ReviewedAt = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             ReviewedById = 1,
-                            Slug = "istanbul-turlari",
-                            SocialLinks = "",
                             StatusId = 1,
-                            Tagline = "Iki Kitanin Kesisim Noktasi",
                             TaxNumber = "5678901234",
                             Website = "www.istanbulturlari.com"
                         });

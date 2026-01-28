@@ -5,7 +5,7 @@
 <div id="toursApp">
 <div class="mb-4">
     <h1><i class="bi bi-geo-alt"></i> Turlar</h1>
-    <p class="text-muted">Sizin icin en uygun turu secin ve hayalinizdeki tatile baslayın!</p>
+    <p class="text-muted">Sizin icin en uygun turu secin ve hayalinizdeki tatile baslayin!</p>
 </div>
 
 <!-- Loading -->
@@ -38,6 +38,19 @@
                 <p class="card-text text-muted">
                     <i class="bi bi-geo-alt"></i> <span data-bind="text: destination"></span>
                 </p>
+                <!-- Puan ve Yorum Sayisi -->
+                <p class="card-text mb-2">
+                    <!-- ko if: reviewCount > 0 -->
+                    <span class="text-warning">
+                        <i class="bi bi-star-fill"></i>
+                        <strong data-bind="text: averageRating.toFixed(1)"></strong>
+                    </span>
+                    <small class="text-muted">(<span data-bind="text: reviewCount"></span> yorum)</small>
+                    <!-- /ko -->
+                    <!-- ko if: reviewCount === 0 -->
+                    <small class="text-muted"><i class="bi bi-star"></i> Henuz yorum yok</small>
+                    <!-- /ko -->
+                </p>
                 <p class="card-text" data-bind="text: description"></p>
                 <div class="d-flex justify-content-between align-items-center">
                     <span class="badge bg-primary fs-6" data-bind="text: price.toLocaleString('tr-TR', {style: 'currency', currency: 'TRY'})"></span>
@@ -63,42 +76,415 @@
     <i class="bi bi-info-circle"></i> Henuz tur bulunmamaktadir. Yakinda yeni turlar eklenecektir!
 </div>
 
-<!-- Details Modal -->
+<!-- Details Modal (Yorumlarla birlikte) -->
 <div class="modal fade" id="detailsModal" tabindex="-1">
-    <div class="modal-dialog modal-lg">
+    <div class="modal-dialog modal-xl">
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title">Tur Detayi</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
             </div>
             <div class="modal-body" data-bind="with: selectedTour">
-                <div class="row">
-                    <div class="col-md-6">
+                <!-- Tur Bilgileri -->
+                <div class="row mb-4">
+                    <div class="col-md-5">
+                        <!-- ko if: imageUrl -->
+                        <img data-bind="attr: { src: imageUrl }" class="img-fluid rounded mb-3" style="max-height: 250px; width: 100%; object-fit: cover;" />
+                        <!-- /ko -->
                         <h4 data-bind="text: name"></h4>
                         <p class="text-muted"><i class="bi bi-geo-alt"></i> <span data-bind="text: destination"></span></p>
                         <p data-bind="visible: company" class="alert alert-light">
                             <i class="bi bi-building"></i> <strong>Firma:</strong> <span data-bind="text: company ? company.name : ''"></span>
                         </p>
                     </div>
-                    <div class="col-md-6">
+                    <div class="col-md-7">
                         <dl class="row">
-                            <dt class="col-sm-5">Fiyat</dt>
-                            <dd class="col-sm-7"><span class="badge bg-success fs-6" data-bind="text: price.toLocaleString('tr-TR', {style: 'currency', currency: 'TRY'})"></span></dd>
+                            <dt class="col-sm-4">Fiyat</dt>
+                            <dd class="col-sm-8"><span class="badge bg-success fs-6" data-bind="text: price.toLocaleString('tr-TR', {style: 'currency', currency: 'TRY'})"></span></dd>
 
-                            <dt class="col-sm-5">Sure</dt>
-                            <dd class="col-sm-7"><span data-bind="text: durationDays"></span> gun</dd>
+                            <dt class="col-sm-4">Sure</dt>
+                            <dd class="col-sm-8"><span data-bind="text: durationDays"></span> gun</dd>
 
-                            <dt class="col-sm-5">Kapasite</dt>
-                            <dd class="col-sm-7"><span data-bind="text: maxCapacity || '-'"></span> kisi</dd>
+                            <dt class="col-sm-4">Kapasite</dt>
+                            <dd class="col-sm-8"><span data-bind="text: maxCapacity || '-'"></span> kisi</dd>
 
-                            <dt class="col-sm-5">Aciklama</dt>
-                            <dd class="col-sm-7" data-bind="text: description || '-'"></dd>
+                            <dt class="col-sm-4">Aciklama</dt>
+                            <dd class="col-sm-8" data-bind="text: description || '-'"></dd>
                         </dl>
+
+                        <!-- Puan Ozeti -->
+                        <div class="card bg-light">
+                            <div class="card-body">
+                                <div class="d-flex align-items-center mb-2">
+                                    <div class="display-4 text-warning me-3" data-bind="text: (averageRating || 0).toFixed(1)"></div>
+                                    <div>
+                                        <div data-bind="html: $parent.renderStars(averageRating || 0)"></div>
+                                        <small class="text-muted"><span data-bind="text: reviewCount || 0"></span> yorum</small>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <hr />
+
+                <!-- Yorumlar Bolumu -->
+                <div class="row">
+                    <div class="col-12">
+                        <div class="d-flex justify-content-between align-items-center mb-3">
+                            <h5 class="mb-0"><i class="bi bi-chat-quote"></i> Yorumlar</h5>
+                            <button class="btn btn-primary btn-sm" data-bind="click: $parent.openWriteReviewModal, visible: $parent.canWriteReview()">
+                                <i class="bi bi-pencil"></i> Yorum Yaz
+                            </button>
+                        </div>
+
+                        <!-- Filtreleme -->
+                        <div class="d-flex gap-2 mb-3 flex-wrap">
+                            <select class="form-select form-select-sm" style="width: auto;" data-bind="value: $parent.reviewSort">
+                                <option value="newest">En Yeni</option>
+                                <option value="oldest">En Eski</option>
+                                <option value="highest">En Yuksek Puan</option>
+                                <option value="lowest">En Dusuk Puan</option>
+                                <option value="helpful">En Yardimci</option>
+                            </select>
+                            <select class="form-select form-select-sm" style="width: auto;" data-bind="value: $parent.reviewRatingFilter">
+                                <option value="">Tum Puanlar</option>
+                                <option value="5">5 Yildiz</option>
+                                <option value="4">4 Yildiz</option>
+                                <option value="3">3 Yildiz</option>
+                                <option value="2">2 Yildiz</option>
+                                <option value="1">1 Yildiz</option>
+                            </select>
+                        </div>
+
+                        <!-- Yorumlar Loading -->
+                        <div data-bind="visible: $parent.isLoadingReviews" class="text-center py-4">
+                            <div class="spinner-border spinner-border-sm text-primary"></div>
+                            <span class="ms-2">Yorumlar yukleniyor...</span>
+                        </div>
+
+                        <!-- Yorum Listesi -->
+                        <div data-bind="visible: !$parent.isLoadingReviews(), foreach: $parent.reviews">
+                            <div class="card mb-3">
+                                <div class="card-body">
+                                    <div class="d-flex justify-content-between align-items-start mb-2">
+                                        <div>
+                                            <strong data-bind="text: visitor.firstName + ' ' + visitor.lastInitial"></strong>
+                                            <!-- ko if: isVerified -->
+                                            <span class="badge bg-success ms-1" title="Dogrulanmis Yorum"><i class="bi bi-patch-check-fill"></i></span>
+                                            <!-- /ko -->
+                                            <br />
+                                            <small class="text-muted">
+                                                <i class="bi" data-bind="class: travelTypeIcon"></i>
+                                                <span data-bind="text: $parent.getTravelTypeName(travelTypeId)"></span>
+                                                <!-- ko if: visitDate -->
+                                                - <span data-bind="text: $parent.formatDate(visitDate)"></span>
+                                                <!-- /ko -->
+                                            </small>
+                                        </div>
+                                        <div class="text-end">
+                                            <div data-bind="html: $parent.renderStars(overallRating)"></div>
+                                            <small class="text-muted" data-bind="text: $parent.formatDate(createdAt)"></small>
+                                        </div>
+                                    </div>
+
+                                    <!-- ko if: title -->
+                                    <h6 class="mb-2" data-bind="text: title"></h6>
+                                    <!-- /ko -->
+
+                                    <!-- ko if: pros -->
+                                    <p class="mb-1"><span class="text-success"><i class="bi bi-plus-circle"></i> Olumlu:</span> <span data-bind="text: pros"></span></p>
+                                    <!-- /ko -->
+
+                                    <!-- ko if: cons -->
+                                    <p class="mb-1"><span class="text-danger"><i class="bi bi-dash-circle"></i> Olumsuz:</span> <span data-bind="text: cons"></span></p>
+                                    <!-- /ko -->
+
+                                    <!-- ko if: comment -->
+                                    <p class="mb-2" data-bind="text: comment"></p>
+                                    <!-- /ko -->
+
+                                    <!-- Tavsiye -->
+                                    <p class="mb-2">
+                                        <!-- ko if: wouldRecommend -->
+                                        <span class="badge bg-success"><i class="bi bi-hand-thumbs-up"></i> Tavsiye Eder</span>
+                                        <!-- /ko -->
+                                        <!-- ko ifnot: wouldRecommend -->
+                                        <span class="badge bg-secondary"><i class="bi bi-hand-thumbs-down"></i> Tavsiye Etmez</span>
+                                        <!-- /ko -->
+                                    </p>
+
+                                    <!-- Yardimci / Sikayet -->
+                                    <div class="d-flex justify-content-between align-items-center border-top pt-2 mt-2">
+                                        <div>
+                                            <small class="text-muted me-3">Bu yorum yardimci oldu mu?</small>
+                                            <button class="btn btn-sm btn-outline-success me-1" data-bind="click: function() { $parents[1].voteHelpful(id, true) }">
+                                                <i class="bi bi-hand-thumbs-up"></i> <span data-bind="text: helpfulCount"></span>
+                                            </button>
+                                            <button class="btn btn-sm btn-outline-secondary" data-bind="click: function() { $parents[1].voteHelpful(id, false) }">
+                                                <i class="bi bi-hand-thumbs-down"></i> <span data-bind="text: notHelpfulCount"></span>
+                                            </button>
+                                        </div>
+                                        <div>
+                                            <button class="btn btn-sm btn-link text-muted" data-bind="click: function() { $parents[1].openReplyModal(id) }">
+                                                <i class="bi bi-reply"></i> Yanit Ver
+                                            </button>
+                                            <button class="btn btn-sm btn-link text-muted" data-bind="click: function() { $parents[1].openReportModal(id) }">
+                                                <i class="bi bi-flag"></i> Sikayet
+                                            </button>
+                                        </div>
+                                    </div>
+
+                                    <!-- Yanitlar -->
+                                    <!-- ko if: replies && replies.length > 0 -->
+                                    <div class="mt-3 ms-4 border-start ps-3">
+                                        <!-- ko foreach: replies -->
+                                        <div class="mb-2">
+                                            <div class="d-flex justify-content-between">
+                                                <div>
+                                                    <strong data-bind="text: visitor.firstName + ' ' + visitor.lastInitial"></strong>
+                                                    <!-- ko if: isFromCompany -->
+                                                    <span class="badge bg-info ms-1"><i class="bi bi-building"></i> Firma</span>
+                                                    <!-- /ko -->
+                                                </div>
+                                                <small class="text-muted" data-bind="text: $parents[2].formatDate(createdAt)"></small>
+                                            </div>
+                                            <p class="mb-0 text-muted" data-bind="text: comment"></p>
+                                        </div>
+                                        <!-- /ko -->
+                                    </div>
+                                    <!-- /ko -->
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Yorum Yok -->
+                        <div data-bind="visible: !$parent.isLoadingReviews() && $parent.reviews().length === 0" class="text-center py-4 text-muted">
+                            <i class="bi bi-chat-square-text" style="font-size: 3rem;"></i>
+                            <p class="mt-2">Henuz yorum yapilmamis. Ilk yorumu siz yapin!</p>
+                        </div>
+
+                        <!-- Daha Fazla Yukle -->
+                        <div class="text-center" data-bind="visible: $parent.hasMoreReviews()">
+                            <button class="btn btn-outline-primary" data-bind="click: $parent.loadMoreReviews, disable: $parent.isLoadingReviews">
+                                Daha Fazla Yukle
+                            </button>
+                        </div>
                     </div>
                 </div>
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Kapat</button>
+                <button type="button" class="btn btn-success" data-bind="click: function() { openReservationModal(selectedTour()) }">
+                    <i class="bi bi-calendar-check"></i> Rezervasyon Yap
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Write Review Modal -->
+<div class="modal fade" id="writeReviewModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header bg-primary text-white">
+                <h5 class="modal-title"><i class="bi bi-star"></i> Yorum Yaz</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <form id="reviewForm">
+                    <!-- Genel Puan -->
+                    <div class="mb-4 text-center">
+                        <label class="form-label fw-bold">Genel Puaniniz *</label>
+                        <div class="star-rating fs-2" data-bind="foreach: [1,2,3,4,5]">
+                            <i class="bi cursor-pointer"
+                               data-bind="css: $data <= $parent.reviewFormData().overallRating ? 'bi-star-fill text-warning' : 'bi-star text-muted',
+                                          click: function() { $parent.reviewFormData().overallRating = $data; $parent.reviewFormData.valueHasMutated(); }"></i>
+                        </div>
+                    </div>
+
+                    <!-- Detayli Puanlar -->
+                    <div class="row mb-3">
+                        <div class="col-md-4 mb-2">
+                            <label class="form-label small">Hizmet Kalitesi</label>
+                            <select class="form-select form-select-sm" data-bind="value: reviewFormData().serviceRating">
+                                <option value="">Secin</option>
+                                <option value="5">5 - Mukemmel</option>
+                                <option value="4">4 - Cok Iyi</option>
+                                <option value="3">3 - Iyi</option>
+                                <option value="2">2 - Orta</option>
+                                <option value="1">1 - Kotu</option>
+                            </select>
+                        </div>
+                        <div class="col-md-4 mb-2">
+                            <label class="form-label small">Fiyat/Deger</label>
+                            <select class="form-select form-select-sm" data-bind="value: reviewFormData().valueRating">
+                                <option value="">Secin</option>
+                                <option value="5">5 - Mukemmel</option>
+                                <option value="4">4 - Cok Iyi</option>
+                                <option value="3">3 - Iyi</option>
+                                <option value="2">2 - Orta</option>
+                                <option value="1">1 - Kotu</option>
+                            </select>
+                        </div>
+                        <div class="col-md-4 mb-2">
+                            <label class="form-label small">Lokasyon</label>
+                            <select class="form-select form-select-sm" data-bind="value: reviewFormData().locationRating">
+                                <option value="">Secin</option>
+                                <option value="5">5 - Mukemmel</option>
+                                <option value="4">4 - Cok Iyi</option>
+                                <option value="3">3 - Iyi</option>
+                                <option value="2">2 - Orta</option>
+                                <option value="1">1 - Kotu</option>
+                            </select>
+                        </div>
+                        <div class="col-md-4 mb-2">
+                            <label class="form-label small">Organizasyon</label>
+                            <select class="form-select form-select-sm" data-bind="value: reviewFormData().organizationRating">
+                                <option value="">Secin</option>
+                                <option value="5">5 - Mukemmel</option>
+                                <option value="4">4 - Cok Iyi</option>
+                                <option value="3">3 - Iyi</option>
+                                <option value="2">2 - Orta</option>
+                                <option value="1">1 - Kotu</option>
+                            </select>
+                        </div>
+                        <div class="col-md-4 mb-2">
+                            <label class="form-label small">Rehber/Personel</label>
+                            <select class="form-select form-select-sm" data-bind="value: reviewFormData().guideRating">
+                                <option value="">Secin</option>
+                                <option value="5">5 - Mukemmel</option>
+                                <option value="4">4 - Cok Iyi</option>
+                                <option value="3">3 - Iyi</option>
+                                <option value="2">2 - Orta</option>
+                                <option value="1">1 - Kotu</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <hr />
+
+                    <!-- Yorum Icerigi -->
+                    <div class="mb-3">
+                        <label class="form-label">Yorum Basligi</label>
+                        <input type="text" class="form-control" data-bind="value: reviewFormData().title" placeholder="Kisa bir baslik yazin" maxlength="200" />
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label"><i class="bi bi-plus-circle text-success"></i> Olumlu Yonler</label>
+                            <textarea class="form-control" rows="3" data-bind="value: reviewFormData().pros" placeholder="Nelerden memnun kaldiniz?"></textarea>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label"><i class="bi bi-dash-circle text-danger"></i> Olumsuz Yonler</label>
+                            <textarea class="form-control" rows="3" data-bind="value: reviewFormData().cons" placeholder="Nelerden memnun kalmadiniz?"></textarea>
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Detayli Yorum</label>
+                        <textarea class="form-control" rows="4" data-bind="value: reviewFormData().comment" placeholder="Deneyiminizi paylasın..."></textarea>
+                    </div>
+
+                    <hr />
+
+                    <!-- Seyahat Bilgileri -->
+                    <div class="row">
+                        <div class="col-md-4 mb-3">
+                            <label class="form-label">Seyahat Tarihi</label>
+                            <input type="date" class="form-control" data-bind="value: reviewFormData().visitDate" />
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <label class="form-label">Seyahat Tipi</label>
+                            <select class="form-select" data-bind="value: reviewFormData().travelTypeId">
+                                <option value="0">Yalniz</option>
+                                <option value="1">Cift</option>
+                                <option value="2">Aile</option>
+                                <option value="3">Arkadaslar</option>
+                                <option value="4">Is Seyahati</option>
+                            </select>
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <label class="form-label">Tavsiye Eder misiniz?</label>
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" data-bind="checked: reviewFormData().wouldRecommend" id="wouldRecommend" />
+                                <label class="form-check-label" for="wouldRecommend">Evet, tavsiye ederim</label>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Iptal</button>
+                <button type="button" class="btn btn-primary" data-bind="click: submitReview, disable: isSaving() || reviewFormData().overallRating < 1">
+                    <span data-bind="visible: isSaving" class="spinner-border spinner-border-sm me-1"></span>
+                    Yorumu Gonder
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Reply Modal -->
+<div class="modal fade" id="replyModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title"><i class="bi bi-reply"></i> Yanit Yaz</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <div class="mb-3">
+                    <label class="form-label">Yanitiniz</label>
+                    <textarea class="form-control" rows="3" data-bind="value: replyText" placeholder="Yanitinizi yazin..."></textarea>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Iptal</button>
+                <button type="button" class="btn btn-primary" data-bind="click: submitReply, disable: isSaving() || !replyText()">
+                    <span data-bind="visible: isSaving" class="spinner-border spinner-border-sm me-1"></span>
+                    Gonder
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Report Modal -->
+<div class="modal fade" id="reportModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header bg-warning">
+                <h5 class="modal-title"><i class="bi bi-flag"></i> Yorumu Sikayet Et</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <div class="mb-3">
+                    <label class="form-label">Sikayet Sebebi *</label>
+                    <select class="form-select" data-bind="value: reportReasonId">
+                        <option value="">Secin...</option>
+                        <option value="0">Spam veya Reklam</option>
+                        <option value="1">Uygunsuz Icerik</option>
+                        <option value="2">Sahte/Yaniltici Yorum</option>
+                        <option value="3">Taciz/Hakaret</option>
+                        <option value="4">Kisisel Bilgi Paylasimi</option>
+                        <option value="5">Konu Disi</option>
+                        <option value="6">Telif Hakki Ihlali</option>
+                        <option value="99">Diger</option>
+                    </select>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Ek Aciklama</label>
+                    <textarea class="form-control" rows="3" data-bind="value: reportDescription" placeholder="Detaylı aciklama (opsiyonel)"></textarea>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Iptal</button>
+                <button type="button" class="btn btn-warning" data-bind="click: submitReport, disable: isSaving() || !reportReasonId()">
+                    <span data-bind="visible: isSaving" class="spinner-border spinner-border-sm me-1"></span>
+                    Sikayet Et
+                </button>
             </div>
         </div>
     </div>
@@ -155,16 +541,54 @@
 </div>
 </div>
 
+<style>
+.cursor-pointer { cursor: pointer; }
+.star-rating i:hover { transform: scale(1.2); }
+</style>
+
 @section Scripts {
 <script>
 function ToursViewModel() {
     var self = this;
 
+    // Tur verileri
     self.tours = ko.observableArray([]);
     self.isLoading = ko.observable(true);
     self.isSaving = ko.observable(false);
     self.selectedTour = ko.observable(null);
 
+    // Yorum verileri
+    self.reviews = ko.observableArray([]);
+    self.isLoadingReviews = ko.observable(false);
+    self.reviewSort = ko.observable('newest');
+    self.reviewRatingFilter = ko.observable('');
+    self.reviewPage = ko.observable(1);
+    self.reviewTotalPages = ko.observable(1);
+
+    // Yorum yazma formu
+    self.reviewFormData = ko.observable({
+        overallRating: 0,
+        serviceRating: '',
+        valueRating: '',
+        locationRating: '',
+        organizationRating: '',
+        guideRating: '',
+        title: '',
+        pros: '',
+        cons: '',
+        comment: '',
+        visitDate: '',
+        travelTypeId: '0',
+        wouldRecommend: true
+    });
+
+    // Yanit ve sikayet
+    self.selectedReviewId = ko.observable(null);
+    self.replyText = ko.observable('');
+    self.reportReasonId = ko.observable('');
+    self.reportDescription = ko.observable('');
+
+    // Rezervasyon verileri
     self.reservationData = ko.observable({
         fullName: '',
         email: '',
@@ -173,8 +597,51 @@ function ToursViewModel() {
         notes: ''
     });
 
-    var detailsModal, reservationModal;
+    // Modal referanslari
+    var detailsModal, reservationModal, writeReviewModal, replyModal, reportModal;
 
+    // Seyahat tipi isimleri
+    var travelTypes = {
+        0: 'Yalniz', 1: 'Cift', 2: 'Aile', 3: 'Arkadaslar', 4: 'Is Seyahati'
+    };
+
+    self.getTravelTypeName = function(id) {
+        return travelTypes[id] || '';
+    };
+
+    // Yildiz render
+    self.renderStars = function(rating) {
+        var html = '';
+        for (var i = 1; i <= 5; i++) {
+            if (i <= rating) {
+                html += '<i class="bi bi-star-fill text-warning"></i>';
+            } else if (i - 0.5 <= rating) {
+                html += '<i class="bi bi-star-half text-warning"></i>';
+            } else {
+                html += '<i class="bi bi-star text-warning"></i>';
+            }
+        }
+        return html;
+    };
+
+    // Tarih formatlama
+    self.formatDate = function(dateStr) {
+        if (!dateStr) return '';
+        var date = new Date(dateStr);
+        return date.toLocaleDateString('tr-TR');
+    };
+
+    // Giris yapildi mi kontrolu
+    self.canWriteReview = function() {
+        return window.currentUser && window.currentUser.id;
+    };
+
+    // Daha fazla yorum var mi
+    self.hasMoreReviews = function() {
+        return self.reviewPage() < self.reviewTotalPages();
+    };
+
+    // Turları yukle
     self.loadData = function() {
         self.isLoading(true);
         $.ajax({
@@ -191,11 +658,247 @@ function ToursViewModel() {
         });
     };
 
+    // Yorumlari yukle
+    self.loadReviews = function(tourId, append) {
+        if (!append) {
+            self.reviewPage(1);
+            self.reviews([]);
+        }
+
+        self.isLoadingReviews(true);
+        var params = {
+            sort: self.reviewSort(),
+            page: self.reviewPage(),
+            pageSize: 5
+        };
+        if (self.reviewRatingFilter()) {
+            params.rating = self.reviewRatingFilter();
+        }
+
+        $.ajax({
+            url: apiBaseUrl + '/api/tours/' + tourId + '/reviews',
+            method: 'GET',
+            data: params,
+            success: function(data) {
+                if (append) {
+                    self.reviews(self.reviews().concat(data.reviews));
+                } else {
+                    self.reviews(data.reviews);
+                }
+                self.reviewTotalPages(data.pagination.totalPages);
+                self.isLoadingReviews(false);
+            },
+            error: function() {
+                toastr.error('Yorumlar yuklenirken hata olustu');
+                self.isLoadingReviews(false);
+            }
+        });
+    };
+
+    // Daha fazla yorum yukle
+    self.loadMoreReviews = function() {
+        self.reviewPage(self.reviewPage() + 1);
+        self.loadReviews(self.selectedTour().id, true);
+    };
+
+    // Filtre/siralama degistiginde yorumlari yeniden yukle
+    self.reviewSort.subscribe(function() {
+        if (self.selectedTour()) {
+            self.loadReviews(self.selectedTour().id, false);
+        }
+    });
+    self.reviewRatingFilter.subscribe(function() {
+        if (self.selectedTour()) {
+            self.loadReviews(self.selectedTour().id, false);
+        }
+    });
+
+    // Detay goster
     self.showDetails = function(tour) {
         self.selectedTour(tour);
+        self.loadReviews(tour.id, false);
         detailsModal.show();
     };
 
+    // Yorum yazma modali
+    self.openWriteReviewModal = function() {
+        if (!self.canWriteReview()) {
+            toastr.warning('Yorum yapmak icin giris yapmaniz gerekiyor');
+            return;
+        }
+        self.reviewFormData({
+            overallRating: 0,
+            serviceRating: '',
+            valueRating: '',
+            locationRating: '',
+            organizationRating: '',
+            guideRating: '',
+            title: '',
+            pros: '',
+            cons: '',
+            comment: '',
+            visitDate: '',
+            travelTypeId: '0',
+            wouldRecommend: true
+        });
+        writeReviewModal.show();
+    };
+
+    // Yorum gonder
+    self.submitReview = function() {
+        var data = self.reviewFormData();
+        if (data.overallRating < 1) {
+            toastr.warning('Lutfen bir puan secin');
+            return;
+        }
+
+        self.isSaving(true);
+        $.ajax({
+            url: apiBaseUrl + '/api/tours/' + self.selectedTour().id + '/reviews',
+            method: 'POST',
+            contentType: 'application/json',
+            data: JSON.stringify({
+                visitorId: window.currentUser.id,
+                overallRating: data.overallRating,
+                serviceRating: data.serviceRating ? parseInt(data.serviceRating) : null,
+                valueRating: data.valueRating ? parseInt(data.valueRating) : null,
+                locationRating: data.locationRating ? parseInt(data.locationRating) : null,
+                organizationRating: data.organizationRating ? parseInt(data.organizationRating) : null,
+                guideRating: data.guideRating ? parseInt(data.guideRating) : null,
+                title: data.title,
+                pros: data.pros,
+                cons: data.cons,
+                comment: data.comment,
+                visitDate: data.visitDate || null,
+                travelTypeId: parseInt(data.travelTypeId),
+                wouldRecommend: data.wouldRecommend
+            }),
+            success: function(response) {
+                writeReviewModal.hide();
+                toastr.success(response.message || 'Yorumunuz eklendi');
+                self.loadReviews(self.selectedTour().id, false);
+                // Tur listesini de guncelle (puan degismis olabilir)
+                self.loadData();
+                self.isSaving(false);
+            },
+            error: function(xhr) {
+                var msg = xhr.responseJSON ? xhr.responseJSON.message : 'Hata olustu';
+                toastr.error(msg);
+                self.isSaving(false);
+            }
+        });
+    };
+
+    // Yardimci oylama
+    self.voteHelpful = function(reviewId, isHelpful) {
+        if (!self.canWriteReview()) {
+            toastr.warning('Oy vermek icin giris yapmaniz gerekiyor');
+            return;
+        }
+
+        $.ajax({
+            url: apiBaseUrl + '/api/reviews/' + reviewId + '/helpful',
+            method: 'POST',
+            contentType: 'application/json',
+            data: JSON.stringify({
+                visitorId: window.currentUser.id,
+                isHelpful: isHelpful
+            }),
+            success: function(response) {
+                // Yorumu guncelle
+                var review = self.reviews().find(function(r) { return r.id === reviewId; });
+                if (review) {
+                    review.helpfulCount = response.helpfulCount;
+                    review.notHelpfulCount = response.notHelpfulCount;
+                    self.reviews.valueHasMutated();
+                }
+                toastr.success(response.message);
+            },
+            error: function(xhr) {
+                var msg = xhr.responseJSON ? xhr.responseJSON.message : 'Hata olustu';
+                toastr.error(msg);
+            }
+        });
+    };
+
+    // Yanit modali
+    self.openReplyModal = function(reviewId) {
+        if (!self.canWriteReview()) {
+            toastr.warning('Yanit vermek icin giris yapmaniz gerekiyor');
+            return;
+        }
+        self.selectedReviewId(reviewId);
+        self.replyText('');
+        replyModal.show();
+    };
+
+    // Yanit gonder
+    self.submitReply = function() {
+        if (!self.replyText()) return;
+
+        self.isSaving(true);
+        $.ajax({
+            url: apiBaseUrl + '/api/reviews/' + self.selectedReviewId() + '/reply',
+            method: 'POST',
+            contentType: 'application/json',
+            data: JSON.stringify({
+                visitorId: window.currentUser.id,
+                comment: self.replyText()
+            }),
+            success: function(response) {
+                replyModal.hide();
+                toastr.success(response.message || 'Yanitiniz eklendi');
+                self.loadReviews(self.selectedTour().id, false);
+                self.isSaving(false);
+            },
+            error: function(xhr) {
+                var msg = xhr.responseJSON ? xhr.responseJSON.message : 'Hata olustu';
+                toastr.error(msg);
+                self.isSaving(false);
+            }
+        });
+    };
+
+    // Sikayet modali
+    self.openReportModal = function(reviewId) {
+        if (!self.canWriteReview()) {
+            toastr.warning('Sikayet etmek icin giris yapmaniz gerekiyor');
+            return;
+        }
+        self.selectedReviewId(reviewId);
+        self.reportReasonId('');
+        self.reportDescription('');
+        reportModal.show();
+    };
+
+    // Sikayet gonder
+    self.submitReport = function() {
+        if (!self.reportReasonId()) return;
+
+        self.isSaving(true);
+        $.ajax({
+            url: apiBaseUrl + '/api/reviews/' + self.selectedReviewId() + '/report',
+            method: 'POST',
+            contentType: 'application/json',
+            data: JSON.stringify({
+                visitorId: window.currentUser.id,
+                reasonId: parseInt(self.reportReasonId()),
+                description: self.reportDescription()
+            }),
+            success: function(response) {
+                reportModal.hide();
+                toastr.success(response.message || 'Sikayetiniz alindi');
+                self.isSaving(false);
+            },
+            error: function(xhr) {
+                var msg = xhr.responseJSON ? xhr.responseJSON.message : 'Hata olustu';
+                toastr.error(msg);
+                self.isSaving(false);
+            }
+        });
+    };
+
+    // Rezervasyon modali
     self.openReservationModal = function(tour) {
         self.selectedTour(tour);
         self.reservationData({
@@ -216,10 +919,6 @@ function ToursViewModel() {
         }
 
         self.isSaving(true);
-        var tour = self.selectedTour();
-        var data = self.reservationData();
-
-        // Simdi sadece bilgilendirme yapiyoruz - gercek rezervasyon icin visitor/login gerekli
         setTimeout(function() {
             reservationModal.hide();
             toastr.success('Rezervasyon talebiniz alindi! En kisa surede sizinle iletisime gececegiz.');
@@ -227,9 +926,13 @@ function ToursViewModel() {
         }, 500);
     };
 
+    // Sayfa yuklendiginde
     $(document).ready(function() {
         detailsModal = new bootstrap.Modal(document.getElementById('detailsModal'));
         reservationModal = new bootstrap.Modal(document.getElementById('reservationModal'));
+        writeReviewModal = new bootstrap.Modal(document.getElementById('writeReviewModal'));
+        replyModal = new bootstrap.Modal(document.getElementById('replyModal'));
+        reportModal = new bootstrap.Modal(document.getElementById('reportModal'));
         self.loadData();
     });
 }

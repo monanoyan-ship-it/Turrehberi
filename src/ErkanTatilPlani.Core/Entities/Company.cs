@@ -14,6 +14,50 @@ public class Company : BaseEntity
     public string TaxNumber { get; set; } = string.Empty;
 
     // ===============================================
+    // SEO VE PUBLIC PROFIL ALANLARI
+    // ===============================================
+
+    /// <summary>
+    /// SEO-friendly URL slug (ornek: "mugla-tur-acentasi")
+    /// </summary>
+    public string Slug { get; set; } = string.Empty;
+
+    /// <summary>
+    /// SEO Meta Title
+    /// </summary>
+    public string MetaTitle { get; set; } = string.Empty;
+
+    /// <summary>
+    /// SEO Meta Description
+    /// </summary>
+    public string MetaDescription { get; set; } = string.Empty;
+
+    /// <summary>
+    /// Firma slogan/tanitim cumlesi
+    /// </summary>
+    public string Tagline { get; set; } = string.Empty;
+
+    /// <summary>
+    /// Kurulus yili
+    /// </summary>
+    public int? FoundedYear { get; set; }
+
+    /// <summary>
+    /// Sehir/Bolge (arama ve filtreleme icin)
+    /// </summary>
+    public string City { get; set; } = string.Empty;
+
+    /// <summary>
+    /// Sosyal medya linkleri (JSON formatinda)
+    /// </summary>
+    public string SocialLinks { get; set; } = string.Empty;
+
+    /// <summary>
+    /// Kapak fotografi URL
+    /// </summary>
+    public string CoverImageUrl { get; set; } = string.Empty;
+
+    // ===============================================
     // BASVURU VE ONAY ALANLARI
     // ===============================================
 

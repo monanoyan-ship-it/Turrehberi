@@ -3,11 +3,43 @@
 }
 
 <div id="adminCompaniesApp">
+    <!-- Filtre Butonlari -->
     <div class="d-flex justify-content-between align-items-center mb-4">
-        <p class="text-muted mb-0">Firmalari yonetin ve yeni firmalar ekleyin</p>
+        <div class="btn-group" role="group">
+            <button type="button" class="btn"
+                    data-bind="click: function() { filterStatus(null) }, css: filterStatus() === null ? 'btn-primary' : 'btn-outline-primary'">
+                Tumu <span class="badge bg-light text-dark ms-1" data-bind="text: companies().length"></span>
+            </button>
+            <button type="button" class="btn"
+                    data-bind="click: function() { filterStatus(0) }, css: filterStatus() === 0 ? 'btn-warning' : 'btn-outline-warning'">
+                <i class="bi bi-hourglass-split me-1"></i> Bekleyen
+                <span class="badge bg-light text-dark ms-1" data-bind="text: pendingCount()"></span>
+            </button>
+            <button type="button" class="btn"
+                    data-bind="click: function() { filterStatus(1) }, css: filterStatus() === 1 ? 'btn-success' : 'btn-outline-success'">
+                <i class="bi bi-check-circle me-1"></i> Onaylanan
+            </button>
+            <button type="button" class="btn"
+                    data-bind="click: function() { filterStatus(2) }, css: filterStatus() === 2 ? 'btn-danger' : 'btn-outline-danger'">
+                <i class="bi bi-x-circle me-1"></i> Reddedilen
+            </button>
+            <button type="button" class="btn"
+                    data-bind="click: function() { filterStatus(3) }, css: filterStatus() === 3 ? 'btn-secondary' : 'btn-outline-secondary'">
+                <i class="bi bi-pause-circle me-1"></i> Askida
+            </button>
+        </div>
         <button class="btn btn-primary" data-bind="click: openCreateModal">
             <i class="bi bi-plus-circle me-1"></i> Yeni Firma
         </button>
+    </div>
+
+    <!-- Bekleyen Basvuru Uyarisi -->
+    <div class="alert alert-warning d-flex align-items-center mb-4" data-bind="visible: pendingCount() > 0">
+        <i class="bi bi-exclamation-triangle-fill me-2 fs-5"></i>
+        <div>
+            <strong data-bind="text: pendingCount"></strong> firma basvurusu onay bekliyor.
+            <a href="#" class="alert-link" data-bind="click: function() { filterStatus(0) }">Goruntule</a>
+        </div>
     </div>
 
     <div class="admin-card">
@@ -21,11 +53,13 @@
                             <th>E-posta</th>
                             <th>Telefon</th>
                             <th>Vergi No</th>
+                            <th>Basvuru Tarihi</th>
+                            <th>Sozlesme</th>
                             <th>Durum</th>
-                            <th style="width: 150px;">Islemler</th>
+                            <th style="width: 220px;">Islemler</th>
                         </tr>
                     </thead>
-                    <tbody data-bind="foreach: companies">
+                    <tbody data-bind="foreach: filteredCompanies">
                         <tr>
                             <td>
                                 <!-- ko if: logoUrl -->
@@ -45,10 +79,54 @@
                             <td data-bind="text: phone"></td>
                             <td><code data-bind="text: taxNumber"></code></td>
                             <td>
-                                <span class="badge" data-bind="css: isActive ? 'bg-success' : 'bg-secondary', text: isActive ? 'Aktif' : 'Pasif'"></span>
+                                <small data-bind="text: $parent.formatDate(applicationDate)"></small>
+                            </td>
+                            <td>
+                                <!-- ko if: contractFileUrl -->
+                                <a href="#" class="text-success text-decoration-none" data-bind="attr: { href: apiBaseUrl + contractFileUrl }" target="_blank" title="Sozlesme Goruntule">
+                                    <i class="bi bi-file-earmark-pdf-fill fs-5"></i>
+                                </a>
+                                <small class="text-muted d-block" data-bind="text: $parent.formatDateShort(contractUploadedAt)"></small>
+                                <!-- /ko -->
+                                <!-- ko ifnot: contractFileUrl -->
+                                <span class="badge bg-secondary">Yok</span>
+                                <!-- /ko -->
+                            </td>
+                            <td>
+                                <span class="badge" data-bind="css: $parent.getStatusBadgeClass(statusId), html: $parent.getStatusBadge(statusId)"></span>
                             </td>
                             <td>
                                 <div class="btn-group btn-group-sm">
+                                    <!-- Bekleyen icin Onayla/Reddet -->
+                                    <!-- ko if: statusId === 0 -->
+                                    <button class="btn btn-success" data-bind="click: $parent.openApproveModal" title="Onayla">
+                                        <i class="bi bi-check-lg"></i>
+                                    </button>
+                                    <button class="btn btn-danger" data-bind="click: $parent.openRejectModal" title="Reddet">
+                                        <i class="bi bi-x-lg"></i>
+                                    </button>
+                                    <!-- /ko -->
+                                    <!-- Onaylanan icin Askiya Al -->
+                                    <!-- ko if: statusId === 1 -->
+                                    <button class="btn btn-outline-warning" data-bind="click: $parent.openSuspendModal" title="Askiya Al">
+                                        <i class="bi bi-pause"></i>
+                                    </button>
+                                    <!-- /ko -->
+                                    <!-- Askidaki icin Aktifle -->
+                                    <!-- ko if: statusId === 3 -->
+                                    <button class="btn btn-outline-success" data-bind="click: $parent.openReactivateModal" title="Tekrar Aktifle">
+                                        <i class="bi bi-play"></i>
+                                    </button>
+                                    <!-- /ko -->
+                                    <!-- Detay butonu -->
+                                    <button class="btn btn-outline-info" data-bind="click: $parent.openDetailsModal" title="Detay">
+                                        <i class="bi bi-eye"></i>
+                                    </button>
+                                    <!-- Sozlesme butonu -->
+                                    <button class="btn btn-outline-secondary" data-bind="click: $parent.openContractModal" title="Sozlesme">
+                                        <i class="bi bi-file-earmark-pdf"></i>
+                                    </button>
+                                    <!-- Duzenle/Sil -->
                                     <button class="btn btn-outline-primary" data-bind="click: $parent.openEditModal" title="Duzenle">
                                         <i class="bi bi-pencil"></i>
                                     </button>
@@ -60,6 +138,12 @@
                         </tr>
                     </tbody>
                 </table>
+            </div>
+
+            <!-- Bos durum -->
+            <div class="text-center py-5" data-bind="visible: filteredCompanies().length === 0">
+                <i class="bi bi-inbox text-muted" style="font-size: 3rem;"></i>
+                <p class="text-muted mt-2">Bu kategoride firma bulunmuyor</p>
             </div>
         </div>
     </div>
@@ -125,6 +209,196 @@
         </div>
     </div>
 
+    <!-- Approve Modal -->
+    <div class="modal fade" id="approveModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header bg-success text-white">
+                    <h5 class="modal-title"><i class="bi bi-check-circle me-2"></i>Firma Onayla</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <p><strong data-bind="text: selectedCompany() ? selectedCompany().name : ''"></strong> firmasini onaylamak istediginizden emin misiniz?</p>
+                    <div class="mb-3">
+                        <label class="form-label">Not (Opsiyonel)</label>
+                        <textarea class="form-control" rows="2" data-bind="value: reviewNotes" placeholder="Onay notu ekleyebilirsiniz..."></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Iptal</button>
+                    <button type="button" class="btn btn-success" data-bind="click: approveCompany, disable: isSaving">
+                        <span data-bind="visible: isSaving" class="spinner-border spinner-border-sm me-1"></span>
+                        <i class="bi bi-check-lg me-1"></i> Onayla
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Reject Modal -->
+    <div class="modal fade" id="rejectModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header bg-danger text-white">
+                    <h5 class="modal-title"><i class="bi bi-x-circle me-2"></i>Firma Reddet</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <p><strong data-bind="text: selectedCompany() ? selectedCompany().name : ''"></strong> firmasinin basvurusunu reddetmek istediginizden emin misiniz?</p>
+                    <div class="mb-3">
+                        <label class="form-label">Red Sebebi *</label>
+                        <textarea class="form-control" rows="3" data-bind="value: rejectionReason" placeholder="Red sebebini yazin..." required></textarea>
+                        <div class="form-text text-danger" data-bind="visible: !rejectionReason()">Red sebebi zorunludur</div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Iptal</button>
+                    <button type="button" class="btn btn-danger" data-bind="click: rejectCompany, disable: isSaving() || !rejectionReason()">
+                        <span data-bind="visible: isSaving" class="spinner-border spinner-border-sm me-1"></span>
+                        <i class="bi bi-x-lg me-1"></i> Reddet
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Suspend Modal -->
+    <div class="modal fade" id="suspendModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header bg-warning">
+                    <h5 class="modal-title"><i class="bi bi-pause-circle me-2"></i>Firma Askiya Al</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <p><strong data-bind="text: selectedCompany() ? selectedCompany().name : ''"></strong> firmasini askiya almak istediginizden emin misiniz?</p>
+                    <div class="alert alert-warning">
+                        <i class="bi bi-exclamation-triangle me-1"></i>
+                        Askiya alinan firmalar tur ekleyemez ve mevcut turlari gizlenir.
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Askiya Alma Sebebi *</label>
+                        <textarea class="form-control" rows="3" data-bind="value: suspendReason" placeholder="Askiya alma sebebini yazin..." required></textarea>
+                        <div class="form-text text-danger" data-bind="visible: !suspendReason()">Sebep zorunludur</div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Iptal</button>
+                    <button type="button" class="btn btn-warning" data-bind="click: suspendCompany, disable: isSaving() || !suspendReason()">
+                        <span data-bind="visible: isSaving" class="spinner-border spinner-border-sm me-1"></span>
+                        <i class="bi bi-pause me-1"></i> Askiya Al
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Reactivate Modal -->
+    <div class="modal fade" id="reactivateModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header bg-success text-white">
+                    <h5 class="modal-title"><i class="bi bi-play-circle me-2"></i>Firma Aktifle</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <p><strong data-bind="text: selectedCompany() ? selectedCompany().name : ''"></strong> firmasini tekrar aktiflemek istediginizden emin misiniz?</p>
+                    <div class="mb-3">
+                        <label class="form-label">Not (Opsiyonel)</label>
+                        <textarea class="form-control" rows="2" data-bind="value: reactivateNotes" placeholder="Not ekleyebilirsiniz..."></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Iptal</button>
+                    <button type="button" class="btn btn-success" data-bind="click: reactivateCompany, disable: isSaving">
+                        <span data-bind="visible: isSaving" class="spinner-border spinner-border-sm me-1"></span>
+                        <i class="bi bi-play me-1"></i> Aktifle
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Details Modal -->
+    <div class="modal fade" id="detailsModal" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title"><i class="bi bi-building me-2"></i>Firma Detaylari</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body" data-bind="with: selectedCompany">
+                    <div class="row">
+                        <div class="col-md-8">
+                            <h4 data-bind="text: name"></h4>
+                            <p class="text-muted" data-bind="text: description"></p>
+                        </div>
+                        <div class="col-md-4 text-end">
+                            <span class="badge fs-6" data-bind="css: $parent.getStatusBadgeClass(statusId), html: $parent.getStatusBadge(statusId)"></span>
+                        </div>
+                    </div>
+                    <hr />
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h6 class="text-muted">Iletisim Bilgileri</h6>
+                            <p><i class="bi bi-envelope me-2"></i><span data-bind="text: email"></span></p>
+                            <p><i class="bi bi-telephone me-2"></i><span data-bind="text: phone || '-'"></span></p>
+                            <p><i class="bi bi-geo-alt me-2"></i><span data-bind="text: address || '-'"></span></p>
+                            <p><i class="bi bi-globe me-2"></i><span data-bind="text: website || '-'"></span></p>
+                        </div>
+                        <div class="col-md-6">
+                            <h6 class="text-muted">Basvuru Bilgileri</h6>
+                            <p><strong>Vergi No:</strong> <code data-bind="text: taxNumber"></code></p>
+                            <p><strong>Basvuru Tarihi:</strong> <span data-bind="text: $parent.formatDate(applicationDate)"></span></p>
+                            <!-- ko if: reviewedAt -->
+                            <p><strong>Inceleme Tarihi:</strong> <span data-bind="text: $parent.formatDate(reviewedAt)"></span></p>
+                            <!-- /ko -->
+                        </div>
+                    </div>
+                    <!-- ko if: applicationNotes -->
+                    <div class="mt-3">
+                        <h6 class="text-muted">Basvuru Notu</h6>
+                        <div class="bg-light p-3 rounded" data-bind="text: applicationNotes"></div>
+                    </div>
+                    <!-- /ko -->
+                    <!-- ko if: rejectionReason -->
+                    <div class="mt-3">
+                        <h6 class="text-danger">Red Sebebi</h6>
+                        <div class="bg-danger bg-opacity-10 p-3 rounded text-danger" data-bind="text: rejectionReason"></div>
+                    </div>
+                    <!-- /ko -->
+                    <!-- ko if: reviewNotes -->
+                    <div class="mt-3">
+                        <h6 class="text-muted">Admin Notu</h6>
+                        <div class="bg-info bg-opacity-10 p-3 rounded" data-bind="text: reviewNotes"></div>
+                    </div>
+                    <!-- /ko -->
+                    <hr />
+                    <div class="mt-3">
+                        <h6 class="text-muted"><i class="bi bi-file-earmark-pdf me-1"></i>Sozlesme</h6>
+                        <!-- ko if: contractFileUrl -->
+                        <div class="d-flex align-items-center gap-3">
+                            <a class="btn btn-outline-success btn-sm" data-bind="attr: { href: apiBaseUrl + contractFileUrl }" target="_blank">
+                                <i class="bi bi-eye me-1"></i> Goruntule
+                            </a>
+                            <a class="btn btn-outline-primary btn-sm" data-bind="attr: { href: apiBaseUrl + contractFileUrl, download: 'sozlesme.pdf' }">
+                                <i class="bi bi-download me-1"></i> Indir
+                            </a>
+                            <small class="text-muted">Yukleme: <span data-bind="text: $parent.formatDate(contractUploadedAt)"></span></small>
+                        </div>
+                        <!-- /ko -->
+                        <!-- ko ifnot: contractFileUrl -->
+                        <span class="badge bg-secondary">Sozlesme yuklenmemis</span>
+                        <!-- /ko -->
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Kapat</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- Delete Modal -->
     <div class="modal fade" id="deleteModal" tabindex="-1">
         <div class="modal-dialog">
@@ -143,47 +417,468 @@
             </div>
         </div>
     </div>
+
+    <!-- Contract Upload Modal -->
+    <div class="modal fade" id="contractModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header bg-secondary text-white">
+                    <h5 class="modal-title"><i class="bi bi-file-earmark-pdf me-2"></i>Sozlesme Yonetimi</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <h6 class="mb-3" data-bind="text: selectedCompany() ? selectedCompany().name : ''"></h6>
+
+                    <!-- Mevcut Sozlesme -->
+                    <div class="mb-4" data-bind="visible: selectedCompany() && selectedCompany().contractFileUrl">
+                        <label class="form-label fw-semibold">Mevcut Sozlesme</label>
+                        <div class="d-flex align-items-center gap-2 p-3 bg-light rounded">
+                            <i class="bi bi-file-earmark-pdf-fill text-danger fs-3"></i>
+                            <div class="flex-grow-1">
+                                <div class="fw-semibold">sozlesme.pdf</div>
+                                <small class="text-muted" data-bind="text: 'Yukleme: ' + (selectedCompany() ? formatDate(selectedCompany().contractUploadedAt) : '')"></small>
+                            </div>
+                            <a class="btn btn-sm btn-outline-primary" data-bind="attr: { href: apiBaseUrl + (selectedCompany() ? selectedCompany().contractFileUrl : '') }" target="_blank">
+                                <i class="bi bi-eye"></i>
+                            </a>
+                            <button class="btn btn-sm btn-outline-danger" data-bind="click: deleteContract, disable: isUploading">
+                                <i class="bi bi-trash"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Yukleme Formu -->
+                    <div>
+                        <label class="form-label fw-semibold" data-bind="text: selectedCompany() && selectedCompany().contractFileUrl ? 'Yeni Sozlesme Yukle' : 'Sozlesme Yukle'"></label>
+                        <div class="input-group">
+                            <input type="file" class="form-control" id="contractFileInput" accept=".pdf" data-bind="event: { change: onFileSelected }">
+                            <button class="btn btn-primary" type="button" data-bind="click: uploadContract, disable: isUploading() || !selectedFile()">
+                                <span data-bind="visible: isUploading" class="spinner-border spinner-border-sm me-1"></span>
+                                <i class="bi bi-upload me-1" data-bind="visible: !isUploading()"></i>
+                                Yukle
+                            </button>
+                        </div>
+                        <div class="form-text">
+                            <i class="bi bi-info-circle me-1"></i>
+                            Sadece PDF dosyalari. Maksimum boyut: 10MB
+                        </div>
+                    </div>
+
+                    <!-- Progress Bar -->
+                    <div class="mt-3" data-bind="visible: isUploading">
+                        <div class="progress">
+                            <div class="progress-bar progress-bar-striped progress-bar-animated" role="progressbar"
+                                 data-bind="style: { width: uploadProgress() + '%' }, attr: { 'aria-valuenow': uploadProgress() }"
+                                 aria-valuemin="0" aria-valuemax="100"></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Kapat</button>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
 
 @section Scripts {
 <script>
 function AdminCompaniesViewModel() {
     var self = this;
+
+    // Veriler
     self.companies = ko.observableArray([]);
     self.isLoading = ko.observable(true);
     self.isSaving = ko.observable(false);
     self.isEditing = ko.observable(false);
     self.selectedCompany = ko.observable(null);
-    self.formData = ko.observable({ id: 0, name: '', email: '', phone: '', address: '', website: '', taxNumber: '', logoUrl: '', description: '', isActive: true });
-    var formModal, deleteModal;
+    self.filterStatus = ko.observable(null);
 
-    self.loadData = function() {
-        $.ajax({ url: apiBaseUrl + '/api/companies', method: 'GET' })
-            .done(function(data) { self.companies(data); self.isLoading(false); })
-            .fail(function() { toastr.error('Veriler yuklenemedi'); self.isLoading(false); });
+    // Form verileri
+    self.formData = ko.observable({
+        id: 0, name: '', email: '', phone: '', address: '',
+        website: '', taxNumber: '', logoUrl: '', description: '',
+        isActive: true, statusId: 1
+    });
+
+    // Onay form verileri
+    self.reviewNotes = ko.observable('');
+    self.rejectionReason = ko.observable('');
+    self.suspendReason = ko.observable('');
+    self.reactivateNotes = ko.observable('');
+
+    // Sozlesme upload verileri
+    self.selectedFile = ko.observable(null);
+    self.isUploading = ko.observable(false);
+    self.uploadProgress = ko.observable(0);
+
+    // Modal referanslari
+    var formModal, deleteModal, approveModal, rejectModal, suspendModal, reactivateModal, detailsModal, contractModal;
+
+    // Bekleyen sayisi
+    self.pendingCount = ko.computed(function() {
+        return self.companies().filter(function(c) { return c.statusId === 0; }).length;
+    });
+
+    // Filtrelenmis firmalar
+    self.filteredCompanies = ko.computed(function() {
+        var status = self.filterStatus();
+        if (status === null) return self.companies();
+        return self.companies().filter(function(c) { return c.statusId === status; });
+    });
+
+    // Durum badge'i
+    self.getStatusBadge = function(statusId) {
+        var statuses = {
+            0: '<i class="bi bi-hourglass-split me-1"></i>Bekliyor',
+            1: '<i class="bi bi-check-circle me-1"></i>Onaylandi',
+            2: '<i class="bi bi-x-circle me-1"></i>Reddedildi',
+            3: '<i class="bi bi-pause-circle me-1"></i>Askida'
+        };
+        return statuses[statusId] || 'Bilinmiyor';
     };
 
-    self.openCreateModal = function() { self.isEditing(false); self.formData({ id: 0, name: '', email: '', phone: '', address: '', website: '', taxNumber: '', logoUrl: '', description: '', isActive: true }); formModal.show(); };
-    self.openEditModal = function(c) { self.isEditing(true); self.formData(Object.assign({}, c)); formModal.show(); };
-    self.openDeleteModal = function(c) { self.selectedCompany(c); deleteModal.show(); };
+    self.getStatusBadgeClass = function(statusId) {
+        var classes = {
+            0: 'bg-warning text-dark',
+            1: 'bg-success',
+            2: 'bg-danger',
+            3: 'bg-secondary'
+        };
+        return classes[statusId] || 'bg-secondary';
+    };
 
+    // Tarih formatlama
+    self.formatDate = function(dateStr) {
+        if (!dateStr) return '-';
+        var date = new Date(dateStr);
+        return date.toLocaleDateString('tr-TR', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' });
+    };
+
+    // Kisa tarih formatlama (sadece gun/ay)
+    self.formatDateShort = function(dateStr) {
+        if (!dateStr) return '';
+        var date = new Date(dateStr);
+        return date.toLocaleDateString('tr-TR', { day: '2-digit', month: '2-digit' });
+    };
+
+    // Veri yukleme
+    self.loadData = function() {
+        $.ajax({ url: apiBaseUrl + '/api/companies', method: 'GET' })
+            .done(function(data) {
+                self.companies(data);
+                self.isLoading(false);
+            })
+            .fail(function() {
+                toastr.error('Veriler yuklenemedi');
+                self.isLoading(false);
+            });
+    };
+
+    // Modal acma fonksiyonlari
+    self.openCreateModal = function() {
+        self.isEditing(false);
+        self.formData({ id: 0, name: '', email: '', phone: '', address: '', website: '', taxNumber: '', logoUrl: '', description: '', isActive: true, statusId: 1 });
+        formModal.show();
+    };
+
+    self.openEditModal = function(c) {
+        self.isEditing(true);
+        self.formData(Object.assign({}, c));
+        formModal.show();
+    };
+
+    self.openDeleteModal = function(c) {
+        self.selectedCompany(c);
+        deleteModal.show();
+    };
+
+    self.openDetailsModal = function(c) {
+        self.selectedCompany(c);
+        detailsModal.show();
+    };
+
+    self.openApproveModal = function(c) {
+        self.selectedCompany(c);
+        self.reviewNotes('');
+        approveModal.show();
+    };
+
+    self.openRejectModal = function(c) {
+        self.selectedCompany(c);
+        self.rejectionReason('');
+        rejectModal.show();
+    };
+
+    self.openSuspendModal = function(c) {
+        self.selectedCompany(c);
+        self.suspendReason('');
+        suspendModal.show();
+    };
+
+    self.openReactivateModal = function(c) {
+        self.selectedCompany(c);
+        self.reactivateNotes('');
+        reactivateModal.show();
+    };
+
+    self.openContractModal = function(c) {
+        self.selectedCompany(c);
+        self.selectedFile(null);
+        self.uploadProgress(0);
+        // Dosya inputunu temizle
+        var fileInput = document.getElementById('contractFileInput');
+        if (fileInput) fileInput.value = '';
+        contractModal.show();
+    };
+
+    // Dosya secildiginde
+    self.onFileSelected = function(data, event) {
+        var file = event.target.files[0];
+        if (file) {
+            // Dosya tipi kontrolu
+            if (file.type !== 'application/pdf' && !file.name.toLowerCase().endsWith('.pdf')) {
+                toastr.error('Sadece PDF dosyalari yuklenebilir');
+                event.target.value = '';
+                self.selectedFile(null);
+                return;
+            }
+            // Boyut kontrolu (10MB)
+            if (file.size > 10 * 1024 * 1024) {
+                toastr.error('Dosya boyutu 10MB\'i gecemez');
+                event.target.value = '';
+                self.selectedFile(null);
+                return;
+            }
+            self.selectedFile(file);
+        } else {
+            self.selectedFile(null);
+        }
+    };
+
+    // Sozlesme yukle
+    self.uploadContract = function() {
+        if (!self.selectedFile()) {
+            toastr.warning('Lutfen bir dosya secin');
+            return;
+        }
+
+        var formData = new FormData();
+        formData.append('file', self.selectedFile());
+
+        self.isUploading(true);
+        self.uploadProgress(0);
+
+        $.ajax({
+            url: apiBaseUrl + '/api/companies/' + self.selectedCompany().id + '/upload-contract',
+            method: 'POST',
+            data: formData,
+            processData: false,
+            contentType: false,
+            xhr: function() {
+                var xhr = new window.XMLHttpRequest();
+                xhr.upload.addEventListener('progress', function(e) {
+                    if (e.lengthComputable) {
+                        var percent = Math.round((e.loaded / e.total) * 100);
+                        self.uploadProgress(percent);
+                    }
+                }, false);
+                return xhr;
+            }
+        })
+        .done(function(response) {
+            toastr.success(response.message || 'Sozlesme basariyla yuklendi');
+            // Secili firmayi guncelle
+            self.selectedCompany().contractFileUrl = response.contractFileUrl;
+            self.selectedCompany().contractUploadedAt = response.contractUploadedAt;
+            // Listeyi yenile
+            self.loadData();
+            // Formu temizle
+            self.selectedFile(null);
+            var fileInput = document.getElementById('contractFileInput');
+            if (fileInput) fileInput.value = '';
+            self.isUploading(false);
+        })
+        .fail(function(xhr) {
+            var msg = xhr.responseJSON ? xhr.responseJSON.message : 'Yukleme hatasi';
+            toastr.error(msg);
+            self.isUploading(false);
+        });
+    };
+
+    // Sozlesme sil
+    self.deleteContract = function() {
+        if (!confirm('Sozlesmeyi silmek istediginizden emin misiniz?')) return;
+
+        self.isUploading(true);
+        $.ajax({
+            url: apiBaseUrl + '/api/companies/' + self.selectedCompany().id + '/contract',
+            method: 'DELETE'
+        })
+        .done(function(response) {
+            toastr.success(response.message || 'Sozlesme basariyla silindi');
+            // Secili firmayi guncelle
+            self.selectedCompany().contractFileUrl = '';
+            self.selectedCompany().contractUploadedAt = null;
+            // Listeyi yenile
+            self.loadData();
+            self.isUploading(false);
+        })
+        .fail(function(xhr) {
+            var msg = xhr.responseJSON ? xhr.responseJSON.message : 'Silme hatasi';
+            toastr.error(msg);
+            self.isUploading(false);
+        });
+    };
+
+    // CRUD islemleri
     self.saveCompany = function() {
         self.isSaving(true);
         var data = self.formData();
-        $.ajax({ url: apiBaseUrl + '/api/companies' + (self.isEditing() ? '/' + data.id : ''), method: self.isEditing() ? 'PUT' : 'POST', contentType: 'application/json', data: JSON.stringify(data) })
-            .done(function() { formModal.hide(); self.loadData(); toastr.success('Kaydedildi'); self.isSaving(false); })
-            .fail(function() { toastr.error('Hata olustu'); self.isSaving(false); });
+        $.ajax({
+            url: apiBaseUrl + '/api/companies' + (self.isEditing() ? '/' + data.id : ''),
+            method: self.isEditing() ? 'PUT' : 'POST',
+            contentType: 'application/json',
+            data: JSON.stringify(data)
+        })
+        .done(function() {
+            formModal.hide();
+            self.loadData();
+            toastr.success('Kaydedildi');
+            self.isSaving(false);
+        })
+        .fail(function() {
+            toastr.error('Hata olustu');
+            self.isSaving(false);
+        });
     };
 
     self.deleteCompany = function() {
         self.isSaving(true);
         $.ajax({ url: apiBaseUrl + '/api/companies/' + self.selectedCompany().id, method: 'DELETE' })
-            .done(function() { deleteModal.hide(); self.loadData(); toastr.success('Silindi'); self.isSaving(false); })
-            .fail(function() { toastr.error('Hata olustu'); self.isSaving(false); });
+            .done(function() {
+                deleteModal.hide();
+                self.loadData();
+                toastr.success('Silindi');
+                self.isSaving(false);
+            })
+            .fail(function() {
+                toastr.error('Hata olustu');
+                self.isSaving(false);
+            });
     };
 
-    $(document).ready(function() { formModal = new bootstrap.Modal(document.getElementById('formModal')); deleteModal = new bootstrap.Modal(document.getElementById('deleteModal')); self.loadData(); });
+    // Onay islemleri
+    self.approveCompany = function() {
+        self.isSaving(true);
+        var userId = window.currentUser ? window.currentUser.id : null;
+        $.ajax({
+            url: apiBaseUrl + '/api/companies/' + self.selectedCompany().id + '/approve',
+            method: 'POST',
+            contentType: 'application/json',
+            data: JSON.stringify({ reviewedById: userId, reviewNotes: self.reviewNotes() })
+        })
+        .done(function(response) {
+            approveModal.hide();
+            self.loadData();
+            toastr.success(response.message || 'Firma onaylandi');
+            self.isSaving(false);
+        })
+        .fail(function(xhr) {
+            var msg = xhr.responseJSON ? xhr.responseJSON.message : 'Hata olustu';
+            toastr.error(msg);
+            self.isSaving(false);
+        });
+    };
+
+    self.rejectCompany = function() {
+        if (!self.rejectionReason()) {
+            toastr.warning('Red sebebi zorunludur');
+            return;
+        }
+        self.isSaving(true);
+        var userId = window.currentUser ? window.currentUser.id : null;
+        $.ajax({
+            url: apiBaseUrl + '/api/companies/' + self.selectedCompany().id + '/reject',
+            method: 'POST',
+            contentType: 'application/json',
+            data: JSON.stringify({ reviewedById: userId, rejectionReason: self.rejectionReason() })
+        })
+        .done(function(response) {
+            rejectModal.hide();
+            self.loadData();
+            toastr.success(response.message || 'Firma reddedildi');
+            self.isSaving(false);
+        })
+        .fail(function(xhr) {
+            var msg = xhr.responseJSON ? xhr.responseJSON.message : 'Hata olustu';
+            toastr.error(msg);
+            self.isSaving(false);
+        });
+    };
+
+    self.suspendCompany = function() {
+        if (!self.suspendReason()) {
+            toastr.warning('Askiya alma sebebi zorunludur');
+            return;
+        }
+        self.isSaving(true);
+        var userId = window.currentUser ? window.currentUser.id : null;
+        $.ajax({
+            url: apiBaseUrl + '/api/companies/' + self.selectedCompany().id + '/suspend',
+            method: 'POST',
+            contentType: 'application/json',
+            data: JSON.stringify({ reviewedById: userId, reason: self.suspendReason() })
+        })
+        .done(function(response) {
+            suspendModal.hide();
+            self.loadData();
+            toastr.success(response.message || 'Firma askiya alindi');
+            self.isSaving(false);
+        })
+        .fail(function(xhr) {
+            var msg = xhr.responseJSON ? xhr.responseJSON.message : 'Hata olustu';
+            toastr.error(msg);
+            self.isSaving(false);
+        });
+    };
+
+    self.reactivateCompany = function() {
+        self.isSaving(true);
+        var userId = window.currentUser ? window.currentUser.id : null;
+        $.ajax({
+            url: apiBaseUrl + '/api/companies/' + self.selectedCompany().id + '/reactivate',
+            method: 'POST',
+            contentType: 'application/json',
+            data: JSON.stringify({ reviewedById: userId, reviewNotes: self.reactivateNotes() })
+        })
+        .done(function(response) {
+            reactivateModal.hide();
+            self.loadData();
+            toastr.success(response.message || 'Firma tekrar aktiflendi');
+            self.isSaving(false);
+        })
+        .fail(function(xhr) {
+            var msg = xhr.responseJSON ? xhr.responseJSON.message : 'Hata olustu';
+            toastr.error(msg);
+            self.isSaving(false);
+        });
+    };
+
+    // Sayfa yuklendiginde
+    $(document).ready(function() {
+        formModal = new bootstrap.Modal(document.getElementById('formModal'));
+        deleteModal = new bootstrap.Modal(document.getElementById('deleteModal'));
+        approveModal = new bootstrap.Modal(document.getElementById('approveModal'));
+        rejectModal = new bootstrap.Modal(document.getElementById('rejectModal'));
+        suspendModal = new bootstrap.Modal(document.getElementById('suspendModal'));
+        reactivateModal = new bootstrap.Modal(document.getElementById('reactivateModal'));
+        detailsModal = new bootstrap.Modal(document.getElementById('detailsModal'));
+        contractModal = new bootstrap.Modal(document.getElementById('contractModal'));
+        self.loadData();
+    });
 }
+
 ko.applyBindings(new AdminCompaniesViewModel(), document.getElementById('adminCompaniesApp'));
 </script>
 }

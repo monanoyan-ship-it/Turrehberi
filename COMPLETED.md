@@ -77,6 +77,22 @@
 - [x] register-company endpoint StatusId=Pending ile basliyor
 - [x] UserInfo'da CompanyStatusId/CompanyStatusName
 
+### Firma Onay Is Akisi (UI)
+- [x] API Endpoint'leri:
+  - GET /api/companies/pending - Bekleyen basvurular
+  - POST /api/companies/{id}/approve - Onayla
+  - POST /api/companies/{id}/reject - Reddet
+  - POST /api/companies/{id}/suspend - Askiya al
+  - POST /api/companies/{id}/reactivate - Tekrar aktifle
+- [x] Admin Companies sayfasi yenilendi:
+  - Durum filtreleme (Tumu/Bekleyen/Onaylanan/Reddedilen/Askida)
+  - Bekleyen basvuru uyarisi
+  - StatusId badge'i ile durum gosterimi
+  - Onaylama/Reddetme modal'lari
+  - Askiya alma/Aktifle modal'lari
+  - Firma detay modal'i
+  - Toast bildirimleri
+
 ### Yorum Sistemi (Altyapi)
 - [x] TourReview entity (6 alt puan kategorisi)
 - [x] ReviewImage entity (fotograf destegi)
@@ -86,6 +102,80 @@
 - [x] Tour entity'sine ReviewCount, AverageRating alanlari
 - [x] DbContext konfigurasyonlari (unique index'ler, FK'lar)
 - [x] Migration'lar olusturuldu
+
+### Tur Yorum Sistemi (UI)
+- [x] ReviewsController API endpoint'leri:
+  - GET /api/tours/{id}/reviews - Yorumlari listele (pagination, filtreleme, siralama)
+  - POST /api/tours/{id}/reviews - Yeni yorum ekle
+  - PUT /api/reviews/{id} - Yorum guncelle
+  - DELETE /api/reviews/{id} - Yorum sil
+  - POST /api/reviews/{id}/helpful - Yardimci oyla
+  - POST /api/reviews/{id}/report - Sikayet et
+  - POST /api/reviews/{id}/reply - Yanit ekle
+- [x] Tours sayfasinda yorum sistemi:
+  - Tur kartlarinda ortalama puan ve yorum sayisi
+  - Detay modalinde puan ozeti
+  - Yorum listesi (pagination, filtreleme, siralama)
+  - Yorum yazma formu (6 kategori puan, pros/cons, detay)
+  - Yardimci oylama (helpful/not helpful)
+  - Yoruma yanit verme
+  - Yorum sikayet etme
+  - Firma yaniti destegi
+  - Dogrulanmis yorum rozeti
+
+### Sozlesme Yukleme Sistemi
+- [x] Static files middleware eklendi
+- [x] wwwroot/uploads/contracts klasor yapisi
+- [x] CompaniesController endpoint'leri:
+  - POST /api/companies/{id}/upload-contract - Sozlesme yukle
+  - DELETE /api/companies/{id}/contract - Sozlesme sil
+- [x] PDF validasyonu (extension + content-type)
+- [x] 10MB boyut limiti
+- [x] Admin panel entegrasyonu (sozlesme sutunu, yukleme modali, indirme/silme)
+- [x] 9 dilde Contract.* localization string'leri
+
+### Yorum Moderasyon Paneli (Admin)
+- [x] Admin Reviews API endpoint'leri:
+  - GET /api/admin/reviews - Tum yorumlari listele (durum filtreleme)
+  - POST /api/reviews/{id}/approve - Yorum onayla
+  - POST /api/reviews/{id}/reject - Yorum reddet
+  - POST /api/reviews/{id}/flag - Incelemeye al
+  - GET /api/admin/reports - Sikayetleri listele
+  - POST /api/reports/{id}/resolve - Sikayeti cozumle
+- [x] Admin/Reviews.cshtml sayfasi:
+  - Durum filtreleme (Tumu/Bekleyen/Onaylanan/Reddedilen/Isaretelenen)
+  - Yorum listesi (tur adi, kullanici, puan, tarih, durum)
+  - Onaylama/Reddetme/Isaretleme islemleri
+  - Moderasyon notu ekleme
+  - Toast bildirimleri
+- [x] Admin menuye Reviews linki eklendi
+- [x] 9 dilde Admin.Reviews.* localization string'leri
+
+### Firma Profil Sayfasi (SEO)
+- [x] Company entity'sine SEO alanlari eklendi:
+  - Slug, MetaTitle, MetaDescription, Tagline
+  - FoundedYear, City, SocialLinks, CoverImageUrl
+- [x] Slug icin unique index
+- [x] Zengin seed data (5 firma icin tum SEO alanlari)
+- [x] API endpoint'leri:
+  - GET /api/companies/profile/{slug} - Firma profili (turlar, yorumlar, istatistikler)
+  - GET /api/companies/public - Public firma listesi (sehir filtreleme)
+- [x] Web route'lari: /Firmalar/{slug}, /Companies/Details/{slug}
+- [x] Companies/Details.cshtml sayfasi:
+  - Dinamik SEO meta tag'leri (title, description, OG, Twitter Card)
+  - Schema.org JSON-LD (TravelAgency, AggregateRating)
+  - Cover image ve logo
+  - Istatistik cubugu (turlar, puan, yorumlar, deneyim yili)
+  - Hakkinda bolumu
+  - Turlar listesi
+  - Yorumlar ve puan dagilimi
+  - Iletisim sidebar'i
+- [x] 9 dilde CompanyProfile.* localization string'leri
+
+### Cift Startup Projesi Yapilandirmasi
+- [x] `ErkanTatilPlani.slnLaunch` dosyasi olusturuldu (API + Web profili)
+- [x] API ve Web projeleri birlikte baslatilacak sekilde ayarlandi
+- [ ] Visual Studio'da profil gorunurlugu kontrol edilecek (VS 2022 17.11+ gerekli)
 
 ### Dokumantasyon
 - [x] CLAUDE.md (gelistirici kurallari)
@@ -101,12 +191,13 @@
 |--------|-------|
 | Toplam Entity | 11 |
 | Toplam Enum | 6 |
-| API Endpoint | ~25 |
+| API Endpoint | ~35 |
 | Desteklenen Dil | 9 |
 | Seed Firma | 5 |
 | Seed Tur | 15 |
 | Seed Kullanici | 12 |
 | Seed Rezervasyon | 6 |
+| Admin Sayfalari | 3 (Companies, Visitors, Reviews) |
 
 ---
 
