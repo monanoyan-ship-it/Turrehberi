@@ -163,6 +163,9 @@
             <a href="/Admin/MyReservations" class="nav-link @(ViewData["ActiveMenu"]?.ToString() == "MyReservations" ? "active" : "")">
                 <i class="bi bi-calendar-check"></i> Rezervasyonlarim
             </a>
+            <a href="/Admin/MyReviews" class="nav-link @(ViewData["ActiveMenu"]?.ToString() == "MyReviews" ? "active" : "")">
+                <i class="bi bi-chat-square-text"></i> <span data-t="MyReviews.Title">Yorumlar</span>
+            </a>
         </nav>
 
         <nav class="nav-section" id="staffMenu">

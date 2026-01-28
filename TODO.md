@@ -71,10 +71,10 @@
 - [ ] Kullanici avatar yukleme
 
 ### Firma Ozellikleri
-- [ ] Firma dashboard'u (istatistikler)
-- [ ] Tur yonetim sayfasi (CRUD)
-- [ ] Rezervasyon yonetimi
-- [ ] Yorumlara yanit verme arayuzu
+- [x] Firma dashboard'u (istatistikler)
+- [x] Tur yonetim sayfasi (CRUD)
+- [x] Rezervasyon yonetimi
+- [x] Yorumlara yanit verme arayuzu
 
 ### Arama ve Filtreleme
 - [ ] Gelismis tur arama (tarih, fiyat, destinasyon)

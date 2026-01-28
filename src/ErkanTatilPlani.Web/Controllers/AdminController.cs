@@ -56,6 +56,14 @@ public class AdminController : Controller
         return View();
     }
 
+    // Firma sahibinin turlarindaki yorumlar
+    public IActionResult MyReviews()
+    {
+        SetCommonViewData("MyReviews", "Yorumlar");
+        ViewBag.UserRole = "CompanyOwner";
+        return View();
+    }
+
     // ============================================
     // STAFF VE ADMIN SAYFALARI
     // ============================================

@@ -2,18 +2,371 @@
     Layout = "_AdminLayout";
 }
 
-<div class="alert alert-info">
-    <i class="bi bi-info-circle me-2"></i>
-    <strong>Firma Sahibi Paneli:</strong> Bu sayfada firmaniza ait turlara yapilan rezervasyonlari gorebilirsiniz.
+<div id="myReservationsApp">
+    <!-- Yukleniyor -->
+    <div data-bind="visible: isLoading()" class="text-center py-5">
+        <div class="spinner-border text-primary" role="status">
+            <span class="visually-hidden">Yukleniyor...</span>
+        </div>
+        <p class="mt-3 text-muted" data-t="Common.Loading">Yukleniyor...</p>
+    </div>
+
+    <!-- Ana Icerik -->
+    <div data-bind="visible: !isLoading()">
+        <!-- Istatistik Kartlari -->
+        <div class="row g-3 mb-4">
+            <div class="col-6 col-lg-3">
+                <div class="stat-card h-100 cursor-pointer" data-bind="click: function() { filterByStatus('all') }, css: { 'border-primary': currentFilter() === 'all' }">
+                    <div class="d-flex align-items-center gap-3">
+                        <div class="stat-icon bg-primary bg-opacity-10 text-primary">
+                            <i class="bi bi-calendar-check"></i>
+                        </div>
+                        <div>
+                            <div class="text-muted small" data-t="MyReservations.Total">Toplam</div>
+                            <div class="fs-4 fw-bold" data-bind="text: stats().total">0</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-6 col-lg-3">
+                <div class="stat-card h-100 cursor-pointer" data-bind="click: function() { filterByStatus('Pending') }, css: { 'border-warning': currentFilter() === 'Pending' }">
+                    <div class="d-flex align-items-center gap-3">
+                        <div class="stat-icon bg-warning bg-opacity-10 text-warning">
+                            <i class="bi bi-clock"></i>
+                        </div>
+                        <div>
+                            <div class="text-muted small" data-t="Status.Pending">Bekleyen</div>
+                            <div class="fs-4 fw-bold" data-bind="text: stats().pending">0</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-6 col-lg-3">
+                <div class="stat-card h-100 cursor-pointer" data-bind="click: function() { filterByStatus('Confirmed') }, css: { 'border-success': currentFilter() === 'Confirmed' }">
+                    <div class="d-flex align-items-center gap-3">
+                        <div class="stat-icon bg-success bg-opacity-10 text-success">
+                            <i class="bi bi-check-circle"></i>
+                        </div>
+                        <div>
+                            <div class="text-muted small" data-t="Status.Confirmed">Onaylanan</div>
+                            <div class="fs-4 fw-bold" data-bind="text: stats().confirmed">0</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-6 col-lg-3">
+                <div class="stat-card h-100 cursor-pointer" data-bind="click: function() { filterByStatus('Completed') }, css: { 'border-info': currentFilter() === 'Completed' }">
+                    <div class="d-flex align-items-center gap-3">
+                        <div class="stat-icon bg-info bg-opacity-10 text-info">
+                            <i class="bi bi-flag"></i>
+                        </div>
+                        <div>
+                            <div class="text-muted small" data-t="Status.Completed">Tamamlanan</div>
+                            <div class="fs-4 fw-bold" data-bind="text: stats().completed">0</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Rezervasyon Listesi -->
+        <div class="admin-card">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <span>
+                    <i class="bi bi-calendar-check me-2"></i>
+                    <span data-t="MyReservations.Title">Rezervasyonlarim</span>
+                    <span class="badge bg-secondary ms-2" data-bind="text: reservations().length"></span>
+                </span>
+                <div class="btn-group btn-group-sm">
+                    <button class="btn btn-outline-secondary" data-bind="click: function() { filterByStatus('all') }, css: { active: currentFilter() === 'all' }">
+                        <span data-t="Common.All">Tumu</span>
+                    </button>
+                    <button class="btn btn-outline-warning" data-bind="click: function() { filterByStatus('Pending') }, css: { active: currentFilter() === 'Pending' }">
+                        <span data-t="Status.Pending">Bekleyen</span>
+                    </button>
+                    <button class="btn btn-outline-success" data-bind="click: function() { filterByStatus('Confirmed') }, css: { active: currentFilter() === 'Confirmed' }">
+                        <span data-t="Status.Confirmed">Onaylanan</span>
+                    </button>
+                </div>
+            </div>
+            <div class="card-body p-0">
+                <!-- Veri yok -->
+                <div data-bind="visible: reservations().length === 0" class="text-center text-muted py-5">
+                    <i class="bi bi-calendar-x fs-1"></i>
+                    <p class="mt-3" data-t="MyReservations.NoReservations">Henuz rezervasyon yok</p>
+                </div>
+
+                <!-- Tablo -->
+                <div class="table-responsive" data-bind="visible: reservations().length > 0">
+                    <table class="table table-hover mb-0">
+                        <thead class="table-light">
+                            <tr>
+                                <th data-t="Tour.Name">Tur</th>
+                                <th data-t="MyReservations.Customer">Musteri</th>
+                                <th data-t="Reservation.StartDate">Tarih</th>
+                                <th class="text-center" data-t="Reservation.People">Kisi</th>
+                                <th class="text-end" data-t="Reservation.TotalPrice">Tutar</th>
+                                <th class="text-center" data-t="Reservation.Status">Durum</th>
+                                <th class="text-center" data-t="Common.Actions">Islemler</th>
+                            </tr>
+                        </thead>
+                        <tbody data-bind="foreach: reservations">
+                            <tr>
+                                <td>
+                                    <div class="fw-medium" data-bind="text: tourName"></div>
+                                    <small class="text-muted" data-bind="text: tourDestination"></small>
+                                </td>
+                                <td>
+                                    <div data-bind="text: visitorName"></div>
+                                    <small class="text-muted" data-bind="text: visitorEmail"></small>
+                                </td>
+                                <td>
+                                    <div data-bind="text: $parent.formatDate(startDate)"></div>
+                                    <small class="text-muted" data-bind="text: '- ' + $parent.formatDate(endDate)"></small>
+                                </td>
+                                <td class="text-center">
+                                    <span class="badge bg-secondary" data-bind="text: numberOfPeople"></span>
+                                </td>
+                                <td class="text-end fw-medium" data-bind="text: $parent.formatCurrency(totalPrice)"></td>
+                                <td class="text-center">
+                                    <span class="badge" data-bind="css: $parent.getStatusBadgeClass(status), text: $parent.getStatusText(status)"></span>
+                                </td>
+                                <td class="text-center">
+                                    <div class="btn-group btn-group-sm">
+                                        <button class="btn btn-outline-primary" data-bind="click: $parent.showDetails" title="Detay">
+                                            <i class="bi bi-eye"></i>
+                                        </button>
+                                        <!-- Bekleyen ise Onayla/Reddet -->
+                                        <button class="btn btn-success" data-bind="visible: status === 'Pending', click: function() { $parent.updateStatus($data, 'Confirmed') }" title="Onayla">
+                                            <i class="bi bi-check"></i>
+                                        </button>
+                                        <button class="btn btn-danger" data-bind="visible: status === 'Pending', click: function() { $parent.updateStatus($data, 'Cancelled') }" title="Iptal Et">
+                                            <i class="bi bi-x"></i>
+                                        </button>
+                                        <!-- Onaylanan ise Tamamla -->
+                                        <button class="btn btn-info" data-bind="visible: status === 'Confirmed', click: function() { $parent.updateStatus($data, 'Completed') }" title="Tamamla">
+                                            <i class="bi bi-flag"></i>
+                                        </button>
+                                    </div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Detay Modal -->
+    <div class="modal fade" id="detailModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">
+                        <i class="bi bi-calendar-check me-2"></i>
+                        <span data-t="MyReservations.Details">Rezervasyon Detayi</span>
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body" data-bind="with: selectedReservation">
+                    <div class="mb-3">
+                        <label class="form-label text-muted small" data-t="Tour.Name">Tur</label>
+                        <div class="fw-medium" data-bind="text: tourName"></div>
+                        <small class="text-muted" data-bind="text: tourDestination"></small>
+                    </div>
+                    <hr>
+                    <div class="row mb-3">
+                        <div class="col-6">
+                            <label class="form-label text-muted small" data-t="MyReservations.Customer">Musteri</label>
+                            <div data-bind="text: visitorName"></div>
+                        </div>
+                        <div class="col-6">
+                            <label class="form-label text-muted small" data-t="Register.Phone">Telefon</label>
+                            <div data-bind="text: visitorPhone || '-'"></div>
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label text-muted small" data-t="Register.Email">E-posta</label>
+                        <div data-bind="text: visitorEmail"></div>
+                    </div>
+                    <hr>
+                    <div class="row mb-3">
+                        <div class="col-6">
+                            <label class="form-label text-muted small" data-t="Reservation.StartDate">Baslangic</label>
+                            <div data-bind="text: $parent.formatDate(startDate)"></div>
+                        </div>
+                        <div class="col-6">
+                            <label class="form-label text-muted small" data-t="Reservation.EndDate">Bitis</label>
+                            <div data-bind="text: $parent.formatDate(endDate)"></div>
+                        </div>
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col-6">
+                            <label class="form-label text-muted small" data-t="Reservation.People">Kisi Sayisi</label>
+                            <div data-bind="text: numberOfPeople"></div>
+                        </div>
+                        <div class="col-6">
+                            <label class="form-label text-muted small" data-t="Reservation.TotalPrice">Toplam Tutar</label>
+                            <div class="fw-bold text-primary" data-bind="text: $parent.formatCurrency(totalPrice)"></div>
+                        </div>
+                    </div>
+                    <div class="mb-3" data-bind="visible: notes">
+                        <label class="form-label text-muted small" data-t="Reservation.Notes">Notlar</label>
+                        <div data-bind="text: notes"></div>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label text-muted small" data-t="Reservation.Status">Durum</label>
+                        <div>
+                            <span class="badge" data-bind="css: $parent.getStatusBadgeClass(status), text: $parent.getStatusText(status)"></span>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" data-t="Common.Close">Kapat</button>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
 
-<div class="admin-card">
-    <div class="card-header">
-        <i class="bi bi-calendar-check me-2"></i>Rezervasyonlarim
-    </div>
-    <div class="card-body text-center text-muted py-5">
-        <i class="bi bi-calendar-check fs-1"></i>
-        <p class="mt-3">Bu ozellik firma sahibi girisi yapildiginda aktif olacaktir.</p>
-        <p><small>Simdilik Admin panelinden rezervasyon yonetimi yapabilirsiniz.</small></p>
-    </div>
-</div>
+<style>
+    .stat-card.cursor-pointer { cursor: pointer; transition: border-color 0.2s; }
+    .stat-card.cursor-pointer:hover { border-color: #0d6efd !important; }
+    .stat-card.border-primary { border: 2px solid #0d6efd !important; }
+    .stat-card.border-warning { border: 2px solid #ffc107 !important; }
+    .stat-card.border-success { border: 2px solid #198754 !important; }
+    .stat-card.border-info { border: 2px solid #0dcaf0 !important; }
+</style>
+
+@section Scripts {
+    <script>
+        function MyReservationsViewModel() {
+            var self = this;
+
+            // Observables
+            self.isLoading = ko.observable(true);
+            self.reservations = ko.observableArray([]);
+            self.stats = ko.observable({ total: 0, pending: 0, confirmed: 0, cancelled: 0, completed: 0 });
+            self.currentFilter = ko.observable('all');
+            self.selectedReservation = ko.observable(null);
+
+            // Modals
+            var detailModal = null;
+
+            // Helper functions
+            self.formatCurrency = function(value) {
+                if (!value) return '0 TL';
+                return new Intl.NumberFormat('tr-TR', { style: 'decimal' }).format(value) + ' TL';
+            };
+
+            self.formatDate = function(dateString) {
+                if (!dateString) return '';
+                var date = new Date(dateString);
+                return date.toLocaleDateString('tr-TR');
+            };
+
+            self.getStatusBadgeClass = function(status) {
+                var classes = {
+                    'Pending': 'bg-warning',
+                    'Confirmed': 'bg-success',
+                    'Cancelled': 'bg-danger',
+                    'Completed': 'bg-info'
+                };
+                return classes[status] || 'bg-secondary';
+            };
+
+            self.getStatusText = function(status) {
+                var texts = {
+                    'Pending': T('Status.Pending') || 'Beklemede',
+                    'Confirmed': T('Status.Confirmed') || 'Onaylandi',
+                    'Cancelled': T('Status.Cancelled') || 'Iptal Edildi',
+                    'Completed': T('Status.Completed') || 'Tamamlandi'
+                };
+                return texts[status] || status;
+            };
+
+            // Rezervasyonlari yukle
+            self.loadReservations = function(status) {
+                self.isLoading(true);
+                var token = localStorage.getItem('authToken');
+                var url = apiBaseUrl + '/api/reservations/my';
+                if (status && status !== 'all') {
+                    url += '?status=' + status;
+                }
+
+                $.ajax({
+                    url: url,
+                    method: 'GET',
+                    headers: token ? { 'Authorization': 'Bearer ' + token } : {},
+                    success: function(data) {
+                        self.reservations(data.reservations || []);
+                        self.stats(data.stats || { total: 0, pending: 0, confirmed: 0, cancelled: 0, completed: 0 });
+                        self.isLoading(false);
+                    },
+                    error: function(xhr) {
+                        console.error('Rezervasyonlar yuklenemedi:', xhr);
+                        if (xhr.status === 401) {
+                            toastr.error(T('Login.Error.Required') || 'Giris yapmaniz gerekiyor');
+                        } else if (xhr.status === 403) {
+                            toastr.warning(xhr.responseJSON?.message || 'Firma sahibi degilsiniz');
+                        } else {
+                            toastr.error(T('Common.Error') || 'Bir hata olustu');
+                        }
+                        self.isLoading(false);
+                    }
+                });
+            };
+
+            // Filtrele
+            self.filterByStatus = function(status) {
+                self.currentFilter(status);
+                self.loadReservations(status);
+            };
+
+            // Detay goster
+            self.showDetails = function(reservation) {
+                self.selectedReservation(reservation);
+                detailModal.show();
+            };
+
+            // Durum guncelle
+            self.updateStatus = function(reservation, newStatus) {
+                var token = localStorage.getItem('authToken');
+
+                $.ajax({
+                    url: apiBaseUrl + '/api/reservations/my/' + reservation.id + '/status',
+                    method: 'PATCH',
+                    headers: token ? { 'Authorization': 'Bearer ' + token } : {},
+                    contentType: 'application/json',
+                    data: JSON.stringify({ status: newStatus }),
+                    success: function() {
+                        var messages = {
+                            'Confirmed': T('MyReservations.ConfirmSuccess') || 'Rezervasyon onaylandi',
+                            'Cancelled': T('MyReservations.CancelSuccess') || 'Rezervasyon iptal edildi',
+                            'Completed': T('MyReservations.CompleteSuccess') || 'Rezervasyon tamamlandi'
+                        };
+                        toastr.success(messages[newStatus] || 'Durum guncellendi');
+                        self.loadReservations(self.currentFilter());
+                    },
+                    error: function(xhr) {
+                        console.error('Durum guncellenemedi:', xhr);
+                        toastr.error(xhr.responseJSON?.message || T('Common.Error') || 'Bir hata olustu');
+                    }
+                });
+            };
+
+            // Init
+            $(document).ready(function() {
+                detailModal = new bootstrap.Modal(document.getElementById('detailModal'));
+                self.loadReservations();
+            });
+        }
+
+        // Localization helper
+        if (typeof T === 'undefined') {
+            window.T = function(key) { return null; };
+        }
+
+        ko.applyBindings(new MyReservationsViewModel(), document.getElementById('myReservationsApp'));
+    </script>
+}

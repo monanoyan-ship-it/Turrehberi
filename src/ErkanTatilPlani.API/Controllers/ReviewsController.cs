@@ -410,6 +410,85 @@ public class ReviewsController : ControllerBase
     }
 
     // ===============================================
+    // FIRMA SAHIBI YORUMLARI
+    // ===============================================
+
+    /// <summary>
+    /// Firma sahibinin turlarina yapilan yorumlari listele
+    /// </summary>
+    [HttpGet("reviews/my")]
+    public async Task<ActionResult<object>> GetMyReviews([FromQuery] int companyId, [FromQuery] bool? hasReply = null)
+    {
+        // Firmanin turlarinin ID'leri
+        var companyTourIds = await _context.Tours
+            .Where(t => t.CompanyId == companyId)
+            .Select(t => t.Id)
+            .ToListAsync();
+
+        var query = _context.TourReviews
+            .Include(r => r.Tour)
+            .Include(r => r.Visitor)
+            .Include(r => r.Replies.Where(reply => reply.IsActive))
+            .Where(r => companyTourIds.Contains(r.TourId) && r.IsActive && r.StatusId == ReviewStatuses.Ids.Approved);
+
+        // Yanit filtresi
+        if (hasReply.HasValue)
+        {
+            if (hasReply.Value)
+                query = query.Where(r => r.Replies.Any(reply => reply.IsFromCompany));
+            else
+                query = query.Where(r => !r.Replies.Any(reply => reply.IsFromCompany));
+        }
+
+        var reviews = await query
+            .OrderByDescending(r => r.CreatedAt)
+            .Select(r => new
+            {
+                r.Id,
+                r.TourId,
+                TourName = r.Tour.Name,
+                TourDestination = r.Tour.Destination,
+                r.OverallRating,
+                r.Title,
+                r.Comment,
+                r.Pros,
+                r.Cons,
+                r.IsVerified,
+                r.WouldRecommend,
+                r.CreatedAt,
+                VisitorName = r.Visitor.FirstName + " " + (r.Visitor.LastName.Length > 0 ? r.Visitor.LastName[0] + "." : ""),
+                HasCompanyReply = r.Replies.Any(reply => reply.IsFromCompany),
+                CompanyReply = r.Replies
+                    .Where(reply => reply.IsFromCompany)
+                    .OrderByDescending(reply => reply.CreatedAt)
+                    .Select(reply => new
+                    {
+                        reply.Id,
+                        reply.Comment,
+                        reply.CreatedAt
+                    })
+                    .FirstOrDefault()
+            })
+            .ToListAsync();
+
+        // Istatistikler
+        var allReviews = await _context.TourReviews
+            .Include(r => r.Replies)
+            .Where(r => companyTourIds.Contains(r.TourId) && r.IsActive && r.StatusId == ReviewStatuses.Ids.Approved)
+            .ToListAsync();
+
+        var stats = new
+        {
+            total = allReviews.Count,
+            withReply = allReviews.Count(r => r.Replies.Any(reply => reply.IsFromCompany)),
+            withoutReply = allReviews.Count(r => !r.Replies.Any(reply => reply.IsFromCompany)),
+            averageRating = allReviews.Any() ? Math.Round(allReviews.Average(r => r.OverallRating), 1) : 0
+        };
+
+        return Ok(new { reviews, stats });
+    }
+
+    // ===============================================
     // ADMIN MODERASYON
     // ===============================================
 

@@ -2,15 +2,17 @@
 
 ## ONEMLI KURALLAR
 
-1. **Kullanici net emir vermeden KOD DEGISTIRME!** Soru sormak degisiklik talebi degildir. Once sor, onay al, sonra degistir.
+1. **ASLA YALAN SOYLEME!** Bir isi yaptigini soyluyorsan, gercekten yapmis ol. Belirsizlik varsa acikca belirt. Ornek: "Commit ettim" yerine "Su 13 dosyayi commit ettim, diger 15 dosya hala bekliyor" de.
 
-2. **Kullanici acikca "Commit Et" demedikce ASLA git commit yapma!** Degisiklikleri kaydet ama commit etme.
+2. **Kullanici net emir vermeden KOD DEGISTIRME!** Soru sormak degisiklik talebi degildir. Once sor, onay al, sonra degistir.
 
-3. **Her is tamamlandiginda BUILD TESTI yap!** Kod degisikligi yaptiktan sonra `dotnet build ErkanTatilPlani.sln` calistir ve hata olmadigini dogrula.
+3. **Kullanici acikca "Commit Et" demedikce ASLA git commit yapma!** Degisiklikleri kaydet ama commit etme.
 
-4. **Projeyi ASLA calistirma!** Kullanici Visual Studio'dan calistiracak. `dotnet run` kullanma, sadece `dotnet build` ile test yap.
+4. **Her is tamamlandiginda BUILD TESTI yap!** Kod degisikligi yaptiktan sonra `dotnet build ErkanTatilPlani.sln` calistir ve hata olmadigini dogrula.
 
-5. **PostgreSQL DateTime:** Her zaman `DateTimeKind.Utc` kullan. PostgreSQL `timestamp with time zone` icin UTC gerektirir.
+5. **Projeyi ASLA calistirma!** Kullanici Visual Studio'dan calistiracak. `dotnet run` kullanma, sadece `dotnet build` ile test yap.
+
+6. **PostgreSQL DateTime:** Her zaman `DateTimeKind.Utc` kullan. PostgreSQL `timestamp with time zone` icin UTC gerektirir.
    ```csharp
    // DOGRU
    DateTime.UtcNow
@@ -21,7 +23,7 @@
    new DateTime(2026, 1, 1)
    ```
 
-6. **JSON Circular Reference:** Entity'lerde navigation property'ler dolayli referans olusturur. API'de `ReferenceHandler.IgnoreCycles` kullan.
+7. **JSON Circular Reference:** Entity'lerde navigation property'ler dolayli referans olusturur. API'de `ReferenceHandler.IgnoreCycles` kullan.
    ```csharp
    builder.Services.AddControllers()
        .AddJsonOptions(options =>
@@ -122,6 +124,32 @@ _localizer.T("Register.Title")
 - Seed data mevcut: 5 firma, 15 tur, 10 kullanici (5 firma sahibi + 5 ziyaretci), 6 rezervasyon
 - Resimler picsum.photos'tan dinamik olarak yuklenir
 - Localization: JSON tabanli, 9 dil, RTL destekli. Yeni string eklerken TUM dil dosyalarini guncelle!
+
+---
+
+## Son Durum (28 Ocak 2026)
+
+**Tamamlanan (commit edilmedi):**
+- Firma Dashboard (CompanyDashboard)
+- Tur Yonetim (MyTours CRUD)
+- Rezervasyon Yonetimi (MyReservations)
+- Yorumlara Yanit (MyReviews)
+
+**Degisiklik yapilan dosyalar (commit bekliyor):**
+- CompaniesController.cs (dashboard endpoint)
+- ToursController.cs (my endpoint)
+- ReservationsController.cs (my endpoint + status)
+- ReviewsController.cs (my endpoint)
+- AdminController.cs (4 yeni action)
+- _AdminLayout.cshtml (menu linkleri)
+- CompanyDashboard.cshtml (yeni)
+- MyTours.cshtml (yenilendi)
+- MyReservations.cshtml (yenilendi)
+- MyReviews.cshtml (yeni)
+- 9 localization dosyasi
+- TODO.md, COMPLETED.md
+
+**Siradaki is:** Profil sayfasi veya Sifre degistirme veya Gelismis tur arama
 
 ---
 

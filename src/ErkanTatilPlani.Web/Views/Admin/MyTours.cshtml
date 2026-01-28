@@ -2,22 +2,421 @@
     Layout = "_AdminLayout";
 }
 
-<div class="alert alert-info">
-    <i class="bi bi-info-circle me-2"></i>
-    <strong>Firma Sahibi Paneli:</strong> Bu sayfada sadece kendi firmaniza ait turlari gorebilir ve yonetebilirsiniz.
+<div id="myToursApp">
+    <!-- Firma Durumu Uyarisi -->
+    <div data-bind="visible: !canManageTours() && !isLoading()" class="alert alert-warning">
+        <i class="bi bi-exclamation-triangle me-2"></i>
+        <strong data-t="Error.CompanyNotApproved">Firma onaylanmadan tur islemleri yapamazsiniz.</strong>
+        <span data-t="Error.CompanyPending">Basvurunuz inceleniyor.</span>
+    </div>
+
+    <!-- Yukleniyor -->
+    <div data-bind="visible: isLoading()" class="text-center py-5">
+        <div class="spinner-border text-primary" role="status">
+            <span class="visually-hidden">Yukleniyor...</span>
+        </div>
+        <p class="mt-3 text-muted" data-t="Common.Loading">Yukleniyor...</p>
+    </div>
+
+    <!-- Ana Icerik -->
+    <div data-bind="visible: !isLoading()">
+        <!-- Tur Listesi -->
+        <div class="admin-card">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <span><i class="bi bi-geo-alt me-2"></i><span data-t="MyTours.Title">Turlarim</span></span>
+                <button class="btn btn-sm btn-primary" data-bind="click: openAddModal, enable: canManageTours()">
+                    <i class="bi bi-plus me-1"></i><span data-t="MyTours.AddTour">Yeni Tur Ekle</span>
+                </button>
+            </div>
+            <div class="card-body p-0">
+                <!-- Veri yok -->
+                <div data-bind="visible: tours().length === 0" class="text-center text-muted py-5">
+                    <i class="bi bi-geo-alt fs-1"></i>
+                    <p class="mt-3" data-t="MyTours.NoTours">Henuz tur eklenmemis</p>
+                    <button class="btn btn-primary" data-bind="click: openAddModal, enable: canManageTours()">
+                        <i class="bi bi-plus me-1"></i><span data-t="MyTours.AddFirstTour">Ilk Turunuzu Ekleyin</span>
+                    </button>
+                </div>
+
+                <!-- Tablo -->
+                <div class="table-responsive" data-bind="visible: tours().length > 0">
+                    <table class="table table-hover mb-0">
+                        <thead class="table-light">
+                            <tr>
+                                <th style="width: 80px;"></th>
+                                <th data-t="Tour.Name">Tur Adi</th>
+                                <th data-t="Tour.Destination">Destinasyon</th>
+                                <th class="text-end" data-t="Tour.Price">Fiyat</th>
+                                <th class="text-center" data-t="Tour.Duration">Sure</th>
+                                <th class="text-center" data-t="Tour.Capacity">Kapasite</th>
+                                <th class="text-center" data-t="MyTours.Reservations">Rezervasyon</th>
+                                <th class="text-center" data-t="Dashboard.Rating">Puan</th>
+                                <th class="text-center" data-t="Common.Active">Durum</th>
+                                <th class="text-center" data-t="Common.Actions">Islemler</th>
+                            </tr>
+                        </thead>
+                        <tbody data-bind="foreach: tours">
+                            <tr data-bind="css: { 'table-secondary': !isActive }">
+                                <td>
+                                    <img data-bind="attr: { src: imageUrl || 'https://picsum.photos/seed/' + id + '/60/40' }"
+                                         class="rounded" style="width: 60px; height: 40px; object-fit: cover;">
+                                </td>
+                                <td>
+                                    <div class="fw-medium" data-bind="text: name"></div>
+                                    <small class="text-muted" data-bind="text: description.substring(0, 50) + (description.length > 50 ? '...' : '')"></small>
+                                </td>
+                                <td data-bind="text: destination"></td>
+                                <td class="text-end fw-medium" data-bind="text: $parent.formatCurrency(price)"></td>
+                                <td class="text-center">
+                                    <span data-bind="text: durationDays"></span> <span data-t="MyTours.Days">gun</span>
+                                </td>
+                                <td class="text-center" data-bind="text: maxCapacity"></td>
+                                <td class="text-center">
+                                    <span class="badge bg-primary" data-bind="text: reservationCount"></span>
+                                </td>
+                                <td class="text-center">
+                                    <span data-bind="visible: averageRating > 0">
+                                        <span data-bind="text: averageRating.toFixed(1)"></span>
+                                        <i class="bi bi-star-fill text-warning"></i>
+                                        <small class="text-muted">(<span data-bind="text: reviewCount"></span>)</small>
+                                    </span>
+                                    <span data-bind="visible: !averageRating || averageRating === 0" class="text-muted">-</span>
+                                </td>
+                                <td class="text-center">
+                                    <span class="badge" data-bind="css: isActive ? 'bg-success' : 'bg-secondary', text: isActive ? 'Aktif' : 'Pasif'"></span>
+                                </td>
+                                <td class="text-center">
+                                    <div class="btn-group btn-group-sm">
+                                        <button class="btn btn-outline-primary" data-bind="click: $parent.openEditModal, enable: $parent.canManageTours()" title="Duzenle">
+                                            <i class="bi bi-pencil"></i>
+                                        </button>
+                                        <button class="btn btn-outline-danger" data-bind="click: $parent.confirmDelete, enable: $parent.canManageTours()" title="Sil">
+                                            <i class="bi bi-trash"></i>
+                                        </button>
+                                    </div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Tur Ekle/Duzenle Modal -->
+    <div class="modal fade" id="tourModal" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">
+                        <i class="bi bi-geo-alt me-2"></i>
+                        <span data-bind="text: isEditing() ? 'Tur Duzenle' : 'Yeni Tur Ekle'"></span>
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="tourForm">
+                        <div class="row g-3">
+                            <!-- Tur Adi -->
+                            <div class="col-md-6">
+                                <label class="form-label" data-t="Tour.Name">Tur Adi <span class="text-danger">*</span></label>
+                                <input type="text" class="form-control" data-bind="value: formData().name" required>
+                            </div>
+
+                            <!-- Destinasyon -->
+                            <div class="col-md-6">
+                                <label class="form-label" data-t="Tour.Destination">Destinasyon <span class="text-danger">*</span></label>
+                                <input type="text" class="form-control" data-bind="value: formData().destination" required>
+                            </div>
+
+                            <!-- Aciklama -->
+                            <div class="col-12">
+                                <label class="form-label" data-t="Tour.Description">Aciklama</label>
+                                <textarea class="form-control" rows="3" data-bind="value: formData().description"></textarea>
+                            </div>
+
+                            <!-- Fiyat -->
+                            <div class="col-md-4">
+                                <label class="form-label" data-t="Tour.Price">Fiyat (TL) <span class="text-danger">*</span></label>
+                                <input type="number" class="form-control" data-bind="value: formData().price" min="0" step="0.01" required>
+                            </div>
+
+                            <!-- Sure -->
+                            <div class="col-md-4">
+                                <label class="form-label" data-t="Tour.Duration">Sure (Gun) <span class="text-danger">*</span></label>
+                                <input type="number" class="form-control" data-bind="value: formData().durationDays" min="1" required>
+                            </div>
+
+                            <!-- Kapasite -->
+                            <div class="col-md-4">
+                                <label class="form-label" data-t="Tour.Capacity">Maksimum Kapasite <span class="text-danger">*</span></label>
+                                <input type="number" class="form-control" data-bind="value: formData().maxCapacity" min="1" required>
+                            </div>
+
+                            <!-- Resim URL -->
+                            <div class="col-12">
+                                <label class="form-label" data-t="MyTours.ImageUrl">Resim URL</label>
+                                <input type="url" class="form-control" data-bind="value: formData().imageUrl" placeholder="https://...">
+                                <small class="text-muted" data-t="MyTours.ImageUrlHint">Bos birakirsaniz varsayilan resim kullanilir</small>
+                            </div>
+
+                            <!-- One Cikan -->
+                            <div class="col-12">
+                                <div class="form-check">
+                                    <input type="checkbox" class="form-check-input" id="isFeatured" data-bind="checked: formData().isFeatured">
+                                    <label class="form-check-label" for="isFeatured" data-t="Tour.Featured">One Cikan Tur</label>
+                                </div>
+                                <small class="text-muted" data-t="MyTours.FeaturedHint">One cikan turlar ana sayfada gosterilir</small>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" data-t="Common.Cancel">Iptal</button>
+                    <button type="button" class="btn btn-primary" data-bind="click: saveTour, enable: !isSaving()">
+                        <span data-bind="visible: isSaving()" class="spinner-border spinner-border-sm me-1"></span>
+                        <span data-t="Common.Save">Kaydet</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Silme Onay Modal -->
+    <div class="modal fade" id="deleteModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title text-danger">
+                        <i class="bi bi-exclamation-triangle me-2"></i>
+                        <span data-t="MyTours.DeleteConfirm">Tur Silme</span>
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <p data-t="MyTours.DeleteMessage">Bu turu silmek istediginizden emin misiniz?</p>
+                    <p class="fw-bold" data-bind="text: deletingTour() ? deletingTour().name : ''"></p>
+                    <div class="alert alert-warning">
+                        <i class="bi bi-info-circle me-2"></i>
+                        <span data-t="MyTours.DeleteWarning">Bu islem geri alinamaz. Tura ait rezervasyonlar etkilenmez.</span>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" data-t="Common.Cancel">Iptal</button>
+                    <button type="button" class="btn btn-danger" data-bind="click: deleteTour, enable: !isDeleting()">
+                        <span data-bind="visible: isDeleting()" class="spinner-border spinner-border-sm me-1"></span>
+                        <span data-t="Common.Delete">Sil</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
 
-<!-- Tur listesi icin Admin/Tours.cshtml'deki ayni yapi kullanilacak -->
-<div class="admin-card">
-    <div class="card-header d-flex justify-content-between align-items-center">
-        <span><i class="bi bi-geo-alt me-2"></i>Turlarim</span>
-        <button class="btn btn-sm btn-primary">
-            <i class="bi bi-plus me-1"></i>Yeni Tur Ekle
-        </button>
-    </div>
-    <div class="card-body text-center text-muted py-5">
-        <i class="bi bi-geo-alt fs-1"></i>
-        <p class="mt-3">Bu ozellik firma sahibi girisi yapildiginda aktif olacaktir.</p>
-        <p><small>Simdilik Admin panelinden tur yonetimi yapabilirsiniz.</small></p>
-    </div>
-</div>
+@section Scripts {
+    <script>
+        function MyToursViewModel() {
+            var self = this;
+
+            // Observables
+            self.isLoading = ko.observable(true);
+            self.isSaving = ko.observable(false);
+            self.isDeleting = ko.observable(false);
+            self.tours = ko.observableArray([]);
+            self.canManageTours = ko.observable(false);
+            self.companyId = ko.observable(null);
+
+            // Form
+            self.isEditing = ko.observable(false);
+            self.editingTourId = ko.observable(null);
+            self.formData = ko.observable({
+                name: '',
+                description: '',
+                destination: '',
+                price: 0,
+                durationDays: 1,
+                maxCapacity: 20,
+                imageUrl: '',
+                isFeatured: false
+            });
+
+            // Delete
+            self.deletingTour = ko.observable(null);
+
+            // Modals
+            var tourModal = null;
+            var deleteModal = null;
+
+            // Helper functions
+            self.formatCurrency = function(value) {
+                if (!value) return '0 TL';
+                return new Intl.NumberFormat('tr-TR', { style: 'decimal' }).format(value) + ' TL';
+            };
+
+            // Turlari yukle
+            self.loadTours = function() {
+                self.isLoading(true);
+
+                // Token'i al
+                var token = localStorage.getItem('authToken');
+
+                $.ajax({
+                    url: apiBaseUrl + '/api/tours/my',
+                    method: 'GET',
+                    headers: token ? { 'Authorization': 'Bearer ' + token } : {},
+                    success: function(data) {
+                        self.tours(data.tours || []);
+                        self.canManageTours(data.canManageTours);
+                        self.isLoading(false);
+                    },
+                    error: function(xhr) {
+                        console.error('Turlar yuklenemedi:', xhr);
+                        if (xhr.status === 401) {
+                            toastr.error(T('Login.Error.Required') || 'Giris yapmaniz gerekiyor');
+                        } else if (xhr.status === 403) {
+                            var response = xhr.responseJSON;
+                            toastr.warning(response?.message || 'Firma sahibi degilsiniz');
+                        } else {
+                            toastr.error(T('Common.Error') || 'Bir hata olustu');
+                        }
+                        self.isLoading(false);
+                    }
+                });
+            };
+
+            // Modal'i ac - Yeni tur
+            self.openAddModal = function() {
+                self.isEditing(false);
+                self.editingTourId(null);
+                self.formData({
+                    name: '',
+                    description: '',
+                    destination: '',
+                    price: 0,
+                    durationDays: 1,
+                    maxCapacity: 20,
+                    imageUrl: '',
+                    isFeatured: false
+                });
+                tourModal.show();
+            };
+
+            // Modal'i ac - Duzenle
+            self.openEditModal = function(tour) {
+                self.isEditing(true);
+                self.editingTourId(tour.id);
+                self.formData({
+                    name: tour.name,
+                    description: tour.description,
+                    destination: tour.destination,
+                    price: tour.price,
+                    durationDays: tour.durationDays,
+                    maxCapacity: tour.maxCapacity,
+                    imageUrl: tour.imageUrl,
+                    isFeatured: tour.isFeatured
+                });
+                tourModal.show();
+            };
+
+            // Tur kaydet
+            self.saveTour = function() {
+                var data = self.formData();
+
+                // Validasyon
+                if (!data.name || !data.destination || !data.price || !data.durationDays || !data.maxCapacity) {
+                    toastr.warning(T('Common.Required') || 'Zorunlu alanlari doldurun');
+                    return;
+                }
+
+                self.isSaving(true);
+                var token = localStorage.getItem('authToken');
+
+                // CompanyId'yi ekle
+                var userStr = localStorage.getItem('currentUser');
+                if (userStr) {
+                    try {
+                        var user = JSON.parse(userStr);
+                        data.companyId = user.companyId;
+                    } catch (e) {}
+                }
+
+                var isEdit = self.isEditing();
+                var url = isEdit ? apiBaseUrl + '/api/tours/' + self.editingTourId() : apiBaseUrl + '/api/tours';
+                var method = isEdit ? 'PUT' : 'POST';
+
+                if (isEdit) {
+                    data.id = self.editingTourId();
+                }
+
+                $.ajax({
+                    url: url,
+                    method: method,
+                    headers: token ? { 'Authorization': 'Bearer ' + token } : {},
+                    contentType: 'application/json',
+                    data: JSON.stringify(data),
+                    success: function() {
+                        toastr.success(isEdit ? (T('MyTours.UpdateSuccess') || 'Tur guncellendi') : (T('MyTours.AddSuccess') || 'Tur eklendi'));
+                        tourModal.hide();
+                        self.loadTours();
+                        self.isSaving(false);
+                    },
+                    error: function(xhr) {
+                        console.error('Tur kaydedilemedi:', xhr);
+                        var response = xhr.responseJSON;
+                        toastr.error(response?.message || T('Common.Error') || 'Bir hata olustu');
+                        self.isSaving(false);
+                    }
+                });
+            };
+
+            // Silme onay modal
+            self.confirmDelete = function(tour) {
+                self.deletingTour(tour);
+                deleteModal.show();
+            };
+
+            // Turu sil
+            self.deleteTour = function() {
+                if (!self.deletingTour()) return;
+
+                self.isDeleting(true);
+                var token = localStorage.getItem('authToken');
+
+                $.ajax({
+                    url: apiBaseUrl + '/api/tours/' + self.deletingTour().id,
+                    method: 'DELETE',
+                    headers: token ? { 'Authorization': 'Bearer ' + token } : {},
+                    success: function() {
+                        toastr.success(T('MyTours.DeleteSuccess') || 'Tur silindi');
+                        deleteModal.hide();
+                        self.loadTours();
+                        self.isDeleting(false);
+                        self.deletingTour(null);
+                    },
+                    error: function(xhr) {
+                        console.error('Tur silinemedi:', xhr);
+                        var response = xhr.responseJSON;
+                        toastr.error(response?.message || T('Common.Error') || 'Bir hata olustu');
+                        self.isDeleting(false);
+                    }
+                });
+            };
+
+            // Init
+            $(document).ready(function() {
+                tourModal = new bootstrap.Modal(document.getElementById('tourModal'));
+                deleteModal = new bootstrap.Modal(document.getElementById('deleteModal'));
+                self.loadTours();
+            });
+        }
+
+        // Localization helper
+        if (typeof T === 'undefined') {
+            window.T = function(key) {
+                return null;
+            };
+        }
+
+        ko.applyBindings(new MyToursViewModel(), document.getElementById('myToursApp'));
+    </script>
+}

@@ -177,6 +177,38 @@
 - [x] API ve Web projeleri birlikte baslatilacak sekilde ayarlandi
 - [ ] Visual Studio'da profil gorunurlugu kontrol edilecek (VS 2022 17.11+ gerekli)
 
+### Firma Sahibi Paneli (Company Owner Dashboard)
+- [x] CompanyDashboard sayfasi:
+  - GET /api/companies/{id}/dashboard endpoint
+  - 4 istatistik karti (Turlar, Rezervasyonlar, Gelir, Puan)
+  - Son 5 rezervasyon tablosu
+  - Son 5 yorum listesi
+  - Tur performansi tablosu
+  - KnockoutJS ViewModel
+- [x] MyTours sayfasi (Tur Yonetimi CRUD):
+  - GET /api/tours/my endpoint
+  - Tur listesi tablosu
+  - Yeni tur ekleme modal
+  - Tur duzenleme modal
+  - Tur silme (soft delete)
+  - Firma onay durumu kontrolu
+- [x] MyReservations sayfasi (Rezervasyon Yonetimi):
+  - GET /api/reservations/my endpoint
+  - PATCH /api/reservations/my/{id}/status endpoint
+  - Rezervasyon listesi (filtreleme: Bekleyen/Onaylanan/Tamamlanan)
+  - Durum degistirme (Onayla/Iptal/Tamamla)
+  - Detay modal
+  - Istatistik kartlari
+- [x] MyReviews sayfasi (Yorumlara Yanit Verme):
+  - GET /api/reviews/my endpoint
+  - Yorum listesi (filtreleme: Yanitlanan/Yanit Bekleyen)
+  - Firma yaniti formu
+  - Istatistik kartlari
+- [x] Admin menu'ye firma sahibi linkleri:
+  - Dashboard, Turlarim, Rezervasyonlarim, Yorumlar
+- [x] 9 dilde localization string'leri:
+  - Dashboard.*, MyTours.*, MyReservations.*, MyReviews.*
+
 ### Dokumantasyon
 - [x] CLAUDE.md (gelistirici kurallari)
 - [x] PROJE_YAPISI.md (detayli proje dokumantasyonu)
@@ -191,13 +223,13 @@
 |--------|-------|
 | Toplam Entity | 11 |
 | Toplam Enum | 6 |
-| API Endpoint | ~35 |
+| API Endpoint | ~45 |
 | Desteklenen Dil | 9 |
 | Seed Firma | 5 |
 | Seed Tur | 15 |
 | Seed Kullanici | 12 |
 | Seed Rezervasyon | 6 |
-| Admin Sayfalari | 3 (Companies, Visitors, Reviews) |
+| Admin Sayfalari | 7 (Companies, Visitors, Reviews, CompanyDashboard, MyTours, MyReservations, MyReviews) |
 
 ---
 

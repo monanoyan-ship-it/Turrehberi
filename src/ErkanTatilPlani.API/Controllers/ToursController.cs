@@ -47,6 +47,57 @@ public class ToursController : ControllerBase
         return tour;
     }
 
+    /// <summary>
+    /// Firma sahibinin kendi turlarini listele
+    /// </summary>
+    [HttpGet("my")]
+    [Authorize]
+    public async Task<ActionResult<object>> GetMyTours()
+    {
+        var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+        if (string.IsNullOrEmpty(userIdClaim))
+            return Unauthorized(new { message = "Giris yapmaniz gerekiyor" });
+
+        var visitor = await _context.Visitors
+            .Include(v => v.Company)
+            .FirstOrDefaultAsync(v => v.Id == int.Parse(userIdClaim) && v.IsActive);
+
+        if (visitor == null)
+            return Unauthorized(new { message = "Kullanici bulunamadi" });
+
+        if (visitor.Company == null)
+            return StatusCode(403, new { message = "Firma sahibi degilsiniz", code = "NOT_COMPANY_OWNER" });
+
+        var tours = await _context.Tours
+            .Where(t => t.CompanyId == visitor.Company.Id)
+            .OrderByDescending(t => t.CreatedAt)
+            .Select(t => new
+            {
+                t.Id,
+                t.Name,
+                t.Description,
+                t.Destination,
+                t.Price,
+                t.DurationDays,
+                t.MaxCapacity,
+                t.ImageUrl,
+                t.IsFeatured,
+                t.IsActive,
+                t.ReviewCount,
+                t.AverageRating,
+                t.CreatedAt,
+                ReservationCount = t.Reservations.Count(r => r.IsActive)
+            })
+            .ToListAsync();
+
+        return Ok(new
+        {
+            tours,
+            companyStatus = visitor.Company.StatusId,
+            canManageTours = visitor.Company.StatusId == CompanyStatuses.Ids.Approved
+        });
+    }
+
     [HttpPost]
     [Authorize]
     public async Task<ActionResult<Tour>> CreateTour(Tour tour)
