@@ -1,0 +1,373 @@
+@{
+    Layout = "_AdminLayout";
+}
+
+<div id="companyDashboardApp">
+    <!-- Yukleniyor -->
+    <div data-bind="visible: isLoading()" class="text-center py-5">
+        <div class="spinner-border text-primary" role="status">
+            <span class="visually-hidden">Yukleniyor...</span>
+        </div>
+        <p class="mt-3 text-muted" data-t="Common.Loading">Yukleniyor...</p>
+    </div>
+
+    <!-- Dashboard Icerigi -->
+    <div data-bind="visible: !isLoading()">
+        <!-- Hosgeldiniz Mesaji -->
+        <div class="alert alert-primary mb-4">
+            <i class="bi bi-speedometer2 me-2"></i>
+            <strong data-t="Dashboard.Welcome">Hosgeldiniz!</strong>
+            <span data-t="Dashboard.WelcomeMessage">Firmanizin genel durumunu buradan takip edebilirsiniz.</span>
+        </div>
+
+        <!-- Istatistik Kartlari -->
+        <div class="row g-4 mb-4">
+            <!-- Toplam Tur -->
+            <div class="col-md-6 col-xl-3">
+                <div class="stat-card h-100">
+                    <div class="d-flex align-items-center gap-3">
+                        <div class="stat-icon bg-primary bg-opacity-10 text-primary">
+                            <i class="bi bi-map"></i>
+                        </div>
+                        <div>
+                            <div class="text-muted small" data-t="Dashboard.Stats.TotalTours">Toplam Tur</div>
+                            <div class="fs-3 fw-bold" data-bind="text: stats().totalTours">0</div>
+                            <div class="text-muted small">
+                                <span data-bind="text: stats().activeTours">0</span>
+                                <span data-t="Dashboard.Stats.ActiveTours">aktif</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Rezervasyonlar -->
+            <div class="col-md-6 col-xl-3">
+                <div class="stat-card h-100">
+                    <div class="d-flex align-items-center gap-3">
+                        <div class="stat-icon bg-success bg-opacity-10 text-success">
+                            <i class="bi bi-calendar-check"></i>
+                        </div>
+                        <div>
+                            <div class="text-muted small" data-t="Dashboard.Stats.TotalReservations">Toplam Rezervasyon</div>
+                            <div class="fs-3 fw-bold" data-bind="text: stats().totalReservations">0</div>
+                            <div class="text-muted small">
+                                <span data-bind="text: stats().pendingReservations">0</span>
+                                <span data-t="Dashboard.Stats.PendingReservations">bekleyen</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Gelir -->
+            <div class="col-md-6 col-xl-3">
+                <div class="stat-card h-100">
+                    <div class="d-flex align-items-center gap-3">
+                        <div class="stat-icon bg-warning bg-opacity-10 text-warning">
+                            <i class="bi bi-currency-lira"></i>
+                        </div>
+                        <div>
+                            <div class="text-muted small" data-t="Dashboard.Stats.TotalRevenue">Toplam Gelir</div>
+                            <div class="fs-3 fw-bold">
+                                <span data-bind="text: formatCurrency(stats().totalRevenue)">0</span>
+                            </div>
+                            <div class="text-muted small">
+                                <span data-t="Dashboard.Stats.MonthlyRevenue">Bu ay:</span>
+                                <span data-bind="text: formatCurrency(stats().monthlyRevenue)">0</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Puan -->
+            <div class="col-md-6 col-xl-3">
+                <div class="stat-card h-100">
+                    <div class="d-flex align-items-center gap-3">
+                        <div class="stat-icon bg-info bg-opacity-10 text-info">
+                            <i class="bi bi-star-fill"></i>
+                        </div>
+                        <div>
+                            <div class="text-muted small" data-t="Dashboard.Stats.AverageRating">Ortalama Puan</div>
+                            <div class="fs-3 fw-bold">
+                                <span data-bind="text: stats().averageRating">0</span>
+                                <i class="bi bi-star-fill text-warning fs-5"></i>
+                            </div>
+                            <div class="text-muted small">
+                                <span data-bind="text: stats().totalReviews">0</span>
+                                <span data-t="Dashboard.Stats.TotalReviews">yorum</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Son Rezervasyonlar ve Yorumlar -->
+        <div class="row g-4 mb-4">
+            <!-- Son Rezervasyonlar -->
+            <div class="col-lg-6">
+                <div class="admin-card h-100">
+                    <div class="card-header d-flex justify-content-between align-items-center">
+                        <span><i class="bi bi-calendar-check me-2"></i><span data-t="Dashboard.RecentReservations">Son Rezervasyonlar</span></span>
+                        <a href="/Admin/MyReservations" class="btn btn-sm btn-outline-primary" data-t="Dashboard.ViewAll">Tumu</a>
+                    </div>
+                    <div class="card-body p-0">
+                        <!-- Veri yok -->
+                        <div data-bind="visible: recentReservations().length === 0" class="text-center text-muted py-5">
+                            <i class="bi bi-calendar-x fs-1"></i>
+                            <p class="mt-3" data-t="Dashboard.NoData">Henuz veri bulunmuyor</p>
+                        </div>
+
+                        <!-- Tablo -->
+                        <div class="table-responsive" data-bind="visible: recentReservations().length > 0">
+                            <table class="table table-hover mb-0">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th data-t="Tour.Name">Tur</th>
+                                        <th data-t="Dashboard.Customer">Musteri</th>
+                                        <th data-t="Reservation.People">Kisi</th>
+                                        <th data-t="Reservation.TotalPrice">Tutar</th>
+                                        <th data-t="Reservation.Status">Durum</th>
+                                    </tr>
+                                </thead>
+                                <tbody data-bind="foreach: recentReservations">
+                                    <tr>
+                                        <td>
+                                            <span class="fw-medium" data-bind="text: tourName"></span>
+                                        </td>
+                                        <td data-bind="text: customerName"></td>
+                                        <td data-bind="text: numberOfPeople"></td>
+                                        <td data-bind="text: $parent.formatCurrency(totalPrice)"></td>
+                                        <td>
+                                            <span class="badge" data-bind="css: $parent.getStatusBadgeClass(status), text: $parent.getStatusText(status)"></span>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Son Yorumlar -->
+            <div class="col-lg-6">
+                <div class="admin-card h-100">
+                    <div class="card-header d-flex justify-content-between align-items-center">
+                        <span><i class="bi bi-chat-square-text me-2"></i><span data-t="Dashboard.RecentReviews">Son Yorumlar</span></span>
+                    </div>
+                    <div class="card-body p-0">
+                        <!-- Veri yok -->
+                        <div data-bind="visible: recentReviews().length === 0" class="text-center text-muted py-5">
+                            <i class="bi bi-chat-square fs-1"></i>
+                            <p class="mt-3" data-t="Dashboard.NoData">Henuz veri bulunmuyor</p>
+                        </div>
+
+                        <!-- Liste -->
+                        <div class="list-group list-group-flush" data-bind="visible: recentReviews().length > 0, foreach: recentReviews">
+                            <div class="list-group-item">
+                                <div class="d-flex justify-content-between align-items-start">
+                                    <div class="flex-grow-1">
+                                        <div class="d-flex align-items-center gap-2 mb-1">
+                                            <span class="text-warning" data-bind="html: $parent.getStars(overallRating)"></span>
+                                            <small class="text-muted" data-bind="text: visitorName"></small>
+                                        </div>
+                                        <div class="small text-muted mb-1" data-bind="text: tourName"></div>
+                                        <div class="small" data-bind="text: comment || title"></div>
+                                    </div>
+                                    <small class="text-muted ms-2" data-bind="text: $parent.formatDate(createdAt)"></small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tur Performansi -->
+        <div class="admin-card">
+            <div class="card-header">
+                <i class="bi bi-bar-chart me-2"></i><span data-t="Dashboard.TourPerformance">Tur Performansi</span>
+            </div>
+            <div class="card-body p-0">
+                <!-- Veri yok -->
+                <div data-bind="visible: tourPerformance().length === 0" class="text-center text-muted py-5">
+                    <i class="bi bi-bar-chart fs-1"></i>
+                    <p class="mt-3" data-t="Dashboard.NoData">Henuz veri bulunmuyor</p>
+                </div>
+
+                <!-- Tablo -->
+                <div class="table-responsive" data-bind="visible: tourPerformance().length > 0">
+                    <table class="table table-hover mb-0">
+                        <thead class="table-light">
+                            <tr>
+                                <th data-t="Tour.Name">Tur Adi</th>
+                                <th class="text-center" data-t="Dashboard.Reservations">Rezervasyon</th>
+                                <th class="text-end" data-t="Dashboard.Revenue">Gelir</th>
+                                <th class="text-center" data-t="Dashboard.Rating">Puan</th>
+                                <th class="text-center" data-t="Dashboard.Reviews">Yorum</th>
+                            </tr>
+                        </thead>
+                        <tbody data-bind="foreach: tourPerformance">
+                            <tr>
+                                <td>
+                                    <span class="fw-medium" data-bind="text: name"></span>
+                                </td>
+                                <td class="text-center">
+                                    <span class="badge bg-primary" data-bind="text: reservationCount"></span>
+                                </td>
+                                <td class="text-end fw-medium" data-bind="text: $parent.formatCurrency(revenue)"></td>
+                                <td class="text-center">
+                                    <span data-bind="visible: averageRating > 0">
+                                        <span data-bind="text: averageRating"></span>
+                                        <i class="bi bi-star-fill text-warning"></i>
+                                    </span>
+                                    <span data-bind="visible: averageRating === 0" class="text-muted">-</span>
+                                </td>
+                                <td class="text-center">
+                                    <span class="badge bg-secondary" data-bind="text: reviewCount"></span>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        function CompanyDashboardViewModel() {
+            var self = this;
+
+            // Observables
+            self.isLoading = ko.observable(true);
+            self.stats = ko.observable({
+                totalTours: 0,
+                activeTours: 0,
+                totalReservations: 0,
+                pendingReservations: 0,
+                confirmedReservations: 0,
+                completedReservations: 0,
+                totalRevenue: 0,
+                monthlyRevenue: 0,
+                totalReviews: 0,
+                averageRating: 0
+            });
+            self.recentReservations = ko.observableArray([]);
+            self.recentReviews = ko.observableArray([]);
+            self.tourPerformance = ko.observableArray([]);
+
+            // TODO: Gercek auth sisteminden alinacak
+            self.companyId = ko.observable(null);
+
+            // Helper functions
+            self.formatCurrency = function(value) {
+                if (!value) return '0 TL';
+                return new Intl.NumberFormat('tr-TR', { style: 'decimal' }).format(value) + ' TL';
+            };
+
+            self.formatDate = function(dateString) {
+                if (!dateString) return '';
+                var date = new Date(dateString);
+                return date.toLocaleDateString('tr-TR');
+            };
+
+            self.getStars = function(rating) {
+                var html = '';
+                for (var i = 0; i < 5; i++) {
+                    if (i < rating) {
+                        html += '<i class="bi bi-star-fill"></i>';
+                    } else {
+                        html += '<i class="bi bi-star"></i>';
+                    }
+                }
+                return html;
+            };
+
+            self.getStatusBadgeClass = function(status) {
+                var classes = {
+                    'Pending': 'bg-warning',
+                    'Confirmed': 'bg-success',
+                    'Cancelled': 'bg-danger',
+                    'Completed': 'bg-info'
+                };
+                return classes[status] || 'bg-secondary';
+            };
+
+            self.getStatusText = function(status) {
+                var texts = {
+                    'Pending': T('Status.Pending'),
+                    'Confirmed': T('Status.Confirmed'),
+                    'Cancelled': T('Status.Cancelled'),
+                    'Completed': T('Status.Completed')
+                };
+                return texts[status] || status;
+            };
+
+            // Dashboard verilerini yukle
+            self.loadDashboard = function() {
+                self.isLoading(true);
+
+                // Firma ID'sini al (localStorage'dan veya session'dan)
+                var userStr = localStorage.getItem('currentUser');
+                if (userStr) {
+                    try {
+                        var user = JSON.parse(userStr);
+                        if (user.companyId) {
+                            self.companyId(user.companyId);
+                        }
+                    } catch (e) {
+                        console.error('Kullanici bilgisi okunamadi:', e);
+                    }
+                }
+
+                if (!self.companyId()) {
+                    // Test icin varsayilan firma ID (gercek uygulamada kaldirılacak)
+                    self.companyId(1);
+                }
+
+                $.ajax({
+                    url: apiBaseUrl + '/api/companies/' + self.companyId() + '/dashboard',
+                    method: 'GET',
+                    success: function(data) {
+                        self.stats(data.stats);
+                        self.recentReservations(data.recentReservations || []);
+                        self.recentReviews(data.recentReviews || []);
+                        self.tourPerformance(data.tourPerformance || []);
+                        self.isLoading(false);
+                    },
+                    error: function(xhr) {
+                        console.error('Dashboard yuklenemedi:', xhr);
+                        toastr.error(T('Common.Error'));
+                        self.isLoading(false);
+                    }
+                });
+            };
+
+            // Sayfa yuklendiginde calistir
+            self.loadDashboard();
+        }
+
+        // Localization helper (eger tanimli degilse)
+        if (typeof T === 'undefined') {
+            window.T = function(key, param) {
+                // Fallback - ceviri sistemi yuklenmemisse
+                var fallbacks = {
+                    'Status.Pending': 'Beklemede',
+                    'Status.Confirmed': 'Onaylandi',
+                    'Status.Cancelled': 'Iptal Edildi',
+                    'Status.Completed': 'Tamamlandi',
+                    'Common.Error': 'Bir hata olustu'
+                };
+                return fallbacks[key] || key;
+            };
+        }
+
+        $(document).ready(function() {
+            ko.applyBindings(new CompanyDashboardViewModel(), document.getElementById('companyDashboardApp'));
+        });
+    </script>
+}

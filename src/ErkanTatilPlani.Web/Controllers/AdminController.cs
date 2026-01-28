@@ -32,6 +32,14 @@ public class AdminController : Controller
     // FIRMA SAHIBI SAYFALARI
     // ============================================
 
+    // Firma sahibi dashboard'u
+    public IActionResult CompanyDashboard()
+    {
+        SetCommonViewData("CompanyDashboard", "Dashboard");
+        ViewBag.UserRole = "CompanyOwner";
+        return View();
+    }
+
     // Firma sahibinin kendi turlari
     public IActionResult MyTours()
     {
@@ -95,6 +103,13 @@ public class AdminController : Controller
     public IActionResult Languages()
     {
         SetCommonViewData("Languages", "Dil Yonetimi");
+        return View();
+    }
+
+    // Yorum moderasyonu (Staff ve Admin)
+    public IActionResult Reviews()
+    {
+        SetCommonViewData("Reviews", "Yorum Moderasyonu");
         return View();
     }
 }

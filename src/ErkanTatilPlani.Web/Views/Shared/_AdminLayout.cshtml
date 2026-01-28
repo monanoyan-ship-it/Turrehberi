@@ -154,6 +154,9 @@
 
         <nav class="nav-section" id="companyOwnerMenu">
             <div class="nav-section-title">Firma Yonetimi</div>
+            <a href="/Admin/CompanyDashboard" class="nav-link @(ViewData["ActiveMenu"]?.ToString() == "CompanyDashboard" ? "active" : "")">
+                <i class="bi bi-speedometer2"></i> <span data-t="Menu.Dashboard">Dashboard</span>
+            </a>
             <a href="/Admin/MyTours" class="nav-link @(ViewData["ActiveMenu"]?.ToString() == "MyTours" ? "active" : "")">
                 <i class="bi bi-geo-alt"></i> Turlarim
             </a>
@@ -175,6 +178,9 @@
             </a>
             <a href="/Admin/Reservations" class="nav-link @(ViewData["ActiveMenu"]?.ToString() == "Reservations" ? "active" : "")">
                 <i class="bi bi-calendar-check"></i> Rezervasyonlar
+            </a>
+            <a href="/Admin/Reviews" class="nav-link @(ViewData["ActiveMenu"]?.ToString() == "Reviews" ? "active" : "")">
+                <i class="bi bi-chat-square-text"></i> Yorumlar
             </a>
         </nav>
 
