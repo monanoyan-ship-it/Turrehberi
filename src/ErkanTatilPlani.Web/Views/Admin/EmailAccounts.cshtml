@@ -1,0 +1,205 @@
+@{
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+
+<div id="emailAccountsApp">
+    <!-- Header -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h4 class="mb-1" data-t="Admin.EmailAccounts.Title">Email Hesaplari</h4>
+            <p class="text-muted mb-0" data-t="Admin.EmailAccounts.Subtitle">SMTP email hesaplarini yonetin</p>
+        </div>
+        <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#accountModal" data-bind="click: openCreateModal">
+            <i class="bi bi-plus-lg me-1"></i> <span data-t="Admin.EmailAccounts.AddAccount">Yeni Hesap</span>
+        </button>
+    </div>
+
+    <!-- Loading -->
+    <div data-bind="visible: loading" class="text-center py-5">
+        <div class="spinner-border text-primary" role="status">
+            <span class="visually-hidden">Loading...</span>
+        </div>
+    </div>
+
+    <!-- Table -->
+    <div class="admin-card" data-bind="visible: !loading()">
+        <div class="table-responsive">
+            <table class="table table-hover mb-0">
+                <thead>
+                    <tr>
+                        <th data-t="Admin.EmailAccounts.Name">Hesap Adi</th>
+                        <th data-t="Admin.EmailAccounts.SmtpHost">SMTP Host</th>
+                        <th data-t="Admin.EmailAccounts.Port">Port</th>
+                        <th data-t="Admin.EmailAccounts.FromEmail">Gonderen Email</th>
+                        <th data-t="Admin.EmailAccounts.Default">Varsayilan</th>
+                        <th data-t="Common.Status">Durum</th>
+                        <th data-t="Common.Actions">Islemler</th>
+                    </tr>
+                </thead>
+                <tbody data-bind="foreach: accounts">
+                    <tr>
+                        <td>
+                            <strong data-bind="text: name"></strong>
+                            <div class="small text-muted" data-bind="text: description"></div>
+                        </td>
+                        <td data-bind="text: smtpHost"></td>
+                        <td data-bind="text: smtpPort"></td>
+                        <td>
+                            <span data-bind="text: fromEmail"></span>
+                            <div class="small text-muted" data-bind="text: fromName"></div>
+                        </td>
+                        <td>
+                            <span class="badge" data-bind="css: isDefault ? 'bg-success' : 'bg-secondary', text: isDefault ? 'Evet' : 'Hayir'"></span>
+                        </td>
+                        <td>
+                            <span class="badge" data-bind="css: isActive ? 'bg-success' : 'bg-danger', text: isActive ? 'Aktif' : 'Pasif'"></span>
+                        </td>
+                        <td>
+                            <div class="btn-group btn-group-sm">
+                                <button class="btn btn-outline-primary" data-bind="click: $parent.openEditModal" title="Duzenle">
+                                    <i class="bi bi-pencil"></i>
+                                </button>
+                                <button class="btn btn-outline-info" data-bind="click: $parent.copyAccount" title="Kopyala">
+                                    <i class="bi bi-copy"></i>
+                                </button>
+                                <button class="btn btn-outline-success" data-bind="click: $parent.openTestModal" title="Test Email">
+                                    <i class="bi bi-send"></i>
+                                </button>
+                                <button class="btn btn-outline-warning" data-bind="click: $parent.setDefault, visible: !isDefault" title="Varsayilan Yap">
+                                    <i class="bi bi-star"></i>
+                                </button>
+                                <button class="btn btn-outline-danger" data-bind="click: $parent.deleteAccount, visible: !isDefault" title="Sil">
+                                    <i class="bi bi-trash"></i>
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Empty State -->
+        <div data-bind="visible: accounts().length === 0" class="text-center py-5">
+            <i class="bi bi-envelope-x display-4 text-muted"></i>
+            <p class="text-muted mt-2" data-t="Admin.EmailAccounts.NoAccounts">Henuz email hesabi yok</p>
+        </div>
+    </div>
+</div>
+
+<!-- Account Modal -->
+<div class="modal fade" id="accountModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" data-bind="text: editingAccount() ? 'Email Hesabi Duzenle' : 'Yeni Email Hesabi'"></h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <form id="accountForm">
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label" data-t="Admin.EmailAccounts.Name">Hesap Adi</label>
+                            <input type="text" class="form-control" data-bind="value: formData.name" placeholder="default, reservations, support..." required>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label" data-t="Admin.EmailAccounts.Description">Aciklama</label>
+                            <input type="text" class="form-control" data-bind="value: formData.description" placeholder="Bu hesabin kullanim amaci">
+                        </div>
+                    </div>
+
+                    <hr class="my-3">
+                    <h6 class="text-muted mb-3"><i class="bi bi-hdd-network me-1"></i> SMTP Ayarlari</h6>
+
+                    <div class="row">
+                        <div class="col-md-8 mb-3">
+                            <label class="form-label" data-t="Admin.EmailAccounts.SmtpHost">SMTP Host</label>
+                            <input type="text" class="form-control" data-bind="value: formData.smtpHost" placeholder="smtp.gmail.com" required>
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <label class="form-label" data-t="Admin.EmailAccounts.Port">Port</label>
+                            <input type="number" class="form-control" data-bind="value: formData.smtpPort" placeholder="587" required>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label" data-t="Admin.EmailAccounts.Username">Kullanici Adi</label>
+                            <input type="text" class="form-control" data-bind="value: formData.smtpUsername" placeholder="user@gmail.com">
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label" data-t="Admin.EmailAccounts.Password">Sifre</label>
+                            <div class="input-group">
+                                <input type="password" class="form-control" data-bind="value: formData.smtpPassword, attr: { type: showPassword() ? 'text' : 'password' }" placeholder="App password">
+                                <button class="btn btn-outline-secondary" type="button" data-bind="click: togglePassword">
+                                    <i data-bind="css: showPassword() ? 'bi bi-eye-slash' : 'bi bi-eye'"></i>
+                                </button>
+                            </div>
+                            <small class="text-muted" data-bind="visible: editingAccount()">Degistirmek istemiyorsaniz bos birakin</small>
+                        </div>
+                    </div>
+
+                    <div class="form-check mb-3">
+                        <input class="form-check-input" type="checkbox" id="enableSsl" data-bind="checked: formData.enableSsl">
+                        <label class="form-check-label" for="enableSsl" data-t="Admin.EmailAccounts.EnableSsl">SSL/TLS Kullan</label>
+                    </div>
+
+                    <hr class="my-3">
+                    <h6 class="text-muted mb-3"><i class="bi bi-person-badge me-1"></i> Gonderen Bilgileri</h6>
+
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label" data-t="Admin.EmailAccounts.FromEmail">Gonderen Email</label>
+                            <input type="email" class="form-control" data-bind="value: formData.fromEmail" placeholder="noreply@domain.com" required>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label" data-t="Admin.EmailAccounts.FromName">Gonderen Ismi</label>
+                            <input type="text" class="form-control" data-bind="value: formData.fromName" placeholder="Erkan Tatil Plani" required>
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label" data-t="Admin.EmailAccounts.DisplayOrder">Siralama</label>
+                        <input type="number" class="form-control" data-bind="value: formData.displayOrder" style="width: 100px;">
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" data-t="Common.Cancel">Iptal</button>
+                <button type="button" class="btn btn-primary" data-bind="click: saveAccount, disable: saving">
+                    <span data-bind="visible: saving"><span class="spinner-border spinner-border-sm me-1"></span></span>
+                    <span data-t="Common.Save">Kaydet</span>
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Test Email Modal -->
+<div class="modal fade" id="testModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" data-t="Admin.EmailAccounts.TestEmail">Test Email Gonder</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <p class="text-muted" data-bind="html: 'Hesap: <strong>' + (testAccountName() || '') + '</strong>'"></p>
+                <div class="mb-3">
+                    <label class="form-label" data-t="Admin.EmailAccounts.RecipientEmail">Alici Email Adresi</label>
+                    <input type="email" class="form-control" data-bind="value: testEmail" placeholder="test@example.com">
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" data-t="Common.Cancel">Iptal</button>
+                <button type="button" class="btn btn-success" data-bind="click: sendTestEmail, disable: sendingTest">
+                    <span data-bind="visible: sendingTest"><span class="spinner-border spinner-border-sm me-1"></span></span>
+                    <i class="bi bi-send me-1"></i> <span data-t="Admin.EmailAccounts.SendTest">Gonder</span>
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+<script src="~/js/Admin/EmailAccounts.js"></script>
+}

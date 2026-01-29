@@ -26,6 +26,18 @@
     {
       "library": "toastr.js@2.1.4",
       "destination": "wwwroot/lib/toastr/"
+    },
+    {
+      "library": "summernote@0.8.20",
+      "destination": "wwwroot/lib/summernote/",
+      "files": [
+        "summernote-bs5.min.css",
+        "summernote-bs5.min.js",
+        "font/summernote.eot",
+        "font/summernote.ttf",
+        "font/summernote.woff",
+        "font/summernote.woff2"
+      ]
     }
   ]
 }

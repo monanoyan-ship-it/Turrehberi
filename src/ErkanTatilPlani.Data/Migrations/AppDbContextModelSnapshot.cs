@@ -464,6 +464,372 @@ namespace ErkanTatilPlani.Data.Migrations
                     b.ToTable("CompanyGalleryImages");
                 });
 
+            modelBuilder.Entity("ErkanTatilPlani.Core.Entities.EmailAccount", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("Description")
+                        .HasMaxLength(500)
+                        .HasColumnType("character varying(500)");
+
+                    b.Property<int>("DisplayOrder")
+                        .HasColumnType("integer");
+
+                    b.Property<bool>("EnableSsl")
+                        .HasColumnType("boolean");
+
+                    b.Property<string>("FromEmail")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)");
+
+                    b.Property<string>("FromName")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("boolean");
+
+                    b.Property<bool>("IsDefault")
+                        .HasColumnType("boolean");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<string>("SmtpHost")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)");
+
+                    b.Property<string>("SmtpPassword")
+                        .IsRequired()
+                        .HasMaxLength(500)
+                        .HasColumnType("character varying(500)");
+
+                    b.Property<int>("SmtpPort")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("SmtpUsername")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)");
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("IsDefault");
+
+                    b.HasIndex("Name")
+                        .IsUnique();
+
+                    b.ToTable("EmailAccounts");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1,
+                            CreatedAt = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
+                            Description = "Varsayilan email hesabi",
+                            DisplayOrder = 1,
+                            EnableSsl = true,
+                            FromEmail = "noreply@erkantatilplani.com",
+                            FromName = "Erkan Tatil Plani",
+                            IsActive = true,
+                            IsDefault = true,
+                            Name = "default",
+                            SmtpHost = "smtp.gmail.com",
+                            SmtpPassword = "",
+                            SmtpPort = 587,
+                            SmtpUsername = "noreply@erkantatilplani.com"
+                        },
+                        new
+                        {
+                            Id = 2,
+                            CreatedAt = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
+                            Description = "Rezervasyon emailleri icin",
+                            DisplayOrder = 2,
+                            EnableSsl = true,
+                            FromEmail = "reservations@erkantatilplani.com",
+                            FromName = "Erkan Tatil Plani - Rezervasyonlar",
+                            IsActive = true,
+                            IsDefault = false,
+                            Name = "reservations",
+                            SmtpHost = "smtp.gmail.com",
+                            SmtpPassword = "",
+                            SmtpPort = 587,
+                            SmtpUsername = "reservations@erkantatilplani.com"
+                        });
+                });
+
+            modelBuilder.Entity("ErkanTatilPlani.Core.Entities.EmailTemplate", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("Description")
+                        .HasMaxLength(1000)
+                        .HasColumnType("character varying(1000)");
+
+                    b.Property<int?>("EmailAccountId")
+                        .HasColumnType("integer");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("boolean");
+
+                    b.Property<bool>("IsSystemTemplate")
+                        .HasColumnType("boolean");
+
+                    b.Property<string>("Key")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)");
+
+                    b.Property<string>("Placeholders")
+                        .HasMaxLength(2000)
+                        .HasColumnType("character varying(2000)");
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("EmailAccountId");
+
+                    b.HasIndex("Key")
+                        .IsUnique();
+
+                    b.ToTable("EmailTemplates");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1,
+                            CreatedAt = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
+                            Description = "Kullanici sifre sifirlama istegi yaptiginda gonderilir",
+                            EmailAccountId = 1,
+                            IsActive = true,
+                            IsSystemTemplate = true,
+                            Key = "password_reset",
+                            Name = "Sifre Sifirlama",
+                            Placeholders = "[\"{customerName}\", \"{resetUrl}\"]"
+                        },
+                        new
+                        {
+                            Id = 2,
+                            CreatedAt = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
+                            Description = "Kullanici kayit oldugunda veya email dogrulamasi istediginde gonderilir",
+                            EmailAccountId = 1,
+                            IsActive = true,
+                            IsSystemTemplate = true,
+                            Key = "email_verification",
+                            Name = "Email Dogrulama",
+                            Placeholders = "[\"{customerName}\", \"{verifyUrl}\"]"
+                        },
+                        new
+                        {
+                            Id = 3,
+                            CreatedAt = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
+                            Description = "Rezervasyon onaylandiginda musteriye gonderilir",
+                            EmailAccountId = 2,
+                            IsActive = true,
+                            IsSystemTemplate = true,
+                            Key = "reservation_confirmed",
+                            Name = "Rezervasyon Onaylandi",
+                            Placeholders = "[\"{customerName}\", \"{tourName}\", \"{companyName}\", \"{destination}\", \"{startDate}\", \"{endDate}\", \"{numberOfPeople}\", \"{totalPrice}\"]"
+                        },
+                        new
+                        {
+                            Id = 4,
+                            CreatedAt = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
+                            Description = "Rezervasyon iptal edildiginde musteriye gonderilir",
+                            EmailAccountId = 2,
+                            IsActive = true,
+                            IsSystemTemplate = true,
+                            Key = "reservation_cancelled",
+                            Name = "Rezervasyon Iptal Edildi",
+                            Placeholders = "[\"{customerName}\", \"{tourName}\", \"{companyName}\", \"{destination}\", \"{startDate}\", \"{endDate}\", \"{numberOfPeople}\", \"{totalPrice}\"]"
+                        },
+                        new
+                        {
+                            Id = 5,
+                            CreatedAt = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
+                            Description = "Rezervasyon reddedildiginde musteriye gonderilir",
+                            EmailAccountId = 2,
+                            IsActive = true,
+                            IsSystemTemplate = true,
+                            Key = "reservation_rejected",
+                            Name = "Rezervasyon Reddedildi",
+                            Placeholders = "[\"{customerName}\", \"{tourName}\", \"{companyName}\", \"{destination}\", \"{startDate}\", \"{endDate}\", \"{numberOfPeople}\", \"{totalPrice}\", \"{rejectionReason}\"]"
+                        });
+                });
+
+            modelBuilder.Entity("ErkanTatilPlani.Core.Entities.EmailTemplateTranslation", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Body")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<int>("EmailTemplateId")
+                        .HasColumnType("integer");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("boolean");
+
+                    b.Property<string>("LanguageCode")
+                        .IsRequired()
+                        .HasMaxLength(10)
+                        .HasColumnType("character varying(10)");
+
+                    b.Property<string>("Subject")
+                        .IsRequired()
+                        .HasMaxLength(500)
+                        .HasColumnType("character varying(500)");
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("EmailTemplateId", "LanguageCode")
+                        .IsUnique();
+
+                    b.ToTable("EmailTemplateTranslations");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1,
+                            Body = "<!DOCTYPE html>\r\n<html>\r\n<head>\r\n    <meta charset='utf-8'>\r\n    <meta name='viewport' content='width=device-width, initial-scale=1.0'>\r\n    <style>\r\n        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; margin: 0; padding: 0; background-color: #f5f5f5; }\r\n        .container { max-width: 600px; margin: 0 auto; background-color: #ffffff; }\r\n        .header { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 30px; text-align: center; }\r\n        .header h1 { color: #ffffff; margin: 0; font-size: 24px; }\r\n        .content { padding: 40px 30px; }\r\n        .btn { display: inline-block; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: #ffffff; padding: 14px 30px; text-decoration: none; border-radius: 5px; font-weight: 600; margin: 20px 0; }\r\n        .footer { background-color: #f8f9fa; padding: 20px; text-align: center; font-size: 12px; color: #6c757d; }\r\n        .details { background-color: #f8f9fa; padding: 20px; border-radius: 8px; margin: 20px 0; }\r\n        .details-row { display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid #e9ecef; }\r\n        .details-row:last-child { border-bottom: none; }\r\n    </style>\r\n</head>\r\n<body>\r\n    <div class='container'>\r\n        \r\n            <div class='header'><h1>Sifre Sifirlama</h1></div>\r\n            <div class='content'>\r\n                <p>Merhaba {customerName},</p>\r\n                <p>Sifrenizi sifirlamak icin asagidaki butona tiklayin. Eger bu istegi siz yapmadiysiniz, bu emaili gormezden gelebilirsiniz.</p>\r\n                <p style='text-align: center;'><a href='{resetUrl}' class='btn'>Sifremi Sifirla</a></p>\r\n                <p style='color: #6c757d; font-size: 14px;'>Bu link 1 saat icinde gecerliligini yitirecektir.</p>\r\n            </div>\r\n        <div class='footer'>\r\n            <p>Bu email Erkan Tatil Plani tarafindan otomatik olarak gonderilmistir.</p>\r\n            <p>&copy; 2026 Erkan Tatil Plani. Tum haklari saklidir.</p>\r\n        </div>\r\n    </div>\r\n</body>\r\n</html>",
+                            CreatedAt = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
+                            EmailTemplateId = 1,
+                            IsActive = true,
+                            LanguageCode = "tr",
+                            Subject = "Sifre Sifirlama - Erkan Tatil Plani"
+                        },
+                        new
+                        {
+                            Id = 2,
+                            Body = "<!DOCTYPE html>\r\n<html>\r\n<head>\r\n    <meta charset='utf-8'>\r\n    <meta name='viewport' content='width=device-width, initial-scale=1.0'>\r\n    <style>\r\n        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; margin: 0; padding: 0; background-color: #f5f5f5; }\r\n        .container { max-width: 600px; margin: 0 auto; background-color: #ffffff; }\r\n        .header { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 30px; text-align: center; }\r\n        .header h1 { color: #ffffff; margin: 0; font-size: 24px; }\r\n        .content { padding: 40px 30px; }\r\n        .btn { display: inline-block; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: #ffffff; padding: 14px 30px; text-decoration: none; border-radius: 5px; font-weight: 600; margin: 20px 0; }\r\n        .footer { background-color: #f8f9fa; padding: 20px; text-align: center; font-size: 12px; color: #6c757d; }\r\n        .details { background-color: #f8f9fa; padding: 20px; border-radius: 8px; margin: 20px 0; }\r\n        .details-row { display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid #e9ecef; }\r\n        .details-row:last-child { border-bottom: none; }\r\n    </style>\r\n</head>\r\n<body>\r\n    <div class='container'>\r\n        \r\n            <div class='header'><h1>Password Reset</h1></div>\r\n            <div class='content'>\r\n                <p>Hello {customerName},</p>\r\n                <p>Click the button below to reset your password. If you did not make this request, you can ignore this email.</p>\r\n                <p style='text-align: center;'><a href='{resetUrl}' class='btn'>Reset My Password</a></p>\r\n                <p style='color: #6c757d; font-size: 14px;'>This link will expire in 1 hour.</p>\r\n            </div>\r\n        <div class='footer'>\r\n            <p>Bu email Erkan Tatil Plani tarafindan otomatik olarak gonderilmistir.</p>\r\n            <p>&copy; 2026 Erkan Tatil Plani. Tum haklari saklidir.</p>\r\n        </div>\r\n    </div>\r\n</body>\r\n</html>",
+                            CreatedAt = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
+                            EmailTemplateId = 1,
+                            IsActive = true,
+                            LanguageCode = "en",
+                            Subject = "Password Reset - Erkan Tatil Plani"
+                        },
+                        new
+                        {
+                            Id = 3,
+                            Body = "<!DOCTYPE html>\r\n<html>\r\n<head>\r\n    <meta charset='utf-8'>\r\n    <meta name='viewport' content='width=device-width, initial-scale=1.0'>\r\n    <style>\r\n        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; margin: 0; padding: 0; background-color: #f5f5f5; }\r\n        .container { max-width: 600px; margin: 0 auto; background-color: #ffffff; }\r\n        .header { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 30px; text-align: center; }\r\n        .header h1 { color: #ffffff; margin: 0; font-size: 24px; }\r\n        .content { padding: 40px 30px; }\r\n        .btn { display: inline-block; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: #ffffff; padding: 14px 30px; text-decoration: none; border-radius: 5px; font-weight: 600; margin: 20px 0; }\r\n        .footer { background-color: #f8f9fa; padding: 20px; text-align: center; font-size: 12px; color: #6c757d; }\r\n        .details { background-color: #f8f9fa; padding: 20px; border-radius: 8px; margin: 20px 0; }\r\n        .details-row { display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid #e9ecef; }\r\n        .details-row:last-child { border-bottom: none; }\r\n    </style>\r\n</head>\r\n<body>\r\n    <div class='container'>\r\n        \r\n            <div class='header'><h1>Email Dogrulama</h1></div>\r\n            <div class='content'>\r\n                <p>Merhaba {customerName},</p>\r\n                <p>Hesabinizi aktif etmek ve tum ozelliklere erisebilmek icin email adresinizi dogrulayin.</p>\r\n                <p style='text-align: center;'><a href='{verifyUrl}' class='btn'>Email Adresimi Dogrula</a></p>\r\n            </div>\r\n        <div class='footer'>\r\n            <p>Bu email Erkan Tatil Plani tarafindan otomatik olarak gonderilmistir.</p>\r\n            <p>&copy; 2026 Erkan Tatil Plani. Tum haklari saklidir.</p>\r\n        </div>\r\n    </div>\r\n</body>\r\n</html>",
+                            CreatedAt = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
+                            EmailTemplateId = 2,
+                            IsActive = true,
+                            LanguageCode = "tr",
+                            Subject = "Email Dogrulama - Erkan Tatil Plani"
+                        },
+                        new
+                        {
+                            Id = 4,
+                            Body = "<!DOCTYPE html>\r\n<html>\r\n<head>\r\n    <meta charset='utf-8'>\r\n    <meta name='viewport' content='width=device-width, initial-scale=1.0'>\r\n    <style>\r\n        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; margin: 0; padding: 0; background-color: #f5f5f5; }\r\n        .container { max-width: 600px; margin: 0 auto; background-color: #ffffff; }\r\n        .header { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 30px; text-align: center; }\r\n        .header h1 { color: #ffffff; margin: 0; font-size: 24px; }\r\n        .content { padding: 40px 30px; }\r\n        .btn { display: inline-block; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: #ffffff; padding: 14px 30px; text-decoration: none; border-radius: 5px; font-weight: 600; margin: 20px 0; }\r\n        .footer { background-color: #f8f9fa; padding: 20px; text-align: center; font-size: 12px; color: #6c757d; }\r\n        .details { background-color: #f8f9fa; padding: 20px; border-radius: 8px; margin: 20px 0; }\r\n        .details-row { display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid #e9ecef; }\r\n        .details-row:last-child { border-bottom: none; }\r\n    </style>\r\n</head>\r\n<body>\r\n    <div class='container'>\r\n        \r\n            <div class='header'><h1>Email Verification</h1></div>\r\n            <div class='content'>\r\n                <p>Hello {customerName},</p>\r\n                <p>Verify your email address to activate your account and access all features.</p>\r\n                <p style='text-align: center;'><a href='{verifyUrl}' class='btn'>Verify My Email</a></p>\r\n            </div>\r\n        <div class='footer'>\r\n            <p>Bu email Erkan Tatil Plani tarafindan otomatik olarak gonderilmistir.</p>\r\n            <p>&copy; 2026 Erkan Tatil Plani. Tum haklari saklidir.</p>\r\n        </div>\r\n    </div>\r\n</body>\r\n</html>",
+                            CreatedAt = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
+                            EmailTemplateId = 2,
+                            IsActive = true,
+                            LanguageCode = "en",
+                            Subject = "Email Verification - Erkan Tatil Plani"
+                        },
+                        new
+                        {
+                            Id = 5,
+                            Body = "<!DOCTYPE html>\r\n<html>\r\n<head>\r\n    <meta charset='utf-8'>\r\n    <meta name='viewport' content='width=device-width, initial-scale=1.0'>\r\n    <style>\r\n        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; margin: 0; padding: 0; background-color: #f5f5f5; }\r\n        .container { max-width: 600px; margin: 0 auto; background-color: #ffffff; }\r\n        .header { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 30px; text-align: center; }\r\n        .header h1 { color: #ffffff; margin: 0; font-size: 24px; }\r\n        .content { padding: 40px 30px; }\r\n        .btn { display: inline-block; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: #ffffff; padding: 14px 30px; text-decoration: none; border-radius: 5px; font-weight: 600; margin: 20px 0; }\r\n        .footer { background-color: #f8f9fa; padding: 20px; text-align: center; font-size: 12px; color: #6c757d; }\r\n        .details { background-color: #f8f9fa; padding: 20px; border-radius: 8px; margin: 20px 0; }\r\n        .details-row { display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid #e9ecef; }\r\n        .details-row:last-child { border-bottom: none; }\r\n    </style>\r\n</head>\r\n<body>\r\n    <div class='container'>\r\n        \r\n            <div class='header'><h1>Rezervasyonunuz Onaylandi!</h1></div>\r\n            <div class='content'>\r\n                <p>Merhaba {customerName},</p>\r\n                <p>Rezervasyonunuz basariyla onaylandi. Asagida rezervasyon detaylarinizi bulabilirsiniz.</p>\r\n                <div class='details'>\r\n                    <div class='details-row'><span><strong>Tur:</strong></span><span>{tourName}</span></div>\r\n                    <div class='details-row'><span><strong>Firma:</strong></span><span>{companyName}</span></div>\r\n                    <div class='details-row'><span><strong>Destinasyon:</strong></span><span>{destination}</span></div>\r\n                    <div class='details-row'><span><strong>Tarih:</strong></span><span>{startDate} - {endDate}</span></div>\r\n                    <div class='details-row'><span><strong>Kisi Sayisi:</strong></span><span>{numberOfPeople}</span></div>\r\n                    <div class='details-row'><span><strong>Toplam:</strong></span><span>{totalPrice} TL</span></div>\r\n                </div>\r\n                <p>Bizi tercih ettiginiz icin tesekkur ederiz. Iyi tatiller dileriz!</p>\r\n            </div>\r\n        <div class='footer'>\r\n            <p>Bu email Erkan Tatil Plani tarafindan otomatik olarak gonderilmistir.</p>\r\n            <p>&copy; 2026 Erkan Tatil Plani. Tum haklari saklidir.</p>\r\n        </div>\r\n    </div>\r\n</body>\r\n</html>",
+                            CreatedAt = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
+                            EmailTemplateId = 3,
+                            IsActive = true,
+                            LanguageCode = "tr",
+                            Subject = "Rezervasyonunuz Onaylandi - Erkan Tatil Plani"
+                        },
+                        new
+                        {
+                            Id = 6,
+                            Body = "<!DOCTYPE html>\r\n<html>\r\n<head>\r\n    <meta charset='utf-8'>\r\n    <meta name='viewport' content='width=device-width, initial-scale=1.0'>\r\n    <style>\r\n        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; margin: 0; padding: 0; background-color: #f5f5f5; }\r\n        .container { max-width: 600px; margin: 0 auto; background-color: #ffffff; }\r\n        .header { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 30px; text-align: center; }\r\n        .header h1 { color: #ffffff; margin: 0; font-size: 24px; }\r\n        .content { padding: 40px 30px; }\r\n        .btn { display: inline-block; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: #ffffff; padding: 14px 30px; text-decoration: none; border-radius: 5px; font-weight: 600; margin: 20px 0; }\r\n        .footer { background-color: #f8f9fa; padding: 20px; text-align: center; font-size: 12px; color: #6c757d; }\r\n        .details { background-color: #f8f9fa; padding: 20px; border-radius: 8px; margin: 20px 0; }\r\n        .details-row { display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid #e9ecef; }\r\n        .details-row:last-child { border-bottom: none; }\r\n    </style>\r\n</head>\r\n<body>\r\n    <div class='container'>\r\n        \r\n            <div class='header'><h1>Your Reservation is Confirmed!</h1></div>\r\n            <div class='content'>\r\n                <p>Hello {customerName},</p>\r\n                <p>Your reservation has been confirmed successfully. Below you can find your reservation details.</p>\r\n                <div class='details'>\r\n                    <div class='details-row'><span><strong>Tour:</strong></span><span>{tourName}</span></div>\r\n                    <div class='details-row'><span><strong>Company:</strong></span><span>{companyName}</span></div>\r\n                    <div class='details-row'><span><strong>Destination:</strong></span><span>{destination}</span></div>\r\n                    <div class='details-row'><span><strong>Date:</strong></span><span>{startDate} - {endDate}</span></div>\r\n                    <div class='details-row'><span><strong>Number of People:</strong></span><span>{numberOfPeople}</span></div>\r\n                    <div class='details-row'><span><strong>Total:</strong></span><span>{totalPrice} TL</span></div>\r\n                </div>\r\n                <p>Thank you for choosing us. Have a great trip!</p>\r\n            </div>\r\n        <div class='footer'>\r\n            <p>Bu email Erkan Tatil Plani tarafindan otomatik olarak gonderilmistir.</p>\r\n            <p>&copy; 2026 Erkan Tatil Plani. Tum haklari saklidir.</p>\r\n        </div>\r\n    </div>\r\n</body>\r\n</html>",
+                            CreatedAt = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
+                            EmailTemplateId = 3,
+                            IsActive = true,
+                            LanguageCode = "en",
+                            Subject = "Your Reservation is Confirmed - Erkan Tatil Plani"
+                        },
+                        new
+                        {
+                            Id = 7,
+                            Body = "<!DOCTYPE html>\r\n<html>\r\n<head>\r\n    <meta charset='utf-8'>\r\n    <meta name='viewport' content='width=device-width, initial-scale=1.0'>\r\n    <style>\r\n        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; margin: 0; padding: 0; background-color: #f5f5f5; }\r\n        .container { max-width: 600px; margin: 0 auto; background-color: #ffffff; }\r\n        .header { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 30px; text-align: center; }\r\n        .header h1 { color: #ffffff; margin: 0; font-size: 24px; }\r\n        .content { padding: 40px 30px; }\r\n        .btn { display: inline-block; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: #ffffff; padding: 14px 30px; text-decoration: none; border-radius: 5px; font-weight: 600; margin: 20px 0; }\r\n        .footer { background-color: #f8f9fa; padding: 20px; text-align: center; font-size: 12px; color: #6c757d; }\r\n        .details { background-color: #f8f9fa; padding: 20px; border-radius: 8px; margin: 20px 0; }\r\n        .details-row { display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid #e9ecef; }\r\n        .details-row:last-child { border-bottom: none; }\r\n    </style>\r\n</head>\r\n<body>\r\n    <div class='container'>\r\n        \r\n            <div class='header'><h1>Rezervasyonunuz Iptal Edildi</h1></div>\r\n            <div class='content'>\r\n                <p>Merhaba {customerName},</p>\r\n                <p>Rezervasyonunuz iptal edilmistir.</p>\r\n                <div class='details'>\r\n                    <div class='details-row'><span><strong>Tur:</strong></span><span>{tourName}</span></div>\r\n                    <div class='details-row'><span><strong>Firma:</strong></span><span>{companyName}</span></div>\r\n                    <div class='details-row'><span><strong>Destinasyon:</strong></span><span>{destination}</span></div>\r\n                    <div class='details-row'><span><strong>Tarih:</strong></span><span>{startDate} - {endDate}</span></div>\r\n                    <div class='details-row'><span><strong>Kisi Sayisi:</strong></span><span>{numberOfPeople}</span></div>\r\n                    <div class='details-row'><span><strong>Toplam:</strong></span><span>{totalPrice} TL</span></div>\r\n                </div>\r\n                <p>Sorulariniz icin bizimle iletisime gecebilirsiniz.</p>\r\n            </div>\r\n        <div class='footer'>\r\n            <p>Bu email Erkan Tatil Plani tarafindan otomatik olarak gonderilmistir.</p>\r\n            <p>&copy; 2026 Erkan Tatil Plani. Tum haklari saklidir.</p>\r\n        </div>\r\n    </div>\r\n</body>\r\n</html>",
+                            CreatedAt = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
+                            EmailTemplateId = 4,
+                            IsActive = true,
+                            LanguageCode = "tr",
+                            Subject = "Rezervasyonunuz Iptal Edildi - Erkan Tatil Plani"
+                        },
+                        new
+                        {
+                            Id = 8,
+                            Body = "<!DOCTYPE html>\r\n<html>\r\n<head>\r\n    <meta charset='utf-8'>\r\n    <meta name='viewport' content='width=device-width, initial-scale=1.0'>\r\n    <style>\r\n        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; margin: 0; padding: 0; background-color: #f5f5f5; }\r\n        .container { max-width: 600px; margin: 0 auto; background-color: #ffffff; }\r\n        .header { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 30px; text-align: center; }\r\n        .header h1 { color: #ffffff; margin: 0; font-size: 24px; }\r\n        .content { padding: 40px 30px; }\r\n        .btn { display: inline-block; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: #ffffff; padding: 14px 30px; text-decoration: none; border-radius: 5px; font-weight: 600; margin: 20px 0; }\r\n        .footer { background-color: #f8f9fa; padding: 20px; text-align: center; font-size: 12px; color: #6c757d; }\r\n        .details { background-color: #f8f9fa; padding: 20px; border-radius: 8px; margin: 20px 0; }\r\n        .details-row { display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid #e9ecef; }\r\n        .details-row:last-child { border-bottom: none; }\r\n    </style>\r\n</head>\r\n<body>\r\n    <div class='container'>\r\n        \r\n            <div class='header'><h1>Your Reservation has been Cancelled</h1></div>\r\n            <div class='content'>\r\n                <p>Hello {customerName},</p>\r\n                <p>Your reservation has been cancelled.</p>\r\n                <div class='details'>\r\n                    <div class='details-row'><span><strong>Tour:</strong></span><span>{tourName}</span></div>\r\n                    <div class='details-row'><span><strong>Company:</strong></span><span>{companyName}</span></div>\r\n                    <div class='details-row'><span><strong>Destination:</strong></span><span>{destination}</span></div>\r\n                    <div class='details-row'><span><strong>Date:</strong></span><span>{startDate} - {endDate}</span></div>\r\n                    <div class='details-row'><span><strong>Number of People:</strong></span><span>{numberOfPeople}</span></div>\r\n                    <div class='details-row'><span><strong>Total:</strong></span><span>{totalPrice} TL</span></div>\r\n                </div>\r\n                <p>For any questions, please contact us.</p>\r\n            </div>\r\n        <div class='footer'>\r\n            <p>Bu email Erkan Tatil Plani tarafindan otomatik olarak gonderilmistir.</p>\r\n            <p>&copy; 2026 Erkan Tatil Plani. Tum haklari saklidir.</p>\r\n        </div>\r\n    </div>\r\n</body>\r\n</html>",
+                            CreatedAt = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
+                            EmailTemplateId = 4,
+                            IsActive = true,
+                            LanguageCode = "en",
+                            Subject = "Your Reservation has been Cancelled - Erkan Tatil Plani"
+                        },
+                        new
+                        {
+                            Id = 9,
+                            Body = "<!DOCTYPE html>\r\n<html>\r\n<head>\r\n    <meta charset='utf-8'>\r\n    <meta name='viewport' content='width=device-width, initial-scale=1.0'>\r\n    <style>\r\n        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; margin: 0; padding: 0; background-color: #f5f5f5; }\r\n        .container { max-width: 600px; margin: 0 auto; background-color: #ffffff; }\r\n        .header { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 30px; text-align: center; }\r\n        .header h1 { color: #ffffff; margin: 0; font-size: 24px; }\r\n        .content { padding: 40px 30px; }\r\n        .btn { display: inline-block; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: #ffffff; padding: 14px 30px; text-decoration: none; border-radius: 5px; font-weight: 600; margin: 20px 0; }\r\n        .footer { background-color: #f8f9fa; padding: 20px; text-align: center; font-size: 12px; color: #6c757d; }\r\n        .details { background-color: #f8f9fa; padding: 20px; border-radius: 8px; margin: 20px 0; }\r\n        .details-row { display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid #e9ecef; }\r\n        .details-row:last-child { border-bottom: none; }\r\n    </style>\r\n</head>\r\n<body>\r\n    <div class='container'>\r\n        \r\n            <div class='header'><h1>Rezervasyonunuz Reddedildi</h1></div>\r\n            <div class='content'>\r\n                <p>Merhaba {customerName},</p>\r\n                <p>Uzulerek bildirmek isteriz ki rezervasyonunuz reddedilmistir.</p>\r\n                <div class='details'>\r\n                    <div class='details-row'><span><strong>Tur:</strong></span><span>{tourName}</span></div>\r\n                    <div class='details-row'><span><strong>Firma:</strong></span><span>{companyName}</span></div>\r\n                    <div class='details-row'><span><strong>Destinasyon:</strong></span><span>{destination}</span></div>\r\n                    <div class='details-row'><span><strong>Tarih:</strong></span><span>{startDate} - {endDate}</span></div>\r\n                    <div class='details-row'><span><strong>Kisi Sayisi:</strong></span><span>{numberOfPeople}</span></div>\r\n                    <div class='details-row'><span><strong>Toplam:</strong></span><span>{totalPrice} TL</span></div>\r\n                    <div class='details-row'><span><strong>Sebep:</strong></span><span>{rejectionReason}</span></div>\r\n                </div>\r\n                <p>Sorulariniz icin bizimle iletisime gecebilirsiniz.</p>\r\n            </div>\r\n        <div class='footer'>\r\n            <p>Bu email Erkan Tatil Plani tarafindan otomatik olarak gonderilmistir.</p>\r\n            <p>&copy; 2026 Erkan Tatil Plani. Tum haklari saklidir.</p>\r\n        </div>\r\n    </div>\r\n</body>\r\n</html>",
+                            CreatedAt = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
+                            EmailTemplateId = 5,
+                            IsActive = true,
+                            LanguageCode = "tr",
+                            Subject = "Rezervasyonunuz Reddedildi - Erkan Tatil Plani"
+                        },
+                        new
+                        {
+                            Id = 10,
+                            Body = "<!DOCTYPE html>\r\n<html>\r\n<head>\r\n    <meta charset='utf-8'>\r\n    <meta name='viewport' content='width=device-width, initial-scale=1.0'>\r\n    <style>\r\n        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; margin: 0; padding: 0; background-color: #f5f5f5; }\r\n        .container { max-width: 600px; margin: 0 auto; background-color: #ffffff; }\r\n        .header { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 30px; text-align: center; }\r\n        .header h1 { color: #ffffff; margin: 0; font-size: 24px; }\r\n        .content { padding: 40px 30px; }\r\n        .btn { display: inline-block; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: #ffffff; padding: 14px 30px; text-decoration: none; border-radius: 5px; font-weight: 600; margin: 20px 0; }\r\n        .footer { background-color: #f8f9fa; padding: 20px; text-align: center; font-size: 12px; color: #6c757d; }\r\n        .details { background-color: #f8f9fa; padding: 20px; border-radius: 8px; margin: 20px 0; }\r\n        .details-row { display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid #e9ecef; }\r\n        .details-row:last-child { border-bottom: none; }\r\n    </style>\r\n</head>\r\n<body>\r\n    <div class='container'>\r\n        \r\n            <div class='header'><h1>Your Reservation has been Rejected</h1></div>\r\n            <div class='content'>\r\n                <p>Hello {customerName},</p>\r\n                <p>We regret to inform you that your reservation has been rejected.</p>\r\n                <div class='details'>\r\n                    <div class='details-row'><span><strong>Tour:</strong></span><span>{tourName}</span></div>\r\n                    <div class='details-row'><span><strong>Company:</strong></span><span>{companyName}</span></div>\r\n                    <div class='details-row'><span><strong>Destination:</strong></span><span>{destination}</span></div>\r\n                    <div class='details-row'><span><strong>Date:</strong></span><span>{startDate} - {endDate}</span></div>\r\n                    <div class='details-row'><span><strong>Number of People:</strong></span><span>{numberOfPeople}</span></div>\r\n                    <div class='details-row'><span><strong>Total:</strong></span><span>{totalPrice} TL</span></div>\r\n                    <div class='details-row'><span><strong>Reason:</strong></span><span>{rejectionReason}</span></div>\r\n                </div>\r\n                <p>For any questions, please contact us.</p>\r\n            </div>\r\n        <div class='footer'>\r\n            <p>Bu email Erkan Tatil Plani tarafindan otomatik olarak gonderilmistir.</p>\r\n            <p>&copy; 2026 Erkan Tatil Plani. Tum haklari saklidir.</p>\r\n        </div>\r\n    </div>\r\n</body>\r\n</html>",
+                            CreatedAt = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
+                            EmailTemplateId = 5,
+                            IsActive = true,
+                            LanguageCode = "en",
+                            Subject = "Your Reservation has been Rejected - Erkan Tatil Plani"
+                        });
+                });
+
             modelBuilder.Entity("ErkanTatilPlani.Core.Entities.FavoriteTour", b =>
                 {
                     b.Property<int>("Id")
@@ -1799,6 +2165,27 @@ namespace ErkanTatilPlani.Data.Migrations
                     b.Navigation("Company");
                 });
 
+            modelBuilder.Entity("ErkanTatilPlani.Core.Entities.EmailTemplate", b =>
+                {
+                    b.HasOne("ErkanTatilPlani.Core.Entities.EmailAccount", "EmailAccount")
+                        .WithMany("EmailTemplates")
+                        .HasForeignKey("EmailAccountId")
+                        .OnDelete(DeleteBehavior.SetNull);
+
+                    b.Navigation("EmailAccount");
+                });
+
+            modelBuilder.Entity("ErkanTatilPlani.Core.Entities.EmailTemplateTranslation", b =>
+                {
+                    b.HasOne("ErkanTatilPlani.Core.Entities.EmailTemplate", "EmailTemplate")
+                        .WithMany("Translations")
+                        .HasForeignKey("EmailTemplateId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("EmailTemplate");
+                });
+
             modelBuilder.Entity("ErkanTatilPlani.Core.Entities.FavoriteTour", b =>
                 {
                     b.HasOne("ErkanTatilPlani.Core.Entities.Tour", "Tour")
@@ -2001,6 +2388,16 @@ namespace ErkanTatilPlani.Data.Migrations
                     b.Navigation("GalleryImages");
 
                     b.Navigation("Tours");
+                });
+
+            modelBuilder.Entity("ErkanTatilPlani.Core.Entities.EmailAccount", b =>
+                {
+                    b.Navigation("EmailTemplates");
+                });
+
+            modelBuilder.Entity("ErkanTatilPlani.Core.Entities.EmailTemplate", b =>
+                {
+                    b.Navigation("Translations");
                 });
 
             modelBuilder.Entity("ErkanTatilPlani.Core.Entities.Language", b =>

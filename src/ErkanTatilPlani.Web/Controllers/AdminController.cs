@@ -120,4 +120,18 @@ public class AdminController : Controller
         SetCommonViewData("Reviews", "Yorum Moderasyonu");
         return View();
     }
+
+    // Email hesaplari yonetimi (Sadece Admin)
+    public IActionResult EmailAccounts()
+    {
+        SetCommonViewData("EmailAccounts", "Email Hesaplari");
+        return View();
+    }
+
+    // Email sablonlari yonetimi (Sadece Admin)
+    public IActionResult EmailTemplates()
+    {
+        SetCommonViewData("EmailTemplates", "Email Sablonlari");
+        return View();
+    }
 }

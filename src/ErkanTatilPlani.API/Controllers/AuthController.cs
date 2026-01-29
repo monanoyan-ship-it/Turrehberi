@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.RateLimiting;
 using ErkanTatilPlani.Core.Entities;
 using ErkanTatilPlani.Core.Enums;
+using ErkanTatilPlani.Core.Services;
 using ErkanTatilPlani.Data.Context;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.RateLimiting;
@@ -20,12 +21,18 @@ public class AuthController : ControllerBase
     private readonly AppDbContext _context;
     private readonly IConfiguration _configuration;
     private readonly IWebHostEnvironment _environment;
+    private readonly IEmailService _emailService;
 
-    public AuthController(AppDbContext context, IConfiguration configuration, IWebHostEnvironment environment)
+    public AuthController(
+        AppDbContext context,
+        IConfiguration configuration,
+        IWebHostEnvironment environment,
+        IEmailService emailService)
     {
         _context = context;
         _configuration = configuration;
         _environment = environment;
+        _emailService = emailService;
     }
 
     [HttpPost("login")]
@@ -381,23 +388,19 @@ public class AuthController : ControllerBase
         visitor.UpdatedAt = DateTime.UtcNow;
         await _context.SaveChangesAsync();
 
-        // Gercek uygulamada burada email gonderilir
-        // Simdilik token'i response'ta dondur (development icin)
+        // Sifre sifirlama email'i gonder
         var resetUrl = $"{request.BaseUrl}/Account/ResetPassword?token={Uri.EscapeDataString(token)}&email={Uri.EscapeDataString(visitor.Email)}";
+        var customerName = $"{visitor.FirstName} {visitor.LastName}";
 
-        // TODO: Email gonderme servisi eklendiginde burada email gonderilecek
-        // await _emailService.SendPasswordResetEmail(visitor.Email, resetUrl);
+        await _emailService.SendPasswordResetEmailAsync(
+            visitor.Email,
+            resetUrl,
+            customerName,
+            visitor.PreferredLanguage);
 
         return Ok(new
         {
-            message = "Eger bu email adresi sistemde kayitliysa, sifre sifirlama linki gonderildi.",
-            // Development icin - production'da kaldirilacak
-            debug = new
-            {
-                resetUrl,
-                token,
-                expiresAt = visitor.PasswordResetTokenExpiry
-            }
+            message = "Eger bu email adresi sistemde kayitliysa, sifre sifirlama linki gonderildi."
         });
     }
 
@@ -486,22 +489,19 @@ public class AuthController : ControllerBase
         visitor.UpdatedAt = DateTime.UtcNow;
         await _context.SaveChangesAsync();
 
-        // Gercek uygulamada burada email gonderilir
+        // Email dogrulama linki gonder
         var verifyUrl = $"{request.BaseUrl}/Account/VerifyEmail?token={Uri.EscapeDataString(token)}&email={Uri.EscapeDataString(visitor.Email)}";
+        var customerName = $"{visitor.FirstName} {visitor.LastName}";
 
-        // TODO: Email gonderme servisi eklendiginde burada email gonderilecek
-        // await _emailService.SendVerificationEmail(visitor.Email, verifyUrl);
+        await _emailService.SendEmailVerificationAsync(
+            visitor.Email,
+            verifyUrl,
+            customerName,
+            visitor.PreferredLanguage);
 
         return Ok(new
         {
-            message = "Dogrulama linki email adresinize gonderildi.",
-            // Development icin - production'da kaldirilacak
-            debug = new
-            {
-                verifyUrl,
-                token,
-                expiresAt = visitor.EmailVerificationTokenExpiry
-            }
+            message = "Dogrulama linki email adresinize gonderildi."
         });
     }
 

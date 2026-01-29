@@ -32,15 +32,18 @@
        });
    ```
 
+8. **Admin Panel SADECE Bootstrap kullanir!** Admin panelde ozel CSS class'lari veya stil ozellestirmeleri kullanma. Tum UI sadece Bootstrap 5.3 component'leri ve utility class'lari ile yapilir. Ozel `.loading`, `.custom-modal` gibi class'lar ekleme. Modal boyutu icin `modal-lg`, `modal-xl` gibi Bootstrap class'lari kullan.
+
 ---
 
 ## Proje Dokumanlari
 
 **Onemli:** Projeye baslarken asagidaki dosyalari oku:
 
-1. **PROJE_YAPISI.md** - Detayli proje yapisi, entity'ler, API endpoint'leri, mimari
-2. **TODO.md** - Yapilacaklar listesi (oncelikli gorevler)
-3. **COMPLETED.md** - Tamamlanan isler ve mevcut durum
+1. **PATTERNS.md** - Kod pattern'leri ve kurallar (JS ayrimi, ViewModel yapisi, API cagrilari)
+2. **PROJE_YAPISI.md** - Detayli proje yapisi, entity'ler, API endpoint'leri, mimari
+3. **TODO.md** - Yapilacaklar listesi (oncelikli gorevler)
+4. **COMPLETED.md** - Tamamlanan isler ve mevcut durum
 
 ---
 
@@ -127,7 +130,7 @@ _localizer.T("Register.Title")
 
 ---
 
-## Son Durum (28 Ocak 2026)
+## Son Durum (29 Ocak 2026)
 
 **Tamamlanan (commit edilmedi):**
 - Firma Dashboard (CompanyDashboard)
@@ -137,18 +140,28 @@ _localizer.T("Register.Title")
 - Profil Sayfasi (kisisel bilgiler, sifre degistirme, dil tercihi)
 - Gelismis Tur Arama (arama, filtreleme, siralama)
 - Sifremi Unuttum (forgot-password, reset-password)
+- Email Yonetim Sistemi (Email Hesaplari + Email Sablonlari)
 
-**Degisiklik yapilan dosyalar (commit bekliyor):**
-- Visitor.cs (Address, BirthDate, AvatarUrl, PasswordResetToken, PasswordResetTokenExpiry)
-- AuthController.cs (profile, change-password, forgot-password, reset-password, verify-reset-token)
-- ToursController.cs (filtreleme parametreleri, companies endpoint)
-- AccountController.cs (Profile, ForgotPassword, ResetPassword actions)
-- Profile.cshtml, ForgotPassword.cshtml, ResetPassword.cshtml (yeni)
-- Views/Tours/Index.cshtml (filtreleme UI)
-- Login.cshtml (sifremi unuttum linki)
-- Migration: AddVisitorProfileFields, AddPasswordResetFields
-- 9 localization dosyasi (Profile.*, Tours.*, ForgotPassword.*, ResetPassword.* keyleri)
-- TODO.md, CLAUDE.md
+**Yeni Entity'ler:**
+- EmailAccount.cs (SMTP ayarlari)
+- EmailTemplate.cs (Email sablonlari)
+- EmailTemplateTranslation.cs (Sablon cevirileri, 9 dil)
+
+**Yeni Controller'lar:**
+- EmailAccountsController.cs (CRUD + copy + test)
+- EmailTemplatesController.cs (CRUD + translations + preview)
+
+**Yeni Admin Sayfalari:**
+- EmailAccounts.cshtml (Email hesap yonetimi)
+- EmailTemplates.cshtml (Email sablon yonetimi, 9 dil destegi)
+
+**Guncellenen Dosyalar:**
+- AppDbContext.cs (DbSet'ler, konfigurasyonlar, seed data)
+- IEmailService.cs, EmailService.cs (DB okuma, cache, template sistemi)
+- AdminController.cs (yeni action'lar)
+- _AdminLayout.cshtml (menu linkleri)
+- 9 localization dosyasi (Admin.EmailAccounts.*, Admin.EmailTemplates.* keyleri)
+- Migration: AddEmailManagementSystem
 
 **Siradaki is:** Email dogrulama veya Firma arama veya Kullanici avatar yukleme
 

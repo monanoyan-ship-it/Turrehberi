@@ -1,0 +1,319 @@
+@{
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+
+@section Styles {
+<link rel="stylesheet" href="~/lib/summernote/summernote-bs5.min.css" />
+}
+
+<div id="emailTemplatesApp">
+    <!-- Header -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h4 class="mb-1">Email Sablonlari</h4>
+            <p class="text-muted mb-0">Email sablonlarini ve ceviri iceriklerini yonetin</p>
+        </div>
+        <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#templateModal" data-bind="click: openCreateModal">
+            <i class="bi bi-plus-lg me-1"></i> Yeni Sablon
+        </button>
+    </div>
+
+    <!-- Loading -->
+    <div data-bind="visible: loading" class="text-center py-5">
+        <div class="spinner-border text-primary" role="status">
+            <span class="visually-hidden">Loading...</span>
+        </div>
+    </div>
+
+    <!-- Templates List -->
+    <div class="card" data-bind="visible: !loading()">
+        <div class="table-responsive">
+            <table class="table table-hover mb-0">
+                <thead class="table-light">
+                    <tr>
+                        <th>Anahtar</th>
+                        <th>Sablon Adi</th>
+                        <th>Email Hesabi</th>
+                        <th>Diller</th>
+                        <th>Tip</th>
+                        <th>Islemler</th>
+                    </tr>
+                </thead>
+                <tbody data-bind="foreach: templates">
+                    <tr>
+                        <td><code data-bind="text: key"></code></td>
+                        <td>
+                            <strong data-bind="text: name"></strong>
+                            <div class="small text-muted" data-bind="text: description"></div>
+                        </td>
+                        <td>
+                            <span class="badge bg-info" data-bind="text: emailAccountName || 'Varsayilan'"></span>
+                        </td>
+                        <td>
+                            <!-- ko foreach: availableLanguages -->
+                            <span class="badge bg-secondary me-1" data-bind="text: $data.toUpperCase()"></span>
+                            <!-- /ko -->
+                            <span class="text-muted small" data-bind="visible: availableLanguages.length === 0">-</span>
+                        </td>
+                        <td>
+                            <span class="badge" data-bind="css: isSystemTemplate ? 'bg-warning' : 'bg-primary', text: isSystemTemplate ? 'Sistem' : 'Ozel'"></span>
+                        </td>
+                        <td>
+                            <div class="btn-group btn-group-sm">
+                                <button class="btn btn-outline-primary" data-bind="click: $parent.openEditModal" title="Duzenle">
+                                    <i class="bi bi-pencil"></i>
+                                </button>
+                                <button class="btn btn-outline-info" data-bind="click: $parent.openPreviewModal" title="Onizleme">
+                                    <i class="bi bi-eye"></i>
+                                </button>
+                                <button class="btn btn-outline-danger" data-bind="click: $parent.deleteTemplate, visible: !isSystemTemplate" title="Sil">
+                                    <i class="bi bi-trash"></i>
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Empty State -->
+        <div data-bind="visible: templates().length === 0" class="text-center py-5">
+            <i class="bi bi-file-earmark-x display-4 text-muted"></i>
+            <p class="text-muted mt-2">Henuz email sablonu yok</p>
+        </div>
+    </div>
+
+    <!-- Template Edit Modal -->
+    <div class="modal fade" id="templateModal" tabindex="-1" data-bs-backdrop="static">
+        <div class="modal-dialog modal-fullscreen">
+            <div class="modal-content">
+                <div class="modal-header py-2 bg-light">
+                    <h5 class="modal-title" data-bind="text: editingTemplate() ? 'Email Sablonu Duzenle: ' + editingTemplate().name : 'Yeni Email Sablonu'"></h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <!-- Modal Loading -->
+                    <div data-bind="visible: loadingModal" class="text-center py-5">
+                        <div class="spinner-border text-primary" role="status"></div>
+                        <p class="mt-2 text-muted">Yukleniyor...</p>
+                    </div>
+
+                    <div data-bind="visible: !loadingModal()">
+                        <!-- Template Info -->
+                        <div class="row mb-3">
+                            <div class="col-md-3">
+                                <label class="form-label small fw-bold">Anahtar (Key)</label>
+                                <input type="text" class="form-control form-control-sm" data-bind="value: formData.key, enable: !editingTemplate()" placeholder="password_reset">
+                            </div>
+                            <div class="col-md-3">
+                                <label class="form-label small fw-bold">Sablon Adi</label>
+                                <input type="text" class="form-control form-control-sm" data-bind="value: formData.name" placeholder="Sifre Sifirlama">
+                            </div>
+                            <div class="col-md-3">
+                                <label class="form-label small fw-bold">Email Hesabi</label>
+                                <select class="form-select form-select-sm" data-bind="value: formData.emailAccountId, options: accounts, optionsText: 'name', optionsValue: 'id', optionsCaption: 'Varsayilan Hesap'"></select>
+                            </div>
+                            <div class="col-md-3">
+                                <label class="form-label small fw-bold">Aciklama</label>
+                                <input type="text" class="form-control form-control-sm" data-bind="value: formData.description" placeholder="Sablon aciklamasi">
+                            </div>
+                        </div>
+
+                        <!-- Language Tabs -->
+                        <div class="d-flex justify-content-between align-items-center mb-3 border-bottom pb-2">
+                            <div class="btn-group btn-group-sm" role="group">
+                                <!-- ko foreach: supportedLanguages -->
+                                <button type="button" class="btn"
+                                        data-bind="click: function() { $parent.selectLanguage($data); },
+                                                   css: $parent.selectedLanguage() === code ? 'btn-primary' : 'btn-outline-secondary'">
+                                    <span data-bind="text: name"></span>
+                                    <!-- ko if: $parent.hasTranslation(code) -->
+                                    <i class="bi bi-check-circle-fill text-success ms-1"></i>
+                                    <!-- /ko -->
+                                </button>
+                                <!-- /ko -->
+                            </div>
+                            <div>
+                                <button type="button" class="btn btn-outline-danger btn-sm me-2" data-bind="click: deleteTranslation, visible: hasTranslation(selectedLanguage())">
+                                    <i class="bi bi-trash me-1"></i> Ceviriyi Sil
+                                </button>
+                                <button type="button" class="btn btn-success btn-sm" data-bind="click: saveTranslation, disable: savingTranslation">
+                                    <!-- ko if: savingTranslation -->
+                                    <span class="spinner-border spinner-border-sm me-1"></span>
+                                    <!-- /ko -->
+                                    <!-- ko ifnot: savingTranslation -->
+                                    <i class="bi bi-check-lg me-1"></i>
+                                    <!-- /ko -->
+                                    <span data-bind="text: selectedLanguage().toUpperCase()"></span> Kaydet
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Editor Row -->
+                        <div class="row">
+                            <!-- Main Editor -->
+                            <div class="col-md-9">
+                                <div class="mb-2">
+                                    <label class="form-label small fw-bold">Email Konusu</label>
+                                    <input type="text" class="form-control" data-bind="value: translationData.subject" placeholder="Sifre Sifirlama - {customerName}">
+                                </div>
+                                <div>
+                                    <label class="form-label small fw-bold">Email Icerigi (HTML)</label>
+                                    <div id="emailBodyEditor"></div>
+                                    <small class="text-muted">Sagdaki placeholder'lari icerige ekleyebilirsiniz.</small>
+                                </div>
+                            </div>
+
+                            <!-- Placeholder Sidebar -->
+                            <div class="col-md-3">
+                                <div class="card h-100">
+                                    <div class="card-header bg-secondary text-white py-2">
+                                        <i class="bi bi-braces me-1"></i> Placeholder Rehberi
+                                    </div>
+                                    <div class="card-body p-0" style="max-height: 500px; overflow-y: auto;">
+                                        <!-- Temel -->
+                                        <div class="bg-light px-3 py-1 fw-bold small text-uppercase text-muted">Temel</div>
+                                        <div class="list-group list-group-flush">
+                                            <a href="#" class="list-group-item list-group-item-action py-2" data-bind="click: function() { insertPlaceholder('{customerName}'); }">
+                                                <code class="text-warning">{customerName}</code>
+                                                <div class="small text-muted">Musteri adi</div>
+                                            </a>
+                                        </div>
+
+                                        <!-- URL'ler -->
+                                        <div class="bg-light px-3 py-1 fw-bold small text-uppercase text-muted">URL'ler</div>
+                                        <div class="list-group list-group-flush">
+                                            <a href="#" class="list-group-item list-group-item-action py-2" data-bind="click: function() { insertPlaceholder('{resetUrl}'); }">
+                                                <code class="text-warning">{resetUrl}</code>
+                                                <div class="small text-muted">Sifre sifirlama linki</div>
+                                            </a>
+                                            <a href="#" class="list-group-item list-group-item-action py-2" data-bind="click: function() { insertPlaceholder('{verifyUrl}'); }">
+                                                <code class="text-warning">{verifyUrl}</code>
+                                                <div class="small text-muted">Email dogrulama linki</div>
+                                            </a>
+                                        </div>
+
+                                        <!-- Rezervasyon -->
+                                        <div class="bg-light px-3 py-1 fw-bold small text-uppercase text-muted">Rezervasyon</div>
+                                        <div class="list-group list-group-flush">
+                                            <a href="#" class="list-group-item list-group-item-action py-2" data-bind="click: function() { insertPlaceholder('{tourName}'); }">
+                                                <code class="text-warning">{tourName}</code>
+                                                <div class="small text-muted">Tur adi</div>
+                                            </a>
+                                            <a href="#" class="list-group-item list-group-item-action py-2" data-bind="click: function() { insertPlaceholder('{companyName}'); }">
+                                                <code class="text-warning">{companyName}</code>
+                                                <div class="small text-muted">Firma adi</div>
+                                            </a>
+                                            <a href="#" class="list-group-item list-group-item-action py-2" data-bind="click: function() { insertPlaceholder('{destination}'); }">
+                                                <code class="text-warning">{destination}</code>
+                                                <div class="small text-muted">Destinasyon</div>
+                                            </a>
+                                            <a href="#" class="list-group-item list-group-item-action py-2" data-bind="click: function() { insertPlaceholder('{startDate}'); }">
+                                                <code class="text-warning">{startDate}</code>
+                                                <div class="small text-muted">Baslangic tarihi</div>
+                                            </a>
+                                            <a href="#" class="list-group-item list-group-item-action py-2" data-bind="click: function() { insertPlaceholder('{endDate}'); }">
+                                                <code class="text-warning">{endDate}</code>
+                                                <div class="small text-muted">Bitis tarihi</div>
+                                            </a>
+                                            <a href="#" class="list-group-item list-group-item-action py-2" data-bind="click: function() { insertPlaceholder('{numberOfPeople}'); }">
+                                                <code class="text-warning">{numberOfPeople}</code>
+                                                <div class="small text-muted">Kisi sayisi</div>
+                                            </a>
+                                            <a href="#" class="list-group-item list-group-item-action py-2" data-bind="click: function() { insertPlaceholder('{totalPrice}'); }">
+                                                <code class="text-warning">{totalPrice}</code>
+                                                <div class="small text-muted">Toplam fiyat</div>
+                                            </a>
+                                            <a href="#" class="list-group-item list-group-item-action py-2" data-bind="click: function() { insertPlaceholder('{rejectionReason}'); }">
+                                                <code class="text-warning">{rejectionReason}</code>
+                                                <div class="small text-muted">Red sebebi</div>
+                                            </a>
+                                        </div>
+
+                                        <!-- Ornek -->
+                                        <div class="bg-light px-3 py-1 fw-bold small text-uppercase text-muted">Ornek Kullanim</div>
+                                        <div class="p-3 small">
+                                            <p class="mb-1 fw-bold">Buton:</p>
+                                            <code class="d-block bg-white p-2 rounded border mb-2" style="font-size: 11px;">
+                                                &lt;a href="{resetUrl}"&gt;Tikla&lt;/a&gt;
+                                            </code>
+                                            <p class="mb-1 fw-bold">URL goster:</p>
+                                            <code class="d-block bg-white p-2 rounded border" style="font-size: 11px;">
+                                                &lt;a href="{resetUrl}"&gt;{resetUrl}&lt;/a&gt;
+                                            </code>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer py-2 bg-light">
+                    <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">Kapat</button>
+                    <!-- ko ifnot: editingTemplate -->
+                    <button type="button" class="btn btn-primary btn-sm" data-bind="click: saveTemplate, disable: saving">
+                        <!-- ko if: saving -->
+                        <span class="spinner-border spinner-border-sm me-1"></span>
+                        <!-- /ko -->
+                        Sablon Olustur
+                    </button>
+                    <!-- /ko -->
+                    <!-- ko if: editingTemplate -->
+                    <button type="button" class="btn btn-primary btn-sm" data-bind="click: updateTemplate, disable: saving">
+                        <!-- ko if: saving -->
+                        <span class="spinner-border spinner-border-sm me-1"></span>
+                        <!-- /ko -->
+                        Sablonu Guncelle
+                    </button>
+                    <!-- /ko -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Preview Modal -->
+    <div class="modal fade" id="previewModal" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Email Onizleme</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label class="form-label">Dil Secin:</label>
+                        <select class="form-select" style="width: 200px;" data-bind="value: previewLanguage, options: supportedLanguages, optionsText: 'name', optionsValue: 'code', event: { change: loadPreview }"></select>
+                    </div>
+
+                    <!-- ko if: loadingPreview -->
+                    <div class="text-center py-4">
+                        <div class="spinner-border text-primary"></div>
+                    </div>
+                    <!-- /ko -->
+
+                    <!-- ko ifnot: loadingPreview -->
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">Konu:</label>
+                        <div class="p-2 bg-light rounded" data-bind="text: previewSubject"></div>
+                    </div>
+                    <div>
+                        <label class="form-label fw-bold">Icerik:</label>
+                        <div class="border rounded p-3 bg-white" style="max-height: 400px; overflow-y: auto;">
+                            <iframe id="previewFrame" style="width: 100%; height: 350px; border: none;"></iframe>
+                        </div>
+                    </div>
+                    <!-- /ko -->
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Kapat</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div><!-- #emailTemplatesApp sonu -->
+
+@section Scripts {
+<script src="~/lib/summernote/summernote-bs5.min.js"></script>
+<script src="~/js/Admin/EmailTemplates.js"></script>
+}

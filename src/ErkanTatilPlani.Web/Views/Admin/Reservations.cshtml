@@ -114,46 +114,5 @@
 </div>
 
 @section Scripts {
-<script>
-function AdminReservationsViewModel() {
-    var self = this;
-    self.reservations = ko.observableArray([]);
-    self.tours = ko.observableArray([]);
-    self.filterStatus = ko.observable('');
-    self.filterTour = ko.observable(null);
-    self.selectedReservation = ko.observable(null);
-    var detailsModal;
-
-    self.getStatusBadge = function(s) { return ['bg-warning text-dark', 'bg-success', 'bg-danger', 'bg-primary'][s] || 'bg-secondary'; };
-    self.getStatusText = function(s) { return ['Beklemede', 'Onaylandi', 'Iptal', 'Tamamlandi'][s] || 'Bilinmiyor'; };
-
-    self.filteredReservations = ko.computed(function() {
-        var status = self.filterStatus();
-        var tour = self.filterTour();
-        return self.reservations().filter(function(r) {
-            var matchStatus = status === '' || r.status.toString() === status;
-            var matchTour = !tour || r.tourId == tour;
-            return matchStatus && matchTour;
-        });
-    });
-
-    self.loadData = function() {
-        $.when($.ajax({ url: apiBaseUrl + '/api/reservations' }), $.ajax({ url: apiBaseUrl + '/api/tours' }))
-            .done(function(r, t) { self.reservations(r[0]); self.tours(t[0]); });
-    };
-
-    self.showDetails = function(r) { self.selectedReservation(r); detailsModal.show(); };
-
-    self.updateStatus = function(reservation, newStatus) {
-        var data = Object.assign({}, reservation);
-        data.status = newStatus;
-        $.ajax({ url: apiBaseUrl + '/api/reservations/' + reservation.id, method: 'PUT', contentType: 'application/json', data: JSON.stringify(data) })
-            .done(function() { self.loadData(); toastr.success(newStatus === 1 ? 'Onaylandi' : 'Iptal edildi'); })
-            .fail(function() { toastr.error('Hata olustu'); });
-    };
-
-    $(document).ready(function() { detailsModal = new bootstrap.Modal(document.getElementById('detailsModal')); self.loadData(); });
-}
-ko.applyBindings(new AdminReservationsViewModel(), document.getElementById('adminReservationsApp'));
-</script>
+<script src="~/js/Admin/Reservations.js"></script>
 }

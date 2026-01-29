@@ -33,6 +33,11 @@ public class AppDbContext : DbContext
     // Gallery
     public DbSet<CompanyGalleryImage> CompanyGalleryImages => Set<CompanyGalleryImage>();
 
+    // Email Management
+    public DbSet<EmailAccount> EmailAccounts => Set<EmailAccount>();
+    public DbSet<EmailTemplate> EmailTemplates => Set<EmailTemplate>();
+    public DbSet<EmailTemplateTranslation> EmailTemplateTranslations => Set<EmailTemplateTranslation>();
+
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         base.OnModelCreating(modelBuilder);
@@ -316,6 +321,58 @@ public class AppDbContext : DbContext
             entity.HasIndex(e => new { e.Level, e.Timestamp });
         });
 
+        // ===============================================
+        // EMAIL YONETIMI
+        // ===============================================
+
+        modelBuilder.Entity<EmailAccount>(entity =>
+        {
+            entity.HasKey(e => e.Id);
+            entity.Property(e => e.Name).IsRequired().HasMaxLength(100);
+            entity.Property(e => e.Description).HasMaxLength(500);
+            entity.Property(e => e.SmtpHost).IsRequired().HasMaxLength(200);
+            entity.Property(e => e.SmtpUsername).HasMaxLength(200);
+            entity.Property(e => e.SmtpPassword).HasMaxLength(500);
+            entity.Property(e => e.FromEmail).IsRequired().HasMaxLength(200);
+            entity.Property(e => e.FromName).HasMaxLength(200);
+
+            entity.HasIndex(e => e.Name).IsUnique();
+            entity.HasIndex(e => e.IsDefault);
+        });
+
+        modelBuilder.Entity<EmailTemplate>(entity =>
+        {
+            entity.HasKey(e => e.Id);
+            entity.Property(e => e.Key).IsRequired().HasMaxLength(100);
+            entity.Property(e => e.Name).IsRequired().HasMaxLength(200);
+            entity.Property(e => e.Description).HasMaxLength(1000);
+            entity.Property(e => e.Placeholders).HasMaxLength(2000);
+
+            entity.HasIndex(e => e.Key).IsUnique();
+
+            entity.HasOne(e => e.EmailAccount)
+                  .WithMany(a => a.EmailTemplates)
+                  .HasForeignKey(e => e.EmailAccountId)
+                  .IsRequired(false)
+                  .OnDelete(DeleteBehavior.SetNull);
+        });
+
+        modelBuilder.Entity<EmailTemplateTranslation>(entity =>
+        {
+            entity.HasKey(e => e.Id);
+            entity.Property(e => e.LanguageCode).IsRequired().HasMaxLength(10);
+            entity.Property(e => e.Subject).IsRequired().HasMaxLength(500);
+            entity.Property(e => e.Body).IsRequired();
+
+            // Her sablon icin her dil sadece bir kez tanimlanabilir
+            entity.HasIndex(e => new { e.EmailTemplateId, e.LanguageCode }).IsUnique();
+
+            entity.HasOne(e => e.EmailTemplate)
+                  .WithMany(t => t.Translations)
+                  .HasForeignKey(e => e.EmailTemplateId)
+                  .OnDelete(DeleteBehavior.Cascade);
+        });
+
         // Seed Data
         SeedData(modelBuilder);
     }
@@ -412,5 +469,403 @@ public class AppDbContext : DbContext
             new Language { Id = 5, Name = "Espanol", LanguageCulture = "es-ES", UniqueSeoCode = "es", FlagIcon = "fi fi-es", IsDefault = false, DisplayOrder = 5, CreatedAt = now, IsActive = true }
         };
         modelBuilder.Entity<Language>().HasData(languages);
+
+        // Email Hesaplari
+        var emailAccounts = new[]
+        {
+            new EmailAccount
+            {
+                Id = 1,
+                Name = "default",
+                Description = "Varsayilan email hesabi",
+                SmtpHost = "smtp.gmail.com",
+                SmtpPort = 587,
+                SmtpUsername = "noreply@erkantatilplani.com",
+                SmtpPassword = "",
+                FromEmail = "noreply@erkantatilplani.com",
+                FromName = "Erkan Tatil Plani",
+                EnableSsl = true,
+                IsDefault = true,
+                DisplayOrder = 1,
+                CreatedAt = now,
+                IsActive = true
+            },
+            new EmailAccount
+            {
+                Id = 2,
+                Name = "reservations",
+                Description = "Rezervasyon emailleri icin",
+                SmtpHost = "smtp.gmail.com",
+                SmtpPort = 587,
+                SmtpUsername = "reservations@erkantatilplani.com",
+                SmtpPassword = "",
+                FromEmail = "reservations@erkantatilplani.com",
+                FromName = "Erkan Tatil Plani - Rezervasyonlar",
+                EnableSsl = true,
+                IsDefault = false,
+                DisplayOrder = 2,
+                CreatedAt = now,
+                IsActive = true
+            }
+        };
+        modelBuilder.Entity<EmailAccount>().HasData(emailAccounts);
+
+        // Email Sablonlari (5 sistem sablonu)
+        var emailTemplates = new[]
+        {
+            new EmailTemplate
+            {
+                Id = 1,
+                Key = "password_reset",
+                Name = "Sifre Sifirlama",
+                Description = "Kullanici sifre sifirlama istegi yaptiginda gonderilir",
+                EmailAccountId = 1,
+                Placeholders = "[\"{customerName}\", \"{resetUrl}\"]",
+                IsSystemTemplate = true,
+                CreatedAt = now,
+                IsActive = true
+            },
+            new EmailTemplate
+            {
+                Id = 2,
+                Key = "email_verification",
+                Name = "Email Dogrulama",
+                Description = "Kullanici kayit oldugunda veya email dogrulamasi istediginde gonderilir",
+                EmailAccountId = 1,
+                Placeholders = "[\"{customerName}\", \"{verifyUrl}\"]",
+                IsSystemTemplate = true,
+                CreatedAt = now,
+                IsActive = true
+            },
+            new EmailTemplate
+            {
+                Id = 3,
+                Key = "reservation_confirmed",
+                Name = "Rezervasyon Onaylandi",
+                Description = "Rezervasyon onaylandiginda musteriye gonderilir",
+                EmailAccountId = 2,
+                Placeholders = "[\"{customerName}\", \"{tourName}\", \"{companyName}\", \"{destination}\", \"{startDate}\", \"{endDate}\", \"{numberOfPeople}\", \"{totalPrice}\"]",
+                IsSystemTemplate = true,
+                CreatedAt = now,
+                IsActive = true
+            },
+            new EmailTemplate
+            {
+                Id = 4,
+                Key = "reservation_cancelled",
+                Name = "Rezervasyon Iptal Edildi",
+                Description = "Rezervasyon iptal edildiginde musteriye gonderilir",
+                EmailAccountId = 2,
+                Placeholders = "[\"{customerName}\", \"{tourName}\", \"{companyName}\", \"{destination}\", \"{startDate}\", \"{endDate}\", \"{numberOfPeople}\", \"{totalPrice}\"]",
+                IsSystemTemplate = true,
+                CreatedAt = now,
+                IsActive = true
+            },
+            new EmailTemplate
+            {
+                Id = 5,
+                Key = "reservation_rejected",
+                Name = "Rezervasyon Reddedildi",
+                Description = "Rezervasyon reddedildiginde musteriye gonderilir",
+                EmailAccountId = 2,
+                Placeholders = "[\"{customerName}\", \"{tourName}\", \"{companyName}\", \"{destination}\", \"{startDate}\", \"{endDate}\", \"{numberOfPeople}\", \"{totalPrice}\", \"{rejectionReason}\"]",
+                IsSystemTemplate = true,
+                CreatedAt = now,
+                IsActive = true
+            }
+        };
+        modelBuilder.Entity<EmailTemplate>().HasData(emailTemplates);
+
+        // Email Sablon Cevirileri (Her sablon icin tr ve en)
+        SeedEmailTemplateTranslations(modelBuilder, now);
     }
+
+    private void SeedEmailTemplateTranslations(ModelBuilder modelBuilder, DateTime now)
+    {
+        var translations = new List<EmailTemplateTranslation>();
+        var id = 1;
+
+        // Password Reset - TR
+        translations.Add(new EmailTemplateTranslation
+        {
+            Id = id++,
+            EmailTemplateId = 1,
+            LanguageCode = "tr",
+            Subject = "Sifre Sifirlama - Erkan Tatil Plani",
+            Body = GetPasswordResetTemplateBody("tr"),
+            CreatedAt = now,
+            IsActive = true
+        });
+
+        // Password Reset - EN
+        translations.Add(new EmailTemplateTranslation
+        {
+            Id = id++,
+            EmailTemplateId = 1,
+            LanguageCode = "en",
+            Subject = "Password Reset - Erkan Tatil Plani",
+            Body = GetPasswordResetTemplateBody("en"),
+            CreatedAt = now,
+            IsActive = true
+        });
+
+        // Email Verification - TR
+        translations.Add(new EmailTemplateTranslation
+        {
+            Id = id++,
+            EmailTemplateId = 2,
+            LanguageCode = "tr",
+            Subject = "Email Dogrulama - Erkan Tatil Plani",
+            Body = GetEmailVerificationTemplateBody("tr"),
+            CreatedAt = now,
+            IsActive = true
+        });
+
+        // Email Verification - EN
+        translations.Add(new EmailTemplateTranslation
+        {
+            Id = id++,
+            EmailTemplateId = 2,
+            LanguageCode = "en",
+            Subject = "Email Verification - Erkan Tatil Plani",
+            Body = GetEmailVerificationTemplateBody("en"),
+            CreatedAt = now,
+            IsActive = true
+        });
+
+        // Reservation Confirmed - TR
+        translations.Add(new EmailTemplateTranslation
+        {
+            Id = id++,
+            EmailTemplateId = 3,
+            LanguageCode = "tr",
+            Subject = "Rezervasyonunuz Onaylandi - Erkan Tatil Plani",
+            Body = GetReservationConfirmedTemplateBody("tr"),
+            CreatedAt = now,
+            IsActive = true
+        });
+
+        // Reservation Confirmed - EN
+        translations.Add(new EmailTemplateTranslation
+        {
+            Id = id++,
+            EmailTemplateId = 3,
+            LanguageCode = "en",
+            Subject = "Your Reservation is Confirmed - Erkan Tatil Plani",
+            Body = GetReservationConfirmedTemplateBody("en"),
+            CreatedAt = now,
+            IsActive = true
+        });
+
+        // Reservation Cancelled - TR
+        translations.Add(new EmailTemplateTranslation
+        {
+            Id = id++,
+            EmailTemplateId = 4,
+            LanguageCode = "tr",
+            Subject = "Rezervasyonunuz Iptal Edildi - Erkan Tatil Plani",
+            Body = GetReservationCancelledTemplateBody("tr"),
+            CreatedAt = now,
+            IsActive = true
+        });
+
+        // Reservation Cancelled - EN
+        translations.Add(new EmailTemplateTranslation
+        {
+            Id = id++,
+            EmailTemplateId = 4,
+            LanguageCode = "en",
+            Subject = "Your Reservation has been Cancelled - Erkan Tatil Plani",
+            Body = GetReservationCancelledTemplateBody("en"),
+            CreatedAt = now,
+            IsActive = true
+        });
+
+        // Reservation Rejected - TR
+        translations.Add(new EmailTemplateTranslation
+        {
+            Id = id++,
+            EmailTemplateId = 5,
+            LanguageCode = "tr",
+            Subject = "Rezervasyonunuz Reddedildi - Erkan Tatil Plani",
+            Body = GetReservationRejectedTemplateBody("tr"),
+            CreatedAt = now,
+            IsActive = true
+        });
+
+        // Reservation Rejected - EN
+        translations.Add(new EmailTemplateTranslation
+        {
+            Id = id++,
+            EmailTemplateId = 5,
+            LanguageCode = "en",
+            Subject = "Your Reservation has been Rejected - Erkan Tatil Plani",
+            Body = GetReservationRejectedTemplateBody("en"),
+            CreatedAt = now,
+            IsActive = true
+        });
+
+        modelBuilder.Entity<EmailTemplateTranslation>().HasData(translations);
+    }
+
+    private static string GetEmailBaseTemplate(string content) => $@"<!DOCTYPE html>
+<html>
+<head>
+    <meta charset='utf-8'>
+    <meta name='viewport' content='width=device-width, initial-scale=1.0'>
+    <style>
+        body {{ font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; margin: 0; padding: 0; background-color: #f5f5f5; }}
+        .container {{ max-width: 600px; margin: 0 auto; background-color: #ffffff; }}
+        .header {{ background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 30px; text-align: center; }}
+        .header h1 {{ color: #ffffff; margin: 0; font-size: 24px; }}
+        .content {{ padding: 40px 30px; }}
+        .btn {{ display: inline-block; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: #ffffff; padding: 14px 30px; text-decoration: none; border-radius: 5px; font-weight: 600; margin: 20px 0; }}
+        .footer {{ background-color: #f8f9fa; padding: 20px; text-align: center; font-size: 12px; color: #6c757d; }}
+        .details {{ background-color: #f8f9fa; padding: 20px; border-radius: 8px; margin: 20px 0; }}
+        .details-row {{ display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid #e9ecef; }}
+        .details-row:last-child {{ border-bottom: none; }}
+    </style>
+</head>
+<body>
+    <div class='container'>
+        {content}
+        <div class='footer'>
+            <p>Bu email Erkan Tatil Plani tarafindan otomatik olarak gonderilmistir.</p>
+            <p>&copy; 2026 Erkan Tatil Plani. Tum haklari saklidir.</p>
+        </div>
+    </div>
+</body>
+</html>";
+
+    private static string GetPasswordResetTemplateBody(string lang) => lang == "tr"
+        ? GetEmailBaseTemplate(@"
+            <div class='header'><h1>Sifre Sifirlama</h1></div>
+            <div class='content'>
+                <p>Merhaba {customerName},</p>
+                <p>Sifrenizi sifirlamak icin asagidaki butona tiklayin. Eger bu istegi siz yapmadiysiniz, bu emaili gormezden gelebilirsiniz.</p>
+                <p style='text-align: center;'><a href='{resetUrl}' class='btn'>Sifremi Sifirla</a></p>
+                <p style='color: #6c757d; font-size: 14px;'>Bu link 1 saat icinde gecerliligini yitirecektir.</p>
+            </div>")
+        : GetEmailBaseTemplate(@"
+            <div class='header'><h1>Password Reset</h1></div>
+            <div class='content'>
+                <p>Hello {customerName},</p>
+                <p>Click the button below to reset your password. If you did not make this request, you can ignore this email.</p>
+                <p style='text-align: center;'><a href='{resetUrl}' class='btn'>Reset My Password</a></p>
+                <p style='color: #6c757d; font-size: 14px;'>This link will expire in 1 hour.</p>
+            </div>");
+
+    private static string GetEmailVerificationTemplateBody(string lang) => lang == "tr"
+        ? GetEmailBaseTemplate(@"
+            <div class='header'><h1>Email Dogrulama</h1></div>
+            <div class='content'>
+                <p>Merhaba {customerName},</p>
+                <p>Hesabinizi aktif etmek ve tum ozelliklere erisebilmek icin email adresinizi dogrulayin.</p>
+                <p style='text-align: center;'><a href='{verifyUrl}' class='btn'>Email Adresimi Dogrula</a></p>
+            </div>")
+        : GetEmailBaseTemplate(@"
+            <div class='header'><h1>Email Verification</h1></div>
+            <div class='content'>
+                <p>Hello {customerName},</p>
+                <p>Verify your email address to activate your account and access all features.</p>
+                <p style='text-align: center;'><a href='{verifyUrl}' class='btn'>Verify My Email</a></p>
+            </div>");
+
+    private static string GetReservationConfirmedTemplateBody(string lang) => lang == "tr"
+        ? GetEmailBaseTemplate(@"
+            <div class='header'><h1>Rezervasyonunuz Onaylandi!</h1></div>
+            <div class='content'>
+                <p>Merhaba {customerName},</p>
+                <p>Rezervasyonunuz basariyla onaylandi. Asagida rezervasyon detaylarinizi bulabilirsiniz.</p>
+                <div class='details'>
+                    <div class='details-row'><span><strong>Tur:</strong></span><span>{tourName}</span></div>
+                    <div class='details-row'><span><strong>Firma:</strong></span><span>{companyName}</span></div>
+                    <div class='details-row'><span><strong>Destinasyon:</strong></span><span>{destination}</span></div>
+                    <div class='details-row'><span><strong>Tarih:</strong></span><span>{startDate} - {endDate}</span></div>
+                    <div class='details-row'><span><strong>Kisi Sayisi:</strong></span><span>{numberOfPeople}</span></div>
+                    <div class='details-row'><span><strong>Toplam:</strong></span><span>{totalPrice} TL</span></div>
+                </div>
+                <p>Bizi tercih ettiginiz icin tesekkur ederiz. Iyi tatiller dileriz!</p>
+            </div>")
+        : GetEmailBaseTemplate(@"
+            <div class='header'><h1>Your Reservation is Confirmed!</h1></div>
+            <div class='content'>
+                <p>Hello {customerName},</p>
+                <p>Your reservation has been confirmed successfully. Below you can find your reservation details.</p>
+                <div class='details'>
+                    <div class='details-row'><span><strong>Tour:</strong></span><span>{tourName}</span></div>
+                    <div class='details-row'><span><strong>Company:</strong></span><span>{companyName}</span></div>
+                    <div class='details-row'><span><strong>Destination:</strong></span><span>{destination}</span></div>
+                    <div class='details-row'><span><strong>Date:</strong></span><span>{startDate} - {endDate}</span></div>
+                    <div class='details-row'><span><strong>Number of People:</strong></span><span>{numberOfPeople}</span></div>
+                    <div class='details-row'><span><strong>Total:</strong></span><span>{totalPrice} TL</span></div>
+                </div>
+                <p>Thank you for choosing us. Have a great trip!</p>
+            </div>");
+
+    private static string GetReservationCancelledTemplateBody(string lang) => lang == "tr"
+        ? GetEmailBaseTemplate(@"
+            <div class='header'><h1>Rezervasyonunuz Iptal Edildi</h1></div>
+            <div class='content'>
+                <p>Merhaba {customerName},</p>
+                <p>Rezervasyonunuz iptal edilmistir.</p>
+                <div class='details'>
+                    <div class='details-row'><span><strong>Tur:</strong></span><span>{tourName}</span></div>
+                    <div class='details-row'><span><strong>Firma:</strong></span><span>{companyName}</span></div>
+                    <div class='details-row'><span><strong>Destinasyon:</strong></span><span>{destination}</span></div>
+                    <div class='details-row'><span><strong>Tarih:</strong></span><span>{startDate} - {endDate}</span></div>
+                    <div class='details-row'><span><strong>Kisi Sayisi:</strong></span><span>{numberOfPeople}</span></div>
+                    <div class='details-row'><span><strong>Toplam:</strong></span><span>{totalPrice} TL</span></div>
+                </div>
+                <p>Sorulariniz icin bizimle iletisime gecebilirsiniz.</p>
+            </div>")
+        : GetEmailBaseTemplate(@"
+            <div class='header'><h1>Your Reservation has been Cancelled</h1></div>
+            <div class='content'>
+                <p>Hello {customerName},</p>
+                <p>Your reservation has been cancelled.</p>
+                <div class='details'>
+                    <div class='details-row'><span><strong>Tour:</strong></span><span>{tourName}</span></div>
+                    <div class='details-row'><span><strong>Company:</strong></span><span>{companyName}</span></div>
+                    <div class='details-row'><span><strong>Destination:</strong></span><span>{destination}</span></div>
+                    <div class='details-row'><span><strong>Date:</strong></span><span>{startDate} - {endDate}</span></div>
+                    <div class='details-row'><span><strong>Number of People:</strong></span><span>{numberOfPeople}</span></div>
+                    <div class='details-row'><span><strong>Total:</strong></span><span>{totalPrice} TL</span></div>
+                </div>
+                <p>For any questions, please contact us.</p>
+            </div>");
+
+    private static string GetReservationRejectedTemplateBody(string lang) => lang == "tr"
+        ? GetEmailBaseTemplate(@"
+            <div class='header'><h1>Rezervasyonunuz Reddedildi</h1></div>
+            <div class='content'>
+                <p>Merhaba {customerName},</p>
+                <p>Uzulerek bildirmek isteriz ki rezervasyonunuz reddedilmistir.</p>
+                <div class='details'>
+                    <div class='details-row'><span><strong>Tur:</strong></span><span>{tourName}</span></div>
+                    <div class='details-row'><span><strong>Firma:</strong></span><span>{companyName}</span></div>
+                    <div class='details-row'><span><strong>Destinasyon:</strong></span><span>{destination}</span></div>
+                    <div class='details-row'><span><strong>Tarih:</strong></span><span>{startDate} - {endDate}</span></div>
+                    <div class='details-row'><span><strong>Kisi Sayisi:</strong></span><span>{numberOfPeople}</span></div>
+                    <div class='details-row'><span><strong>Toplam:</strong></span><span>{totalPrice} TL</span></div>
+                    <div class='details-row'><span><strong>Sebep:</strong></span><span>{rejectionReason}</span></div>
+                </div>
+                <p>Sorulariniz icin bizimle iletisime gecebilirsiniz.</p>
+            </div>")
+        : GetEmailBaseTemplate(@"
+            <div class='header'><h1>Your Reservation has been Rejected</h1></div>
+            <div class='content'>
+                <p>Hello {customerName},</p>
+                <p>We regret to inform you that your reservation has been rejected.</p>
+                <div class='details'>
+                    <div class='details-row'><span><strong>Tour:</strong></span><span>{tourName}</span></div>
+                    <div class='details-row'><span><strong>Company:</strong></span><span>{companyName}</span></div>
+                    <div class='details-row'><span><strong>Destination:</strong></span><span>{destination}</span></div>
+                    <div class='details-row'><span><strong>Date:</strong></span><span>{startDate} - {endDate}</span></div>
+                    <div class='details-row'><span><strong>Number of People:</strong></span><span>{numberOfPeople}</span></div>
+                    <div class='details-row'><span><strong>Total:</strong></span><span>{totalPrice} TL</span></div>
+                    <div class='details-row'><span><strong>Reason:</strong></span><span>{rejectionReason}</span></div>
+                </div>
+                <p>For any questions, please contact us.</p>
+            </div>");
 }
