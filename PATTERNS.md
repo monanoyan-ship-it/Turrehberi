@@ -170,4 +170,16 @@ $.ajax({
 
 ---
 
+---
+
+## Claude Calisma Kurallari
+
+### Is Akisi
+1. **Once anlat** - Ne yapacagini kullaniciya acikla
+2. **Onay bekle** - Kullanici onay verene kadar kod yazma
+3. **Onay gelince yap** - Degisiklikleri gerceklestir
+4. **Commit icin ayri onay** - "Commit et" denmedikce ASLA commit yapma
+
+---
+
 *Son Guncelleme: Ocak 2026*
