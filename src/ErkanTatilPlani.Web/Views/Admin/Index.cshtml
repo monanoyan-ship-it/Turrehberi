@@ -6,53 +6,61 @@
     <!-- Stat Cards -->
     <div class="row g-4 mb-4">
         <div class="col-md-3">
-            <div class="stat-card">
-                <div class="d-flex justify-content-between align-items-center">
-                    <div>
-                        <div class="text-muted small">Toplam Tur</div>
-                        <div class="fs-3 fw-bold" data-bind="text: stats().totalTours">-</div>
-                    </div>
-                    <div class="stat-icon bg-primary bg-opacity-10 text-primary">
-                        <i class="bi bi-geo-alt"></i>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <div class="col-md-3">
-            <div class="stat-card">
-                <div class="d-flex justify-content-between align-items-center">
-                    <div>
-                        <div class="text-muted small">Toplam Firma</div>
-                        <div class="fs-3 fw-bold" data-bind="text: stats().totalCompanies">-</div>
-                    </div>
-                    <div class="stat-icon bg-success bg-opacity-10 text-success">
-                        <i class="bi bi-building"></i>
+            <div class="card h-100">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <div class="text-muted small">Toplam Tur</div>
+                            <div class="fs-3 fw-bold" data-bind="text: stats().totalTours">-</div>
+                        </div>
+                        <div class="rounded p-2 bg-primary bg-opacity-10 text-primary">
+                            <i class="bi bi-geo-alt fs-4"></i>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
         <div class="col-md-3">
-            <div class="stat-card">
-                <div class="d-flex justify-content-between align-items-center">
-                    <div>
-                        <div class="text-muted small">Toplam Kullanici</div>
-                        <div class="fs-3 fw-bold" data-bind="text: stats().totalVisitors">-</div>
-                    </div>
-                    <div class="stat-icon bg-info bg-opacity-10 text-info">
-                        <i class="bi bi-people"></i>
+            <div class="card h-100">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <div class="text-muted small">Toplam Firma</div>
+                            <div class="fs-3 fw-bold" data-bind="text: stats().totalCompanies">-</div>
+                        </div>
+                        <div class="rounded p-2 bg-success bg-opacity-10 text-success">
+                            <i class="bi bi-building fs-4"></i>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
         <div class="col-md-3">
-            <div class="stat-card">
-                <div class="d-flex justify-content-between align-items-center">
-                    <div>
-                        <div class="text-muted small">Bekleyen Rezervasyon</div>
-                        <div class="fs-3 fw-bold text-warning" data-bind="text: stats().pendingReservations">-</div>
+            <div class="card h-100">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <div class="text-muted small">Toplam Kullanici</div>
+                            <div class="fs-3 fw-bold" data-bind="text: stats().totalVisitors">-</div>
+                        </div>
+                        <div class="rounded p-2 bg-info bg-opacity-10 text-info">
+                            <i class="bi bi-people fs-4"></i>
+                        </div>
                     </div>
-                    <div class="stat-icon bg-warning bg-opacity-10 text-warning">
-                        <i class="bi bi-calendar-check"></i>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card h-100">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <div class="text-muted small">Bekleyen Rezervasyon</div>
+                            <div class="fs-3 fw-bold text-warning" data-bind="text: stats().pendingReservations">-</div>
+                        </div>
+                        <div class="rounded p-2 bg-warning bg-opacity-10 text-warning">
+                            <i class="bi bi-calendar-check fs-4"></i>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -62,7 +70,7 @@
     <div class="row g-4">
         <!-- Son Rezervasyonlar -->
         <div class="col-lg-8">
-            <div class="admin-card">
+            <div class="card">
                 <div class="card-header d-flex justify-content-between align-items-center">
                     <span><i class="bi bi-calendar-check me-2"></i>Son Rezervasyonlar</span>
                     <a href="/Admin/Reservations" class="btn btn-sm btn-outline-primary">Tumunu Gor</a>
@@ -102,7 +110,7 @@
 
         <!-- Populer Turlar -->
         <div class="col-lg-4">
-            <div class="admin-card">
+            <div class="card">
                 <div class="card-header">
                     <i class="bi bi-star me-2"></i>One Cikan Turlar
                 </div>
@@ -138,7 +146,7 @@
     <!-- Cache Yonetimi -->
     <div class="row g-4 mt-2">
         <div class="col-12">
-            <div class="admin-card">
+            <div class="card">
                 <div class="card-header d-flex justify-content-between align-items-center">
                     <span><i class="bi bi-database me-2"></i>Cache Yonetimi</span>
                     <span class="badge bg-info">Performans</span>

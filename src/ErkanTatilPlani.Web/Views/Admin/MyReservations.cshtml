@@ -16,53 +16,61 @@
         <!-- Istatistik Kartlari -->
         <div class="row g-3 mb-4">
             <div class="col-6 col-lg-3">
-                <div class="stat-card h-100 cursor-pointer" data-bind="click: function() { filterByStatus('all') }, css: { 'border-primary': currentFilter() === 'all' }">
-                    <div class="d-flex align-items-center gap-3">
-                        <div class="stat-icon bg-primary bg-opacity-10 text-primary">
-                            <i class="bi bi-calendar-check"></i>
-                        </div>
-                        <div>
-                            <div class="text-muted small" data-t="MyReservations.Total">Toplam</div>
-                            <div class="fs-4 fw-bold" data-bind="text: stats().total">0</div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="col-6 col-lg-3">
-                <div class="stat-card h-100 cursor-pointer" data-bind="click: function() { filterByStatus('Pending') }, css: { 'border-warning': currentFilter() === 'Pending' }">
-                    <div class="d-flex align-items-center gap-3">
-                        <div class="stat-icon bg-warning bg-opacity-10 text-warning">
-                            <i class="bi bi-clock"></i>
-                        </div>
-                        <div>
-                            <div class="text-muted small" data-t="Status.Pending">Bekleyen</div>
-                            <div class="fs-4 fw-bold" data-bind="text: stats().pending">0</div>
+                <div class="card h-100" style="cursor: pointer;" data-bind="click: function() { filterByStatus('all') }">
+                    <div class="card-body">
+                        <div class="d-flex align-items-center gap-3">
+                            <div class="rounded p-2 bg-primary bg-opacity-10 text-primary">
+                                <i class="bi bi-calendar-check fs-4"></i>
+                            </div>
+                            <div>
+                                <div class="text-muted small" data-t="MyReservations.Total">Toplam</div>
+                                <div class="fs-4 fw-bold" data-bind="text: stats().total">0</div>
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
             <div class="col-6 col-lg-3">
-                <div class="stat-card h-100 cursor-pointer" data-bind="click: function() { filterByStatus('Confirmed') }, css: { 'border-success': currentFilter() === 'Confirmed' }">
-                    <div class="d-flex align-items-center gap-3">
-                        <div class="stat-icon bg-success bg-opacity-10 text-success">
-                            <i class="bi bi-check-circle"></i>
-                        </div>
-                        <div>
-                            <div class="text-muted small" data-t="Status.Confirmed">Onaylanan</div>
-                            <div class="fs-4 fw-bold" data-bind="text: stats().confirmed">0</div>
+                <div class="card h-100" style="cursor: pointer;" data-bind="click: function() { filterByStatus('Pending') }">
+                    <div class="card-body">
+                        <div class="d-flex align-items-center gap-3">
+                            <div class="rounded p-2 bg-warning bg-opacity-10 text-warning">
+                                <i class="bi bi-clock fs-4"></i>
+                            </div>
+                            <div>
+                                <div class="text-muted small" data-t="Status.Pending">Bekleyen</div>
+                                <div class="fs-4 fw-bold" data-bind="text: stats().pending">0</div>
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
             <div class="col-6 col-lg-3">
-                <div class="stat-card h-100 cursor-pointer" data-bind="click: function() { filterByStatus('Completed') }, css: { 'border-info': currentFilter() === 'Completed' }">
-                    <div class="d-flex align-items-center gap-3">
-                        <div class="stat-icon bg-info bg-opacity-10 text-info">
-                            <i class="bi bi-flag"></i>
+                <div class="card h-100" style="cursor: pointer;" data-bind="click: function() { filterByStatus('Confirmed') }">
+                    <div class="card-body">
+                        <div class="d-flex align-items-center gap-3">
+                            <div class="rounded p-2 bg-success bg-opacity-10 text-success">
+                                <i class="bi bi-check-circle fs-4"></i>
+                            </div>
+                            <div>
+                                <div class="text-muted small" data-t="Status.Confirmed">Onaylanan</div>
+                                <div class="fs-4 fw-bold" data-bind="text: stats().confirmed">0</div>
+                            </div>
                         </div>
-                        <div>
-                            <div class="text-muted small" data-t="Status.Completed">Tamamlanan</div>
-                            <div class="fs-4 fw-bold" data-bind="text: stats().completed">0</div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-6 col-lg-3">
+                <div class="card h-100" style="cursor: pointer;" data-bind="click: function() { filterByStatus('Completed') }">
+                    <div class="card-body">
+                        <div class="d-flex align-items-center gap-3">
+                            <div class="rounded p-2 bg-info bg-opacity-10 text-info">
+                                <i class="bi bi-flag fs-4"></i>
+                            </div>
+                            <div>
+                                <div class="text-muted small" data-t="Status.Completed">Tamamlanan</div>
+                                <div class="fs-4 fw-bold" data-bind="text: stats().completed">0</div>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -70,7 +78,7 @@
         </div>
 
         <!-- Rezervasyon Listesi -->
-        <div class="admin-card">
+        <div class="card">
             <div class="card-header d-flex justify-content-between align-items-center">
                 <span>
                     <i class="bi bi-calendar-check me-2"></i>
@@ -228,15 +236,6 @@
         </div>
     </div>
 </div>
-
-<style>
-    .stat-card.cursor-pointer { cursor: pointer; transition: border-color 0.2s; }
-    .stat-card.cursor-pointer:hover { border-color: #0d6efd !important; }
-    .stat-card.border-primary { border: 2px solid #0d6efd !important; }
-    .stat-card.border-warning { border: 2px solid #ffc107 !important; }
-    .stat-card.border-success { border: 2px solid #198754 !important; }
-    .stat-card.border-info { border: 2px solid #0dcaf0 !important; }
-</style>
 
 @section Scripts {
 <script src="~/js/Admin/MyReservations.js"></script>

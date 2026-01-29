@@ -24,17 +24,19 @@
         <div class="row g-4 mb-4">
             <!-- Toplam Tur -->
             <div class="col-md-6 col-xl-3">
-                <div class="stat-card h-100">
-                    <div class="d-flex align-items-center gap-3">
-                        <div class="stat-icon bg-primary bg-opacity-10 text-primary">
-                            <i class="bi bi-map"></i>
-                        </div>
-                        <div>
-                            <div class="text-muted small" data-t="Dashboard.Stats.TotalTours">Toplam Tur</div>
-                            <div class="fs-3 fw-bold" data-bind="text: stats().totalTours">0</div>
-                            <div class="text-muted small">
-                                <span data-bind="text: stats().activeTours">0</span>
-                                <span data-t="Dashboard.Stats.ActiveTours">aktif</span>
+                <div class="card h-100">
+                    <div class="card-body">
+                        <div class="d-flex align-items-center gap-3">
+                            <div class="rounded p-2 bg-primary bg-opacity-10 text-primary">
+                                <i class="bi bi-map fs-4"></i>
+                            </div>
+                            <div>
+                                <div class="text-muted small" data-t="Dashboard.Stats.TotalTours">Toplam Tur</div>
+                                <div class="fs-3 fw-bold" data-bind="text: stats().totalTours">0</div>
+                                <div class="text-muted small">
+                                    <span data-bind="text: stats().activeTours">0</span>
+                                    <span data-t="Dashboard.Stats.ActiveTours">aktif</span>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -43,17 +45,19 @@
 
             <!-- Rezervasyonlar -->
             <div class="col-md-6 col-xl-3">
-                <div class="stat-card h-100">
-                    <div class="d-flex align-items-center gap-3">
-                        <div class="stat-icon bg-success bg-opacity-10 text-success">
-                            <i class="bi bi-calendar-check"></i>
-                        </div>
-                        <div>
-                            <div class="text-muted small" data-t="Dashboard.Stats.TotalReservations">Toplam Rezervasyon</div>
-                            <div class="fs-3 fw-bold" data-bind="text: stats().totalReservations">0</div>
-                            <div class="text-muted small">
-                                <span data-bind="text: stats().pendingReservations">0</span>
-                                <span data-t="Dashboard.Stats.PendingReservations">bekleyen</span>
+                <div class="card h-100">
+                    <div class="card-body">
+                        <div class="d-flex align-items-center gap-3">
+                            <div class="rounded p-2 bg-success bg-opacity-10 text-success">
+                                <i class="bi bi-calendar-check fs-4"></i>
+                            </div>
+                            <div>
+                                <div class="text-muted small" data-t="Dashboard.Stats.TotalReservations">Toplam Rezervasyon</div>
+                                <div class="fs-3 fw-bold" data-bind="text: stats().totalReservations">0</div>
+                                <div class="text-muted small">
+                                    <span data-bind="text: stats().pendingReservations">0</span>
+                                    <span data-t="Dashboard.Stats.PendingReservations">bekleyen</span>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -62,19 +66,21 @@
 
             <!-- Gelir -->
             <div class="col-md-6 col-xl-3">
-                <div class="stat-card h-100">
-                    <div class="d-flex align-items-center gap-3">
-                        <div class="stat-icon bg-warning bg-opacity-10 text-warning">
-                            <i class="bi bi-currency-lira"></i>
-                        </div>
-                        <div>
-                            <div class="text-muted small" data-t="Dashboard.Stats.TotalRevenue">Toplam Gelir</div>
-                            <div class="fs-3 fw-bold">
-                                <span data-bind="text: formatCurrency(stats().totalRevenue)">0</span>
+                <div class="card h-100">
+                    <div class="card-body">
+                        <div class="d-flex align-items-center gap-3">
+                            <div class="rounded p-2 bg-warning bg-opacity-10 text-warning">
+                                <i class="bi bi-currency-lira fs-4"></i>
                             </div>
-                            <div class="text-muted small">
-                                <span data-t="Dashboard.Stats.MonthlyRevenue">Bu ay:</span>
-                                <span data-bind="text: formatCurrency(stats().monthlyRevenue)">0</span>
+                            <div>
+                                <div class="text-muted small" data-t="Dashboard.Stats.TotalRevenue">Toplam Gelir</div>
+                                <div class="fs-3 fw-bold">
+                                    <span data-bind="text: formatCurrency(stats().totalRevenue)">0</span>
+                                </div>
+                                <div class="text-muted small">
+                                    <span data-t="Dashboard.Stats.MonthlyRevenue">Bu ay:</span>
+                                    <span data-bind="text: formatCurrency(stats().monthlyRevenue)">0</span>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -83,20 +89,22 @@
 
             <!-- Puan -->
             <div class="col-md-6 col-xl-3">
-                <div class="stat-card h-100">
-                    <div class="d-flex align-items-center gap-3">
-                        <div class="stat-icon bg-info bg-opacity-10 text-info">
-                            <i class="bi bi-star-fill"></i>
-                        </div>
-                        <div>
-                            <div class="text-muted small" data-t="Dashboard.Stats.AverageRating">Ortalama Puan</div>
-                            <div class="fs-3 fw-bold">
-                                <span data-bind="text: stats().averageRating">0</span>
-                                <i class="bi bi-star-fill text-warning fs-5"></i>
+                <div class="card h-100">
+                    <div class="card-body">
+                        <div class="d-flex align-items-center gap-3">
+                            <div class="rounded p-2 bg-info bg-opacity-10 text-info">
+                                <i class="bi bi-star-fill fs-4"></i>
                             </div>
-                            <div class="text-muted small">
-                                <span data-bind="text: stats().totalReviews">0</span>
-                                <span data-t="Dashboard.Stats.TotalReviews">yorum</span>
+                            <div>
+                                <div class="text-muted small" data-t="Dashboard.Stats.AverageRating">Ortalama Puan</div>
+                                <div class="fs-3 fw-bold">
+                                    <span data-bind="text: stats().averageRating">0</span>
+                                    <i class="bi bi-star-fill text-warning fs-5"></i>
+                                </div>
+                                <div class="text-muted small">
+                                    <span data-bind="text: stats().totalReviews">0</span>
+                                    <span data-t="Dashboard.Stats.TotalReviews">yorum</span>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -108,7 +116,7 @@
         <div class="row g-4 mb-4">
             <!-- Son Rezervasyonlar -->
             <div class="col-lg-6">
-                <div class="admin-card h-100">
+                <div class="card h-100">
                     <div class="card-header d-flex justify-content-between align-items-center">
                         <span><i class="bi bi-calendar-check me-2"></i><span data-t="Dashboard.RecentReservations">Son Rezervasyonlar</span></span>
                         <a href="/Admin/MyReservations" class="btn btn-sm btn-outline-primary" data-t="Dashboard.ViewAll">Tumu</a>
@@ -153,7 +161,7 @@
 
             <!-- Son Yorumlar -->
             <div class="col-lg-6">
-                <div class="admin-card h-100">
+                <div class="card h-100">
                     <div class="card-header d-flex justify-content-between align-items-center">
                         <span><i class="bi bi-chat-square-text me-2"></i><span data-t="Dashboard.RecentReviews">Son Yorumlar</span></span>
                     </div>
@@ -186,7 +194,7 @@
         </div>
 
         <!-- Tur Performansi -->
-        <div class="admin-card">
+        <div class="card">
             <div class="card-header">
                 <i class="bi bi-bar-chart me-2"></i><span data-t="Dashboard.TourPerformance">Tur Performansi</span>
             </div>
