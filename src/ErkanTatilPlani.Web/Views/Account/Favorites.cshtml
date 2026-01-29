@@ -1,0 +1,207 @@
+@{
+    ViewData["Title"] = "Favorilerim";
+}
+
+<div id="favoritesApp">
+    <!-- Hero Section -->
+    <div class="bg-primary text-white py-4 mb-4 rounded-3">
+        <div class="container">
+            <div class="row align-items-center">
+                <div class="col-md-8">
+                    <h1 class="display-6 mb-2">
+                        <i class="bi bi-heart-fill me-2"></i>
+                        <span data-t="Favorites.Title">Favori Turlarim</span>
+                    </h1>
+                    <p class="mb-0 opacity-75" data-t="Favorites.Subtitle">Begendigi turlar burda listelenir</p>
+                </div>
+                <div class="col-md-4 text-md-end mt-3 mt-md-0">
+                    <span class="badge bg-light text-primary fs-6">
+                        <span data-bind="text: favorites().length"></span>
+                        <span data-t="Favorites.Tours">Tur</span>
+                    </span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Loading -->
+    <div data-bind="visible: isLoading" class="text-center py-5">
+        <div class="spinner-border text-primary" role="status">
+            <span class="visually-hidden">Yukleniyor...</span>
+        </div>
+    </div>
+
+    <!-- Favorites List -->
+    <div data-bind="visible: !isLoading()">
+        <div class="row g-4" data-bind="foreach: favorites">
+            <div class="col-md-6 col-lg-4">
+                <div class="card h-100 shadow-sm border-0 tour-card">
+                    <!-- Tour Image -->
+                    <div class="position-relative">
+                        <img data-bind="attr: { src: tourImageUrl || 'https://picsum.photos/seed/' + tourId + '/400/250' }"
+                             class="card-img-top" style="height: 200px; object-fit: cover;" alt="Tour">
+
+                        <!-- Featured Badge -->
+                        <span class="position-absolute top-0 start-0 m-2 badge bg-warning" data-bind="visible: tourIsFeatured">
+                            <i class="bi bi-star-fill me-1"></i>
+                            <span data-t="Tour.Featured">Onerilen</span>
+                        </span>
+
+                        <!-- Remove Button -->
+                        <button class="btn btn-danger btn-sm position-absolute top-0 end-0 m-2"
+                                data-bind="click: $parent.removeFavorite" title="Favorilerden Cikar">
+                            <i class="bi bi-heart-fill"></i>
+                        </button>
+                    </div>
+
+                    <div class="card-body">
+                        <h5 class="card-title mb-1" data-bind="text: tourName"></h5>
+                        <p class="text-muted small mb-2">
+                            <i class="bi bi-geo-alt me-1"></i>
+                            <span data-bind="text: tourDestination"></span>
+                        </p>
+
+                        <!-- Rating -->
+                        <div class="mb-2" data-bind="visible: tourReviewCount > 0">
+                            <span class="text-warning">
+                                <!-- ko foreach: $parent.getStars(tourAverageRating) -->
+                                <i data-bind="class: $data"></i>
+                                <!-- /ko -->
+                            </span>
+                            <span class="ms-1 small text-muted">
+                                <span data-bind="text: tourAverageRating.toFixed(1)"></span>
+                                (<span data-bind="text: tourReviewCount"></span>)
+                            </span>
+                        </div>
+
+                        <!-- Info -->
+                        <div class="d-flex justify-content-between align-items-center mb-3">
+                            <div>
+                                <span class="text-muted small">
+                                    <i class="bi bi-clock me-1"></i>
+                                    <span data-bind="text: tourDurationDays"></span> <span data-t="Tour.Days">Gun</span>
+                                </span>
+                            </div>
+                            <div class="fs-5 fw-bold text-primary" data-bind="text: tourPrice.toLocaleString('tr-TR', {style: 'currency', currency: 'TRY'})"></div>
+                        </div>
+
+                        <!-- Company -->
+                        <div class="small text-muted mb-3">
+                            <i class="bi bi-building me-1"></i>
+                            <a data-bind="attr: { href: '/Firmalar/' + companySlug }, text: companyName" class="text-decoration-none"></a>
+                        </div>
+
+                        <!-- Actions -->
+                        <div class="d-flex gap-2">
+                            <a class="btn btn-primary flex-grow-1" data-bind="attr: { href: '/Turlar#tour-' + tourId }">
+                                <i class="bi bi-info-circle me-1"></i>
+                                <span data-t="Common.Details">Detay</span>
+                            </a>
+                        </div>
+                    </div>
+
+                    <div class="card-footer bg-transparent border-0 pt-0">
+                        <small class="text-muted">
+                            <i class="bi bi-calendar-plus me-1"></i>
+                            <span data-t="Favorites.AddedOn">Eklendi:</span>
+                            <span data-bind="text: new Date(createdAt).toLocaleDateString('tr-TR')"></span>
+                        </small>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Empty State -->
+        <div data-bind="visible: favorites().length === 0" class="text-center py-5">
+            <i class="bi bi-heart text-muted" style="font-size: 4rem;"></i>
+            <h5 class="mt-3 text-muted" data-t="Favorites.NoFavorites">Henuz favori turunuz yok</h5>
+            <p class="text-muted" data-t="Favorites.ExploreMessage">Turlar sayfasindan begendiklerinizi favorilere ekleyin!</p>
+            <a href="/Turlar" class="btn btn-primary">
+                <i class="bi bi-search me-1"></i>
+                <span data-t="Favorites.ExploreTours">Turlari Kesfet</span>
+            </a>
+        </div>
+    </div>
+</div>
+
+<style>
+.tour-card {
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+.tour-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 0.5rem 1rem rgba(0,0,0,0.15) !important;
+}
+</style>
+
+@section Scripts {
+<script>
+function FavoritesViewModel() {
+    var self = this;
+
+    self.favorites = ko.observableArray([]);
+    self.isLoading = ko.observable(true);
+
+    self.getStars = function(rating) {
+        var stars = [];
+        var fullStars = Math.floor(rating);
+        var hasHalf = rating - fullStars >= 0.5;
+
+        for (var i = 0; i < fullStars; i++) {
+            stars.push('bi bi-star-fill');
+        }
+        if (hasHalf) {
+            stars.push('bi bi-star-half');
+        }
+        while (stars.length < 5) {
+            stars.push('bi bi-star');
+        }
+        return stars;
+    };
+
+    self.loadFavorites = function() {
+        self.isLoading(true);
+
+        $.ajax({
+            url: apiBaseUrl + '/api/favorites',
+            method: 'GET',
+            headers: { 'Authorization': 'Bearer ' + localStorage.getItem('token') },
+            success: function(response) {
+                self.favorites(response.favorites || []);
+                self.isLoading(false);
+            },
+            error: function(xhr) {
+                if (xhr.status === 401) {
+                    window.location.href = '/Account/Login?returnUrl=' + encodeURIComponent(window.location.pathname);
+                } else {
+                    toastr.error(T('Common.Error'));
+                }
+                self.isLoading(false);
+            }
+        });
+    };
+
+    self.removeFavorite = function(favorite) {
+        if (!confirm(T('Favorites.RemoveConfirm'))) return;
+
+        $.ajax({
+            url: apiBaseUrl + '/api/favorites/' + favorite.tourId,
+            method: 'DELETE',
+            headers: { 'Authorization': 'Bearer ' + localStorage.getItem('token') },
+            success: function() {
+                self.favorites.remove(favorite);
+                toastr.success(T('Favorites.Removed'));
+            },
+            error: function() {
+                toastr.error(T('Common.Error'));
+            }
+        });
+    };
+
+    // Initialize
+    self.loadFavorites();
+}
+
+ko.applyBindings(new FavoritesViewModel(), document.getElementById('favoritesApp'));
+</script>
+}

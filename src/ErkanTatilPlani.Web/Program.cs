@@ -8,6 +8,9 @@ builder.Services.AddControllersWithViews();
 // API Base URL
 var apiBaseUrl = builder.Configuration["ApiBaseUrl"] ?? "https://localhost:7001";
 
+// HttpClientFactory (for SitemapController)
+builder.Services.AddHttpClient();
+
 // HttpClient servislerini kaydet
 builder.Services.AddHttpClient<ICompanyService, CompanyService>(client =>
 {

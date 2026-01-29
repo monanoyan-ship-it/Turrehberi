@@ -1,0 +1,133 @@
+@{
+    ViewData["Title"] = "Email Dogrulama";
+}
+
+<div class="row justify-content-center mt-5">
+    <div class="col-md-5">
+        <div class="card shadow-lg border-0">
+            <div class="card-body p-5">
+                <div class="text-center mb-4">
+                    <i class="bi bi-envelope-check text-primary" style="font-size: 4rem;"></i>
+                    <h3 class="mt-3" data-t="VerifyEmail.Title">Email Dogrulama</h3>
+                </div>
+
+                <div id="verifyEmailApp">
+                    <!-- Kontrol -->
+                    <div data-bind="visible: isChecking" class="text-center py-4">
+                        <div class="spinner-border text-primary"></div>
+                        <p class="mt-2 text-muted" data-t="VerifyEmail.Checking">Email adresiniz dogrulaniyor...</p>
+                    </div>
+
+                    <!-- Gecersiz Token -->
+                    <div data-bind="visible: !isChecking() && !isSuccess() && hasError()" class="text-center">
+                        <div class="alert alert-danger">
+                            <i class="bi bi-x-circle-fill me-2"></i>
+                            <span data-bind="text: errorMessage"></span>
+                        </div>
+                        <p class="text-muted mb-3" data-t="VerifyEmail.RequestNewLink">Dogrulama linki gecersiz veya suresi dolmus olabilir.</p>
+                        <a href="/Account/Profile" class="btn btn-warning">
+                            <i class="bi bi-arrow-repeat me-1"></i>
+                            <span data-t="VerifyEmail.RequestAgain">Yeni Link Iste</span>
+                        </a>
+                    </div>
+
+                    <!-- Basarili -->
+                    <div data-bind="visible: !isChecking() && isSuccess()" class="text-center">
+                        <div class="alert alert-success">
+                            <i class="bi bi-check-circle-fill me-2"></i>
+                            <span data-t="VerifyEmail.Success">Email adresiniz basariyla dogrulandi!</span>
+                        </div>
+                        <p class="text-muted mb-3" data-t="VerifyEmail.SuccessDesc">Artik tum ozellikleri kullanabilirsiniz.</p>
+                        <div class="d-grid gap-2">
+                            <a href="/" class="btn btn-primary">
+                                <i class="bi bi-house me-1"></i>
+                                <span data-t="Menu.Home">Ana Sayfa</span>
+                            </a>
+                            <a href="/Account/Profile" class="btn btn-outline-secondary">
+                                <i class="bi bi-person me-1"></i>
+                                <span data-t="Menu.Profile">Profil</span>
+                            </a>
+                        </div>
+                    </div>
+
+                    <!-- Token/Email Yok -->
+                    <div data-bind="visible: !isChecking() && !hasToken()" class="text-center">
+                        <div class="alert alert-warning">
+                            <i class="bi bi-exclamation-triangle-fill me-2"></i>
+                            <span data-t="VerifyEmail.MissingParams">Dogrulama linki eksik veya hatali.</span>
+                        </div>
+                        <p class="text-muted mb-3" data-t="VerifyEmail.CheckEmail">Lutfen email adresinize gonderilen linke tiklayiniz.</p>
+                        <a href="/Account/Profile" class="btn btn-primary">
+                            <i class="bi bi-arrow-repeat me-1"></i>
+                            <span data-t="VerifyEmail.GoToProfile">Profilime Git</span>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+<script>
+function VerifyEmailViewModel() {
+    var self = this;
+
+    // URL'den parametreleri al
+    var urlParams = new URLSearchParams(window.location.search);
+    self.token = urlParams.get('token') || '@ViewBag.Token';
+    self.email = urlParams.get('email') || '@ViewBag.Email';
+
+    self.isChecking = ko.observable(true);
+    self.isSuccess = ko.observable(false);
+    self.hasError = ko.observable(false);
+    self.hasToken = ko.observable(true);
+    self.errorMessage = ko.observable('');
+
+    self.verifyEmail = function() {
+        // Token veya email yoksa
+        if (!self.token || !self.email) {
+            self.isChecking(false);
+            self.hasToken(false);
+            return;
+        }
+
+        $.ajax({
+            url: apiBaseUrl + '/api/auth/verify-email',
+            method: 'GET',
+            data: {
+                email: self.email,
+                token: self.token
+            },
+            success: function(response) {
+                self.isChecking(false);
+                if (response.success) {
+                    self.isSuccess(true);
+                    toastr.success(T('VerifyEmail.Success'));
+
+                    // LocalStorage'daki user bilgisini guncelle
+                    var user = JSON.parse(localStorage.getItem('user') || '{}');
+                    if (user.email === self.email) {
+                        user.emailVerified = true;
+                        localStorage.setItem('user', JSON.stringify(user));
+                    }
+                } else {
+                    self.hasError(true);
+                    self.errorMessage(response.error || T('VerifyEmail.InvalidToken'));
+                }
+            },
+            error: function(xhr) {
+                self.isChecking(false);
+                self.hasError(true);
+                self.errorMessage(xhr.responseJSON?.error || T('VerifyEmail.InvalidToken'));
+            }
+        });
+    };
+
+    // Sayfa yuklendiginde dogrulama yap
+    self.verifyEmail();
+}
+
+ko.applyBindings(new VerifyEmailViewModel(), document.getElementById('verifyEmailApp'));
+</script>
+}

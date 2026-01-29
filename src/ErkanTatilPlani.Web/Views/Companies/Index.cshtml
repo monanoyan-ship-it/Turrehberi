@@ -1,350 +1,291 @@
 @{
     ViewData["Title"] = "Firmalar";
+    ViewData["Description"] = "Guvenilir tur ve seyahat firmalari listesi. Onayli firmalar, musteri yorumlari ve en iyi tatil firsatlari icin dogru adres!";
+    ViewData["OgTitle"] = "Tur Firmalari - Erkan Tatil Plani";
+    ViewData["OgDescription"] = "Turkiye'nin onayli tur firmalarini kesfedin. Musteri yorumlari, firma profilleri ve en iyi tatil tekliflerini inceleyin!";
+    ViewData["OgType"] = "website";
+}
+
+@section Head {
+    <!-- Companies Page Schema.org JSON-LD -->
+    <script type="application/ld+json">
+    {
+        "@@context": "https://schema.org",
+        "@@type": "CollectionPage",
+        "name": "Tur Firmalari",
+        "description": "Guvenilir tur ve seyahat firmalari listesi",
+        "url": "@Context.Request.GetDisplayUrl()",
+        "isPartOf": {
+            "@@type": "WebSite",
+            "name": "Erkan Tatil Plani"
+        }
+    }
+    </script>
 }
 
 <div id="companiesApp">
-<div class="d-flex justify-content-between align-items-center mb-4">
-    <h1><i class="bi bi-building"></i> Firmalar</h1>
-    <button class="btn btn-primary" data-bind="click: openCreateModal">
-        <i class="bi bi-plus-circle"></i> Yeni Firma
-    </button>
-</div>
-
-<!-- Loading -->
-<div data-bind="visible: isLoading" class="text-center py-5">
-    <div class="spinner-border text-primary" role="status">
-        <span class="visually-hidden">Yukleniyor...</span>
-    </div>
-</div>
-
-<!-- Liste -->
-<div class="row g-4" data-bind="visible: !isLoading(), foreach: companies">
-    <div class="col-md-4">
-        <div class="card h-100 shadow-sm">
-            <div class="card-body">
-                <div class="d-flex align-items-center mb-3">
-                    <div class="bg-primary text-white rounded d-flex align-items-center justify-content-center me-3" style="width: 60px; height: 60px;">
-                        <i class="bi bi-building" style="font-size: 1.5rem;"></i>
-                    </div>
-                    <div>
-                        <h5 class="card-title mb-0" data-bind="text: name"></h5>
-                        <small class="text-muted" data-bind="text: email"></small>
-                    </div>
+    <!-- Hero Section -->
+    <div class="bg-primary text-white py-4 mb-4 rounded-3">
+        <div class="container">
+            <div class="row align-items-center">
+                <div class="col-md-8">
+                    <h1 class="display-6 mb-2">
+                        <i class="bi bi-building me-2"></i>
+                        <span data-t="Menu.Companies">Firmalar</span>
+                    </h1>
+                    <p class="mb-0 opacity-75" data-t="Companies.Subtitle">Guvenilir seyahat firmalarimizi kesfedin</p>
                 </div>
-                <p class="card-text" data-bind="text: description"></p>
-                <div class="mb-2">
-                    <i class="bi bi-telephone"></i> <span data-bind="text: phone"></span>
-                </div>
-                <div class="mb-2" data-bind="visible: website">
-                    <i class="bi bi-globe"></i> <span data-bind="text: website"></span>
+                <div class="col-md-4 text-md-end mt-3 mt-md-0">
+                    <span class="badge bg-light text-primary fs-6">
+                        <span data-bind="text: companies().length"></span>
+                        <span data-t="Companies.CompanyCount">Firma</span>
+                    </span>
                 </div>
             </div>
-            <div class="card-footer bg-transparent">
-                <div class="btn-group w-100">
-                    <button class="btn btn-outline-info" data-bind="click: $parent.showDetails">
-                        <i class="bi bi-eye"></i> Detay
+        </div>
+    </div>
+
+    <!-- Search and Filter -->
+    <div class="card shadow-sm border-0 mb-4">
+        <div class="card-body">
+            <div class="row g-3">
+                <!-- Search -->
+                <div class="col-md-5">
+                    <div class="input-group">
+                        <span class="input-group-text bg-white"><i class="bi bi-search"></i></span>
+                        <input type="text" class="form-control"
+                               data-bind="value: searchQuery, valueUpdate: 'afterkeydown', event: { keyup: onSearchKeyup }"
+                               data-t-placeholder="Companies.SearchPlaceholder" placeholder="Firma ara (isim, sehir, aciklama)..." />
+                        <button class="btn btn-outline-secondary" data-bind="visible: searchQuery(), click: clearSearch">
+                            <i class="bi bi-x-lg"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- City Filter -->
+                <div class="col-md-3">
+                    <select class="form-select" data-bind="value: selectedCity, event: { change: applyFilters }">
+                        <option value="" data-t="Companies.AllCities">Tum Sehirler</option>
+                        <!-- ko foreach: cities -->
+                        <option data-bind="value: $data, text: $data"></option>
+                        <!-- /ko -->
+                    </select>
+                </div>
+
+                <!-- Sort -->
+                <div class="col-md-3">
+                    <select class="form-select" data-bind="value: sortBy, event: { change: applyFilters }">
+                        <option value="" data-t="Companies.SortDefault">Varsayilan Siralama</option>
+                        <option value="name_asc" data-t="Companies.SortNameAsc">Isim (A-Z)</option>
+                        <option value="name_desc" data-t="Companies.SortNameDesc">Isim (Z-A)</option>
+                        <option value="rating" data-t="Companies.SortRating">En Yuksek Puan</option>
+                        <option value="tours" data-t="Companies.SortTours">En Cok Tur</option>
+                        <option value="newest" data-t="Companies.SortNewest">En Yeni</option>
+                    </select>
+                </div>
+
+                <!-- Clear Button -->
+                <div class="col-md-1">
+                    <button class="btn btn-outline-secondary w-100" data-bind="click: clearFilters, visible: hasFilters()">
+                        <i class="bi bi-x-circle"></i>
                     </button>
-                    <button class="btn btn-outline-warning" data-bind="click: $parent.openEditModal">
-                        <i class="bi bi-pencil"></i> Duzenle
-                    </button>
-                    <button class="btn btn-outline-danger" data-bind="click: $parent.openDeleteModal">
-                        <i class="bi bi-trash"></i> Sil
-                    </button>
                 </div>
             </div>
         </div>
     </div>
-</div>
 
-<!-- Bos Liste -->
-<div data-bind="visible: !isLoading() && companies().length === 0" class="alert alert-info text-center">
-    <i class="bi bi-info-circle"></i> Henuz firma bulunmamaktadir.
-    <a href="#" data-bind="click: openCreateModal" class="alert-link">Ilk firmayi ekleyin</a>
-</div>
-
-<!-- Create/Edit Modal -->
-<div class="modal fade" id="formModal" tabindex="-1">
-    <div class="modal-dialog modal-lg">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" data-bind="text: isEditing() ? 'Firma Duzenle' : 'Yeni Firma'"></h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-            </div>
-            <div class="modal-body">
-                <form id="companyForm">
-                    <input type="hidden" data-bind="value: formData().id" />
-
-                    <div class="mb-3">
-                        <label class="form-label">Firma Adi *</label>
-                        <input type="text" class="form-control" data-bind="value: formData().name" required />
-                    </div>
-
-                    <div class="mb-3">
-                        <label class="form-label">Aciklama</label>
-                        <textarea class="form-control" rows="2" data-bind="value: formData().description"></textarea>
-                    </div>
-
-                    <div class="row">
-                        <div class="col-md-6 mb-3">
-                            <label class="form-label">E-posta *</label>
-                            <input type="email" class="form-control" data-bind="value: formData().email" required />
-                        </div>
-                        <div class="col-md-6 mb-3">
-                            <label class="form-label">Telefon</label>
-                            <input type="tel" class="form-control" data-bind="value: formData().phone" />
-                        </div>
-                    </div>
-
-                    <div class="mb-3">
-                        <label class="form-label">Adres</label>
-                        <textarea class="form-control" rows="2" data-bind="value: formData().address"></textarea>
-                    </div>
-
-                    <div class="row">
-                        <div class="col-md-6 mb-3">
-                            <label class="form-label">Website</label>
-                            <input type="url" class="form-control" data-bind="value: formData().website" />
-                        </div>
-                        <div class="col-md-6 mb-3">
-                            <label class="form-label">Vergi No</label>
-                            <input type="text" class="form-control" data-bind="value: formData().taxNumber" />
-                        </div>
-                    </div>
-
-                    <div class="mb-3">
-                        <label class="form-label">Logo URL</label>
-                        <input type="url" class="form-control" data-bind="value: formData().logoUrl" />
-                    </div>
-                </form>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Iptal</button>
-                <button type="button" class="btn btn-primary" data-bind="click: saveCompany, disable: isSaving">
-                    <span data-bind="visible: isSaving" class="spinner-border spinner-border-sm me-1"></span>
-                    <span data-bind="text: isEditing() ? 'Guncelle' : 'Kaydet'"></span>
-                </button>
-            </div>
+    <!-- Loading -->
+    <div data-bind="visible: isLoading" class="text-center py-5">
+        <div class="spinner-border text-primary" role="status">
+            <span class="visually-hidden">Yukleniyor...</span>
         </div>
     </div>
-</div>
 
-<!-- Details Modal -->
-<div class="modal fade" id="detailsModal" tabindex="-1">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title">Firma Detayi</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-            </div>
-            <div class="modal-body" data-bind="with: selectedCompany">
-                <dl class="row">
-                    <dt class="col-sm-4">Firma Adi</dt>
-                    <dd class="col-sm-8" data-bind="text: name"></dd>
-
-                    <dt class="col-sm-4">Aciklama</dt>
-                    <dd class="col-sm-8" data-bind="text: description || '-'"></dd>
-
-                    <dt class="col-sm-4">E-posta</dt>
-                    <dd class="col-sm-8" data-bind="text: email"></dd>
-
-                    <dt class="col-sm-4">Telefon</dt>
-                    <dd class="col-sm-8" data-bind="text: phone || '-'"></dd>
-
-                    <dt class="col-sm-4">Adres</dt>
-                    <dd class="col-sm-8" data-bind="text: address || '-'"></dd>
-
-                    <dt class="col-sm-4">Website</dt>
-                    <dd class="col-sm-8" data-bind="text: website || '-'"></dd>
-
-                    <dt class="col-sm-4">Vergi No</dt>
-                    <dd class="col-sm-8" data-bind="text: taxNumber || '-'"></dd>
-                </dl>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Kapat</button>
-            </div>
-        </div>
-    </div>
-</div>
-
-<!-- Delete Modal -->
-<div class="modal fade" id="deleteModal" tabindex="-1">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title text-danger">Firma Sil</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-            </div>
-            <div class="modal-body">
-                <div class="alert alert-warning">
-                    <i class="bi bi-exclamation-triangle"></i>
-                    <strong>Dikkat!</strong> Bu firmayi silmek istediginizden emin misiniz?
+    <!-- Company List -->
+    <div class="row g-4" data-bind="visible: !isLoading(), foreach: companies">
+        <div class="col-md-6 col-lg-4">
+            <div class="card h-100 shadow-sm border-0 company-card">
+                <!-- Cover Image -->
+                <div class="position-relative">
+                    <div class="bg-gradient" style="height: 80px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);"></div>
+                    <!-- Logo -->
+                    <div class="position-absolute" style="bottom: -30px; left: 20px;">
+                        <div class="bg-white rounded-circle p-2 shadow" style="width: 70px; height: 70px;">
+                            <!-- ko if: logoUrl -->
+                            <img data-bind="attr: { src: logoUrl, alt: name + ' Logo' }"
+                                 class="rounded-circle card-img-lazy"
+                                 style="width: 100%; height: 100%; object-fit: cover;"
+                                 loading="lazy"
+                                 decoding="async" />
+                            <!-- /ko -->
+                            <!-- ko ifnot: logoUrl -->
+                            <div class="bg-primary text-white rounded-circle d-flex align-items-center justify-content-center" style="width: 100%; height: 100%;">
+                                <i class="bi bi-building" style="font-size: 1.5rem;"></i>
+                            </div>
+                            <!-- /ko -->
+                        </div>
+                    </div>
                 </div>
-                <p data-bind="with: selectedCompany">
-                    <strong data-bind="text: name"></strong> firmasini silmek uzeresiniz.
-                </p>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Iptal</button>
-                <button type="button" class="btn btn-danger" data-bind="click: deleteCompany, disable: isSaving">
-                    <span data-bind="visible: isSaving" class="spinner-border spinner-border-sm me-1"></span>
-                    Evet, Sil
-                </button>
+
+                <div class="card-body pt-5">
+                    <h5 class="card-title mb-1" data-bind="text: name"></h5>
+                    <p class="text-muted small mb-2" data-bind="text: tagline || city"></p>
+
+                    <!-- Rating -->
+                    <div class="mb-2" data-bind="visible: reviewCount > 0">
+                        <span class="text-warning">
+                            <!-- ko foreach: $parent.getStars(averageRating) -->
+                            <i data-bind="class: $data"></i>
+                            <!-- /ko -->
+                        </span>
+                        <span class="ms-1 small text-muted">
+                            <span data-bind="text: averageRating.toFixed(1)"></span>
+                            (<span data-bind="text: reviewCount"></span>)
+                        </span>
+                    </div>
+                    <div class="mb-2 text-muted small" data-bind="visible: reviewCount === 0">
+                        <i class="bi bi-star me-1"></i>
+                        <span data-t="Companies.NoReviews">Henuz yorum yok</span>
+                    </div>
+
+                    <!-- Description -->
+                    <p class="card-text text-muted small" data-bind="text: description ? (description.length > 100 ? description.substring(0, 100) + '...' : description) : ''"></p>
+
+                    <!-- Stats -->
+                    <div class="d-flex gap-3 text-muted small">
+                        <span><i class="bi bi-geo-alt me-1"></i><span data-bind="text: city || '-'"></span></span>
+                        <span><i class="bi bi-map me-1"></i><span data-bind="text: tourCount"></span> <span data-t="Companies.Tours">Tur</span></span>
+                    </div>
+                </div>
+
+                <div class="card-footer bg-transparent border-0 pt-0">
+                    <a class="btn btn-outline-primary w-100" data-bind="attr: { href: '/Firmalar/' + slug }">
+                        <i class="bi bi-eye me-1"></i>
+                        <span data-t="Companies.ViewProfile">Profili Gor</span>
+                    </a>
+                </div>
             </div>
         </div>
     </div>
+
+    <!-- Empty State -->
+    <div data-bind="visible: !isLoading() && companies().length === 0" class="text-center py-5">
+        <i class="bi bi-building text-muted" style="font-size: 4rem;"></i>
+        <h5 class="mt-3 text-muted" data-t="Companies.NoResults">Firma bulunamadi</h5>
+        <p class="text-muted" data-t="Companies.TryDifferentSearch">Farkli arama kriterleri deneyin</p>
+        <button class="btn btn-primary" data-bind="click: clearFilters">
+            <i class="bi bi-arrow-counterclockwise me-1"></i>
+            <span data-t="Companies.ClearFilters">Filtreleri Temizle</span>
+        </button>
+    </div>
 </div>
-</div>
+
+<style>
+.company-card {
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+.company-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 0.5rem 1rem rgba(0,0,0,0.15) !important;
+}
+</style>
 
 @section Scripts {
 <script>
 function CompaniesViewModel() {
     var self = this;
 
+    // State
     self.companies = ko.observableArray([]);
+    self.cities = ko.observableArray([]);
     self.isLoading = ko.observable(true);
-    self.isSaving = ko.observable(false);
-    self.isEditing = ko.observable(false);
-    self.selectedCompany = ko.observable(null);
 
-    self.formData = ko.observable({
-        id: 0,
-        name: '',
-        description: '',
-        email: '',
-        phone: '',
-        address: '',
-        website: '',
-        logoUrl: '',
-        taxNumber: ''
+    // Filters
+    self.searchQuery = ko.observable('');
+    self.selectedCity = ko.observable('');
+    self.sortBy = ko.observable('');
+
+    // Debounce timer
+    var searchTimer = null;
+
+    // Computed: Has filters
+    self.hasFilters = ko.computed(function() {
+        return self.searchQuery() || self.selectedCity() || self.sortBy();
     });
 
-    // Modal instances
-    var formModal, detailsModal, deleteModal;
+    // Get star icons
+    self.getStars = function(rating) {
+        var stars = [];
+        var fullStars = Math.floor(rating);
+        var hasHalf = rating - fullStars >= 0.5;
+
+        for (var i = 0; i < fullStars; i++) {
+            stars.push('bi bi-star-fill');
+        }
+        if (hasHalf) {
+            stars.push('bi bi-star-half');
+        }
+        while (stars.length < 5) {
+            stars.push('bi bi-star');
+        }
+        return stars;
+    };
 
     // Load companies
     self.loadCompanies = function() {
         self.isLoading(true);
+
+        var params = {};
+        if (self.searchQuery()) params.search = self.searchQuery();
+        if (self.selectedCity()) params.city = self.selectedCity();
+        if (self.sortBy()) params.sort = self.sortBy();
+
         $.ajax({
-            url: apiBaseUrl + '/api/companies',
+            url: apiBaseUrl + '/api/companies/public',
             method: 'GET',
-            success: function(data) {
-                self.companies(data);
+            data: params,
+            success: function(response) {
+                self.companies(response.companies || []);
+                self.cities(response.cities || []);
                 self.isLoading(false);
             },
             error: function() {
-                toastr.error('Firmalar yuklenirken hata olustu');
+                toastr.error(T('Common.Error'));
                 self.isLoading(false);
             }
         });
     };
 
-    // Open create modal
-    self.openCreateModal = function() {
-        self.isEditing(false);
-        self.formData({
-            id: 0,
-            name: '',
-            description: '',
-            email: '',
-            phone: '',
-            address: '',
-            website: '',
-            logoUrl: '',
-            taxNumber: ''
-        });
-        formModal.show();
+    // Search keyup with debounce
+    self.onSearchKeyup = function() {
+        clearTimeout(searchTimer);
+        searchTimer = setTimeout(function() {
+            self.applyFilters();
+        }, 300);
+        return true;
     };
 
-    // Open edit modal
-    self.openEditModal = function(company) {
-        self.isEditing(true);
-        self.formData({
-            id: company.id,
-            name: company.name,
-            description: company.description,
-            email: company.email,
-            phone: company.phone,
-            address: company.address,
-            website: company.website,
-            logoUrl: company.logoUrl,
-            taxNumber: company.taxNumber,
-            createdAt: company.createdAt,
-            isActive: company.isActive
-        });
-        formModal.show();
+    // Apply filters
+    self.applyFilters = function() {
+        self.loadCompanies();
     };
 
-    // Show details
-    self.showDetails = function(company) {
-        self.selectedCompany(company);
-        detailsModal.show();
+    // Clear search
+    self.clearSearch = function() {
+        self.searchQuery('');
+        self.applyFilters();
     };
 
-    // Open delete modal
-    self.openDeleteModal = function(company) {
-        self.selectedCompany(company);
-        deleteModal.show();
-    };
-
-    // Save company
-    self.saveCompany = function() {
-        var form = document.getElementById('companyForm');
-        if (!form.checkValidity()) {
-            form.reportValidity();
-            return;
-        }
-
-        self.isSaving(true);
-        var data = self.formData();
-        var isEdit = self.isEditing();
-
-        $.ajax({
-            url: apiBaseUrl + '/api/companies' + (isEdit ? '/' + data.id : ''),
-            method: isEdit ? 'PUT' : 'POST',
-            contentType: 'application/json',
-            data: JSON.stringify(data),
-            success: function() {
-                formModal.hide();
-                self.loadCompanies();
-                toastr.success(isEdit ? 'Firma guncellendi' : 'Firma eklendi');
-                self.isSaving(false);
-            },
-            error: function() {
-                toastr.error('Islem sirasinda hata olustu');
-                self.isSaving(false);
-            }
-        });
-    };
-
-    // Delete company
-    self.deleteCompany = function() {
-        self.isSaving(true);
-        var company = self.selectedCompany();
-
-        $.ajax({
-            url: apiBaseUrl + '/api/companies/' + company.id,
-            method: 'DELETE',
-            success: function() {
-                deleteModal.hide();
-                self.loadCompanies();
-                toastr.success('Firma silindi');
-                self.isSaving(false);
-            },
-            error: function() {
-                toastr.error('Silme sirasinda hata olustu');
-                self.isSaving(false);
-            }
-        });
+    // Clear all filters
+    self.clearFilters = function() {
+        self.searchQuery('');
+        self.selectedCity('');
+        self.sortBy('');
+        self.applyFilters();
     };
 
     // Initialize
-    $(document).ready(function() {
-        formModal = new bootstrap.Modal(document.getElementById('formModal'));
-        detailsModal = new bootstrap.Modal(document.getElementById('detailsModal'));
-        deleteModal = new bootstrap.Modal(document.getElementById('deleteModal'));
-        self.loadCompanies();
-    });
+    self.loadCompanies();
 }
 
 ko.applyBindings(new CompaniesViewModel(), document.getElementById('companiesApp'));

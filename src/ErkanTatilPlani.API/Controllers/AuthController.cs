@@ -17,11 +17,13 @@ public class AuthController : ControllerBase
 {
     private readonly AppDbContext _context;
     private readonly IConfiguration _configuration;
+    private readonly IWebHostEnvironment _environment;
 
-    public AuthController(AppDbContext context, IConfiguration configuration)
+    public AuthController(AppDbContext context, IConfiguration configuration, IWebHostEnvironment environment)
     {
         _context = context;
         _configuration = configuration;
+        _environment = environment;
     }
 
     [HttpPost("login")]
@@ -229,6 +231,11 @@ public class AuthController : ControllerBase
             FirstName = visitor.FirstName,
             LastName = visitor.LastName,
             Email = visitor.Email,
+            Phone = visitor.Phone,
+            Address = visitor.Address,
+            BirthDate = visitor.BirthDate,
+            AvatarUrl = visitor.AvatarUrl,
+            EmailVerified = visitor.EmailVerified,
             UserTypeId = visitor.UserTypeId,
             UserTypeName = UserTypes.GetById(visitor.UserTypeId)?.SystemName ?? "Unknown",
             CompanyId = visitor.CompanyId,
@@ -237,6 +244,87 @@ public class AuthController : ControllerBase
             CompanyStatusName = visitor.Company != null ? CompanyStatuses.GetById(visitor.Company.StatusId)?.SystemName : null,
             PreferredLanguage = visitor.PreferredLanguage
         });
+    }
+
+    [HttpPut("profile")]
+    public async Task<IActionResult> UpdateProfile([FromBody] UpdateProfileRequest request)
+    {
+        var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+        if (string.IsNullOrEmpty(userIdClaim) || !int.TryParse(userIdClaim, out var userId))
+            return Unauthorized();
+
+        var visitor = await _context.Visitors
+            .Include(v => v.Company)
+            .FirstOrDefaultAsync(v => v.Id == userId && v.IsActive);
+        if (visitor == null)
+            return Unauthorized();
+
+        // Validation
+        if (string.IsNullOrWhiteSpace(request.FirstName))
+            return BadRequest(new { error = "Ad zorunludur" });
+        if (string.IsNullOrWhiteSpace(request.LastName))
+            return BadRequest(new { error = "Soyad zorunludur" });
+
+        // Update fields
+        visitor.FirstName = request.FirstName.Trim();
+        visitor.LastName = request.LastName.Trim();
+        visitor.Phone = request.Phone?.Trim() ?? string.Empty;
+        visitor.Address = request.Address?.Trim();
+        visitor.BirthDate = request.BirthDate;
+        visitor.UpdatedAt = DateTime.UtcNow;
+
+        await _context.SaveChangesAsync();
+
+        return Ok(new UserInfo
+        {
+            Id = visitor.Id,
+            FirstName = visitor.FirstName,
+            LastName = visitor.LastName,
+            Email = visitor.Email,
+            Phone = visitor.Phone,
+            Address = visitor.Address,
+            BirthDate = visitor.BirthDate,
+            AvatarUrl = visitor.AvatarUrl,
+            EmailVerified = visitor.EmailVerified,
+            UserTypeId = visitor.UserTypeId,
+            UserTypeName = UserTypes.GetById(visitor.UserTypeId)?.SystemName ?? "Unknown",
+            CompanyId = visitor.CompanyId,
+            CompanyName = visitor.Company?.Name,
+            CompanyStatusId = visitor.Company?.StatusId,
+            CompanyStatusName = visitor.Company != null ? CompanyStatuses.GetById(visitor.Company.StatusId)?.SystemName : null,
+            PreferredLanguage = visitor.PreferredLanguage
+        });
+    }
+
+    [HttpPut("change-password")]
+    public async Task<IActionResult> ChangePassword([FromBody] ChangePasswordRequest request)
+    {
+        var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+        if (string.IsNullOrEmpty(userIdClaim) || !int.TryParse(userIdClaim, out var userId))
+            return Unauthorized();
+
+        var visitor = await _context.Visitors.FirstOrDefaultAsync(v => v.Id == userId && v.IsActive);
+        if (visitor == null)
+            return Unauthorized();
+
+        // Validation
+        if (string.IsNullOrEmpty(request.CurrentPassword))
+            return BadRequest(new { error = "Mevcut sifre zorunludur" });
+        if (string.IsNullOrEmpty(request.NewPassword))
+            return BadRequest(new { error = "Yeni sifre zorunludur" });
+        if (request.NewPassword.Length < 6)
+            return BadRequest(new { error = "Yeni sifre en az 6 karakter olmalidir" });
+
+        // Verify current password
+        if (!VerifyPassword(request.CurrentPassword, visitor.PasswordHash))
+            return BadRequest(new { error = "Mevcut sifre hatali" });
+
+        // Update password
+        visitor.PasswordHash = HashPassword(request.NewPassword);
+        visitor.UpdatedAt = DateTime.UtcNow;
+        await _context.SaveChangesAsync();
+
+        return Ok(new { message = "Sifre basariyla degistirildi" });
     }
 
     [HttpPut("language")]
@@ -260,6 +348,296 @@ public class AuthController : ControllerBase
         await _context.SaveChangesAsync();
 
         return Ok(new { language = visitor.PreferredLanguage });
+    }
+
+    /// <summary>
+    /// Sifremi unuttum - email ile sifre sifirlama linki gonder
+    /// </summary>
+    [HttpPost("forgot-password")]
+    public async Task<IActionResult> ForgotPassword([FromBody] ForgotPasswordRequest request)
+    {
+        if (string.IsNullOrWhiteSpace(request.Email))
+            return BadRequest(new { error = "Email zorunludur" });
+
+        var visitor = await _context.Visitors.FirstOrDefaultAsync(v => v.Email == request.Email && v.IsActive);
+
+        // Guvenlik: Kullanici bulunamasa bile basarili mesaji dondur
+        if (visitor == null)
+            return Ok(new { message = "Eger bu email adresi sistemde kayitliysa, sifre sifirlama linki gonderildi." });
+
+        // Token olustur (GUID + timestamp)
+        var token = Guid.NewGuid().ToString("N") + DateTime.UtcNow.Ticks.ToString();
+        var tokenHash = Convert.ToBase64String(SHA256.Create().ComputeHash(Encoding.UTF8.GetBytes(token)));
+
+        // Token'i kaydet (1 saat gecerli)
+        visitor.PasswordResetToken = tokenHash;
+        visitor.PasswordResetTokenExpiry = DateTime.UtcNow.AddHours(1);
+        visitor.UpdatedAt = DateTime.UtcNow;
+        await _context.SaveChangesAsync();
+
+        // Gercek uygulamada burada email gonderilir
+        // Simdilik token'i response'ta dondur (development icin)
+        var resetUrl = $"{request.BaseUrl}/Account/ResetPassword?token={Uri.EscapeDataString(token)}&email={Uri.EscapeDataString(visitor.Email)}";
+
+        // TODO: Email gonderme servisi eklendiginde burada email gonderilecek
+        // await _emailService.SendPasswordResetEmail(visitor.Email, resetUrl);
+
+        return Ok(new
+        {
+            message = "Eger bu email adresi sistemde kayitliysa, sifre sifirlama linki gonderildi.",
+            // Development icin - production'da kaldirilacak
+            debug = new
+            {
+                resetUrl,
+                token,
+                expiresAt = visitor.PasswordResetTokenExpiry
+            }
+        });
+    }
+
+    /// <summary>
+    /// Sifre sifirla - token ile yeni sifre belirle
+    /// </summary>
+    [HttpPost("reset-password")]
+    public async Task<IActionResult> ResetPassword([FromBody] ResetPasswordRequest request)
+    {
+        if (string.IsNullOrWhiteSpace(request.Email))
+            return BadRequest(new { error = "Email zorunludur" });
+        if (string.IsNullOrWhiteSpace(request.Token))
+            return BadRequest(new { error = "Token zorunludur" });
+        if (string.IsNullOrWhiteSpace(request.NewPassword))
+            return BadRequest(new { error = "Yeni sifre zorunludur" });
+        if (request.NewPassword.Length < 6)
+            return BadRequest(new { error = "Sifre en az 6 karakter olmalidir" });
+
+        // Token hash'le
+        var tokenHash = Convert.ToBase64String(SHA256.Create().ComputeHash(Encoding.UTF8.GetBytes(request.Token)));
+
+        var visitor = await _context.Visitors.FirstOrDefaultAsync(v =>
+            v.Email == request.Email &&
+            v.IsActive &&
+            v.PasswordResetToken == tokenHash &&
+            v.PasswordResetTokenExpiry > DateTime.UtcNow);
+
+        if (visitor == null)
+            return BadRequest(new { error = "Gecersiz veya suresi dolmus sifre sifirlama linki" });
+
+        // Sifreyi guncelle
+        visitor.PasswordHash = HashPassword(request.NewPassword);
+        visitor.PasswordResetToken = null;
+        visitor.PasswordResetTokenExpiry = null;
+        visitor.UpdatedAt = DateTime.UtcNow;
+        await _context.SaveChangesAsync();
+
+        return Ok(new { message = "Sifreniz basariyla degistirildi. Simdi giris yapabilirsiniz." });
+    }
+
+    /// <summary>
+    /// Token gecerliligini kontrol et
+    /// </summary>
+    [HttpGet("verify-reset-token")]
+    public async Task<IActionResult> VerifyResetToken([FromQuery] string email, [FromQuery] string token)
+    {
+        if (string.IsNullOrWhiteSpace(email) || string.IsNullOrWhiteSpace(token))
+            return BadRequest(new { valid = false, error = "Email ve token zorunludur" });
+
+        var tokenHash = Convert.ToBase64String(SHA256.Create().ComputeHash(Encoding.UTF8.GetBytes(token)));
+
+        var visitor = await _context.Visitors.FirstOrDefaultAsync(v =>
+            v.Email == email &&
+            v.IsActive &&
+            v.PasswordResetToken == tokenHash &&
+            v.PasswordResetTokenExpiry > DateTime.UtcNow);
+
+        return Ok(new { valid = visitor != null });
+    }
+
+    /// <summary>
+    /// Email dogrulama linki gonder
+    /// </summary>
+    [HttpPost("send-verification-email")]
+    public async Task<IActionResult> SendVerificationEmail([FromBody] SendVerificationEmailRequest request)
+    {
+        var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+        if (string.IsNullOrEmpty(userIdClaim) || !int.TryParse(userIdClaim, out var userId))
+            return Unauthorized();
+
+        var visitor = await _context.Visitors.FirstOrDefaultAsync(v => v.Id == userId && v.IsActive);
+        if (visitor == null)
+            return Unauthorized();
+
+        if (visitor.EmailVerified)
+            return BadRequest(new { error = "Email adresi zaten dogrulanmis" });
+
+        // Token olustur (GUID + timestamp)
+        var token = Guid.NewGuid().ToString("N") + DateTime.UtcNow.Ticks.ToString();
+        var tokenHash = Convert.ToBase64String(SHA256.Create().ComputeHash(Encoding.UTF8.GetBytes(token)));
+
+        // Token'i kaydet (24 saat gecerli)
+        visitor.EmailVerificationToken = tokenHash;
+        visitor.EmailVerificationTokenExpiry = DateTime.UtcNow.AddHours(24);
+        visitor.UpdatedAt = DateTime.UtcNow;
+        await _context.SaveChangesAsync();
+
+        // Gercek uygulamada burada email gonderilir
+        var verifyUrl = $"{request.BaseUrl}/Account/VerifyEmail?token={Uri.EscapeDataString(token)}&email={Uri.EscapeDataString(visitor.Email)}";
+
+        // TODO: Email gonderme servisi eklendiginde burada email gonderilecek
+        // await _emailService.SendVerificationEmail(visitor.Email, verifyUrl);
+
+        return Ok(new
+        {
+            message = "Dogrulama linki email adresinize gonderildi.",
+            // Development icin - production'da kaldirilacak
+            debug = new
+            {
+                verifyUrl,
+                token,
+                expiresAt = visitor.EmailVerificationTokenExpiry
+            }
+        });
+    }
+
+    /// <summary>
+    /// Email adresini dogrula
+    /// </summary>
+    [HttpGet("verify-email")]
+    public async Task<IActionResult> VerifyEmail([FromQuery] string email, [FromQuery] string token)
+    {
+        if (string.IsNullOrWhiteSpace(email) || string.IsNullOrWhiteSpace(token))
+            return BadRequest(new { success = false, error = "Email ve token zorunludur" });
+
+        var tokenHash = Convert.ToBase64String(SHA256.Create().ComputeHash(Encoding.UTF8.GetBytes(token)));
+
+        var visitor = await _context.Visitors.FirstOrDefaultAsync(v =>
+            v.Email == email &&
+            v.IsActive &&
+            v.EmailVerificationToken == tokenHash &&
+            v.EmailVerificationTokenExpiry > DateTime.UtcNow);
+
+        if (visitor == null)
+            return BadRequest(new { success = false, error = "Gecersiz veya suresi dolmus dogrulama linki" });
+
+        // Email dogrulandi
+        visitor.EmailVerified = true;
+        visitor.EmailVerificationToken = null;
+        visitor.EmailVerificationTokenExpiry = null;
+        visitor.UpdatedAt = DateTime.UtcNow;
+        await _context.SaveChangesAsync();
+
+        return Ok(new { success = true, message = "Email adresiniz basariyla dogrulandi." });
+    }
+
+    /// <summary>
+    /// Email dogrulama token gecerliligini kontrol et
+    /// </summary>
+    [HttpGet("verify-email-token")]
+    public async Task<IActionResult> VerifyEmailToken([FromQuery] string email, [FromQuery] string token)
+    {
+        if (string.IsNullOrWhiteSpace(email) || string.IsNullOrWhiteSpace(token))
+            return BadRequest(new { valid = false, error = "Email ve token zorunludur" });
+
+        var tokenHash = Convert.ToBase64String(SHA256.Create().ComputeHash(Encoding.UTF8.GetBytes(token)));
+
+        var visitor = await _context.Visitors.FirstOrDefaultAsync(v =>
+            v.Email == email &&
+            v.IsActive &&
+            v.EmailVerificationToken == tokenHash &&
+            v.EmailVerificationTokenExpiry > DateTime.UtcNow);
+
+        return Ok(new { valid = visitor != null });
+    }
+
+    /// <summary>
+    /// Profil resmi yukle
+    /// </summary>
+    [HttpPost("avatar")]
+    public async Task<IActionResult> UploadAvatar(IFormFile file)
+    {
+        var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+        if (string.IsNullOrEmpty(userIdClaim) || !int.TryParse(userIdClaim, out var userId))
+            return Unauthorized();
+
+        var visitor = await _context.Visitors.FirstOrDefaultAsync(v => v.Id == userId && v.IsActive);
+        if (visitor == null)
+            return Unauthorized();
+
+        if (file == null || file.Length == 0)
+            return BadRequest(new { error = "Dosya secilmedi" });
+
+        // Dosya boyutu kontrolu (max 2MB)
+        if (file.Length > 2 * 1024 * 1024)
+            return BadRequest(new { error = "Dosya boyutu 2MB'i gecemez" });
+
+        // Dosya tipi kontrolu
+        var allowedExtensions = new[] { ".jpg", ".jpeg", ".png", ".gif", ".webp" };
+        var extension = Path.GetExtension(file.FileName).ToLowerInvariant();
+        if (!allowedExtensions.Contains(extension))
+            return BadRequest(new { error = "Sadece resim dosyalari yuklenebilir (jpg, png, gif, webp)" });
+
+        // Upload klasorunu olustur
+        var uploadsFolder = Path.Combine(_environment.WebRootPath ?? "wwwroot", "uploads", "avatars");
+        if (!Directory.Exists(uploadsFolder))
+            Directory.CreateDirectory(uploadsFolder);
+
+        // Eski avatar'i sil
+        if (!string.IsNullOrEmpty(visitor.AvatarUrl) && visitor.AvatarUrl.StartsWith("/uploads/avatars/"))
+        {
+            var oldFilePath = Path.Combine(_environment.WebRootPath ?? "wwwroot", visitor.AvatarUrl.TrimStart('/').Replace('/', Path.DirectorySeparatorChar));
+            if (System.IO.File.Exists(oldFilePath))
+                System.IO.File.Delete(oldFilePath);
+        }
+
+        // Yeni dosya adi olustur
+        var fileName = $"{userId}_{DateTime.UtcNow.Ticks}{extension}";
+        var filePath = Path.Combine(uploadsFolder, fileName);
+
+        // Dosyayi kaydet
+        using (var stream = new FileStream(filePath, FileMode.Create))
+        {
+            await file.CopyToAsync(stream);
+        }
+
+        // URL'i kaydet
+        visitor.AvatarUrl = $"/uploads/avatars/{fileName}";
+        visitor.UpdatedAt = DateTime.UtcNow;
+        await _context.SaveChangesAsync();
+
+        return Ok(new { avatarUrl = visitor.AvatarUrl, message = "Profil resmi basariyla yuklendi" });
+    }
+
+    /// <summary>
+    /// Profil resmini sil
+    /// </summary>
+    [HttpDelete("avatar")]
+    public async Task<IActionResult> DeleteAvatar()
+    {
+        var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+        if (string.IsNullOrEmpty(userIdClaim) || !int.TryParse(userIdClaim, out var userId))
+            return Unauthorized();
+
+        var visitor = await _context.Visitors.FirstOrDefaultAsync(v => v.Id == userId && v.IsActive);
+        if (visitor == null)
+            return Unauthorized();
+
+        // Avatar yoksa
+        if (string.IsNullOrEmpty(visitor.AvatarUrl))
+            return BadRequest(new { error = "Silinecek profil resmi bulunamadi" });
+
+        // Dosyayi sil
+        if (visitor.AvatarUrl.StartsWith("/uploads/avatars/"))
+        {
+            var filePath = Path.Combine(_environment.WebRootPath ?? "wwwroot", visitor.AvatarUrl.TrimStart('/').Replace('/', Path.DirectorySeparatorChar));
+            if (System.IO.File.Exists(filePath))
+                System.IO.File.Delete(filePath);
+        }
+
+        // URL'i temizle
+        visitor.AvatarUrl = null;
+        visitor.UpdatedAt = DateTime.UtcNow;
+        await _context.SaveChangesAsync();
+
+        return Ok(new { message = "Profil resmi basariyla silindi" });
     }
 
     private string GenerateJwtToken(Visitor visitor)
@@ -351,6 +729,11 @@ public class UserInfo
     public string FirstName { get; set; } = string.Empty;
     public string LastName { get; set; } = string.Empty;
     public string Email { get; set; } = string.Empty;
+    public string? Phone { get; set; }
+    public string? Address { get; set; }
+    public DateTime? BirthDate { get; set; }
+    public string? AvatarUrl { get; set; }
+    public bool EmailVerified { get; set; }
     public int UserTypeId { get; set; }
     public string UserTypeName { get; set; } = string.Empty;
     public int? CompanyId { get; set; }
@@ -363,4 +746,37 @@ public class UserInfo
 public class UpdateLanguageRequest
 {
     public string Language { get; set; } = string.Empty;
+}
+
+public class UpdateProfileRequest
+{
+    public string FirstName { get; set; } = string.Empty;
+    public string LastName { get; set; } = string.Empty;
+    public string? Phone { get; set; }
+    public string? Address { get; set; }
+    public DateTime? BirthDate { get; set; }
+}
+
+public class ChangePasswordRequest
+{
+    public string CurrentPassword { get; set; } = string.Empty;
+    public string NewPassword { get; set; } = string.Empty;
+}
+
+public class ForgotPasswordRequest
+{
+    public string Email { get; set; } = string.Empty;
+    public string? BaseUrl { get; set; }
+}
+
+public class ResetPasswordRequest
+{
+    public string Email { get; set; } = string.Empty;
+    public string Token { get; set; } = string.Empty;
+    public string NewPassword { get; set; } = string.Empty;
+}
+
+public class SendVerificationEmailRequest
+{
+    public string? BaseUrl { get; set; }
 }

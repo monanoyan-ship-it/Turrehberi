@@ -28,7 +28,11 @@
             <div class="rounded-3 overflow-hidden" style="height: 250px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
                 <!-- ko if: company().coverImageUrl -->
                 <img data-bind="attr: { src: company().coverImageUrl, alt: company().name + ' Kapak Fotografi' }"
-                     class="w-100 h-100" style="object-fit: cover; opacity: 0.8;" />
+                     class="w-100 h-100 card-img-lazy"
+                     style="object-fit: cover; opacity: 0.8;"
+                     loading="eager"
+                     decoding="async"
+                     fetchpriority="high" />
                 <!-- /ko -->
             </div>
             <div class="position-absolute bottom-0 start-0 end-0 p-4" style="background: linear-gradient(transparent, rgba(0,0,0,0.7));">
@@ -38,7 +42,10 @@
                         <div class="bg-white rounded-3 p-2 shadow" style="margin-bottom: -50px;">
                             <!-- ko if: company().logoUrl -->
                             <img data-bind="attr: { src: company().logoUrl, alt: company().name + ' Logo' }"
-                                 class="rounded" style="width: 100px; height: 100px; object-fit: cover;" />
+                                 class="rounded card-img-lazy"
+                                 style="width: 100px; height: 100px; object-fit: cover;"
+                                 loading="eager"
+                                 decoding="async" />
                             <!-- /ko -->
                             <!-- ko ifnot: company().logoUrl -->
                             <div class="bg-primary text-white rounded d-flex align-items-center justify-content-center"
@@ -116,9 +123,12 @@
                         <div class="row g-3" data-bind="foreach: tours">
                             <div class="col-md-6">
                                 <div class="card h-100 border-0 shadow-sm">
-                                    <div class="position-relative">
+                                    <div class="position-relative lazy-img-container">
                                         <img data-bind="attr: { src: imageUrl || 'https://picsum.photos/400/250', alt: name }"
-                                             class="card-img-top" style="height: 150px; object-fit: cover;" />
+                                             class="card-img-top card-img-lazy"
+                                             style="height: 150px; object-fit: cover;"
+                                             loading="lazy"
+                                             decoding="async" />
                                         <!-- ko if: isFeatured -->
                                         <span class="position-absolute top-0 end-0 m-2 badge bg-warning text-dark">
                                             <i class="bi bi-star-fill"></i> One Cikan

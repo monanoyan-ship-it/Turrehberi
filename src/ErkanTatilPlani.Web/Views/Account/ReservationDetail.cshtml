@@ -1,0 +1,408 @@
+@{
+    ViewData["Title"] = "Rezervasyon Detayi";
+}
+
+<div id="reservationDetailApp">
+    <!-- Loading -->
+    <div data-bind="visible: isLoading" class="text-center py-5">
+        <div class="spinner-border text-primary" role="status">
+            <span class="visually-hidden">Yukleniyor...</span>
+        </div>
+    </div>
+
+    <!-- Content -->
+    <div data-bind="visible: !isLoading() && reservation()">
+        <!-- Breadcrumb -->
+        <nav aria-label="breadcrumb" class="mb-4">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="/" data-t="Menu.Home">Ana Sayfa</a></li>
+                <li class="breadcrumb-item"><a href="/Account/Reservations" data-t="MyReservations.Title">Rezervasyonlarim</a></li>
+                <li class="breadcrumb-item active" data-t="ReservationDetail.Title">Rezervasyon Detayi</li>
+            </ol>
+        </nav>
+
+        <div class="row g-4">
+            <!-- Main Content -->
+            <div class="col-lg-8">
+                <!-- Tour Info Card -->
+                <div class="card shadow-sm border-0 mb-4">
+                    <div class="row g-0">
+                        <div class="col-md-4">
+                            <img data-bind="attr: { src: reservation().tourImageUrl || 'https://picsum.photos/seed/' + reservation().tourId + '/400/300' }"
+                                 class="img-fluid rounded-start h-100" style="object-fit: cover;" alt="Tour">
+                        </div>
+                        <div class="col-md-8">
+                            <div class="card-body">
+                                <div class="d-flex justify-content-between align-items-start mb-2">
+                                    <h4 class="card-title mb-0" data-bind="text: reservation().tourName"></h4>
+                                    <span class="badge fs-6"
+                                          data-bind="css: {
+                                              'bg-warning': reservation().statusId === 0,
+                                              'bg-success': reservation().statusId === 1,
+                                              'bg-danger': reservation().statusId === 2,
+                                              'bg-info': reservation().statusId === 3
+                                          }, text: getStatusText(reservation().status)">
+                                    </span>
+                                </div>
+                                <p class="text-muted mb-3">
+                                    <i class="bi bi-geo-alt me-1"></i>
+                                    <span data-bind="text: reservation().tourDestination"></span>
+                                </p>
+                                <p class="card-text small text-muted" data-bind="text: reservation().tourDescription ? (reservation().tourDescription.length > 200 ? reservation().tourDescription.substring(0, 200) + '...' : reservation().tourDescription) : ''"></p>
+
+                                <div class="d-flex gap-3 mt-3">
+                                    <a class="btn btn-outline-primary btn-sm" data-bind="attr: { href: '/Turlar#tour-' + reservation().tourId }">
+                                        <i class="bi bi-info-circle me-1"></i>
+                                        <span data-t="ReservationDetail.ViewTour">Turu Gor</span>
+                                    </a>
+                                    <a class="btn btn-outline-secondary btn-sm" data-bind="attr: { href: '/Firmalar/' + reservation().companySlug }">
+                                        <i class="bi bi-building me-1"></i>
+                                        <span data-bind="text: reservation().companyName"></span>
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Reservation Details Card -->
+                <div class="card shadow-sm border-0 mb-4">
+                    <div class="card-header bg-white border-0">
+                        <h5 class="mb-0">
+                            <i class="bi bi-calendar-check me-2 text-primary"></i>
+                            <span data-t="ReservationDetail.ReservationInfo">Rezervasyon Bilgileri</span>
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="row g-4">
+                            <div class="col-sm-6">
+                                <div class="d-flex align-items-center">
+                                    <div class="bg-primary bg-opacity-10 rounded p-2 me-3">
+                                        <i class="bi bi-calendar-event text-primary fs-5"></i>
+                                    </div>
+                                    <div>
+                                        <small class="text-muted d-block" data-t="Reservation.StartDate">Baslangic Tarihi</small>
+                                        <span class="fw-semibold" data-bind="text: new Date(reservation().startDate).toLocaleDateString('tr-TR', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })"></span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-sm-6">
+                                <div class="d-flex align-items-center">
+                                    <div class="bg-primary bg-opacity-10 rounded p-2 me-3">
+                                        <i class="bi bi-calendar-check text-primary fs-5"></i>
+                                    </div>
+                                    <div>
+                                        <small class="text-muted d-block" data-t="Reservation.EndDate">Bitis Tarihi</small>
+                                        <span class="fw-semibold" data-bind="text: new Date(reservation().endDate).toLocaleDateString('tr-TR', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })"></span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-sm-6">
+                                <div class="d-flex align-items-center">
+                                    <div class="bg-primary bg-opacity-10 rounded p-2 me-3">
+                                        <i class="bi bi-people text-primary fs-5"></i>
+                                    </div>
+                                    <div>
+                                        <small class="text-muted d-block" data-t="Reservation.People">Kisi Sayisi</small>
+                                        <span class="fw-semibold" data-bind="text: reservation().numberOfPeople + ' Kisi'"></span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-sm-6">
+                                <div class="d-flex align-items-center">
+                                    <div class="bg-primary bg-opacity-10 rounded p-2 me-3">
+                                        <i class="bi bi-clock text-primary fs-5"></i>
+                                    </div>
+                                    <div>
+                                        <small class="text-muted d-block" data-t="Tour.Duration">Tur Suresi</small>
+                                        <span class="fw-semibold" data-bind="text: reservation().tourDurationDays + ' Gun'"></span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Notes -->
+                        <div data-bind="visible: reservation().notes" class="mt-4 p-3 bg-light rounded">
+                            <small class="text-muted d-block mb-1" data-t="Reservation.Notes">Notlar</small>
+                            <span data-bind="text: reservation().notes"></span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Company Contact Card -->
+                <div class="card shadow-sm border-0">
+                    <div class="card-header bg-white border-0">
+                        <h5 class="mb-0">
+                            <i class="bi bi-building me-2 text-primary"></i>
+                            <span data-t="ReservationDetail.CompanyContact">Firma Iletisim</span>
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="row g-3">
+                            <div class="col-sm-6">
+                                <div class="d-flex align-items-center">
+                                    <i class="bi bi-telephone text-muted me-2"></i>
+                                    <a data-bind="attr: { href: 'tel:' + reservation().companyPhone }, text: reservation().companyPhone" class="text-decoration-none"></a>
+                                </div>
+                            </div>
+                            <div class="col-sm-6">
+                                <div class="d-flex align-items-center">
+                                    <i class="bi bi-envelope text-muted me-2"></i>
+                                    <a data-bind="attr: { href: 'mailto:' + reservation().companyEmail }, text: reservation().companyEmail" class="text-decoration-none"></a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Sidebar -->
+            <div class="col-lg-4">
+                <!-- Price Card -->
+                <div class="card shadow-sm border-0 mb-4">
+                    <div class="card-header bg-primary text-white">
+                        <h5 class="mb-0">
+                            <i class="bi bi-receipt me-2"></i>
+                            <span data-t="ReservationDetail.PriceDetails">Fiyat Detayi</span>
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between mb-2">
+                            <span data-t="ReservationDetail.UnitPrice">Birim Fiyat</span>
+                            <span data-bind="text: reservation().tourPrice.toLocaleString('tr-TR', {style: 'currency', currency: 'TRY'})"></span>
+                        </div>
+                        <div class="d-flex justify-content-between mb-2">
+                            <span data-t="Reservation.People">Kisi Sayisi</span>
+                            <span data-bind="text: 'x ' + reservation().numberOfPeople"></span>
+                        </div>
+                        <hr>
+                        <div class="d-flex justify-content-between">
+                            <span class="fw-bold" data-t="Reservation.TotalPrice">Toplam</span>
+                            <span class="fs-4 fw-bold text-primary" data-bind="text: reservation().totalPrice.toLocaleString('tr-TR', {style: 'currency', currency: 'TRY'})"></span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Status Card -->
+                <div class="card shadow-sm border-0 mb-4">
+                    <div class="card-header bg-white border-0">
+                        <h5 class="mb-0">
+                            <i class="bi bi-info-circle me-2 text-primary"></i>
+                            <span data-t="ReservationDetail.StatusInfo">Durum Bilgisi</span>
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="alert mb-3"
+                             data-bind="css: {
+                                 'alert-warning': reservation().statusId === 0,
+                                 'alert-success': reservation().statusId === 1,
+                                 'alert-danger': reservation().statusId === 2,
+                                 'alert-info': reservation().statusId === 3
+                             }">
+                            <i class="bi me-2"
+                               data-bind="css: {
+                                   'bi-hourglass-split': reservation().statusId === 0,
+                                   'bi-check-circle': reservation().statusId === 1,
+                                   'bi-x-circle': reservation().statusId === 2,
+                                   'bi-flag': reservation().statusId === 3
+                               }"></i>
+                            <span data-bind="text: getStatusText(reservation().status)"></span>
+                        </div>
+
+                        <div class="small text-muted">
+                            <div class="mb-1">
+                                <i class="bi bi-calendar-plus me-1"></i>
+                                <span data-t="ReservationDetail.CreatedAt">Olusturulma:</span>
+                                <span data-bind="text: new Date(reservation().createdAt).toLocaleString('tr-TR')"></span>
+                            </div>
+                            <div data-bind="visible: reservation().updatedAt">
+                                <i class="bi bi-calendar-check me-1"></i>
+                                <span data-t="ReservationDetail.UpdatedAt">Son Guncelleme:</span>
+                                <span data-bind="text: reservation().updatedAt ? new Date(reservation().updatedAt).toLocaleString('tr-TR') : '-'"></span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Payment Card -->
+                <div class="card shadow-sm border-0 mb-4" data-bind="visible: reservation().paymentStatusId === 0 && reservation().statusId !== 2">
+                    <div class="card-header bg-success text-white">
+                        <h5 class="mb-0">
+                            <i class="bi bi-credit-card me-2"></i>
+                            <span data-t="Payment.Title">Odeme</span>
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="alert alert-info mb-3">
+                            <i class="bi bi-info-circle me-2"></i>
+                            <span data-t="Payment.PendingMessage">Rezervasyonunuzu tamamlamak icin odeme yapmaniz gerekmektedir.</span>
+                        </div>
+                        <button class="btn btn-success w-100 btn-lg" data-bind="click: initiatePayment, disable: isPaymentLoading">
+                            <span data-bind="visible: !isPaymentLoading()">
+                                <i class="bi bi-credit-card me-1"></i>
+                                <span data-t="Payment.PayNow">Simdi Ode</span>
+                                <span class="ms-2" data-bind="text: reservation().totalPrice.toLocaleString('tr-TR', {style: 'currency', currency: 'TRY'})"></span>
+                            </span>
+                            <span data-bind="visible: isPaymentLoading">
+                                <span class="spinner-border spinner-border-sm me-1"></span>
+                                <span data-t="Payment.Processing">Isleniyor...</span>
+                            </span>
+                        </button>
+                        <div class="mt-3 text-center">
+                            <img src="https://www.iyzico.com/assets/images/content/logo.svg" alt="iyzico" style="height: 24px;">
+                            <small class="text-muted d-block mt-1" data-t="Payment.SecurePayment">Guvenli odeme ile</small>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Payment Success Badge -->
+                <div class="card shadow-sm border-0 mb-4" data-bind="visible: reservation().paymentStatusId === 1">
+                    <div class="card-body text-center">
+                        <i class="bi bi-check-circle-fill text-success" style="font-size: 3rem;"></i>
+                        <h5 class="text-success mt-2" data-t="Payment.Paid">Odendi</h5>
+                        <small class="text-muted" data-bind="visible: reservation().paidAt">
+                            <span data-bind="text: reservation().paidAt ? new Date(reservation().paidAt).toLocaleString('tr-TR') : ''"></span>
+                        </small>
+                    </div>
+                </div>
+
+                <!-- Actions Card -->
+                <div class="card shadow-sm border-0" data-bind="visible: reservation().canCancel">
+                    <div class="card-header bg-white border-0">
+                        <h5 class="mb-0">
+                            <i class="bi bi-gear me-2 text-primary"></i>
+                            <span data-t="Common.Actions">Islemler</span>
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <button class="btn btn-outline-danger w-100" data-bind="click: cancelReservation, disable: isCancelling">
+                            <span data-bind="visible: !isCancelling()">
+                                <i class="bi bi-x-circle me-1"></i>
+                                <span data-t="ReservationDetail.CancelReservation">Rezervasyonu Iptal Et</span>
+                            </span>
+                            <span data-bind="visible: isCancelling">
+                                <span class="spinner-border spinner-border-sm me-1"></span>
+                                <span data-t="Common.Loading">Yukleniyor...</span>
+                            </span>
+                        </button>
+                        <small class="text-muted d-block mt-2" data-t="ReservationDetail.CancelWarning">
+                            Iptal isleminden sonra geri alinmaz.
+                        </small>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Not Found -->
+    <div data-bind="visible: !isLoading() && !reservation()" class="text-center py-5">
+        <i class="bi bi-exclamation-triangle text-warning" style="font-size: 4rem;"></i>
+        <h5 class="mt-3" data-t="ReservationDetail.NotFound">Rezervasyon bulunamadi</h5>
+        <a href="/Account/Reservations" class="btn btn-primary mt-3">
+            <i class="bi bi-arrow-left me-1"></i>
+            <span data-t="Common.Back">Geri Don</span>
+        </a>
+    </div>
+</div>
+
+@section Scripts {
+<script>
+function ReservationDetailViewModel() {
+    var self = this;
+
+    self.reservation = ko.observable(null);
+    self.isLoading = ko.observable(true);
+    self.isCancelling = ko.observable(false);
+    self.isPaymentLoading = ko.observable(false);
+
+    var reservationId = @(ViewBag.ReservationId ?? 0);
+
+    self.getStatusText = function(status) {
+        var statusMap = {
+            'Pending': T('Status.Pending'),
+            'Confirmed': T('Status.Confirmed'),
+            'Cancelled': T('Status.Cancelled'),
+            'Completed': T('Status.Completed')
+        };
+        return statusMap[status] || status;
+    };
+
+    self.loadReservation = function() {
+        self.isLoading(true);
+
+        $.ajax({
+            url: apiBaseUrl + '/api/reservations/visitor/my/' + reservationId,
+            method: 'GET',
+            headers: { 'Authorization': 'Bearer ' + localStorage.getItem('token') },
+            success: function(response) {
+                self.reservation(response);
+                self.isLoading(false);
+            },
+            error: function(xhr) {
+                if (xhr.status === 401) {
+                    window.location.href = '/Account/Login?returnUrl=' + encodeURIComponent(window.location.pathname);
+                } else {
+                    self.reservation(null);
+                }
+                self.isLoading(false);
+            }
+        });
+    };
+
+    self.cancelReservation = function() {
+        if (!confirm(T('ReservationDetail.CancelConfirm'))) return;
+
+        self.isCancelling(true);
+
+        $.ajax({
+            url: apiBaseUrl + '/api/reservations/visitor/my/' + reservationId + '/cancel',
+            method: 'PUT',
+            headers: { 'Authorization': 'Bearer ' + localStorage.getItem('token') },
+            success: function(response) {
+                toastr.success(T('ReservationDetail.CancelSuccess'));
+                self.loadReservation();
+                self.isCancelling(false);
+            },
+            error: function(xhr) {
+                var message = xhr.responseJSON?.message || T('Common.Error');
+                toastr.error(message);
+                self.isCancelling(false);
+            }
+        });
+    };
+
+    self.initiatePayment = function() {
+        self.isPaymentLoading(true);
+
+        $.ajax({
+            url: apiBaseUrl + '/api/payments/initialize/' + reservationId,
+            method: 'POST',
+            headers: { 'Authorization': 'Bearer ' + localStorage.getItem('token') },
+            success: function(response) {
+                if (response.success && response.paymentPageUrl) {
+                    // Iyzico odeme sayfasina yonlendir
+                    window.location.href = response.paymentPageUrl;
+                } else {
+                    toastr.error(response.message || T('Payment.Error'));
+                    self.isPaymentLoading(false);
+                }
+            },
+            error: function(xhr) {
+                var message = xhr.responseJSON?.message || T('Common.Error');
+                toastr.error(message);
+                self.isPaymentLoading(false);
+            }
+        });
+    };
+
+    // Initialize
+    if (reservationId > 0) {
+        self.loadReservation();
+    } else {
+        self.isLoading(false);
+    }
+}
+
+ko.applyBindings(new ReservationDetailViewModel(), document.getElementById('reservationDetailApp'));
+</script>
+}

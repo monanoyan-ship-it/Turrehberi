@@ -1,5 +1,8 @@
+using ErkanTatilPlani.API.Services;
 using ErkanTatilPlani.Core.Localization;
+using ErkanTatilPlani.Core.Services;
 using ErkanTatilPlani.Data.Context;
+using CacheService = ErkanTatilPlani.API.Services.CacheService;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
@@ -10,6 +13,21 @@ var builder = WebApplication.CreateBuilder(args);
 // Localization Service
 var localesPath = Path.Combine(builder.Environment.ContentRootPath, "Localization");
 builder.Services.AddSingleton<ILocalizationService>(new LocalizationService(localesPath));
+
+// Email Service
+builder.Services.Configure<EmailSettings>(builder.Configuration.GetSection("Email"));
+builder.Services.AddScoped<IEmailService, EmailService>();
+
+// Payment Service (Iyzico)
+builder.Services.Configure<PaymentSettings>(builder.Configuration.GetSection("Payment"));
+builder.Services.AddScoped<IPaymentService, IyzicoPaymentService>();
+
+// Cache Service
+builder.Services.AddMemoryCache();
+builder.Services.AddSingleton<ICacheService, CacheService>();
+
+// Response Caching
+builder.Services.AddResponseCaching();
 
 // Add services to the container.
 builder.Services.AddDbContext<AppDbContext>(options =>
@@ -76,6 +94,7 @@ if (app.Environment.IsDevelopment())
 app.UseHttpsRedirection();
 app.UseCors("AllowAll");
 app.UseStaticFiles();
+app.UseResponseCaching();
 app.UseAuthentication();
 app.UseAuthorization();
 app.MapControllers();

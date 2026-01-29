@@ -1,0 +1,603 @@
+@{
+    ViewData["Title"] = "Profil";
+}
+
+<div class="container py-4" id="profileApp">
+    <!-- Loading State -->
+    <div data-bind="visible: isLoading" class="text-center py-5">
+        <div class="spinner-border text-primary" role="status">
+            <span class="visually-hidden">Yukleniyor...</span>
+        </div>
+    </div>
+
+    <!-- Not Logged In -->
+    <div data-bind="visible: !isLoading() && !isLoggedIn()" class="text-center py-5">
+        <i class="bi bi-person-x text-muted" style="font-size: 4rem;"></i>
+        <h4 class="mt-3" data-t="Profile.LoginRequired">Giris yapmaniz gerekiyor</h4>
+        <a href="/Account/Login" class="btn btn-primary mt-3">
+            <i class="bi bi-box-arrow-in-right me-1"></i>
+            <span data-t="Menu.Login">Giris Yap</span>
+        </a>
+    </div>
+
+    <!-- Profile Content -->
+    <div data-bind="visible: !isLoading() && isLoggedIn()">
+        <div class="row">
+            <!-- Left Column - Profile Info -->
+            <div class="col-lg-4 mb-4">
+                <div class="card shadow-sm border-0">
+                    <div class="card-body text-center p-4">
+                        <div class="position-relative d-inline-block mb-3">
+                            <img data-bind="attr: { src: avatarUrl }"
+                                 class="rounded-circle border border-3 border-primary"
+                                 style="width: 120px; height: 120px; object-fit: cover; cursor: pointer;"
+                                 alt="Profil Resmi"
+                                 onclick="document.getElementById('avatarInput').click()" />
+                            <div class="position-absolute bottom-0 end-0">
+                                <button type="button" class="btn btn-primary btn-sm rounded-circle p-1"
+                                        style="width: 32px; height: 32px;"
+                                        onclick="document.getElementById('avatarInput').click()"
+                                        data-bind="disable: isUploadingAvatar">
+                                    <i class="bi bi-camera-fill" data-bind="visible: !isUploadingAvatar()"></i>
+                                    <span class="spinner-border spinner-border-sm" data-bind="visible: isUploadingAvatar"></span>
+                                </button>
+                            </div>
+                            <input type="file" id="avatarInput" class="d-none" accept="image/*"
+                                   data-bind="event: { change: onAvatarSelected }" />
+                        </div>
+                        <!-- Avatar Actions -->
+                        <div class="mb-2" data-bind="visible: hasCustomAvatar">
+                            <button type="button" class="btn btn-outline-danger btn-sm"
+                                    data-bind="click: deleteAvatar, disable: isDeletingAvatar">
+                                <span class="spinner-border spinner-border-sm me-1" data-bind="visible: isDeletingAvatar"></span>
+                                <i class="bi bi-trash me-1" data-bind="visible: !isDeletingAvatar()"></i>
+                                <span data-t="Avatar.Delete">Resmi Sil</span>
+                            </button>
+                        </div>
+                        <h4 data-bind="text: fullName"></h4>
+                        <p class="text-muted mb-1" data-bind="text: email"></p>
+
+                        <!-- Email Verification Status -->
+                        <div class="mb-2">
+                            <span data-bind="visible: emailVerified" class="badge bg-success">
+                                <i class="bi bi-check-circle me-1"></i>
+                                <span data-t="VerifyEmail.Verified">Email Dogrulandi</span>
+                            </span>
+                            <span data-bind="visible: !emailVerified()" class="badge bg-warning text-dark">
+                                <i class="bi bi-exclamation-triangle me-1"></i>
+                                <span data-t="VerifyEmail.NotVerified">Email Dogrulanmadi</span>
+                            </span>
+                        </div>
+
+                        <span class="badge bg-primary" data-bind="text: userTypeName"></span>
+
+                        <!-- Company Info -->
+                        <div data-bind="visible: companyName" class="mt-3 pt-3 border-top">
+                            <small class="text-muted d-block" data-t="Tour.Company">Firma</small>
+                            <span class="fw-semibold" data-bind="text: companyName"></span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Email Verification Card -->
+                <div class="card shadow-sm border-0 mt-4" data-bind="visible: !emailVerified()">
+                    <div class="card-header bg-white border-0 py-3">
+                        <h6 class="mb-0">
+                            <i class="bi bi-envelope-check me-2 text-warning"></i>
+                            <span data-t="VerifyEmail.Title">Email Dogrulama</span>
+                        </h6>
+                    </div>
+                    <div class="card-body">
+                        <p class="text-muted small mb-3" data-t="VerifyEmail.Description">Email adresinizi dogrulayarak hesabinizi guvenli hale getirin.</p>
+                        <button class="btn btn-warning btn-sm w-100" data-bind="click: sendVerificationEmail, disable: isSendingVerification">
+                            <span data-bind="visible: isSendingVerification" class="spinner-border spinner-border-sm me-2"></span>
+                            <i class="bi bi-envelope-arrow-up me-1" data-bind="visible: !isSendingVerification()"></i>
+                            <span data-t="VerifyEmail.SendLink">Dogrulama Linki Gonder</span>
+                        </button>
+                        <div class="alert alert-success mt-2 small" data-bind="visible: verificationSent" data-t="VerifyEmail.LinkSent">Dogrulama linki email adresinize gonderildi.</div>
+                    </div>
+                </div>
+
+                <!-- Language Preference Card -->
+                <div class="card shadow-sm border-0 mt-4">
+                    <div class="card-header bg-white border-0 py-3">
+                        <h6 class="mb-0">
+                            <i class="bi bi-globe me-2 text-primary"></i>
+                            <span data-t="Language.Select">Dil Tercihi</span>
+                        </h6>
+                    </div>
+                    <div class="card-body">
+                        <select class="form-select" data-bind="value: preferredLanguage, event: { change: changeLanguage }">
+                            <option value="tr">Turkce</option>
+                            <option value="en">English</option>
+                            <option value="de">Deutsch</option>
+                            <option value="ru">Russkiy</option>
+                            <option value="es">Espanol</option>
+                            <option value="fr">Francais</option>
+                            <option value="ar">Arabiyya</option>
+                            <option value="fa">Farsi</option>
+                            <option value="pt">Portugues</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right Column - Forms -->
+            <div class="col-lg-8">
+                <!-- Personal Info Form -->
+                <div class="card shadow-sm border-0 mb-4">
+                    <div class="card-header bg-white border-0 py-3">
+                        <h5 class="mb-0">
+                            <i class="bi bi-person me-2 text-primary"></i>
+                            <span data-t="Profile.PersonalInfo">Kisisel Bilgiler</span>
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label" data-t="Register.FirstName">Ad</label>
+                                <input type="text" class="form-control" data-bind="value: firstName" />
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label" data-t="Register.LastName">Soyad</label>
+                                <input type="text" class="form-control" data-bind="value: lastName" />
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label" data-t="Register.Email">E-posta</label>
+                            <input type="email" class="form-control bg-light" data-bind="value: email" readonly />
+                            <small class="text-muted" data-t="Profile.EmailReadonly">E-posta adresi degistirilemez</small>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label" data-t="Register.Phone">Telefon</label>
+                            <input type="tel" class="form-control" data-bind="value: phone" placeholder="05XX XXX XX XX" />
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label" data-t="Profile.Address">Adres</label>
+                            <textarea class="form-control" rows="2" data-bind="value: address" placeholder="Adresiniz"></textarea>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label" data-t="Profile.BirthDate">Dogum Tarihi</label>
+                            <input type="date" class="form-control" data-bind="value: birthDateFormatted" />
+                        </div>
+
+                        <div class="alert alert-danger" data-bind="visible: profileError, text: profileError"></div>
+                        <div class="alert alert-success" data-bind="visible: profileSuccess, text: profileSuccess"></div>
+
+                        <button class="btn btn-primary" data-bind="click: saveProfile, disable: isSavingProfile">
+                            <span data-bind="visible: isSavingProfile" class="spinner-border spinner-border-sm me-2"></span>
+                            <i class="bi bi-check-lg me-1" data-bind="visible: !isSavingProfile()"></i>
+                            <span data-t="Profile.SaveChanges">Degisiklikleri Kaydet</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Change Password Form -->
+                <div class="card shadow-sm border-0">
+                    <div class="card-header bg-white border-0 py-3">
+                        <h5 class="mb-0">
+                            <i class="bi bi-shield-lock me-2 text-primary"></i>
+                            <span data-t="Profile.ChangePassword">Sifre Degistir</span>
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="mb-3">
+                            <label class="form-label" data-t="Profile.CurrentPassword">Mevcut Sifre</label>
+                            <div class="input-group">
+                                <span class="input-group-text"><i class="bi bi-lock"></i></span>
+                                <input type="password" class="form-control" data-bind="value: currentPassword" />
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label" data-t="Profile.NewPassword">Yeni Sifre</label>
+                                <div class="input-group">
+                                    <span class="input-group-text"><i class="bi bi-key"></i></span>
+                                    <input type="password" class="form-control" data-bind="value: newPassword" />
+                                </div>
+                                <small class="text-muted" data-t="Register.PasswordHint">En az 6 karakter</small>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label" data-t="Profile.ConfirmPassword">Sifre Tekrar</label>
+                                <div class="input-group">
+                                    <span class="input-group-text"><i class="bi bi-key-fill"></i></span>
+                                    <input type="password" class="form-control" data-bind="value: confirmPassword" />
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="alert alert-danger" data-bind="visible: passwordError, text: passwordError"></div>
+                        <div class="alert alert-success" data-bind="visible: passwordSuccess, text: passwordSuccess"></div>
+
+                        <button class="btn btn-warning" data-bind="click: changePassword, disable: isChangingPassword">
+                            <span data-bind="visible: isChangingPassword" class="spinner-border spinner-border-sm me-2"></span>
+                            <i class="bi bi-shield-check me-1" data-bind="visible: !isChangingPassword()"></i>
+                            <span data-t="Profile.ChangePassword">Sifre Degistir</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+<script>
+function ProfileViewModel() {
+    var self = this;
+
+    // State
+    self.isLoading = ko.observable(true);
+    self.isLoggedIn = ko.observable(false);
+    self.isSavingProfile = ko.observable(false);
+    self.isChangingPassword = ko.observable(false);
+    self.isSendingVerification = ko.observable(false);
+    self.verificationSent = ko.observable(false);
+    self.isUploadingAvatar = ko.observable(false);
+    self.isDeletingAvatar = ko.observable(false);
+
+    // User Info
+    self.userId = ko.observable(0);
+    self.firstName = ko.observable('');
+    self.lastName = ko.observable('');
+    self.email = ko.observable('');
+    self.phone = ko.observable('');
+    self.address = ko.observable('');
+    self.birthDate = ko.observable(null);
+    self.avatarUrl = ko.observable('');
+    self.emailVerified = ko.observable(false);
+    self.userTypeId = ko.observable(0);
+    self.userTypeName = ko.observable('');
+    self.companyId = ko.observable(null);
+    self.companyName = ko.observable('');
+    self.preferredLanguage = ko.observable('tr');
+
+    // Computed
+    self.fullName = ko.computed(function() {
+        return self.firstName() + ' ' + self.lastName();
+    });
+
+    self.birthDateFormatted = ko.computed({
+        read: function() {
+            if (!self.birthDate()) return '';
+            var d = new Date(self.birthDate());
+            return d.toISOString().split('T')[0];
+        },
+        write: function(value) {
+            if (value) {
+                self.birthDate(new Date(value + 'T00:00:00Z').toISOString());
+            } else {
+                self.birthDate(null);
+            }
+        }
+    });
+
+    self.hasCustomAvatar = ko.computed(function() {
+        var url = self.avatarUrl();
+        return url && url.startsWith('/uploads/avatars/');
+    });
+
+    // Password Fields
+    self.currentPassword = ko.observable('');
+    self.newPassword = ko.observable('');
+    self.confirmPassword = ko.observable('');
+
+    // Messages
+    self.profileError = ko.observable('');
+    self.profileSuccess = ko.observable('');
+    self.passwordError = ko.observable('');
+    self.passwordSuccess = ko.observable('');
+
+    // Load user data
+    self.loadUser = function() {
+        var token = localStorage.getItem('token');
+        if (!token) {
+            self.isLoading(false);
+            self.isLoggedIn(false);
+            return;
+        }
+
+        $.ajax({
+            url: apiBaseUrl + '/api/auth/me',
+            method: 'GET',
+            headers: { 'Authorization': 'Bearer ' + token },
+            success: function(user) {
+                self.userId(user.id);
+                self.firstName(user.firstName || '');
+                self.lastName(user.lastName || '');
+                self.email(user.email || '');
+                self.phone(user.phone || '');
+                self.address(user.address || '');
+                self.birthDate(user.birthDate);
+                self.avatarUrl(user.avatarUrl || 'https://ui-avatars.com/api/?name=' + encodeURIComponent(user.firstName + '+' + user.lastName) + '&size=120&background=0d6efd&color=fff');
+                self.emailVerified(user.emailVerified || false);
+                self.userTypeId(user.userTypeId);
+                self.userTypeName(T('UserType.' + user.userTypeName));
+                self.companyId(user.companyId);
+                self.companyName(user.companyName || '');
+                self.preferredLanguage(user.preferredLanguage || 'tr');
+
+                self.isLoggedIn(true);
+                self.isLoading(false);
+            },
+            error: function() {
+                localStorage.removeItem('token');
+                localStorage.removeItem('user');
+                self.isLoading(false);
+                self.isLoggedIn(false);
+            }
+        });
+    };
+
+    // Save profile
+    self.saveProfile = function() {
+        self.profileError('');
+        self.profileSuccess('');
+
+        if (!self.firstName().trim()) {
+            self.profileError(T('Register.Error.FirstNameRequired'));
+            return;
+        }
+        if (!self.lastName().trim()) {
+            self.profileError(T('Register.Error.LastNameRequired'));
+            return;
+        }
+
+        self.isSavingProfile(true);
+
+        var data = {
+            firstName: self.firstName().trim(),
+            lastName: self.lastName().trim(),
+            phone: self.phone() ? self.phone().trim() : null,
+            address: self.address() ? self.address().trim() : null,
+            birthDate: self.birthDate()
+        };
+
+        $.ajax({
+            url: apiBaseUrl + '/api/auth/profile',
+            method: 'PUT',
+            headers: { 'Authorization': 'Bearer ' + localStorage.getItem('token') },
+            contentType: 'application/json',
+            data: JSON.stringify(data),
+            success: function(user) {
+                // Update local storage
+                var storedUser = JSON.parse(localStorage.getItem('user') || '{}');
+                storedUser.firstName = user.firstName;
+                storedUser.lastName = user.lastName;
+                localStorage.setItem('user', JSON.stringify(storedUser));
+
+                // Update avatar URL with new name
+                self.avatarUrl(user.avatarUrl || 'https://ui-avatars.com/api/?name=' + encodeURIComponent(user.firstName + '+' + user.lastName) + '&size=120&background=0d6efd&color=fff');
+
+                self.profileSuccess(T('Profile.ProfileUpdated'));
+                toastr.success(T('Profile.ProfileUpdated'));
+                self.isSavingProfile(false);
+
+                // Update header name if exists
+                if (window.updateHeaderUser) {
+                    window.updateHeaderUser();
+                }
+            },
+            error: function(xhr) {
+                var msg = xhr.responseJSON?.error || T('Common.Error');
+                self.profileError(msg);
+                self.isSavingProfile(false);
+            }
+        });
+    };
+
+    // Change password
+    self.changePassword = function() {
+        self.passwordError('');
+        self.passwordSuccess('');
+
+        if (!self.currentPassword()) {
+            self.passwordError(T('Profile.CurrentPasswordRequired'));
+            return;
+        }
+        if (!self.newPassword()) {
+            self.passwordError(T('Profile.NewPasswordRequired'));
+            return;
+        }
+        if (self.newPassword().length < 6) {
+            self.passwordError(T('Register.Error.PasswordMin'));
+            return;
+        }
+        if (self.newPassword() !== self.confirmPassword()) {
+            self.passwordError(T('Profile.PasswordMismatch'));
+            return;
+        }
+
+        self.isChangingPassword(true);
+
+        $.ajax({
+            url: apiBaseUrl + '/api/auth/change-password',
+            method: 'PUT',
+            headers: { 'Authorization': 'Bearer ' + localStorage.getItem('token') },
+            contentType: 'application/json',
+            data: JSON.stringify({
+                currentPassword: self.currentPassword(),
+                newPassword: self.newPassword()
+            }),
+            success: function() {
+                self.passwordSuccess(T('Profile.PasswordChanged'));
+                toastr.success(T('Profile.PasswordChanged'));
+                self.currentPassword('');
+                self.newPassword('');
+                self.confirmPassword('');
+                self.isChangingPassword(false);
+            },
+            error: function(xhr) {
+                var msg = xhr.responseJSON?.error || T('Common.Error');
+                if (msg.indexOf('hatali') >= 0 || msg.indexOf('wrong') >= 0) {
+                    msg = T('Profile.WrongPassword');
+                }
+                self.passwordError(msg);
+                self.isChangingPassword(false);
+            }
+        });
+    };
+
+    // Change language
+    self.changeLanguage = function() {
+        var lang = self.preferredLanguage();
+
+        $.ajax({
+            url: apiBaseUrl + '/api/auth/language',
+            method: 'PUT',
+            headers: { 'Authorization': 'Bearer ' + localStorage.getItem('token') },
+            contentType: 'application/json',
+            data: JSON.stringify({ language: lang }),
+            success: function() {
+                // Update local storage
+                var storedUser = JSON.parse(localStorage.getItem('user') || '{}');
+                storedUser.preferredLanguage = lang;
+                localStorage.setItem('user', JSON.stringify(storedUser));
+
+                // Reload page to apply language
+                toastr.success('Dil degistirildi / Language changed');
+                setTimeout(function() {
+                    window.location.reload();
+                }, 500);
+            },
+            error: function(xhr) {
+                toastr.error(xhr.responseJSON?.error || 'Hata');
+            }
+        });
+    };
+
+    // Send verification email
+    self.sendVerificationEmail = function() {
+        self.isSendingVerification(true);
+        self.verificationSent(false);
+
+        $.ajax({
+            url: apiBaseUrl + '/api/auth/send-verification-email',
+            method: 'POST',
+            headers: { 'Authorization': 'Bearer ' + localStorage.getItem('token') },
+            contentType: 'application/json',
+            data: JSON.stringify({ baseUrl: window.location.origin }),
+            success: function(response) {
+                self.verificationSent(true);
+                self.isSendingVerification(false);
+                toastr.success(T('VerifyEmail.LinkSent'));
+
+                // Development icin - konsolda linki goster
+                if (response.debug && response.debug.verifyUrl) {
+                    console.log('Verify URL:', response.debug.verifyUrl);
+                }
+            },
+            error: function(xhr) {
+                var msg = xhr.responseJSON?.error || T('Common.Error');
+                toastr.error(msg);
+                self.isSendingVerification(false);
+            }
+        });
+    };
+
+    // Avatar selected
+    self.onAvatarSelected = function(data, event) {
+        var file = event.target.files[0];
+        if (!file) return;
+
+        // Dosya tipi kontrolu
+        if (!file.type.startsWith('image/')) {
+            toastr.error(T('Avatar.OnlyImages'));
+            return;
+        }
+
+        // Dosya boyutu kontrolu (2MB)
+        if (file.size > 2 * 1024 * 1024) {
+            toastr.error(T('Avatar.MaxSize'));
+            return;
+        }
+
+        self.uploadAvatar(file);
+    };
+
+    // Upload avatar
+    self.uploadAvatar = function(file) {
+        self.isUploadingAvatar(true);
+
+        var formData = new FormData();
+        formData.append('file', file);
+
+        $.ajax({
+            url: apiBaseUrl + '/api/auth/avatar',
+            method: 'POST',
+            headers: { 'Authorization': 'Bearer ' + localStorage.getItem('token') },
+            data: formData,
+            processData: false,
+            contentType: false,
+            success: function(response) {
+                self.avatarUrl(response.avatarUrl);
+                self.isUploadingAvatar(false);
+                toastr.success(T('Avatar.UploadSuccess'));
+
+                // Update local storage
+                var storedUser = JSON.parse(localStorage.getItem('user') || '{}');
+                storedUser.avatarUrl = response.avatarUrl;
+                localStorage.setItem('user', JSON.stringify(storedUser));
+
+                // Update header if exists
+                if (window.updateHeaderUser) {
+                    window.updateHeaderUser();
+                }
+            },
+            error: function(xhr) {
+                var msg = xhr.responseJSON?.error || T('Common.Error');
+                toastr.error(msg);
+                self.isUploadingAvatar(false);
+            }
+        });
+
+        // Input'u temizle
+        document.getElementById('avatarInput').value = '';
+    };
+
+    // Delete avatar
+    self.deleteAvatar = function() {
+        if (!confirm(T('Avatar.DeleteConfirm'))) return;
+
+        self.isDeletingAvatar(true);
+
+        $.ajax({
+            url: apiBaseUrl + '/api/auth/avatar',
+            method: 'DELETE',
+            headers: { 'Authorization': 'Bearer ' + localStorage.getItem('token') },
+            success: function() {
+                // Varsayilan avatar'a don
+                self.avatarUrl('https://ui-avatars.com/api/?name=' + encodeURIComponent(self.firstName() + '+' + self.lastName()) + '&size=120&background=0d6efd&color=fff');
+                self.isDeletingAvatar(false);
+                toastr.success(T('Avatar.DeleteSuccess'));
+
+                // Update local storage
+                var storedUser = JSON.parse(localStorage.getItem('user') || '{}');
+                storedUser.avatarUrl = null;
+                localStorage.setItem('user', JSON.stringify(storedUser));
+
+                // Update header if exists
+                if (window.updateHeaderUser) {
+                    window.updateHeaderUser();
+                }
+            },
+            error: function(xhr) {
+                var msg = xhr.responseJSON?.error || T('Common.Error');
+                toastr.error(msg);
+                self.isDeletingAvatar(false);
+            }
+        });
+    };
+
+    // Initialize
+    self.loadUser();
+}
+
+ko.applyBindings(new ProfileViewModel(), document.getElementById('profileApp'));
+</script>
+}

@@ -1,5 +1,6 @@
 using System.Security.Claims;
 using ErkanTatilPlani.Core.Entities;
+using ErkanTatilPlani.Core.Services;
 using ErkanTatilPlani.Data.Context;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -12,10 +13,12 @@ namespace ErkanTatilPlani.API.Controllers;
 public class ReservationsController : ControllerBase
 {
     private readonly AppDbContext _context;
+    private readonly IEmailService _emailService;
 
-    public ReservationsController(AppDbContext context)
+    public ReservationsController(AppDbContext context, IEmailService emailService)
     {
         _context = context;
+        _emailService = emailService;
     }
 
     [HttpGet]
@@ -130,6 +133,8 @@ public class ReservationsController : ControllerBase
 
         var reservation = await _context.Reservations
             .Include(r => r.Tour)
+                .ThenInclude(t => t.Company)
+            .Include(r => r.Visitor)
             .FirstOrDefaultAsync(r => r.Id == id && r.IsActive);
 
         if (reservation == null)
@@ -142,11 +147,187 @@ public class ReservationsController : ControllerBase
         if (!Enum.TryParse<ReservationStatus>(request.Status, true, out var newStatus))
             return BadRequest(new { message = "Gecersiz durum" });
 
+        var oldStatus = reservation.Status;
         reservation.Status = newStatus;
         reservation.UpdatedAt = DateTime.UtcNow;
         await _context.SaveChangesAsync();
 
+        // Email bildirimi gonder
+        if (oldStatus != newStatus)
+        {
+            var emailModel = new ReservationEmailModel
+            {
+                ToEmail = reservation.Visitor.Email,
+                CustomerName = $"{reservation.Visitor.FirstName} {reservation.Visitor.LastName}",
+                TourName = reservation.Tour.Name,
+                CompanyName = reservation.Tour.Company.Name,
+                Destination = reservation.Tour.Destination,
+                StartDate = reservation.StartDate,
+                EndDate = reservation.EndDate,
+                NumberOfPeople = reservation.NumberOfPeople,
+                TotalPrice = reservation.TotalPrice,
+                Notes = reservation.Notes,
+                RejectionReason = request.RejectionReason,
+                PreferredLanguage = reservation.Visitor.PreferredLanguage ?? "tr"
+            };
+
+            if (newStatus == ReservationStatus.Confirmed)
+            {
+                await _emailService.SendReservationConfirmedEmailAsync(emailModel);
+            }
+            else if (newStatus == ReservationStatus.Cancelled)
+            {
+                await _emailService.SendReservationCancelledEmailAsync(emailModel);
+            }
+        }
+
         return Ok(new { message = "Rezervasyon durumu guncellendi", status = newStatus.ToString() });
+    }
+
+    /// <summary>
+    /// Ziyaretcinin kendi rezervasyonlarini listele
+    /// </summary>
+    [HttpGet("visitor/my")]
+    [Authorize]
+    public async Task<ActionResult<object>> GetVisitorReservations()
+    {
+        var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+        if (string.IsNullOrEmpty(userIdClaim))
+            return Unauthorized(new { message = "Giris yapmaniz gerekiyor" });
+
+        var visitorId = int.Parse(userIdClaim);
+
+        var reservations = await _context.Reservations
+            .Include(r => r.Tour)
+                .ThenInclude(t => t.Company)
+            .Where(r => r.VisitorId == visitorId && r.IsActive)
+            .OrderByDescending(r => r.CreatedAt)
+            .Select(r => new
+            {
+                r.Id,
+                TourId = r.TourId,
+                TourName = r.Tour.Name,
+                TourDestination = r.Tour.Destination,
+                TourImageUrl = r.Tour.ImageUrl,
+                CompanyName = r.Tour.Company.Name,
+                CompanySlug = r.Tour.Company.Slug,
+                r.StartDate,
+                r.EndDate,
+                r.NumberOfPeople,
+                r.TotalPrice,
+                Status = r.Status.ToString(),
+                StatusId = (int)r.Status,
+                r.Notes,
+                r.CreatedAt
+            })
+            .ToListAsync();
+
+        return Ok(new { reservations });
+    }
+
+    /// <summary>
+    /// Ziyaretcinin kendi rezervasyon detayini getir
+    /// </summary>
+    [HttpGet("visitor/my/{id}")]
+    [Authorize]
+    public async Task<ActionResult<object>> GetVisitorReservationDetail(int id)
+    {
+        var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+        if (string.IsNullOrEmpty(userIdClaim))
+            return Unauthorized(new { message = "Giris yapmaniz gerekiyor" });
+
+        var visitorId = int.Parse(userIdClaim);
+
+        var reservation = await _context.Reservations
+            .Include(r => r.Tour)
+                .ThenInclude(t => t.Company)
+            .Where(r => r.Id == id && r.VisitorId == visitorId && r.IsActive)
+            .Select(r => new
+            {
+                r.Id,
+                TourId = r.TourId,
+                TourName = r.Tour.Name,
+                TourDescription = r.Tour.Description,
+                TourDestination = r.Tour.Destination,
+                TourImageUrl = r.Tour.ImageUrl,
+                TourPrice = r.Tour.Price,
+                TourDurationDays = r.Tour.DurationDays,
+                CompanyId = r.Tour.Company.Id,
+                CompanyName = r.Tour.Company.Name,
+                CompanySlug = r.Tour.Company.Slug,
+                CompanyPhone = r.Tour.Company.Phone,
+                CompanyEmail = r.Tour.Company.Email,
+                r.StartDate,
+                r.EndDate,
+                r.NumberOfPeople,
+                r.TotalPrice,
+                Status = r.Status.ToString(),
+                StatusId = (int)r.Status,
+                r.Notes,
+                r.CreatedAt,
+                r.UpdatedAt,
+                CanCancel = r.Status == ReservationStatus.Pending || r.Status == ReservationStatus.Confirmed,
+                // Odeme bilgileri
+                r.PaymentId,
+                PaymentStatus = r.PaymentStatus.ToString(),
+                PaymentStatusId = (int)r.PaymentStatus,
+                r.PaidAt
+            })
+            .FirstOrDefaultAsync();
+
+        if (reservation == null)
+            return NotFound(new { message = "Rezervasyon bulunamadi" });
+
+        return Ok(reservation);
+    }
+
+    /// <summary>
+    /// Ziyaretci kendi rezervasyonunu iptal et
+    /// </summary>
+    [HttpPut("visitor/my/{id}/cancel")]
+    [Authorize]
+    public async Task<IActionResult> CancelVisitorReservation(int id)
+    {
+        var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+        if (string.IsNullOrEmpty(userIdClaim))
+            return Unauthorized(new { message = "Giris yapmaniz gerekiyor" });
+
+        var visitorId = int.Parse(userIdClaim);
+
+        var reservation = await _context.Reservations
+            .Include(r => r.Tour)
+                .ThenInclude(t => t.Company)
+            .Include(r => r.Visitor)
+            .FirstOrDefaultAsync(r => r.Id == id && r.VisitorId == visitorId && r.IsActive);
+
+        if (reservation == null)
+            return NotFound(new { message = "Rezervasyon bulunamadi" });
+
+        // Sadece Pending veya Confirmed durumundaki rezervasyonlar iptal edilebilir
+        if (reservation.Status != ReservationStatus.Pending && reservation.Status != ReservationStatus.Confirmed)
+            return BadRequest(new { message = "Bu rezervasyon iptal edilemez" });
+
+        reservation.Status = ReservationStatus.Cancelled;
+        reservation.UpdatedAt = DateTime.UtcNow;
+        await _context.SaveChangesAsync();
+
+        // Email bildirimi gonder
+        var emailModel = new ReservationEmailModel
+        {
+            ToEmail = reservation.Visitor.Email,
+            CustomerName = $"{reservation.Visitor.FirstName} {reservation.Visitor.LastName}",
+            TourName = reservation.Tour.Name,
+            CompanyName = reservation.Tour.Company.Name,
+            Destination = reservation.Tour.Destination,
+            StartDate = reservation.StartDate,
+            EndDate = reservation.EndDate,
+            NumberOfPeople = reservation.NumberOfPeople,
+            TotalPrice = reservation.TotalPrice,
+            PreferredLanguage = reservation.Visitor.PreferredLanguage ?? "tr"
+        };
+        await _emailService.SendReservationCancelledEmailAsync(emailModel);
+
+        return Ok(new { message = "Rezervasyon iptal edildi" });
     }
 
     [HttpGet("{id}")]
@@ -194,4 +375,5 @@ public class ReservationsController : ControllerBase
 public class UpdateStatusRequest
 {
     public string Status { get; set; } = string.Empty;
+    public string? RejectionReason { get; set; }
 }

@@ -1,0 +1,16 @@
+# Erkan Tatil Plani - Robots.txt
+User-agent: *
+Allow: /
+
+# Disallow admin areas
+Disallow: /Admin/
+Disallow: /Account/
+
+# Allow static resources
+Allow: /css/
+Allow: /js/
+Allow: /images/
+Allow: /lib/
+
+# Sitemap location
+Sitemap: https://erkantatilplani.com/sitemap.xml

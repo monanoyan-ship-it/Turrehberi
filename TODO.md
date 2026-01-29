@@ -55,20 +55,20 @@
 - [x] Google indekslenebilir URL yapisi (slug tabanli)
 
 ### Rezervasyon Iyilestirmeleri
-- [ ] Rezervasyon onay/red email bildirimleri
-- [ ] Rezervasyon detay sayfasi
-- [ ] Odeme entegrasyonu (Stripe/Iyzico)
+- [x] Rezervasyon onay/red email bildirimleri
+- [x] Rezervasyon detay sayfasi
+- [x] Odeme entegrasyonu (Iyzico)
 
 ---
 
 ## Orta Oncelik
 
 ### Kullanici Deneyimi
-- [ ] Profil sayfasi gelistirmeleri
-- [ ] Sifre degistirme
-- [ ] Sifremi unuttum fonksiyonu
-- [ ] Email dogrulama sistemi
-- [ ] Kullanici avatar yukleme
+- [x] Profil sayfasi gelistirmeleri
+- [x] Sifre degistirme
+- [x] Sifremi unuttum fonksiyonu
+- [x] Email dogrulama sistemi
+- [x] Kullanici avatar yukleme
 
 ### Firma Ozellikleri
 - [x] Firma dashboard'u (istatistikler)
@@ -77,19 +77,20 @@
 - [x] Yorumlara yanit verme arayuzu
 
 ### Arama ve Filtreleme
-- [ ] Gelismis tur arama (tarih, fiyat, destinasyon)
-- [ ] Firma arama
-- [ ] Harita entegrasyonu (turlar haritada)
+- [x] Gelismis tur arama (tarih, fiyat, destinasyon)
+- [x] Firma arama
+- [x] Harita entegrasyonu (turlar haritada)
 
 ---
 
 ## Dusuk Oncelik
 
 ### SEO ve Performans
-- [ ] Meta tag'ler ve Open Graph
-- [ ] Sitemap.xml
-- [ ] Resim optimizasyonu (lazy loading)
-- [ ] Cache mekanizmasi
+- [x] Meta tag'ler ve Open Graph
+- [x] Sitemap.xml
+- [x] robots.txt
+- [x] Resim optimizasyonu (lazy loading)
+- [x] Cache mekanizmasi
 
 ### Mobil Uygulama (MAUI)
 - [ ] Login/Register ekranlari
@@ -102,7 +103,7 @@
 - [ ] SSS (Sikca Sorulan Sorular)
 - [ ] Canli destek entegrasyonu
 - [ ] Sosyal medya paylasimi
-- [ ] Favori turlar ozelligi
+- [x] Favori turlar ozelligi
 
 ---
 

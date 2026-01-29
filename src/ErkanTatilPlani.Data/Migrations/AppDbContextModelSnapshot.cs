@@ -308,6 +308,39 @@ namespace ErkanTatilPlani.Data.Migrations
                         });
                 });
 
+            modelBuilder.Entity("ErkanTatilPlani.Core.Entities.FavoriteTour", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("boolean");
+
+                    b.Property<int>("TourId")
+                        .HasColumnType("integer");
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<int>("VisitorId")
+                        .HasColumnType("integer");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("TourId");
+
+                    b.HasIndex("VisitorId", "TourId")
+                        .IsUnique();
+
+                    b.ToTable("FavoriteTours");
+                });
+
             modelBuilder.Entity("ErkanTatilPlani.Core.Entities.Language", b =>
                 {
                     b.Property<int>("Id")
@@ -491,6 +524,18 @@ namespace ErkanTatilPlani.Data.Migrations
                     b.Property<int>("NumberOfPeople")
                         .HasColumnType("integer");
 
+                    b.Property<DateTime?>("PaidAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("PaymentId")
+                        .HasColumnType("text");
+
+                    b.Property<int>("PaymentStatus")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("PaymentToken")
+                        .HasColumnType("text");
+
                     b.Property<DateTime>("StartDate")
                         .HasColumnType("timestamp with time zone");
 
@@ -527,6 +572,7 @@ namespace ErkanTatilPlani.Data.Migrations
                             IsActive = true,
                             Notes = "Ogle yemegi dahil",
                             NumberOfPeople = 2,
+                            PaymentStatus = 0,
                             StartDate = new DateTime(2026, 2, 15, 0, 0, 0, 0, DateTimeKind.Utc),
                             Status = 1,
                             TotalPrice = 1500m,
@@ -541,6 +587,7 @@ namespace ErkanTatilPlani.Data.Migrations
                             IsActive = true,
                             Notes = "Aile gezisi",
                             NumberOfPeople = 4,
+                            PaymentStatus = 0,
                             StartDate = new DateTime(2026, 3, 10, 0, 0, 0, 0, DateTimeKind.Utc),
                             Status = 0,
                             TotalPrice = 4800m,
@@ -555,6 +602,7 @@ namespace ErkanTatilPlani.Data.Migrations
                             IsActive = true,
                             Notes = "Balon ucusu sabah erken",
                             NumberOfPeople = 2,
+                            PaymentStatus = 0,
                             StartDate = new DateTime(2026, 4, 5, 0, 0, 0, 0, DateTimeKind.Utc),
                             Status = 1,
                             TotalPrice = 7000m,
@@ -569,6 +617,7 @@ namespace ErkanTatilPlani.Data.Migrations
                             IsActive = true,
                             Notes = "",
                             NumberOfPeople = 3,
+                            PaymentStatus = 0,
                             StartDate = new DateTime(2026, 2, 20, 0, 0, 0, 0, DateTimeKind.Utc),
                             Status = 3,
                             TotalPrice = 1350m,
@@ -583,6 +632,7 @@ namespace ErkanTatilPlani.Data.Migrations
                             IsActive = true,
                             Notes = "Balikadamla dalis isteniyor",
                             NumberOfPeople = 2,
+                            PaymentStatus = 0,
                             StartDate = new DateTime(2026, 5, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             Status = 1,
                             TotalPrice = 2200m,
@@ -597,6 +647,7 @@ namespace ErkanTatilPlani.Data.Migrations
                             IsActive = true,
                             Notes = "Ozel kutlama",
                             NumberOfPeople = 5,
+                            PaymentStatus = 0,
                             StartDate = new DateTime(2026, 3, 25, 0, 0, 0, 0, DateTimeKind.Utc),
                             Status = 0,
                             TotalPrice = 1750m,
@@ -883,6 +934,12 @@ namespace ErkanTatilPlani.Data.Migrations
 
                     b.Property<bool>("IsFeatured")
                         .HasColumnType("boolean");
+
+                    b.Property<double?>("Latitude")
+                        .HasColumnType("double precision");
+
+                    b.Property<double?>("Longitude")
+                        .HasColumnType("double precision");
 
                     b.Property<int>("MaxCapacity")
                         .HasColumnType("integer");
@@ -1300,6 +1357,15 @@ namespace ErkanTatilPlani.Data.Migrations
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
+                    b.Property<string>("Address")
+                        .HasColumnType("text");
+
+                    b.Property<string>("AvatarUrl")
+                        .HasColumnType("text");
+
+                    b.Property<DateTime?>("BirthDate")
+                        .HasColumnType("timestamp with time zone");
+
                     b.Property<int?>("CompanyId")
                         .HasColumnType("integer");
 
@@ -1310,6 +1376,15 @@ namespace ErkanTatilPlani.Data.Migrations
                         .IsRequired()
                         .HasMaxLength(100)
                         .HasColumnType("character varying(100)");
+
+                    b.Property<string>("EmailVerificationToken")
+                        .HasColumnType("text");
+
+                    b.Property<DateTime?>("EmailVerificationTokenExpiry")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<bool>("EmailVerified")
+                        .HasColumnType("boolean");
 
                     b.Property<string>("FirstName")
                         .IsRequired()
@@ -1329,6 +1404,12 @@ namespace ErkanTatilPlani.Data.Migrations
                     b.Property<string>("PasswordHash")
                         .IsRequired()
                         .HasColumnType("text");
+
+                    b.Property<string>("PasswordResetToken")
+                        .HasColumnType("text");
+
+                    b.Property<DateTime?>("PasswordResetTokenExpiry")
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<string>("Phone")
                         .IsRequired()
@@ -1359,6 +1440,7 @@ namespace ErkanTatilPlani.Data.Migrations
                             Id = 1,
                             CreatedAt = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             Email = "admin@erkantatilplani.com",
+                            EmailVerified = false,
                             FirstName = "Sistem",
                             IdentityNumber = "11111111111",
                             IsActive = true,
@@ -1373,6 +1455,7 @@ namespace ErkanTatilPlani.Data.Migrations
                             Id = 2,
                             CreatedAt = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             Email = "staff@erkantatilplani.com",
+                            EmailVerified = false,
                             FirstName = "Personel",
                             IdentityNumber = "22222222222",
                             IsActive = true,
@@ -1388,6 +1471,7 @@ namespace ErkanTatilPlani.Data.Migrations
                             CompanyId = 1,
                             CreatedAt = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             Email = "ahmet@egetur.com",
+                            EmailVerified = false,
                             FirstName = "Ahmet",
                             IdentityNumber = "33333333333",
                             IsActive = true,
@@ -1403,6 +1487,7 @@ namespace ErkanTatilPlani.Data.Migrations
                             CompanyId = 2,
                             CreatedAt = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             Email = "mehmet@karadenizgezileri.com",
+                            EmailVerified = false,
                             FirstName = "Mehmet",
                             IdentityNumber = "44444444444",
                             IsActive = true,
@@ -1418,6 +1503,7 @@ namespace ErkanTatilPlani.Data.Migrations
                             CompanyId = 3,
                             CreatedAt = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             Email = "fatma@akdenizturizm.com",
+                            EmailVerified = false,
                             FirstName = "Fatma",
                             IdentityNumber = "55555555555",
                             IsActive = true,
@@ -1433,6 +1519,7 @@ namespace ErkanTatilPlani.Data.Migrations
                             CompanyId = 4,
                             CreatedAt = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             Email = "ali@kapadokyabalonlari.com",
+                            EmailVerified = false,
                             FirstName = "Ali",
                             IdentityNumber = "66666666666",
                             IsActive = true,
@@ -1448,6 +1535,7 @@ namespace ErkanTatilPlani.Data.Migrations
                             CompanyId = 5,
                             CreatedAt = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             Email = "ayse@istanbulturlari.com",
+                            EmailVerified = false,
                             FirstName = "Ayse",
                             IdentityNumber = "77777777777",
                             IsActive = true,
@@ -1462,6 +1550,7 @@ namespace ErkanTatilPlani.Data.Migrations
                             Id = 8,
                             CreatedAt = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             Email = "zeynep@gmail.com",
+                            EmailVerified = false,
                             FirstName = "Zeynep",
                             IdentityNumber = "88888888888",
                             IsActive = true,
@@ -1476,6 +1565,7 @@ namespace ErkanTatilPlani.Data.Migrations
                             Id = 9,
                             CreatedAt = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             Email = "mustafa@gmail.com",
+                            EmailVerified = false,
                             FirstName = "Mustafa",
                             IdentityNumber = "99999999999",
                             IsActive = true,
@@ -1490,6 +1580,7 @@ namespace ErkanTatilPlani.Data.Migrations
                             Id = 10,
                             CreatedAt = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             Email = "elif@gmail.com",
+                            EmailVerified = false,
                             FirstName = "Elif",
                             IdentityNumber = "10101010101",
                             IsActive = true,
@@ -1504,6 +1595,7 @@ namespace ErkanTatilPlani.Data.Migrations
                             Id = 11,
                             CreatedAt = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             Email = "emre@gmail.com",
+                            EmailVerified = false,
                             FirstName = "Emre",
                             IdentityNumber = "12121212121",
                             IsActive = true,
@@ -1518,6 +1610,7 @@ namespace ErkanTatilPlani.Data.Migrations
                             Id = 12,
                             CreatedAt = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             Email = "selin@gmail.com",
+                            EmailVerified = false,
                             FirstName = "Selin",
                             IdentityNumber = "13131313131",
                             IsActive = true,
@@ -1537,6 +1630,25 @@ namespace ErkanTatilPlani.Data.Migrations
                         .OnDelete(DeleteBehavior.SetNull);
 
                     b.Navigation("ReviewedBy");
+                });
+
+            modelBuilder.Entity("ErkanTatilPlani.Core.Entities.FavoriteTour", b =>
+                {
+                    b.HasOne("ErkanTatilPlani.Core.Entities.Tour", "Tour")
+                        .WithMany("FavoritedBy")
+                        .HasForeignKey("TourId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("ErkanTatilPlani.Core.Entities.Visitor", "Visitor")
+                        .WithMany("FavoriteTours")
+                        .HasForeignKey("VisitorId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Tour");
+
+                    b.Navigation("Visitor");
                 });
 
             modelBuilder.Entity("ErkanTatilPlani.Core.Entities.LocaleStringResource", b =>
@@ -1734,6 +1846,8 @@ namespace ErkanTatilPlani.Data.Migrations
 
             modelBuilder.Entity("ErkanTatilPlani.Core.Entities.Tour", b =>
                 {
+                    b.Navigation("FavoritedBy");
+
                     b.Navigation("Reservations");
 
                     b.Navigation("Reviews");
@@ -1750,6 +1864,8 @@ namespace ErkanTatilPlani.Data.Migrations
 
             modelBuilder.Entity("ErkanTatilPlani.Core.Entities.Visitor", b =>
                 {
+                    b.Navigation("FavoriteTours");
+
                     b.Navigation("HelpfulVotes");
 
                     b.Navigation("Reservations");

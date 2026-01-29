@@ -1,6 +1,7 @@
 using System.Security.Claims;
 using ErkanTatilPlani.Core.Entities;
 using ErkanTatilPlani.Core.Enums;
+using ErkanTatilPlani.Core.Services;
 using ErkanTatilPlani.Data.Context;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -13,28 +14,146 @@ namespace ErkanTatilPlani.API.Controllers;
 public class ToursController : ControllerBase
 {
     private readonly AppDbContext _context;
+    private readonly ICacheService _cache;
 
-    public ToursController(AppDbContext context)
+    public ToursController(AppDbContext context, ICacheService cache)
     {
         _context = context;
+        _cache = cache;
     }
 
     [HttpGet]
-    public async Task<ActionResult<IEnumerable<Tour>>> GetTours()
+    public async Task<ActionResult<object>> GetTours(
+        [FromQuery] string? search = null,
+        [FromQuery] string? destination = null,
+        [FromQuery] decimal? minPrice = null,
+        [FromQuery] decimal? maxPrice = null,
+        [FromQuery] int? minDays = null,
+        [FromQuery] int? maxDays = null,
+        [FromQuery] int? companyId = null,
+        [FromQuery] bool? featured = null,
+        [FromQuery] string? sort = null)
     {
-        return await _context.Tours
+        var query = _context.Tours
             .Include(t => t.Company)
-            .Where(t => t.IsActive)
+            .Where(t => t.IsActive && t.Company!.StatusId == CompanyStatuses.Ids.Approved);
+
+        // Arama (isim veya aciklama)
+        if (!string.IsNullOrWhiteSpace(search))
+        {
+            var searchLower = search.ToLower();
+            query = query.Where(t => t.Name.ToLower().Contains(searchLower) ||
+                                     t.Description.ToLower().Contains(searchLower) ||
+                                     t.Destination.ToLower().Contains(searchLower));
+        }
+
+        // Destinasyon filtresi
+        if (!string.IsNullOrWhiteSpace(destination))
+        {
+            var destLower = destination.ToLower();
+            query = query.Where(t => t.Destination.ToLower().Contains(destLower));
+        }
+
+        // Fiyat araligi
+        if (minPrice.HasValue)
+            query = query.Where(t => t.Price >= minPrice.Value);
+        if (maxPrice.HasValue)
+            query = query.Where(t => t.Price <= maxPrice.Value);
+
+        // Sure araligi
+        if (minDays.HasValue)
+            query = query.Where(t => t.DurationDays >= minDays.Value);
+        if (maxDays.HasValue)
+            query = query.Where(t => t.DurationDays <= maxDays.Value);
+
+        // Firma filtresi
+        if (companyId.HasValue)
+            query = query.Where(t => t.CompanyId == companyId.Value);
+
+        // One cikan filtresi
+        if (featured.HasValue && featured.Value)
+            query = query.Where(t => t.IsFeatured);
+
+        // Siralama
+        query = sort?.ToLower() switch
+        {
+            "price_asc" => query.OrderBy(t => t.Price),
+            "price_desc" => query.OrderByDescending(t => t.Price),
+            "duration_asc" => query.OrderBy(t => t.DurationDays),
+            "duration_desc" => query.OrderByDescending(t => t.DurationDays),
+            "rating" => query.OrderByDescending(t => t.AverageRating),
+            "newest" => query.OrderByDescending(t => t.CreatedAt),
+            _ => query.OrderByDescending(t => t.IsFeatured).ThenByDescending(t => t.AverageRating)
+        };
+
+        var tours = await query.ToListAsync();
+
+        // Benzersiz destinasyonlar ve fiyat araligi (filtreleme UI icin)
+        var allTours = await _context.Tours
+            .Where(t => t.IsActive && t.Company!.StatusId == CompanyStatuses.Ids.Approved)
             .ToListAsync();
+
+        var destinations = allTours
+            .Select(t => t.Destination)
+            .Distinct()
+            .OrderBy(d => d)
+            .ToList();
+
+        var priceRange = new
+        {
+            min = allTours.Any() ? allTours.Min(t => t.Price) : 0,
+            max = allTours.Any() ? allTours.Max(t => t.Price) : 0
+        };
+
+        var durationRange = new
+        {
+            min = allTours.Any() ? allTours.Min(t => t.DurationDays) : 1,
+            max = allTours.Any() ? allTours.Max(t => t.DurationDays) : 30
+        };
+
+        return Ok(new
+        {
+            tours,
+            filters = new
+            {
+                destinations,
+                priceRange,
+                durationRange
+            },
+            totalCount = tours.Count
+        });
     }
 
     [HttpGet("featured")]
+    [ResponseCache(Duration = 300, VaryByHeader = "Accept-Language")] // 5 dakika HTTP cache
     public async Task<ActionResult<IEnumerable<Tour>>> GetFeaturedTours()
     {
-        return await _context.Tours
-            .Include(t => t.Company)
-            .Where(t => t.IsActive && t.IsFeatured)
+        var tours = await _cache.GetOrCreateAsync(
+            CacheKeys.FeaturedTours,
+            async () => await _context.Tours
+                .Include(t => t.Company)
+                .Where(t => t.IsActive && t.IsFeatured && t.Company!.StatusId == CompanyStatuses.Ids.Approved)
+                .ToListAsync(),
+            CacheDurations.Medium
+        );
+
+        return Ok(tours);
+    }
+
+    /// <summary>
+    /// Filtreleme icin firma listesi (sadece tur olan firmalar)
+    /// </summary>
+    [HttpGet("companies")]
+    public async Task<ActionResult<object>> GetTourCompanies()
+    {
+        var companies = await _context.Companies
+            .Where(c => c.IsActive && c.StatusId == CompanyStatuses.Ids.Approved)
+            .Where(c => c.Tours.Any(t => t.IsActive))
+            .OrderBy(c => c.Name)
+            .Select(c => new { c.Id, c.Name })
             .ToListAsync();
+
+        return Ok(companies);
     }
 
     [HttpGet("{id}")]

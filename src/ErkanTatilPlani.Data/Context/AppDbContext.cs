@@ -24,6 +24,9 @@ public class AppDbContext : DbContext
     public DbSet<ReviewReply> ReviewReplies => Set<ReviewReply>();
     public DbSet<ReviewReport> ReviewReports => Set<ReviewReport>();
 
+    // Favorites
+    public DbSet<FavoriteTour> FavoriteTours => Set<FavoriteTour>();
+
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         base.OnModelCreating(modelBuilder);
@@ -237,6 +240,28 @@ public class AppDbContext : DbContext
                   .HasForeignKey(e => e.ReviewedById)
                   .IsRequired(false)
                   .OnDelete(DeleteBehavior.SetNull);
+        });
+
+        // ===============================================
+        // FAVORI TURLAR
+        // ===============================================
+
+        modelBuilder.Entity<FavoriteTour>(entity =>
+        {
+            entity.HasKey(e => e.Id);
+
+            // Bir kullanici bir turu bir kez favorilere ekleyebilir
+            entity.HasIndex(e => new { e.VisitorId, e.TourId }).IsUnique();
+
+            entity.HasOne(e => e.Visitor)
+                  .WithMany(v => v.FavoriteTours)
+                  .HasForeignKey(e => e.VisitorId)
+                  .OnDelete(DeleteBehavior.Cascade);
+
+            entity.HasOne(e => e.Tour)
+                  .WithMany(t => t.FavoritedBy)
+                  .HasForeignKey(e => e.TourId)
+                  .OnDelete(DeleteBehavior.Cascade);
         });
 
         // Seed Data

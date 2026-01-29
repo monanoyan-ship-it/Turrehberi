@@ -134,22 +134,23 @@ _localizer.T("Register.Title")
 - Tur Yonetim (MyTours CRUD)
 - Rezervasyon Yonetimi (MyReservations)
 - Yorumlara Yanit (MyReviews)
+- Profil Sayfasi (kisisel bilgiler, sifre degistirme, dil tercihi)
+- Gelismis Tur Arama (arama, filtreleme, siralama)
+- Sifremi Unuttum (forgot-password, reset-password)
 
 **Degisiklik yapilan dosyalar (commit bekliyor):**
-- CompaniesController.cs (dashboard endpoint)
-- ToursController.cs (my endpoint)
-- ReservationsController.cs (my endpoint + status)
-- ReviewsController.cs (my endpoint)
-- AdminController.cs (4 yeni action)
-- _AdminLayout.cshtml (menu linkleri)
-- CompanyDashboard.cshtml (yeni)
-- MyTours.cshtml (yenilendi)
-- MyReservations.cshtml (yenilendi)
-- MyReviews.cshtml (yeni)
-- 9 localization dosyasi
-- TODO.md, COMPLETED.md
+- Visitor.cs (Address, BirthDate, AvatarUrl, PasswordResetToken, PasswordResetTokenExpiry)
+- AuthController.cs (profile, change-password, forgot-password, reset-password, verify-reset-token)
+- ToursController.cs (filtreleme parametreleri, companies endpoint)
+- AccountController.cs (Profile, ForgotPassword, ResetPassword actions)
+- Profile.cshtml, ForgotPassword.cshtml, ResetPassword.cshtml (yeni)
+- Views/Tours/Index.cshtml (filtreleme UI)
+- Login.cshtml (sifremi unuttum linki)
+- Migration: AddVisitorProfileFields, AddPasswordResetFields
+- 9 localization dosyasi (Profile.*, Tours.*, ForgotPassword.*, ResetPassword.* keyleri)
+- TODO.md, CLAUDE.md
 
-**Siradaki is:** Profil sayfasi veya Sifre degistirme veya Gelismis tur arama
+**Siradaki is:** Email dogrulama veya Firma arama veya Kullanici avatar yukleme
 
 ---
 

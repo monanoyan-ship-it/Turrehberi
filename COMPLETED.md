@@ -209,6 +209,115 @@
 - [x] 9 dilde localization string'leri:
   - Dashboard.*, MyTours.*, MyReservations.*, MyReviews.*
 
+### Rezervasyon Detay ve Favoriler
+- [x] Rezervasyon Detay Sayfasi:
+  - GET /api/reservations/visitor/my - Kullanici rezervasyonlari
+  - GET /api/reservations/visitor/my/{id} - Rezervasyon detayi
+  - PUT /api/reservations/visitor/my/{id}/cancel - Rezervasyon iptali
+  - /Account/Reservations ve /Account/ReservationDetail sayfalari
+- [x] Favori Turlar Ozelligi:
+  - FavoriteTour entity (Visitor-Tour many-to-many)
+  - GET /api/favorites - Favori turlar listesi
+  - GET /api/favorites/check/{tourId} - Favori kontrolu
+  - POST /api/favorites/check-multiple - Coklu favori kontrolu
+  - POST /api/favorites/{tourId} - Favorilere ekle
+  - DELETE /api/favorites/{tourId} - Favorilerden cikar
+  - POST /api/favorites/{tourId}/toggle - Favori toggle
+  - /Account/Favorites sayfasi
+  - Tur kartlarinda favori butonu (kalp ikonu)
+  - 9 dilde Favorites.* localization string'leri
+
+### Email Bildirim Sistemi
+- [x] Email Servisi Altyapisi:
+  - IEmailService interface (Core/Services)
+  - EmailService implementasyonu (API/Services)
+  - EmailSettings konfigurasyonu (appsettings.json)
+  - SMTP destegi (Gmail, vb.)
+- [x] Rezervasyon Email Bildirimleri:
+  - Rezervasyon onay emaili (HTML sablon)
+  - Rezervasyon iptal emaili (HTML sablon)
+  - Rezervasyon red emaili (HTML sablon)
+  - Kullanici dil tercihine gore email (9 dil)
+- [x] ReservationsController Entegrasyonu:
+  - Durum degisikliginde otomatik email gonderimi
+  - Kullanici iptalinde email bildirimi
+- [x] 9 dilde Email.* localization string'leri
+
+### Iyzico Odeme Entegrasyonu
+- [x] Payment Servisi Altyapisi:
+  - IPaymentService interface (Core/Services)
+  - IyzicoPaymentService implementasyonu (API/Services)
+  - PaymentSettings konfigurasyonu (appsettings.json)
+  - Iyzipay NuGet paketi entegrasyonu
+- [x] PaymentsController API Endpoint'leri:
+  - POST /api/payments/initialize/{reservationId} - Odeme baslat
+  - POST /api/payments/callback - Iyzico callback
+  - GET /api/payments/status/{reservationId} - Odeme durumu
+  - GET /api/payments/pending - Bekleyen odemeler
+- [x] Reservation Entity Guncellemesi:
+  - PaymentId, PaymentStatus, PaidAt, PaymentToken alanlari
+  - PaymentStatusEnum (Pending, Paid, Failed, Refunded)
+  - Migration: AddReservationPaymentFields
+- [x] Web Sayfalari:
+  - /Account/PaymentResult - Odeme sonuc sayfasi
+  - ReservationDetail sayfasinda odeme butonu
+  - Iyzico checkout form yonlendirmesi
+- [x] 9 dilde Payment.* localization string'leri
+
+### SEO ve Performans
+- [x] _Layout.cshtml SEO altyapisi:
+  - RenderSection("Head") ile sayfaya ozel meta tag destegi
+  - Default meta description, keywords, author, robots
+  - Open Graph meta tag'leri (og:title, og:description, og:image, og:url, og:type)
+  - Twitter Card meta tag'leri
+  - Canonical URL destegi
+  - Favicon linkleri
+- [x] Sayfa bazli SEO:
+  - Ana Sayfa: Schema.org WebSite + SearchAction
+  - Turlar: Schema.org CollectionPage
+  - Firmalar: Schema.org CollectionPage
+  - Firma Detay: Mevcut (TravelAgency, AggregateRating)
+- [x] sitemap.xml:
+  - Dinamik SitemapController
+  - Statik sayfalar
+  - Firma profil sayfalarini API'den ceker
+  - 1 saatlik cache
+- [x] robots.txt:
+  - Allow all public pages
+  - Disallow /Admin/ ve /Account/
+  - Sitemap location
+- [x] Resim Optimizasyonu (Lazy Loading):
+  - Native lazy loading (loading="lazy" attribute)
+  - Intersection Observer API destegi (eski tarayicilar icin fallback)
+  - CSS shimmer animasyonu (yukleme placeholder'i)
+  - Fade-in animasyonu (resim yuklenince)
+  - KnockoutJS lazyImage custom binding
+  - decoding="async" ile asenkron decode
+  - fetchpriority="high" kritik resimler icin (LCP)
+  - Tum sayfalarda uygulandı: Home, Tours, Companies, Company Details
+- [x] Cache Mekanizmasi:
+  - ICacheService interface (Core/Services)
+  - CacheService implementasyonu (Memory Cache)
+  - CacheKeys ve CacheDurations sabitleri
+  - Response Caching middleware
+  - API endpoint'lerinde cache:
+    - GET /api/tours/featured - 15 dakika memory + 5 dakika HTTP cache
+    - GET /api/companies/public - 5 dakika HTTP cache
+    - GET /api/localization/languages - 24 saat cache
+    - GET /api/localization/{culture} - 1 saat cache
+  - Sliding expiration ile cache yenileme
+  - Cache invalidation altyapisi (RemoveByPrefix)
+  - CacheController (Admin API):
+    - POST /api/cache/clear - Tum cache temizle
+    - POST /api/cache/clear/tours - Tur cache temizle
+    - POST /api/cache/clear/companies - Firma cache temizle
+    - POST /api/cache/clear/localization - Dil cache temizle
+    - POST /api/cache/clear/stats - Istatistik cache temizle
+  - Admin Dashboard Cache UI:
+    - /Admin sayfasina "Cache Yonetimi" bolumu eklendi
+    - 6 buton: Tum Cache, Tur, Firma, Dil, Istatistik, Yenile
+    - Loading state ve onay dialoglari
+
 ### Dokumantasyon
 - [x] CLAUDE.md (gelistirici kurallari)
 - [x] PROJE_YAPISI.md (detayli proje dokumantasyonu)
@@ -221,9 +330,9 @@
 
 | Metrik | Deger |
 |--------|-------|
-| Toplam Entity | 11 |
-| Toplam Enum | 6 |
-| API Endpoint | ~45 |
+| Toplam Entity | 12 |
+| Toplam Enum | 7 |
+| API Endpoint | ~58 |
 | Desteklenen Dil | 9 |
 | Seed Firma | 5 |
 | Seed Tur | 15 |

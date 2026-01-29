@@ -1,5 +1,6 @@
 using ErkanTatilPlani.Core.Entities;
 using ErkanTatilPlani.Core.Enums;
+using ErkanTatilPlani.Core.Services;
 using ErkanTatilPlani.Data.Context;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -12,12 +13,14 @@ public class CompaniesController : ControllerBase
 {
     private readonly AppDbContext _context;
     private readonly IWebHostEnvironment _env;
+    private readonly ICacheService _cache;
     private const long MaxFileSize = 10 * 1024 * 1024; // 10MB
 
-    public CompaniesController(AppDbContext context, IWebHostEnvironment env)
+    public CompaniesController(AppDbContext context, IWebHostEnvironment env, ICacheService cache)
     {
         _context = context;
         _env = env;
+        _cache = cache;
     }
 
     [HttpGet]
@@ -165,7 +168,11 @@ public class CompaniesController : ControllerBase
     /// Public firma listesi (sadece onaylanmis firmalar)
     /// </summary>
     [HttpGet("public")]
-    public async Task<ActionResult<object>> GetPublicCompanies([FromQuery] string? city = null, [FromQuery] string? search = null)
+    [ResponseCache(Duration = 300, VaryByQueryKeys = new[] { "city", "search", "sort" })] // 5 dakika cache
+    public async Task<ActionResult<object>> GetPublicCompanies(
+        [FromQuery] string? city = null,
+        [FromQuery] string? search = null,
+        [FromQuery] string? sort = null)
     {
         var query = _context.Companies
             .Where(c => c.IsActive && c.StatusId == CompanyStatuses.Ids.Approved);
@@ -179,11 +186,16 @@ public class CompaniesController : ControllerBase
         // Arama
         if (!string.IsNullOrWhiteSpace(search))
         {
-            query = query.Where(c => c.Name.Contains(search) || c.Description.Contains(search) || c.City.Contains(search));
+            var searchLower = search.ToLower();
+            query = query.Where(c =>
+                c.Name.ToLower().Contains(searchLower) ||
+                c.Description.ToLower().Contains(searchLower) ||
+                c.City.ToLower().Contains(searchLower) ||
+                c.Tagline.ToLower().Contains(searchLower));
         }
 
-        var companies = await query
-            .OrderBy(c => c.Name)
+        // Her firma icin rating bilgisi hesapla
+        var companiesWithRating = await query
             .Select(c => new
             {
                 c.Id,
@@ -194,9 +206,31 @@ public class CompaniesController : ControllerBase
                 c.City,
                 c.LogoUrl,
                 c.CoverImageUrl,
-                TourCount = c.Tours.Count(t => t.IsActive)
+                c.FoundedYear,
+                TourCount = c.Tours.Count(t => t.IsActive),
+                ReviewCount = _context.TourReviews
+                    .Where(r => r.Tour.CompanyId == c.Id && r.IsActive && r.StatusId == ReviewStatuses.Ids.Approved)
+                    .Count(),
+                AverageRating = _context.TourReviews
+                    .Where(r => r.Tour.CompanyId == c.Id && r.IsActive && r.StatusId == ReviewStatuses.Ids.Approved)
+                    .Any()
+                    ? Math.Round(_context.TourReviews
+                        .Where(r => r.Tour.CompanyId == c.Id && r.IsActive && r.StatusId == ReviewStatuses.Ids.Approved)
+                        .Average(r => r.OverallRating), 1)
+                    : 0.0
             })
             .ToListAsync();
+
+        // Siralama
+        var sortedCompanies = sort switch
+        {
+            "name_asc" => companiesWithRating.OrderBy(c => c.Name).ToList(),
+            "name_desc" => companiesWithRating.OrderByDescending(c => c.Name).ToList(),
+            "rating" => companiesWithRating.OrderByDescending(c => c.AverageRating).ThenByDescending(c => c.ReviewCount).ToList(),
+            "tours" => companiesWithRating.OrderByDescending(c => c.TourCount).ToList(),
+            "newest" => companiesWithRating.OrderByDescending(c => c.Id).ToList(),
+            _ => companiesWithRating.OrderBy(c => c.Name).ToList()
+        };
 
         // Sehir listesi (filtreleme icin)
         var cities = await _context.Companies
@@ -206,7 +240,7 @@ public class CompaniesController : ControllerBase
             .OrderBy(c => c)
             .ToListAsync();
 
-        return Ok(new { companies, cities });
+        return Ok(new { companies = sortedCompanies, cities, total = sortedCompanies.Count });
     }
 
     [HttpPost]

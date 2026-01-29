@@ -1,11 +1,153 @@
 @{
     ViewData["Title"] = "Turlar";
+    ViewData["Description"] = "Turkiye ve yurt disi turlari listesi. En uygun fiyatlarla tatil firsatlari, sehir turlari, kultur gezileri ve daha fazlasi. Simdi kesfedin!";
+    ViewData["OgTitle"] = "Turlar - Erkan Tatil Plani";
+    ViewData["OgDescription"] = "En iyi tur firsatlarini kesfedin. Fiyat, destinasyon ve sure filtreleri ile size uygun turu bulun!";
+    ViewData["OgType"] = "website";
+}
+
+@section Head {
+    <!-- Tours Page Schema.org JSON-LD -->
+    <script type="application/ld+json">
+    {
+        "@@context": "https://schema.org",
+        "@@type": "CollectionPage",
+        "name": "Turlar",
+        "description": "Turkiye ve yurt disi turlari listesi",
+        "url": "@Context.Request.GetDisplayUrl()",
+        "isPartOf": {
+            "@@type": "WebSite",
+            "name": "Erkan Tatil Plani"
+        }
+    }
+    </script>
 }
 
 <div id="toursApp">
 <div class="mb-4">
-    <h1><i class="bi bi-geo-alt"></i> Turlar</h1>
-    <p class="text-muted">Sizin icin en uygun turu secin ve hayalinizdeki tatile baslayin!</p>
+    <h1><i class="bi bi-geo-alt"></i> <span data-t="Menu.Tours">Turlar</span></h1>
+    <p class="text-muted" data-t="Tours.Subtitle">Sizin icin en uygun turu secin ve hayalinizdeki tatile baslayin!</p>
+</div>
+
+<!-- Arama ve Filtreler -->
+<div class="card shadow-sm mb-4">
+    <div class="card-body">
+        <!-- Arama Kutusu -->
+        <div class="row mb-3">
+            <div class="col-12">
+                <div class="input-group input-group-lg">
+                    <span class="input-group-text bg-primary text-white"><i class="bi bi-search"></i></span>
+                    <input type="text" class="form-control" data-bind="value: searchQuery, valueUpdate: 'afterkeydown'"
+                           data-t-placeholder="Tours.SearchPlaceholder" placeholder="Tur ara (isim, destinasyon, aciklama)..." />
+                    <button class="btn btn-outline-secondary" type="button" data-bind="click: clearSearch, visible: searchQuery()">
+                        <i class="bi bi-x-lg"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Filtre Toggle -->
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <button class="btn btn-outline-primary" type="button" data-bs-toggle="collapse" data-bs-target="#filterPanel">
+                <i class="bi bi-funnel"></i> <span data-t="Tours.AdvancedFilters">Gelismis Filtreler</span>
+                <span class="badge bg-primary ms-1" data-bind="visible: activeFilterCount() > 0, text: activeFilterCount()"></span>
+            </button>
+            <div class="d-flex align-items-center gap-2">
+                <!-- View Toggle -->
+                <div class="btn-group me-2" role="group">
+                    <button type="button" class="btn btn-outline-primary btn-sm"
+                            data-bind="css: { active: viewMode() === 'list' }, click: function() { setViewMode('list'); }">
+                        <i class="bi bi-list-ul"></i> <span data-t="Tours.ListView">Liste</span>
+                    </button>
+                    <button type="button" class="btn btn-outline-primary btn-sm"
+                            data-bind="css: { active: viewMode() === 'map' }, click: function() { setViewMode('map'); }">
+                        <i class="bi bi-map"></i> <span data-t="Tours.MapView">Harita</span>
+                    </button>
+                </div>
+                <label class="text-muted small mb-0" data-t="Tours.SortBy">Sirala:</label>
+                <select class="form-select form-select-sm" style="width: auto;" data-bind="value: sortBy">
+                    <option value="" data-t="Tours.SortDefault">Varsayilan</option>
+                    <option value="price_asc" data-t="Tours.SortPriceAsc">Fiyat (Dusuk-Yuksek)</option>
+                    <option value="price_desc" data-t="Tours.SortPriceDesc">Fiyat (Yuksek-Dusuk)</option>
+                    <option value="duration_asc" data-t="Tours.SortDurationAsc">Sure (Kisa-Uzun)</option>
+                    <option value="duration_desc" data-t="Tours.SortDurationDesc">Sure (Uzun-Kisa)</option>
+                    <option value="rating" data-t="Tours.SortRating">En Yuksek Puan</option>
+                    <option value="newest" data-t="Tours.SortNewest">En Yeni</option>
+                </select>
+            </div>
+        </div>
+
+        <!-- Filtre Paneli -->
+        <div class="collapse" id="filterPanel">
+            <div class="row g-3 pt-3 border-top">
+                <!-- Destinasyon -->
+                <div class="col-md-3">
+                    <label class="form-label small fw-semibold"><i class="bi bi-geo-alt"></i> <span data-t="Tour.Destination">Destinasyon</span></label>
+                    <select class="form-select" data-bind="value: filterDestination, options: destinations, optionsCaption: T('Tours.AllDestinations')"></select>
+                </div>
+
+                <!-- Fiyat Araligi -->
+                <div class="col-md-3">
+                    <label class="form-label small fw-semibold"><i class="bi bi-currency-lira"></i> <span data-t="Tours.PriceRange">Fiyat Araligi</span></label>
+                    <div class="d-flex gap-2">
+                        <input type="number" class="form-control form-control-sm" data-bind="value: filterMinPrice"
+                               data-t-placeholder="Common.Min" placeholder="Min" min="0" />
+                        <input type="number" class="form-control form-control-sm" data-bind="value: filterMaxPrice"
+                               data-t-placeholder="Common.Max" placeholder="Max" min="0" />
+                    </div>
+                </div>
+
+                <!-- Sure Araligi -->
+                <div class="col-md-2">
+                    <label class="form-label small fw-semibold"><i class="bi bi-calendar3"></i> <span data-t="Tours.Duration">Sure (Gun)</span></label>
+                    <div class="d-flex gap-2">
+                        <input type="number" class="form-control form-control-sm" data-bind="value: filterMinDays"
+                               data-t-placeholder="Common.Min" placeholder="Min" min="1" />
+                        <input type="number" class="form-control form-control-sm" data-bind="value: filterMaxDays"
+                               data-t-placeholder="Common.Max" placeholder="Max" min="1" />
+                    </div>
+                </div>
+
+                <!-- Firma -->
+                <div class="col-md-2">
+                    <label class="form-label small fw-semibold"><i class="bi bi-building"></i> <span data-t="Tour.Company">Firma</span></label>
+                    <select class="form-select" data-bind="value: filterCompanyId, options: companies, optionsText: 'name', optionsValue: 'id', optionsCaption: T('Tours.AllCompanies')"></select>
+                </div>
+
+                <!-- One Cikanlar -->
+                <div class="col-md-2 d-flex align-items-end">
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" id="filterFeatured" data-bind="checked: filterFeatured" />
+                        <label class="form-check-label" for="filterFeatured">
+                            <i class="bi bi-star-fill text-warning"></i> <span data-t="Tours.FeaturedOnly">Sadece One Cikan</span>
+                        </label>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Filtre Butonlari -->
+            <div class="d-flex justify-content-between mt-3 pt-3 border-top">
+                <button class="btn btn-outline-secondary btn-sm" data-bind="click: clearFilters">
+                    <i class="bi bi-x-circle"></i> <span data-t="Tours.ClearFilters">Filtreleri Temizle</span>
+                </button>
+                <button class="btn btn-primary btn-sm" data-bind="click: applyFilters">
+                    <i class="bi bi-check-lg"></i> <span data-t="Tours.ApplyFilters">Uygula</span>
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Sonuc Bilgisi -->
+<div class="d-flex justify-content-between align-items-center mb-3" data-bind="visible: !isLoading()">
+    <span class="text-muted">
+        <strong data-bind="text: totalCount"></strong> <span data-t="Tours.ToursFound">tur bulundu</span>
+    </span>
+    <div data-bind="visible: activeFilterCount() > 0">
+        <span class="badge bg-light text-dark">
+            <span data-bind="text: activeFilterCount"></span> <span data-t="Tours.ActiveFilters">aktif filtre</span>
+        </span>
+    </div>
 </div>
 
 <!-- Loading -->
@@ -15,20 +157,48 @@
     </div>
 </div>
 
+<!-- Harita Gorunumu -->
+<div data-bind="visible: !isLoading() && viewMode() === 'map'" class="mb-4">
+    <div class="card shadow-sm">
+        <div class="card-body p-0">
+            <div id="toursMap" style="height: 500px; border-radius: 0.375rem;"></div>
+        </div>
+        <div class="card-footer bg-light">
+            <small class="text-muted">
+                <i class="bi bi-info-circle"></i>
+                <span data-t="Tours.MapInfo">Haritada</span>
+                <strong data-bind="text: toursWithCoordinates()"></strong>
+                <span data-t="Tours.ToursWithLocation">tur konumu gosteriliyor</span>
+            </small>
+        </div>
+    </div>
+</div>
+
 <!-- Liste -->
-<div class="row g-4" data-bind="visible: !isLoading(), foreach: tours">
+<div class="row g-4" data-bind="visible: !isLoading() && viewMode() === 'list', foreach: tours">
     <div class="col-md-4">
         <div class="card h-100 shadow-sm">
-            <div class="card-img-top bg-secondary d-flex align-items-center justify-content-center position-relative" style="height: 180px;">
+            <div class="card-img-top bg-secondary d-flex align-items-center justify-content-center position-relative lazy-img-container" style="height: 180px;">
                 <!-- ko if: imageUrl -->
-                <img data-bind="attr: { src: imageUrl }" class="w-100 h-100" style="object-fit: cover;" />
+                <img data-bind="attr: { src: imageUrl, alt: name }"
+                     class="w-100 h-100 card-img-lazy"
+                     style="object-fit: cover;"
+                     loading="lazy"
+                     decoding="async" />
                 <!-- /ko -->
                 <!-- ko ifnot: imageUrl -->
                 <i class="bi bi-image text-white" style="font-size: 3rem;"></i>
                 <!-- /ko -->
                 <!-- ko if: isFeatured -->
-                <span class="badge bg-warning text-dark position-absolute top-0 end-0 m-2"><i class="bi bi-star-fill"></i> One Cikan</span>
+                <span class="badge bg-warning text-dark position-absolute top-0 start-0 m-2"><i class="bi bi-star-fill"></i> One Cikan</span>
                 <!-- /ko -->
+                <!-- Favori Butonu -->
+                <button class="btn btn-sm position-absolute top-0 end-0 m-2 favorite-btn"
+                        data-bind="click: $parent.toggleFavorite,
+                                   css: { 'btn-danger': $parent.isFavorite(id), 'btn-outline-light': !$parent.isFavorite(id) }"
+                        title="Favorilere Ekle">
+                    <i class="bi" data-bind="css: { 'bi-heart-fill': $parent.isFavorite(id), 'bi-heart': !$parent.isFavorite(id) }"></i>
+                </button>
             </div>
             <div class="card-body">
                 <h5 class="card-title" data-bind="text: name"></h5>
@@ -72,8 +242,8 @@
 </div>
 
 <!-- Bos Liste -->
-<div data-bind="visible: !isLoading() && tours().length === 0" class="alert alert-info text-center">
-    <i class="bi bi-info-circle"></i> Henuz tur bulunmamaktadir. Yakinda yeni turlar eklenecektir!
+<div data-bind="visible: !isLoading() && tours().length === 0 && viewMode() === 'list'" class="alert alert-info text-center">
+    <i class="bi bi-info-circle"></i> <span data-t="Tours.NoTours">Henuz tur bulunmamaktadir. Yakinda yeni turlar eklenecektir!</span>
 </div>
 
 <!-- Details Modal (Yorumlarla birlikte) -->
@@ -89,7 +259,11 @@
                 <div class="row mb-4">
                     <div class="col-md-5">
                         <!-- ko if: imageUrl -->
-                        <img data-bind="attr: { src: imageUrl }" class="img-fluid rounded mb-3" style="max-height: 250px; width: 100%; object-fit: cover;" />
+                        <img data-bind="attr: { src: imageUrl, alt: name }"
+                             class="img-fluid rounded mb-3 card-img-lazy"
+                             style="max-height: 250px; width: 100%; object-fit: cover;"
+                             loading="lazy"
+                             decoding="async" />
                         <!-- /ko -->
                         <h4 data-bind="text: name"></h4>
                         <p class="text-muted"><i class="bi bi-geo-alt"></i> <span data-bind="text: destination"></span></p>
@@ -544,6 +718,10 @@
 <style>
 .cursor-pointer { cursor: pointer; }
 .star-rating i:hover { transform: scale(1.2); }
+/* Harita popup stilleri */
+.tour-popup { min-width: 180px; }
+.tour-popup strong { font-size: 1rem; }
+#toursMap .leaflet-popup-content-wrapper { border-radius: 8px; }
 </style>
 
 @section Scripts {
@@ -556,6 +734,108 @@ function ToursViewModel() {
     self.isLoading = ko.observable(true);
     self.isSaving = ko.observable(false);
     self.selectedTour = ko.observable(null);
+    self.totalCount = ko.observable(0);
+
+    // Harita gorunumu
+    self.viewMode = ko.observable('list');
+    self.map = null;
+    self.markers = [];
+
+    // Koordinatli tur sayisi
+    self.toursWithCoordinates = ko.computed(function() {
+        return self.tours().filter(function(t) { return t.latitude && t.longitude; }).length;
+    });
+
+    // Filtreleme verileri
+    self.searchQuery = ko.observable('');
+    self.filterDestination = ko.observable('');
+    self.filterMinPrice = ko.observable('');
+    self.filterMaxPrice = ko.observable('');
+    self.filterMinDays = ko.observable('');
+    self.filterMaxDays = ko.observable('');
+    self.filterCompanyId = ko.observable('');
+    self.filterFeatured = ko.observable(false);
+    self.sortBy = ko.observable('');
+
+    // Filtre secenekleri (API'den yuklenecek)
+    self.destinations = ko.observableArray([]);
+    self.companies = ko.observableArray([]);
+    self.priceRange = ko.observable({ min: 0, max: 100000 });
+    self.durationRange = ko.observable({ min: 1, max: 30 });
+
+    // Favoriler
+    self.favoriteIds = ko.observableArray([]);
+
+    // Favori mi kontrol et
+    self.isFavorite = function(tourId) {
+        return self.favoriteIds().indexOf(tourId) !== -1;
+    };
+
+    // Favorileri yukle
+    self.loadFavorites = function() {
+        var token = localStorage.getItem('token');
+        if (!token) return;
+
+        var tourIds = self.tours().map(function(t) { return t.id; });
+        if (tourIds.length === 0) return;
+
+        $.ajax({
+            url: apiBaseUrl + '/api/favorites/check-multiple',
+            method: 'POST',
+            contentType: 'application/json',
+            data: JSON.stringify(tourIds),
+            headers: { 'Authorization': 'Bearer ' + token },
+            success: function(response) {
+                self.favoriteIds(response.favoriteIds || []);
+            }
+        });
+    };
+
+    // Favori toggle
+    self.toggleFavorite = function(tour) {
+        var token = localStorage.getItem('token');
+        if (!token) {
+            toastr.warning(T('Common.LoginRequired'));
+            return;
+        }
+
+        $.ajax({
+            url: apiBaseUrl + '/api/favorites/' + tour.id + '/toggle',
+            method: 'POST',
+            headers: { 'Authorization': 'Bearer ' + token },
+            success: function(response) {
+                if (response.isFavorite) {
+                    if (self.favoriteIds().indexOf(tour.id) === -1) {
+                        self.favoriteIds.push(tour.id);
+                    }
+                } else {
+                    self.favoriteIds.remove(tour.id);
+                }
+                toastr.success(response.message);
+            },
+            error: function(xhr) {
+                if (xhr.status === 401) {
+                    toastr.warning(T('Common.LoginRequired'));
+                } else {
+                    toastr.error(T('Common.Error'));
+                }
+            }
+        });
+    };
+
+    // Aktif filtre sayisi
+    self.activeFilterCount = ko.computed(function() {
+        var count = 0;
+        if (self.searchQuery()) count++;
+        if (self.filterDestination()) count++;
+        if (self.filterMinPrice()) count++;
+        if (self.filterMaxPrice()) count++;
+        if (self.filterMinDays()) count++;
+        if (self.filterMaxDays()) count++;
+        if (self.filterCompanyId()) count++;
+        if (self.filterFeatured()) count++;
+        return count;
+    });
 
     // Yorum verileri
     self.reviews = ko.observableArray([]);
@@ -644,11 +924,35 @@ function ToursViewModel() {
     // Turları yukle
     self.loadData = function() {
         self.isLoading(true);
+
+        var params = {};
+        if (self.searchQuery()) params.search = self.searchQuery();
+        if (self.filterDestination()) params.destination = self.filterDestination();
+        if (self.filterMinPrice()) params.minPrice = self.filterMinPrice();
+        if (self.filterMaxPrice()) params.maxPrice = self.filterMaxPrice();
+        if (self.filterMinDays()) params.minDays = self.filterMinDays();
+        if (self.filterMaxDays()) params.maxDays = self.filterMaxDays();
+        if (self.filterCompanyId()) params.companyId = self.filterCompanyId();
+        if (self.filterFeatured()) params.featured = true;
+        if (self.sortBy()) params.sort = self.sortBy();
+
         $.ajax({
             url: apiBaseUrl + '/api/tours',
             method: 'GET',
-            success: function(data) {
-                self.tours(data);
+            data: params,
+            success: function(response) {
+                self.tours(response.tours);
+                self.totalCount(response.totalCount);
+
+                // Filtre seceneklerini guncelle (ilk yuklemede)
+                if (response.filters) {
+                    if (self.destinations().length === 0) {
+                        self.destinations(response.filters.destinations);
+                    }
+                    self.priceRange(response.filters.priceRange);
+                    self.durationRange(response.filters.durationRange);
+                }
+
                 self.isLoading(false);
             },
             error: function() {
@@ -657,6 +961,142 @@ function ToursViewModel() {
             }
         });
     };
+
+    // Firmalari yukle
+    self.loadCompanies = function() {
+        $.ajax({
+            url: apiBaseUrl + '/api/tours/companies',
+            method: 'GET',
+            success: function(data) {
+                self.companies(data);
+            }
+        });
+    };
+
+    // Filtreleri uygula
+    self.applyFilters = function() {
+        self.loadData();
+    };
+
+    // Filtreleri temizle
+    self.clearFilters = function() {
+        self.searchQuery('');
+        self.filterDestination('');
+        self.filterMinPrice('');
+        self.filterMaxPrice('');
+        self.filterMinDays('');
+        self.filterMaxDays('');
+        self.filterCompanyId('');
+        self.filterFeatured(false);
+        self.sortBy('');
+        self.loadData();
+    };
+
+    // Aramayı temizle
+    self.clearSearch = function() {
+        self.searchQuery('');
+        self.loadData();
+    };
+
+    // Gorunum modu degistir
+    self.setViewMode = function(mode) {
+        self.viewMode(mode);
+        if (mode === 'map') {
+            // Haritayi baslatmak icin kucuk bir gecikme gerekli (DOM render)
+            setTimeout(function() {
+                self.initMap();
+            }, 100);
+        }
+    };
+
+    // Haritayi baslat
+    self.initMap = function() {
+        var mapContainer = document.getElementById('toursMap');
+        if (!mapContainer) return;
+
+        // Harita zaten baslatilmissa sadece marker'lari guncelle
+        if (self.map) {
+            self.updateMarkers();
+            return;
+        }
+
+        // Turkiye merkezi koordinatlari
+        self.map = L.map('toursMap').setView([39.0, 35.0], 6);
+
+        // OpenStreetMap tile layer
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+        }).addTo(self.map);
+
+        self.updateMarkers();
+    };
+
+    // Marker'lari guncelle
+    self.updateMarkers = function() {
+        if (!self.map) return;
+
+        // Mevcut marker'lari temizle
+        self.markers.forEach(function(marker) {
+            self.map.removeLayer(marker);
+        });
+        self.markers = [];
+
+        // Koordinatli turlari filtrele
+        var toursWithCoords = self.tours().filter(function(t) {
+            return t.latitude && t.longitude;
+        });
+
+        if (toursWithCoords.length === 0) return;
+
+        var bounds = [];
+
+        toursWithCoords.forEach(function(tour) {
+            var marker = L.marker([tour.latitude, tour.longitude]).addTo(self.map);
+
+            // Popup icerigi
+            var popupContent = '<div class="tour-popup">' +
+                '<strong>' + tour.name + '</strong><br/>' +
+                '<i class="bi bi-geo-alt"></i> ' + tour.destination + '<br/>' +
+                '<span class="badge bg-primary">' + tour.price.toLocaleString('tr-TR', {style: 'currency', currency: 'TRY'}) + '</span> ' +
+                '<small class="text-muted">' + tour.durationDays + ' ' + T('Tour.Days') + '</small><br/>' +
+                (tour.reviewCount > 0 ? '<i class="bi bi-star-fill text-warning"></i> ' + tour.averageRating.toFixed(1) + ' (' + tour.reviewCount + ')' : '') +
+                '<br/><button class="btn btn-sm btn-outline-primary mt-2" onclick="toursVM.showDetails(toursVM.tours().find(function(t){return t.id===' + tour.id + '}))">' +
+                '<i class="bi bi-info-circle"></i> ' + T('Tours.Details') + '</button>' +
+                '</div>';
+
+            marker.bindPopup(popupContent);
+            self.markers.push(marker);
+            bounds.push([tour.latitude, tour.longitude]);
+        });
+
+        // Haritayi marker'lara sigdir
+        if (bounds.length > 0) {
+            self.map.fitBounds(bounds, { padding: [20, 20] });
+        }
+    };
+
+    // Turlar degistiginde marker'lari guncelle ve favorileri yukle
+    self.tours.subscribe(function() {
+        if (self.viewMode() === 'map' && self.map) {
+            self.updateMarkers();
+        }
+        // Favorileri yukle
+        self.loadFavorites();
+    });
+
+    // Siralama degistiginde otomatik yukle
+    self.sortBy.subscribe(function() {
+        self.loadData();
+    });
+
+    // Arama kutusu debounce (300ms bekle)
+    var searchTimeout;
+    self.searchQuery.subscribe(function(newValue) {
+        clearTimeout(searchTimeout);
+        searchTimeout = setTimeout(function() {
+            self.loadData();
+        }, 300);
+    });
 
     // Yorumlari yukle
     self.loadReviews = function(tourId, append) {
@@ -934,9 +1374,11 @@ function ToursViewModel() {
         replyModal = new bootstrap.Modal(document.getElementById('replyModal'));
         reportModal = new bootstrap.Modal(document.getElementById('reportModal'));
         self.loadData();
+        self.loadCompanies();
     });
 }
 
-ko.applyBindings(new ToursViewModel(), document.getElementById('toursApp'));
+var toursVM = new ToursViewModel();
+ko.applyBindings(toursVM, document.getElementById('toursApp'));
 </script>
 }

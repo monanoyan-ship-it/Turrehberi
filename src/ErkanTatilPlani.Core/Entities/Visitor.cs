@@ -22,6 +22,46 @@ public class Visitor : BaseEntity
     /// </summary>
     public string PreferredLanguage { get; set; } = "tr";
 
+    /// <summary>
+    /// Kullanicinin adresi
+    /// </summary>
+    public string? Address { get; set; }
+
+    /// <summary>
+    /// Kullanicinin dogum tarihi
+    /// </summary>
+    public DateTime? BirthDate { get; set; }
+
+    /// <summary>
+    /// Profil resmi URL'i
+    /// </summary>
+    public string? AvatarUrl { get; set; }
+
+    /// <summary>
+    /// Sifre sifirlama token'i
+    /// </summary>
+    public string? PasswordResetToken { get; set; }
+
+    /// <summary>
+    /// Sifre sifirlama token'inin gecerlilik suresi
+    /// </summary>
+    public DateTime? PasswordResetTokenExpiry { get; set; }
+
+    /// <summary>
+    /// Email adresi dogrulandi mi?
+    /// </summary>
+    public bool EmailVerified { get; set; } = false;
+
+    /// <summary>
+    /// Email dogrulama token'i
+    /// </summary>
+    public string? EmailVerificationToken { get; set; }
+
+    /// <summary>
+    /// Email dogrulama token'inin gecerlilik suresi
+    /// </summary>
+    public DateTime? EmailVerificationTokenExpiry { get; set; }
+
     // Firma sahibi ise iliskili firma
     public int? CompanyId { get; set; }
     public virtual Company? Company { get; set; }
@@ -31,4 +71,5 @@ public class Visitor : BaseEntity
     public virtual ICollection<TourReview> Reviews { get; set; } = new List<TourReview>();
     public virtual ICollection<ReviewHelpful> HelpfulVotes { get; set; } = new List<ReviewHelpful>();
     public virtual ICollection<ReviewReply> ReviewReplies { get; set; } = new List<ReviewReply>();
+    public virtual ICollection<FavoriteTour> FavoriteTours { get; set; } = new List<FavoriteTour>();
 }

@@ -11,6 +11,12 @@ public class Reservation : BaseEntity
     public ReservationStatus Status { get; set; } = ReservationStatus.Pending;
     public string Notes { get; set; } = string.Empty;
 
+    // Odeme Bilgileri
+    public string? PaymentId { get; set; }
+    public PaymentStatusEnum PaymentStatus { get; set; } = PaymentStatusEnum.Pending;
+    public DateTime? PaidAt { get; set; }
+    public string? PaymentToken { get; set; }
+
     public virtual Tour Tour { get; set; } = null!;
     public virtual Visitor Visitor { get; set; } = null!;
 }
@@ -21,4 +27,12 @@ public enum ReservationStatus
     Confirmed = 1,
     Cancelled = 2,
     Completed = 3
+}
+
+public enum PaymentStatusEnum
+{
+    Pending = 0,
+    Paid = 1,
+    Failed = 2,
+    Refunded = 3
 }

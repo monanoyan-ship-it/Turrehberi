@@ -3,10 +3,42 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>@ViewData["Title"] - Erkan Tatil Plani</title>
+    <title>@(ViewData["Title"] ?? "Ana Sayfa") - Erkan Tatil Plani</title>
+
+    <!-- Default Meta Tags -->
+    <meta name="description" content="@(ViewData["Description"] ?? "Erkan Tatil Plani - Turkiye'nin en guvenilir tur rezervasyon sistemi. En iyi firmalarin en uygun turlarini kesfedin, hayalinizdeki tatile kavusun!")" />
+    <meta name="keywords" content="tur, tatil, rezervasyon, seyahat, gezi, Turkiye turlari, yurt disi turlari, tur firmalari" />
+    <meta name="author" content="Erkan Tatil Plani" />
+    <meta name="robots" content="index, follow" />
+
+    <!-- Canonical URL -->
+    <link rel="canonical" href="@(ViewData["CanonicalUrl"] ?? Context.Request.GetDisplayUrl())" />
+
+    <!-- Open Graph Meta Tags -->
+    <meta property="og:title" content="@(ViewData["OgTitle"] ?? ViewData["Title"] ?? "Erkan Tatil Plani")" />
+    <meta property="og:description" content="@(ViewData["OgDescription"] ?? ViewData["Description"] ?? "Turkiye'nin en guvenilir tur rezervasyon sistemi. En iyi firmalarin en uygun turlarini kesfedin!")" />
+    <meta property="og:image" content="@(ViewData["OgImage"] ?? "/images/og-default.jpg")" />
+    <meta property="og:url" content="@(ViewData["CanonicalUrl"] ?? Context.Request.GetDisplayUrl())" />
+    <meta property="og:type" content="@(ViewData["OgType"] ?? "website")" />
+    <meta property="og:site_name" content="Erkan Tatil Plani" />
+    <meta property="og:locale" content="tr_TR" />
+
+    <!-- Twitter Card Meta Tags -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="@(ViewData["OgTitle"] ?? ViewData["Title"] ?? "Erkan Tatil Plani")" />
+    <meta name="twitter:description" content="@(ViewData["OgDescription"] ?? ViewData["Description"] ?? "Turkiye'nin en guvenilir tur rezervasyon sistemi.")" />
+    <meta name="twitter:image" content="@(ViewData["OgImage"] ?? "/images/og-default.jpg")" />
+
+    <!-- Favicon -->
+    <link rel="icon" type="image/x-icon" href="/favicon.ico" />
+    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
+
+    @await RenderSectionAsync("Head", required: false)
+
     <link rel="stylesheet" href="~/lib/bootstrap/css/bootstrap.min.css" />
     <link rel="stylesheet" href="~/lib/bootstrap-icons/font/bootstrap-icons.css" />
     <link rel="stylesheet" href="~/lib/toastr/toastr.min.css" />
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
     <style>
         .top-ad-banner {
@@ -178,6 +210,7 @@
     <script src="~/lib/jquery/jquery.min.js"></script>
     <script src="~/lib/bootstrap/js/bootstrap.bundle.min.js"></script>
     <script src="~/lib/knockout/knockout-latest.min.js"></script>
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
     <script src="~/lib/toastr/toastr.min.js"></script>
     <script>
         // ===============================================
@@ -368,9 +401,130 @@
         });
 
         // ===============================================
+        // LAZY LOADING & IMAGE OPTIMIZATION
+        // ===============================================
+        var LazyLoad = {
+            observer: null,
+
+            // Initialize Intersection Observer for lazy loading
+            init: function() {
+                if ('IntersectionObserver' in window) {
+                    this.observer = new IntersectionObserver(this.onIntersect.bind(this), {
+                        rootMargin: '50px 0px',
+                        threshold: 0.01
+                    });
+                    this.observeImages();
+                } else {
+                    // Fallback for older browsers
+                    this.loadAllImages();
+                }
+            },
+
+            // Observe all lazy images
+            observeImages: function() {
+                var images = document.querySelectorAll('img[data-src]');
+                images.forEach(function(img) {
+                    this.observer.observe(img);
+                }.bind(this));
+            },
+
+            // Handle intersection
+            onIntersect: function(entries, observer) {
+                entries.forEach(function(entry) {
+                    if (entry.isIntersecting) {
+                        this.loadImage(entry.target);
+                        observer.unobserve(entry.target);
+                    }
+                }.bind(this));
+            },
+
+            // Load single image
+            loadImage: function(img) {
+                var src = img.getAttribute('data-src');
+                if (!src) return;
+
+                img.classList.add('lazy-img');
+
+                var newImg = new Image();
+                newImg.onload = function() {
+                    img.src = src;
+                    img.classList.add('loaded', 'fade-in-img');
+                    img.removeAttribute('data-src');
+                };
+                newImg.onerror = function() {
+                    img.classList.add('img-error-fallback');
+                    img.alt = 'Resim yuklenemedi';
+                };
+                newImg.src = src;
+            },
+
+            // Fallback: load all images immediately
+            loadAllImages: function() {
+                var images = document.querySelectorAll('img[data-src]');
+                images.forEach(function(img) {
+                    this.loadImage(img);
+                }.bind(this));
+            },
+
+            // Refresh observer (call after dynamic content loads)
+            refresh: function() {
+                if (this.observer) {
+                    this.observeImages();
+                }
+            }
+        };
+
+        // KnockoutJS custom binding for lazy images
+        if (typeof ko !== 'undefined') {
+            ko.bindingHandlers.lazyImage = {
+                init: function(element, valueAccessor) {
+                    var value = ko.unwrap(valueAccessor());
+                    if (value) {
+                        element.setAttribute('data-src', value);
+                        element.classList.add('lazy-img');
+                        // Use native lazy loading as primary
+                        element.setAttribute('loading', 'lazy');
+                        // Set placeholder
+                        element.src = 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 300"%3E%3Crect fill="%23f0f0f0" width="400" height="300"/%3E%3C/svg%3E';
+                    }
+                },
+                update: function(element, valueAccessor) {
+                    var value = ko.unwrap(valueAccessor());
+                    if (value) {
+                        element.setAttribute('data-src', value);
+                        // Load if in viewport
+                        if (LazyLoad.observer) {
+                            LazyLoad.observer.observe(element);
+                        } else {
+                            element.src = value;
+                            element.classList.add('loaded');
+                        }
+                    }
+                }
+            };
+        }
+
+        // Helper function to add loading="lazy" to img elements
+        function initNativeLazyLoading() {
+            // Modern browsers support native lazy loading
+            if ('loading' in HTMLImageElement.prototype) {
+                var images = document.querySelectorAll('img:not([loading])');
+                images.forEach(function(img) {
+                    // Only add lazy loading to images below the fold
+                    if (!img.closest('.carousel-inner')) {
+                        img.setAttribute('loading', 'lazy');
+                    }
+                });
+            }
+        }
+
+        // ===============================================
         // INIT
         // ===============================================
         $(document).ready(function() {
+            // Initialize lazy loading
+            LazyLoad.init();
+            initNativeLazyLoading();
             // Load languages and locale
             loadLanguages();
 

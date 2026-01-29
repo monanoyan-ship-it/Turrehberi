@@ -134,6 +134,61 @@
             </div>
         </div>
     </div>
+
+    <!-- Cache Yonetimi -->
+    <div class="row g-4 mt-2">
+        <div class="col-12">
+            <div class="admin-card">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <span><i class="bi bi-database me-2"></i>Cache Yonetimi</span>
+                    <span class="badge bg-info">Performans</span>
+                </div>
+                <div class="card-body">
+                    <div class="row g-3">
+                        <div class="col-md-4 col-lg-2">
+                            <button class="btn btn-outline-danger w-100" data-bind="click: clearAllCache, disable: isCacheClearing">
+                                <span data-bind="visible: !isCacheClearing()">
+                                    <i class="bi bi-trash3 me-1"></i> Tum Cache
+                                </span>
+                                <span data-bind="visible: isCacheClearing" class="spinner-border spinner-border-sm"></span>
+                            </button>
+                        </div>
+                        <div class="col-md-4 col-lg-2">
+                            <button class="btn btn-outline-primary w-100" data-bind="click: function() { clearCache('tours') }, disable: isCacheClearing">
+                                <i class="bi bi-geo-alt me-1"></i> Tur Cache
+                            </button>
+                        </div>
+                        <div class="col-md-4 col-lg-2">
+                            <button class="btn btn-outline-success w-100" data-bind="click: function() { clearCache('companies') }, disable: isCacheClearing">
+                                <i class="bi bi-building me-1"></i> Firma Cache
+                            </button>
+                        </div>
+                        <div class="col-md-4 col-lg-2">
+                            <button class="btn btn-outline-info w-100" data-bind="click: function() { clearCache('localization') }, disable: isCacheClearing">
+                                <i class="bi bi-translate me-1"></i> Dil Cache
+                            </button>
+                        </div>
+                        <div class="col-md-4 col-lg-2">
+                            <button class="btn btn-outline-warning w-100" data-bind="click: function() { clearCache('stats') }, disable: isCacheClearing">
+                                <i class="bi bi-bar-chart me-1"></i> Istatistik Cache
+                            </button>
+                        </div>
+                        <div class="col-md-4 col-lg-2">
+                            <button class="btn btn-secondary w-100" data-bind="click: loadData">
+                                <i class="bi bi-arrow-clockwise me-1"></i> Yenile
+                            </button>
+                        </div>
+                    </div>
+                    <div class="mt-3">
+                        <small class="text-muted">
+                            <i class="bi bi-info-circle me-1"></i>
+                            Cache temizleme, guncel verilerin gosterilmesini saglar. Performans icin gerekmedikce kullanmayin.
+                        </small>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
 
 @section Scripts {
@@ -150,6 +205,7 @@ function DashboardViewModel() {
 
     self.recentReservations = ko.observableArray([]);
     self.featuredTours = ko.observableArray([]);
+    self.isCacheClearing = ko.observable(false);
 
     self.getStatusBadge = function(status) {
         var badges = {
@@ -169,6 +225,45 @@ function DashboardViewModel() {
             3: 'Tamamlandi'
         };
         return texts[status] || 'Bilinmiyor';
+    };
+
+    // Cache temizleme fonksiyonlari
+    self.clearAllCache = function() {
+        if (!confirm('Tum cache temizlenecek. Emin misiniz?')) return;
+        self.isCacheClearing(true);
+        $.ajax({
+            url: apiBaseUrl + '/api/cache/clear',
+            method: 'POST',
+            success: function(response) {
+                toastr.success(response.message || 'Tum cache temizlendi');
+                self.loadData(); // Verileri yenile
+            },
+            error: function(xhr) {
+                var msg = xhr.responseJSON ? xhr.responseJSON.message : 'Hata olustu';
+                toastr.error(msg);
+            },
+            complete: function() {
+                self.isCacheClearing(false);
+            }
+        });
+    };
+
+    self.clearCache = function(type) {
+        self.isCacheClearing(true);
+        $.ajax({
+            url: apiBaseUrl + '/api/cache/clear/' + type,
+            method: 'POST',
+            success: function(response) {
+                toastr.success(response.message || type + ' cache temizlendi');
+            },
+            error: function(xhr) {
+                var msg = xhr.responseJSON ? xhr.responseJSON.message : 'Hata olustu';
+                toastr.error(msg);
+            },
+            complete: function() {
+                self.isCacheClearing(false);
+            }
+        });
     };
 
     self.loadData = function() {

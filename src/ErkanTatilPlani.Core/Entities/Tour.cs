@@ -11,6 +11,20 @@ public class Tour : BaseEntity
     public string ImageUrl { get; set; } = string.Empty;
     public bool IsFeatured { get; set; } = false;
 
+    // ===============================================
+    // KONUM BILGISI (Harita icin)
+    // ===============================================
+
+    /// <summary>
+    /// Tur lokasyonunun enlemi
+    /// </summary>
+    public double? Latitude { get; set; }
+
+    /// <summary>
+    /// Tur lokasyonunun boylamı
+    /// </summary>
+    public double? Longitude { get; set; }
+
     public int CompanyId { get; set; }
     public virtual Company Company { get; set; } = null!;
 
@@ -34,4 +48,5 @@ public class Tour : BaseEntity
 
     public virtual ICollection<Reservation> Reservations { get; set; } = new List<Reservation>();
     public virtual ICollection<TourReview> Reviews { get; set; } = new List<TourReview>();
+    public virtual ICollection<FavoriteTour> FavoritedBy { get; set; } = new List<FavoriteTour>();
 }

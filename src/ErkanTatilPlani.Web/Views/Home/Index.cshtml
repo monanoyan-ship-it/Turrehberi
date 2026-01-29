@@ -1,5 +1,27 @@
 @{
     ViewData["Title"] = "Ana Sayfa";
+    ViewData["Description"] = "Erkan Tatil Plani - Turkiye'nin en guvenilir tur rezervasyon sistemi. En iyi firmalarin en uygun turlarini kesfedin, hayalinizdeki tatile kavusun!";
+    ViewData["OgTitle"] = "Erkan Tatil Plani - Tur Rezervasyon Sistemi";
+    ViewData["OgDescription"] = "Turkiye ve yurt disi turlari icin en uygun fiyatlar. One cikan turlari kesfedin ve hayalinizdeki tatile basvurun!";
+    ViewData["OgType"] = "website";
+}
+
+@section Head {
+    <!-- Home Page Schema.org JSON-LD -->
+    <script type="application/ld+json">
+    {
+        "@@context": "https://schema.org",
+        "@@type": "WebSite",
+        "name": "Erkan Tatil Plani",
+        "url": "@Context.Request.GetDisplayUrl()",
+        "description": "Turkiye'nin en guvenilir tur rezervasyon sistemi",
+        "potentialAction": {
+            "@@type": "SearchAction",
+            "target": "@($"{Context.Request.Scheme}://{Context.Request.Host}")/Tours?search={search_term_string}",
+            "query-input": "required name=search_term_string"
+        }
+    }
+    </script>
 }
 
 <div id="homeApp">
@@ -76,9 +98,13 @@
     <div class="row g-4" data-bind="foreach: featuredTours">
         <div class="col-md-4">
             <div class="card h-100 shadow-sm border-0 tour-card">
-                <div class="position-relative" style="height: 200px; overflow: hidden;">
+                <div class="position-relative lazy-img-container" style="height: 200px; overflow: hidden;">
                     <!-- ko if: imageUrl -->
-                    <img data-bind="attr: { src: imageUrl, alt: name }" class="w-100 h-100" style="object-fit: cover;">
+                    <img data-bind="attr: { src: imageUrl, alt: name }"
+                         class="w-100 h-100 card-img-lazy"
+                         style="object-fit: cover;"
+                         loading="lazy"
+                         decoding="async" />
                     <!-- /ko -->
                     <!-- ko ifnot: imageUrl -->
                     <div class="d-flex align-items-center justify-content-center bg-secondary w-100 h-100">
