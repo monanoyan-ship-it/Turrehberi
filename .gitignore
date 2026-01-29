@@ -62,3 +62,8 @@ appsettings.Local.json
 *.ipa
 *.msix
 *.appx
+
+# Temp folders
+temp_build/
+temp_build_final/
+nul
