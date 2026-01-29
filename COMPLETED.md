@@ -318,6 +318,32 @@
     - 6 buton: Tum Cache, Tur, Firma, Dil, Istatistik, Yenile
     - Loading state ve onay dialoglari
 
+### Teknik Borc (Altyapi Iyilestirmeleri)
+- [x] Exception Handling Middleware:
+  - Global exception handler
+  - ProblemDetails formatinda JSON response
+  - Development/Production ayrimi
+  - Veritabani loglama entegrasyonu
+- [x] Veritabani Loglama Sistemi:
+  - AppLog entity (Level, Message, Exception, StackTrace, vb.)
+  - IAppLogService interface ve implementasyonu
+  - LogsController (Admin - log goruntuleme, temizleme)
+  - Exception middleware entegrasyonu
+- [x] Rate Limiting:
+  - Global limit: 100 request/dakika (IP bazli)
+  - Auth endpoint'leri: 10 request/dakika
+  - Sensitive endpoint'ler: 5 request/dakika
+  - 429 Too Many Requests response
+- [x] Swagger Iyilestirmeleri:
+  - JWT Bearer authentication
+  - XML dokumantasyon
+  - Swagger UI (/swagger)
+- [x] Unit Test Projesi:
+  - ErkanTatilPlani.Tests (xUnit + Moq)
+  - CacheService testleri (10 test)
+  - Entity testleri (11 test)
+  - Toplam 21 test
+
 ### Dokumantasyon
 - [x] CLAUDE.md (gelistirici kurallari)
 - [x] PROJE_YAPISI.md (detayli proje dokumantasyonu)

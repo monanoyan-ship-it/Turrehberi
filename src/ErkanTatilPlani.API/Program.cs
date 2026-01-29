@@ -1,4 +1,8 @@
+using System.Reflection;
+using System.Threading.RateLimiting;
+using ErkanTatilPlani.API.Middleware;
 using ErkanTatilPlani.API.Services;
+using Microsoft.OpenApi.Models;
 using ErkanTatilPlani.Core.Localization;
 using ErkanTatilPlani.Core.Services;
 using ErkanTatilPlani.Data.Context;
@@ -28,6 +32,69 @@ builder.Services.AddSingleton<ICacheService, CacheService>();
 
 // Response Caching
 builder.Services.AddResponseCaching();
+
+// HttpContextAccessor (log servisi icin)
+builder.Services.AddHttpContextAccessor();
+
+// App Log Service (veritabani loglama)
+builder.Services.AddScoped<IAppLogService, AppLogService>();
+
+// Rate Limiting
+builder.Services.AddRateLimiter(options =>
+{
+    // Global limiter: 100 istek / dakika (IP bazli)
+    options.GlobalLimiter = PartitionedRateLimiter.Create<HttpContext, string>(context =>
+        RateLimitPartition.GetFixedWindowLimiter(
+            partitionKey: context.Connection.RemoteIpAddress?.ToString() ?? "anonymous",
+            factory: partition => new FixedWindowRateLimiterOptions
+            {
+                AutoReplenishment = true,
+                PermitLimit = 100,
+                Window = TimeSpan.FromMinutes(1)
+            }));
+
+    // Auth endpoint'leri icin ozel limiter: 10 istek / dakika
+    options.AddPolicy("auth", context =>
+        RateLimitPartition.GetFixedWindowLimiter(
+            partitionKey: context.Connection.RemoteIpAddress?.ToString() ?? "anonymous",
+            factory: partition => new FixedWindowRateLimiterOptions
+            {
+                AutoReplenishment = true,
+                PermitLimit = 10,
+                Window = TimeSpan.FromMinutes(1)
+            }));
+
+    // Sensitive endpoint'ler icin: 5 istek / dakika
+    options.AddPolicy("sensitive", context =>
+        RateLimitPartition.GetFixedWindowLimiter(
+            partitionKey: context.Connection.RemoteIpAddress?.ToString() ?? "anonymous",
+            factory: partition => new FixedWindowRateLimiterOptions
+            {
+                AutoReplenishment = true,
+                PermitLimit = 5,
+                Window = TimeSpan.FromMinutes(1)
+            }));
+
+    // Rate limit asildisinda response
+    options.OnRejected = async (context, token) =>
+    {
+        context.HttpContext.Response.StatusCode = StatusCodes.Status429TooManyRequests;
+        context.HttpContext.Response.ContentType = "application/json";
+
+        var response = new
+        {
+            type = "https://httpstatuses.com/429",
+            title = "Cok fazla istek",
+            status = 429,
+            detail = "Istek limiti asildi. Lutfen bir sure bekleyip tekrar deneyin.",
+            retryAfter = context.Lease.TryGetMetadata(MetadataName.RetryAfter, out var retryAfter)
+                ? retryAfter.TotalSeconds
+                : 60
+        };
+
+        await context.HttpContext.Response.WriteAsJsonAsync(response, token);
+    };
+});
 
 // Add services to the container.
 builder.Services.AddDbContext<AppDbContext>(options =>
@@ -66,6 +133,57 @@ builder.Services.AddControllers()
     });
 builder.Services.AddOpenApi();
 
+// Swagger/OpenAPI
+builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddSwaggerGen(options =>
+{
+    options.SwaggerDoc("v1", new OpenApiInfo
+    {
+        Version = "v1",
+        Title = "Erkan Tatil Plani API",
+        Description = "Tur kiralama ve rezervasyon sistemi API dokumantasyonu",
+        Contact = new OpenApiContact
+        {
+            Name = "Erkan Tatil Plani",
+            Email = "info@erkantatilplani.com"
+        }
+    });
+
+    // JWT Bearer Authentication
+    options.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
+    {
+        Description = "JWT Authorization header. Ornek: \"Bearer {token}\"",
+        Name = "Authorization",
+        In = ParameterLocation.Header,
+        Type = SecuritySchemeType.ApiKey,
+        Scheme = "Bearer",
+        BearerFormat = "JWT"
+    });
+
+    options.AddSecurityRequirement(new OpenApiSecurityRequirement
+    {
+        {
+            new OpenApiSecurityScheme
+            {
+                Reference = new OpenApiReference
+                {
+                    Type = ReferenceType.SecurityScheme,
+                    Id = "Bearer"
+                }
+            },
+            Array.Empty<string>()
+        }
+    });
+
+    // XML dokumantasyon
+    var xmlFilename = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
+    var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFilename);
+    if (File.Exists(xmlPath))
+    {
+        options.IncludeXmlComments(xmlPath);
+    }
+});
+
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowAll", policy =>
@@ -86,12 +204,23 @@ using (var scope = app.Services.CreateScope())
 }
 
 // Configure the HTTP request pipeline.
+app.UseExceptionHandling(); // Global exception handler - ilk sirada olmali
+
 if (app.Environment.IsDevelopment())
 {
     app.MapOpenApi();
+    app.UseSwagger();
+    app.UseSwaggerUI(options =>
+    {
+        options.SwaggerEndpoint("/swagger/v1/swagger.json", "Erkan Tatil Plani API v1");
+        options.RoutePrefix = "swagger";
+        options.DocumentTitle = "Erkan Tatil Plani API";
+        options.DefaultModelsExpandDepth(-1); // Modelleri gizle
+    });
 }
 
 app.UseHttpsRedirection();
+app.UseRateLimiter(); // Rate limiting
 app.UseCors("AllowAll");
 app.UseStaticFiles();
 app.UseResponseCaching();

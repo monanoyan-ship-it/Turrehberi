@@ -1,13 +1,15 @@
-using ErkanTatilPlani.Core.Entities;
-using ErkanTatilPlani.Core.Enums;
-using ErkanTatilPlani.Data.Context;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Security.Cryptography;
 using System.Text;
+using System.Threading.RateLimiting;
+using ErkanTatilPlani.Core.Entities;
+using ErkanTatilPlani.Core.Enums;
+using ErkanTatilPlani.Data.Context;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.RateLimiting;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
 
 namespace ErkanTatilPlani.API.Controllers;
 
@@ -27,6 +29,7 @@ public class AuthController : ControllerBase
     }
 
     [HttpPost("login")]
+    [EnableRateLimiting("auth")]
     public async Task<IActionResult> Login([FromBody] LoginRequest request)
     {
         if (string.IsNullOrEmpty(request.Email) || string.IsNullOrEmpty(request.Password))
@@ -65,6 +68,7 @@ public class AuthController : ControllerBase
     }
 
     [HttpPost("register")]
+    [EnableRateLimiting("auth")]
     public async Task<IActionResult> Register([FromBody] RegisterRequest request)
     {
         // Validation
@@ -119,6 +123,7 @@ public class AuthController : ControllerBase
     }
 
     [HttpPost("register-company")]
+    [EnableRateLimiting("auth")]
     public async Task<IActionResult> RegisterCompany([FromBody] RegisterCompanyRequest request)
     {
         // Validation
@@ -354,6 +359,7 @@ public class AuthController : ControllerBase
     /// Sifremi unuttum - email ile sifre sifirlama linki gonder
     /// </summary>
     [HttpPost("forgot-password")]
+    [EnableRateLimiting("sensitive")]
     public async Task<IActionResult> ForgotPassword([FromBody] ForgotPasswordRequest request)
     {
         if (string.IsNullOrWhiteSpace(request.Email))
@@ -399,6 +405,7 @@ public class AuthController : ControllerBase
     /// Sifre sifirla - token ile yeni sifre belirle
     /// </summary>
     [HttpPost("reset-password")]
+    [EnableRateLimiting("sensitive")]
     public async Task<IActionResult> ResetPassword([FromBody] ResetPasswordRequest request)
     {
         if (string.IsNullOrWhiteSpace(request.Email))

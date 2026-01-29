@@ -27,6 +27,9 @@ public class AppDbContext : DbContext
     // Favorites
     public DbSet<FavoriteTour> FavoriteTours => Set<FavoriteTour>();
 
+    // Logging
+    public DbSet<AppLog> AppLogs => Set<AppLog>();
+
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         base.OnModelCreating(modelBuilder);
@@ -262,6 +265,32 @@ public class AppDbContext : DbContext
                   .WithMany(t => t.FavoritedBy)
                   .HasForeignKey(e => e.TourId)
                   .OnDelete(DeleteBehavior.Cascade);
+        });
+
+        // ===============================================
+        // UYGULAMA LOGLARI
+        // ===============================================
+
+        modelBuilder.Entity<AppLog>(entity =>
+        {
+            entity.HasKey(e => e.Id);
+            entity.Property(e => e.Level).HasMaxLength(20).IsRequired();
+            entity.Property(e => e.Message).IsRequired();
+            entity.Property(e => e.Source).HasMaxLength(200);
+            entity.Property(e => e.Action).HasMaxLength(200);
+            entity.Property(e => e.TraceId).HasMaxLength(50);
+            entity.Property(e => e.UserId).HasMaxLength(50);
+            entity.Property(e => e.UserName).HasMaxLength(100);
+            entity.Property(e => e.IpAddress).HasMaxLength(45);
+            entity.Property(e => e.UserAgent).HasMaxLength(500);
+            entity.Property(e => e.RequestPath).HasMaxLength(500);
+            entity.Property(e => e.RequestMethod).HasMaxLength(10);
+
+            // Indexler - sorgulama performansi icin
+            entity.HasIndex(e => e.Timestamp);
+            entity.HasIndex(e => e.Level);
+            entity.HasIndex(e => e.Source);
+            entity.HasIndex(e => new { e.Level, e.Timestamp });
         });
 
         // Seed Data
