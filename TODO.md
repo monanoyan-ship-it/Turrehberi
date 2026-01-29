@@ -40,7 +40,7 @@
 - [x] Yorum yazma formu (puan secimi, pros/cons)
 - [x] Yorum filtreleme ve siralama
 - [x] Firma yaniti ozelligi
-- [ ] Fotograf yukleme (sonraki asamada)
+- [x] Fotograf yukleme
 - [x] Yorum moderasyon paneli (Admin)
 
 ### Firma Profil Sayfasi (SEO + Web Sitesi)
@@ -49,7 +49,7 @@
 - [x] Firma hakkinda tam bilgi (logo, aciklama, iletisim, adres)
 - [x] Firmanin turlari listesi
 - [x] Firmanin yorumlari ve ortalama puani
-- [ ] Galeri/Fotograf bolumu (sonraki asamada)
+- [x] Galeri/Fotograf bolumu
 - [ ] Iletisim formu (sonraki asamada)
 - [x] Schema.org yapilandirmasi (TravelAgency, AggregateRating)
 - [x] Google indekslenebilir URL yapisi (slug tabanli)
@@ -102,7 +102,7 @@
 - [ ] Blog/Haber modulu
 - [ ] SSS (Sikca Sorulan Sorular)
 - [ ] Canli destek entegrasyonu
-- [ ] Sosyal medya paylasimi
+- [x] Sosyal medya paylasimi
 - [x] Favori turlar ozelligi
 
 ---

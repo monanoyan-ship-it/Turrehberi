@@ -235,6 +235,20 @@
                     <button class="btn btn-success flex-grow-1" data-bind="click: $parent.openReservationModal">
                         <i class="bi bi-calendar-check"></i> Rezervasyon Yap
                     </button>
+                    <!-- Paylas Dropdown -->
+                    <div class="dropdown">
+                        <button class="btn btn-outline-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown" title="Paylas">
+                            <i class="bi bi-share"></i>
+                        </button>
+                        <ul class="dropdown-menu dropdown-menu-end">
+                            <li><a class="dropdown-item" href="#" data-bind="click: function() { $parent.shareTour($data, 'facebook') }"><i class="bi bi-facebook text-primary me-2"></i>Facebook</a></li>
+                            <li><a class="dropdown-item" href="#" data-bind="click: function() { $parent.shareTour($data, 'twitter') }"><i class="bi bi-twitter-x me-2"></i>X</a></li>
+                            <li><a class="dropdown-item" href="#" data-bind="click: function() { $parent.shareTour($data, 'whatsapp') }"><i class="bi bi-whatsapp text-success me-2"></i>WhatsApp</a></li>
+                            <li><a class="dropdown-item" href="#" data-bind="click: function() { $parent.shareTour($data, 'telegram') }"><i class="bi bi-telegram text-info me-2"></i>Telegram</a></li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li><a class="dropdown-item" href="#" data-bind="click: function() { $parent.shareTour($data, 'copy') }"><i class="bi bi-link-45deg me-2"></i>Linki Kopyala</a></li>
+                        </ul>
+                    </div>
                 </div>
             </div>
         </div>
@@ -297,6 +311,12 @@
                                     </div>
                                 </div>
                             </div>
+                        </div>
+
+                        <!-- Paylas Butonlari -->
+                        <div class="mt-3">
+                            <small class="text-muted d-block mb-2"><i class="bi bi-share"></i> <span data-t="Share.Title">Paylas</span></small>
+                            <div id="tourShareButtons"></div>
                         </div>
                     </div>
                 </div>
@@ -792,6 +812,18 @@ function ToursViewModel() {
     };
 
     // Favori toggle
+    // Tur paylas
+    self.shareTour = function(tour, platform) {
+        var shareUrl = window.location.origin + '/Tours?id=' + tour.id;
+        var shareText = tour.name + ' - ' + tour.destination + ' | Erkan Tatil Plani';
+
+        if (platform === 'copy') {
+            SocialShare.copyLink(shareUrl);
+        } else {
+            SocialShare.share(platform, shareUrl, shareText);
+        }
+    };
+
     self.toggleFavorite = function(tour) {
         var token = localStorage.getItem('token');
         if (!token) {
@@ -1157,6 +1189,17 @@ function ToursViewModel() {
     self.showDetails = function(tour) {
         self.selectedTour(tour);
         self.loadReviews(tour.id, false);
+
+        // Render share buttons
+        var shareUrl = window.location.origin + '/Tours?id=' + tour.id;
+        var shareText = tour.name + ' - ' + tour.destination + ' | Erkan Tatil Plani';
+        $('#tourShareButtons').html(SocialShare.renderButtons({
+            url: shareUrl,
+            text: shareText,
+            size: 'sm',
+            platforms: ['facebook', 'twitter', 'whatsapp', 'telegram', 'copy']
+        }));
+
         detailsModal.show();
     };
 

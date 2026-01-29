@@ -14,13 +14,15 @@ public class CompaniesController : ControllerBase
     private readonly AppDbContext _context;
     private readonly IWebHostEnvironment _env;
     private readonly ICacheService _cache;
+    private readonly IFileUploadService _fileUploadService;
     private const long MaxFileSize = 10 * 1024 * 1024; // 10MB
 
-    public CompaniesController(AppDbContext context, IWebHostEnvironment env, ICacheService cache)
+    public CompaniesController(AppDbContext context, IWebHostEnvironment env, ICacheService cache, IFileUploadService fileUploadService)
     {
         _context = context;
         _env = env;
         _cache = cache;
+        _fileUploadService = fileUploadService;
     }
 
     [HttpGet]
@@ -624,6 +626,195 @@ public class CompaniesController : ControllerBase
 
         return Ok(new { message = "Sozlesme basariyla silindi" });
     }
+
+    // ===============================================
+    // FIRMA GALERI ISLEMLERI
+    // ===============================================
+
+    /// <summary>
+    /// Firma galerisine resim yukle
+    /// </summary>
+    [HttpPost("{id}/gallery")]
+    public async Task<ActionResult<object>> UploadGalleryImage(int id, [FromForm] IFormFile file, [FromForm] string? title = null, [FromForm] string? description = null, [FromForm] bool isFeatured = false)
+    {
+        var company = await _context.Companies.FindAsync(id);
+        if (company == null)
+            return NotFound(new { message = "Firma bulunamadi" });
+
+        // Maksimum 20 resim
+        var imageCount = await _context.CompanyGalleryImages.CountAsync(g => g.CompanyId == id && g.IsActive);
+        if (imageCount >= 20)
+            return BadRequest(new { message = "Galeriye en fazla 20 resim yuklenebilir" });
+
+        // Dosya kontrolu
+        if (file == null || file.Length == 0)
+            return BadRequest(new { message = "Dosya secilmedi" });
+
+        // Yukleme
+        using var stream = file.OpenReadStream();
+        var result = await _fileUploadService.UploadImageWithThumbnailAsync(stream, file.FileName, "galleries");
+
+        if (!result.Success)
+            return BadRequest(new { message = result.ErrorMessage });
+
+        // Eger isFeatured ise diger featured resimlerin durumunu guncelle
+        if (isFeatured)
+        {
+            await _context.CompanyGalleryImages
+                .Where(g => g.CompanyId == id && g.IsFeatured)
+                .ExecuteUpdateAsync(s => s.SetProperty(g => g.IsFeatured, false));
+        }
+
+        // Veritabanina kaydet
+        var galleryImage = new CompanyGalleryImage
+        {
+            CompanyId = id,
+            ImageUrl = result.Url!,
+            ThumbnailUrl = result.ThumbnailUrl ?? result.Url!,
+            Title = title ?? string.Empty,
+            Description = description ?? string.Empty,
+            DisplayOrder = imageCount + 1,
+            FileSize = result.FileSize,
+            Width = result.Width,
+            Height = result.Height,
+            MimeType = result.MimeType ?? "image/jpeg",
+            AltText = title ?? $"Galeri resmi {imageCount + 1}",
+            IsFeatured = isFeatured
+        };
+
+        _context.CompanyGalleryImages.Add(galleryImage);
+        await _context.SaveChangesAsync();
+
+        return Ok(new
+        {
+            message = "Resim yuklendi",
+            image = new
+            {
+                galleryImage.Id,
+                galleryImage.ImageUrl,
+                galleryImage.ThumbnailUrl,
+                galleryImage.Title,
+                galleryImage.Description,
+                galleryImage.DisplayOrder,
+                galleryImage.IsFeatured
+            }
+        });
+    }
+
+    /// <summary>
+    /// Firma galeri resimlerini listele
+    /// </summary>
+    [HttpGet("{id}/gallery")]
+    public async Task<ActionResult<object>> GetGalleryImages(int id)
+    {
+        var company = await _context.Companies.FindAsync(id);
+        if (company == null)
+            return NotFound(new { message = "Firma bulunamadi" });
+
+        var images = await _context.CompanyGalleryImages
+            .Where(g => g.CompanyId == id && g.IsActive)
+            .OrderBy(g => g.DisplayOrder)
+            .Select(g => new
+            {
+                g.Id,
+                g.ImageUrl,
+                g.ThumbnailUrl,
+                g.Title,
+                g.Description,
+                g.DisplayOrder,
+                g.Width,
+                g.Height,
+                g.IsFeatured
+            })
+            .ToListAsync();
+
+        return Ok(images);
+    }
+
+    /// <summary>
+    /// Galeri resmini guncelle
+    /// </summary>
+    [HttpPut("{companyId}/gallery/{imageId}")]
+    public async Task<IActionResult> UpdateGalleryImage(int companyId, int imageId, [FromBody] UpdateGalleryImageRequest request)
+    {
+        var image = await _context.CompanyGalleryImages.FirstOrDefaultAsync(g => g.Id == imageId && g.CompanyId == companyId && g.IsActive);
+        if (image == null)
+            return NotFound(new { message = "Resim bulunamadi" });
+
+        if (request.Title != null) image.Title = request.Title;
+        if (request.Description != null) image.Description = request.Description;
+        if (request.AltText != null) image.AltText = request.AltText;
+        if (request.DisplayOrder.HasValue) image.DisplayOrder = request.DisplayOrder.Value;
+
+        if (request.IsFeatured.HasValue && request.IsFeatured.Value)
+        {
+            // Diger featured'lari kaldir
+            await _context.CompanyGalleryImages
+                .Where(g => g.CompanyId == companyId && g.IsFeatured && g.Id != imageId)
+                .ExecuteUpdateAsync(s => s.SetProperty(g => g.IsFeatured, false));
+            image.IsFeatured = true;
+        }
+        else if (request.IsFeatured.HasValue)
+        {
+            image.IsFeatured = false;
+        }
+
+        image.UpdatedAt = DateTime.UtcNow;
+        await _context.SaveChangesAsync();
+
+        return Ok(new { message = "Resim guncellendi" });
+    }
+
+    /// <summary>
+    /// Galeri resmini sil
+    /// </summary>
+    [HttpDelete("{companyId}/gallery/{imageId}")]
+    public async Task<IActionResult> DeleteGalleryImage(int companyId, int imageId)
+    {
+        var image = await _context.CompanyGalleryImages.FirstOrDefaultAsync(g => g.Id == imageId && g.CompanyId == companyId);
+        if (image == null)
+            return NotFound(new { message = "Resim bulunamadi" });
+
+        // Dosyalari sil
+        await _fileUploadService.DeleteFileAsync(image.ImageUrl);
+        if (!string.IsNullOrEmpty(image.ThumbnailUrl))
+            await _fileUploadService.DeleteFileAsync(image.ThumbnailUrl);
+
+        // Veritabanindan sil (soft delete)
+        image.IsActive = false;
+        image.UpdatedAt = DateTime.UtcNow;
+        await _context.SaveChangesAsync();
+
+        return Ok(new { message = "Resim silindi" });
+    }
+
+    /// <summary>
+    /// Galeri resim siralamasini guncelle
+    /// </summary>
+    [HttpPut("{id}/gallery/reorder")]
+    public async Task<IActionResult> ReorderGalleryImages(int id, [FromBody] ReorderGalleryRequest request)
+    {
+        if (request.ImageIds == null || !request.ImageIds.Any())
+            return BadRequest(new { message = "Resim listesi bos olamaz" });
+
+        var images = await _context.CompanyGalleryImages
+            .Where(g => g.CompanyId == id && request.ImageIds.Contains(g.Id) && g.IsActive)
+            .ToListAsync();
+
+        for (int i = 0; i < request.ImageIds.Count; i++)
+        {
+            var image = images.FirstOrDefault(img => img.Id == request.ImageIds[i]);
+            if (image != null)
+            {
+                image.DisplayOrder = i + 1;
+                image.UpdatedAt = DateTime.UtcNow;
+            }
+        }
+
+        await _context.SaveChangesAsync();
+
+        return Ok(new { message = "Siralama guncellendi" });
+    }
 }
 
 // Request DTO'lari
@@ -650,4 +841,18 @@ public class ReactivateCompanyRequest
 {
     public int? ReviewedById { get; set; }
     public string? ReviewNotes { get; set; }
+}
+
+public class UpdateGalleryImageRequest
+{
+    public string? Title { get; set; }
+    public string? Description { get; set; }
+    public string? AltText { get; set; }
+    public int? DisplayOrder { get; set; }
+    public bool? IsFeatured { get; set; }
+}
+
+public class ReorderGalleryRequest
+{
+    public List<int> ImageIds { get; set; } = new();
 }

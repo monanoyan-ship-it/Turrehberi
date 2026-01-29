@@ -519,6 +519,158 @@
         }
 
         // ===============================================
+        // SOCIAL SHARE UTILITY
+        // ===============================================
+        var SocialShare = {
+            // Share URLs for different platforms
+            platforms: {
+                facebook: 'https://www.facebook.com/sharer/sharer.php?u={url}',
+                twitter: 'https://twitter.com/intent/tweet?url={url}&text={text}',
+                whatsapp: 'https://wa.me/?text={text}%20{url}',
+                telegram: 'https://t.me/share/url?url={url}&text={text}',
+                linkedin: 'https://www.linkedin.com/sharing/share-offsite/?url={url}',
+                pinterest: 'https://pinterest.com/pin/create/button/?url={url}&description={text}'
+            },
+
+            // Open share popup
+            openPopup: function(url, width, height) {
+                width = width || 600;
+                height = height || 400;
+                var left = (screen.width / 2) - (width / 2);
+                var top = (screen.height / 2) - (height / 2);
+                window.open(url, 'share', 'width=' + width + ',height=' + height + ',left=' + left + ',top=' + top);
+            },
+
+            // Share to platform
+            share: function(platform, url, text) {
+                url = url || window.location.href;
+                text = text || document.title;
+
+                var shareUrl = this.platforms[platform];
+                if (!shareUrl) {
+                    console.warn('Unknown platform:', platform);
+                    return;
+                }
+
+                shareUrl = shareUrl
+                    .replace('{url}', encodeURIComponent(url))
+                    .replace('{text}', encodeURIComponent(text));
+
+                this.openPopup(shareUrl);
+            },
+
+            // Copy link to clipboard
+            copyLink: function(url, callback) {
+                url = url || window.location.href;
+
+                if (navigator.clipboard && navigator.clipboard.writeText) {
+                    navigator.clipboard.writeText(url).then(function() {
+                        toastr.success(T('Share.LinkCopied'));
+                        if (callback) callback(true);
+                    }).catch(function() {
+                        // Fallback
+                        SocialShare.copyLinkFallback(url, callback);
+                    });
+                } else {
+                    this.copyLinkFallback(url, callback);
+                }
+            },
+
+            // Fallback copy method
+            copyLinkFallback: function(url, callback) {
+                var textArea = document.createElement('textarea');
+                textArea.value = url;
+                textArea.style.position = 'fixed';
+                textArea.style.left = '-999999px';
+                document.body.appendChild(textArea);
+                textArea.select();
+                try {
+                    document.execCommand('copy');
+                    toastr.success(T('Share.LinkCopied'));
+                    if (callback) callback(true);
+                } catch (err) {
+                    toastr.error(T('Share.CopyFailed'));
+                    if (callback) callback(false);
+                }
+                document.body.removeChild(textArea);
+            },
+
+            // Native share (mobile)
+            nativeShare: function(title, text, url) {
+                if (navigator.share) {
+                    navigator.share({
+                        title: title || document.title,
+                        text: text || '',
+                        url: url || window.location.href
+                    }).catch(function(err) {
+                        if (err.name !== 'AbortError') {
+                            console.warn('Share failed:', err);
+                        }
+                    });
+                    return true;
+                }
+                return false;
+            },
+
+            // Render share buttons (returns HTML)
+            renderButtons: function(options) {
+                options = options || {};
+                var url = options.url || window.location.href;
+                var text = options.text || document.title;
+                var size = options.size || 'sm'; // sm, md, lg
+                var platforms = options.platforms || ['facebook', 'twitter', 'whatsapp', 'telegram', 'linkedin', 'copy'];
+
+                var icons = {
+                    facebook: 'bi-facebook',
+                    twitter: 'bi-twitter-x',
+                    whatsapp: 'bi-whatsapp',
+                    telegram: 'bi-telegram',
+                    linkedin: 'bi-linkedin',
+                    pinterest: 'bi-pinterest',
+                    copy: 'bi-link-45deg'
+                };
+
+                var colors = {
+                    facebook: 'btn-primary',
+                    twitter: 'btn-dark',
+                    whatsapp: 'btn-success',
+                    telegram: 'btn-info',
+                    linkedin: 'btn-primary',
+                    pinterest: 'btn-danger',
+                    copy: 'btn-secondary'
+                };
+
+                var labels = {
+                    facebook: 'Facebook',
+                    twitter: 'X',
+                    whatsapp: 'WhatsApp',
+                    telegram: 'Telegram',
+                    linkedin: 'LinkedIn',
+                    pinterest: 'Pinterest',
+                    copy: T('Share.CopyLink')
+                };
+
+                var html = '<div class="share-buttons d-flex flex-wrap gap-2">';
+                platforms.forEach(function(platform) {
+                    var btnClass = 'btn btn-' + size + ' ' + colors[platform];
+                    var icon = icons[platform];
+                    var label = labels[platform];
+                    var onclick = platform === 'copy'
+                        ? "SocialShare.copyLink('" + url.replace(/'/g, "\\'") + "')"
+                        : "SocialShare.share('" + platform + "', '" + url.replace(/'/g, "\\'") + "', '" + text.replace(/'/g, "\\'") + "')";
+
+                    html += '<button type="button" class="' + btnClass + '" onclick="' + onclick + '" title="' + label + '">';
+                    html += '<i class="bi ' + icon + '"></i>';
+                    if (size !== 'sm') html += ' <span class="d-none d-md-inline">' + label + '</span>';
+                    html += '</button>';
+                });
+                html += '</div>';
+
+                return html;
+            }
+        };
+
+        // ===============================================
         // INIT
         // ===============================================
         $(document).ready(function() {

@@ -30,6 +30,9 @@ public class AppDbContext : DbContext
     // Logging
     public DbSet<AppLog> AppLogs => Set<AppLog>();
 
+    // Gallery
+    public DbSet<CompanyGalleryImage> CompanyGalleryImages => Set<CompanyGalleryImage>();
+
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         base.OnModelCreating(modelBuilder);
@@ -243,6 +246,26 @@ public class AppDbContext : DbContext
                   .HasForeignKey(e => e.ReviewedById)
                   .IsRequired(false)
                   .OnDelete(DeleteBehavior.SetNull);
+        });
+
+        // ===============================================
+        // FIRMA GALERI
+        // ===============================================
+
+        modelBuilder.Entity<CompanyGalleryImage>(entity =>
+        {
+            entity.HasKey(e => e.Id);
+            entity.Property(e => e.ImageUrl).IsRequired().HasMaxLength(500);
+            entity.Property(e => e.ThumbnailUrl).HasMaxLength(500);
+            entity.Property(e => e.Title).HasMaxLength(200);
+            entity.Property(e => e.Description).HasMaxLength(1000);
+            entity.Property(e => e.MimeType).HasMaxLength(50);
+            entity.Property(e => e.AltText).HasMaxLength(200);
+
+            entity.HasOne(e => e.Company)
+                  .WithMany(c => c.GalleryImages)
+                  .HasForeignKey(e => e.CompanyId)
+                  .OnDelete(DeleteBehavior.Cascade);
         });
 
         // ===============================================

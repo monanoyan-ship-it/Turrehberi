@@ -159,10 +159,26 @@
                 </div>
 
                 <div class="card-footer bg-transparent border-0 pt-0">
-                    <a class="btn btn-outline-primary w-100" data-bind="attr: { href: '/Firmalar/' + slug }">
-                        <i class="bi bi-eye me-1"></i>
-                        <span data-t="Companies.ViewProfile">Profili Gor</span>
-                    </a>
+                    <div class="d-flex gap-2">
+                        <a class="btn btn-outline-primary flex-grow-1" data-bind="attr: { href: '/Firmalar/' + slug }">
+                            <i class="bi bi-eye me-1"></i>
+                            <span data-t="Companies.ViewProfile">Profili Gor</span>
+                        </a>
+                        <!-- Paylas Dropdown -->
+                        <div class="dropdown">
+                            <button class="btn btn-outline-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown" title="Paylas">
+                                <i class="bi bi-share"></i>
+                            </button>
+                            <ul class="dropdown-menu dropdown-menu-end">
+                                <li><a class="dropdown-item" href="#" data-bind="click: function() { $parent.shareCompany($data, 'facebook') }"><i class="bi bi-facebook text-primary me-2"></i>Facebook</a></li>
+                                <li><a class="dropdown-item" href="#" data-bind="click: function() { $parent.shareCompany($data, 'twitter') }"><i class="bi bi-twitter-x me-2"></i>X</a></li>
+                                <li><a class="dropdown-item" href="#" data-bind="click: function() { $parent.shareCompany($data, 'whatsapp') }"><i class="bi bi-whatsapp text-success me-2"></i>WhatsApp</a></li>
+                                <li><a class="dropdown-item" href="#" data-bind="click: function() { $parent.shareCompany($data, 'telegram') }"><i class="bi bi-telegram text-info me-2"></i>Telegram</a></li>
+                                <li><hr class="dropdown-divider"></li>
+                                <li><a class="dropdown-item" href="#" data-bind="click: function() { $parent.shareCompany($data, 'copy') }"><i class="bi bi-link-45deg me-2"></i>Linki Kopyala</a></li>
+                            </ul>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -212,6 +228,18 @@ function CompaniesViewModel() {
     self.hasFilters = ko.computed(function() {
         return self.searchQuery() || self.selectedCity() || self.sortBy();
     });
+
+    // Firma paylas
+    self.shareCompany = function(company, platform) {
+        var shareUrl = window.location.origin + '/Firmalar/' + company.slug;
+        var shareText = company.name + ' - ' + (company.tagline || 'Tur Firmasi') + ' | Erkan Tatil Plani';
+
+        if (platform === 'copy') {
+            SocialShare.copyLink(shareUrl);
+        } else {
+            SocialShare.share(platform, shareUrl, shareText);
+        }
+    };
 
     // Get star icons
     self.getStars = function(rating) {

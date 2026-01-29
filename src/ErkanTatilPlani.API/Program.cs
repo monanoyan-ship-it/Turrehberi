@@ -39,6 +39,9 @@ builder.Services.AddHttpContextAccessor();
 // App Log Service (veritabani loglama)
 builder.Services.AddScoped<IAppLogService, AppLogService>();
 
+// File Upload Service
+builder.Services.AddScoped<IFileUploadService, FileUploadService>();
+
 // Rate Limiting
 builder.Services.AddRateLimiter(options =>
 {

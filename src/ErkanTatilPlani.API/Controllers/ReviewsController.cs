@@ -1,5 +1,6 @@
 using ErkanTatilPlani.Core.Entities;
 using ErkanTatilPlani.Core.Enums;
+using ErkanTatilPlani.Core.Services;
 using ErkanTatilPlani.Data.Context;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -11,10 +12,12 @@ namespace ErkanTatilPlani.API.Controllers;
 public class ReviewsController : ControllerBase
 {
     private readonly AppDbContext _context;
+    private readonly IFileUploadService _fileUploadService;
 
-    public ReviewsController(AppDbContext context)
+    public ReviewsController(AppDbContext context, IFileUploadService fileUploadService)
     {
         _context = context;
+        _fileUploadService = fileUploadService;
     }
 
     // ===============================================
@@ -368,6 +371,127 @@ public class ReviewsController : ControllerBase
                 }
             }
         });
+    }
+
+    // ===============================================
+    // RESIM YUKLEME
+    // ===============================================
+
+    /// <summary>
+    /// Yoruma resim yukle
+    /// </summary>
+    [HttpPost("reviews/{id}/images")]
+    public async Task<ActionResult<object>> UploadReviewImage(int id, [FromForm] IFormFile file, [FromForm] int visitorId, [FromForm] string? caption = null)
+    {
+        var review = await _context.TourReviews.FindAsync(id);
+        if (review == null) return NotFound(new { message = "Yorum bulunamadi" });
+
+        // Sadece yorum sahibi yukleyebilir
+        if (review.VisitorId != visitorId)
+            return Forbid();
+
+        // Maksimum 5 resim
+        var imageCount = await _context.ReviewImages.CountAsync(ri => ri.ReviewId == id && ri.IsActive);
+        if (imageCount >= 5)
+            return BadRequest(new { message = "Bir yoruma en fazla 5 resim yukleyebilirsiniz" });
+
+        // Dosya kontrolu
+        if (file == null || file.Length == 0)
+            return BadRequest(new { message = "Dosya secilmedi" });
+
+        // Yukleme
+        using var stream = file.OpenReadStream();
+        var result = await _fileUploadService.UploadImageWithThumbnailAsync(stream, file.FileName, "reviews");
+
+        if (!result.Success)
+            return BadRequest(new { message = result.ErrorMessage });
+
+        // Veritabanina kaydet
+        var reviewImage = new ReviewImage
+        {
+            ReviewId = id,
+            ImageUrl = result.Url!,
+            ThumbnailUrl = result.ThumbnailUrl ?? result.Url!,
+            Caption = caption ?? string.Empty,
+            DisplayOrder = imageCount + 1,
+            FileSize = result.FileSize,
+            Width = result.Width,
+            Height = result.Height,
+            MimeType = result.MimeType ?? "image/jpeg",
+            AltText = caption ?? $"Yorum resmi {imageCount + 1}"
+        };
+
+        _context.ReviewImages.Add(reviewImage);
+        await _context.SaveChangesAsync();
+
+        return Ok(new
+        {
+            message = "Resim yuklendi",
+            image = new
+            {
+                reviewImage.Id,
+                reviewImage.ImageUrl,
+                reviewImage.ThumbnailUrl,
+                reviewImage.Caption,
+                reviewImage.DisplayOrder
+            }
+        });
+    }
+
+    /// <summary>
+    /// Yorum resimlerini listele
+    /// </summary>
+    [HttpGet("reviews/{id}/images")]
+    public async Task<ActionResult<object>> GetReviewImages(int id)
+    {
+        var review = await _context.TourReviews.FindAsync(id);
+        if (review == null) return NotFound(new { message = "Yorum bulunamadi" });
+
+        var images = await _context.ReviewImages
+            .Where(ri => ri.ReviewId == id && ri.IsActive)
+            .OrderBy(ri => ri.DisplayOrder)
+            .Select(ri => new
+            {
+                ri.Id,
+                ri.ImageUrl,
+                ri.ThumbnailUrl,
+                ri.Caption,
+                ri.DisplayOrder,
+                ri.Width,
+                ri.Height
+            })
+            .ToListAsync();
+
+        return Ok(images);
+    }
+
+    /// <summary>
+    /// Yorum resmini sil
+    /// </summary>
+    [HttpDelete("reviews/{reviewId}/images/{imageId}")]
+    public async Task<IActionResult> DeleteReviewImage(int reviewId, int imageId, [FromQuery] int visitorId)
+    {
+        var review = await _context.TourReviews.FindAsync(reviewId);
+        if (review == null) return NotFound(new { message = "Yorum bulunamadi" });
+
+        // Sadece yorum sahibi silebilir
+        if (review.VisitorId != visitorId)
+            return Forbid();
+
+        var image = await _context.ReviewImages.FirstOrDefaultAsync(ri => ri.Id == imageId && ri.ReviewId == reviewId);
+        if (image == null) return NotFound(new { message = "Resim bulunamadi" });
+
+        // Dosyayi sil
+        await _fileUploadService.DeleteFileAsync(image.ImageUrl);
+        if (!string.IsNullOrEmpty(image.ThumbnailUrl))
+            await _fileUploadService.DeleteFileAsync(image.ThumbnailUrl);
+
+        // Veritabanindan sil (soft delete)
+        image.IsActive = false;
+        image.UpdatedAt = DateTime.UtcNow;
+        await _context.SaveChangesAsync();
+
+        return Ok(new { message = "Resim silindi" });
     }
 
     // ===============================================
