@@ -130,40 +130,27 @@ _localizer.T("Register.Title")
 
 ---
 
-## Son Durum (29 Ocak 2026)
+## Son Durum (30 Ocak 2026)
 
-**Tamamlanan (commit edilmedi):**
-- Firma Dashboard (CompanyDashboard)
-- Tur Yonetim (MyTours CRUD)
-- Rezervasyon Yonetimi (MyReservations)
-- Yorumlara Yanit (MyReviews)
-- Profil Sayfasi (kisisel bilgiler, sifre degistirme, dil tercihi)
-- Gelismis Tur Arama (arama, filtreleme, siralama)
-- Sifremi Unuttum (forgot-password, reset-password)
-- Email Yonetim Sistemi (Email Hesaplari + Email Sablonlari)
+**Bugün yapılanlar:**
+- iyzico sandbox entegrasyonu (API Key: appsettings.json'da)
+- Ön ödeme / tam ödeme ayrımı (PaymentStatusEnum: Pending, DepositPaid, FullyPaid, Failed, Refunded)
+- Reservation entity: DepositAmount, PaidAmount alanları eklendi
+- Company entity: DepositPercentage alanı eklendi (firma bazlı ön ödeme yüzdesi)
+- /Tours sayfasında rezervasyon modalı ve ödeme akışı
+- /Account/ReservationDetail sayfasında ödeme bilgileri ve kalan ödeme butonu
+- /Admin/Reservations ve /Reservations sayfaları güncellendi (ödeme bilgileri eklendi)
+- /Reservations sayfası sadeleştirildi (sadece görüntüleme, düzenleme yok)
+- CompanyDashboard'da ön ödeme yüzdesi ayarı
 
-**Yeni Entity'ler:**
-- EmailAccount.cs (SMTP ayarlari)
-- EmailTemplate.cs (Email sablonlari)
-- EmailTemplateTranslation.cs (Sablon cevirileri, 9 dil)
+**Bilinen sorunlar / Eksikler:**
+- Migration sonrası mevcut verilerde depositAmount/paidAmount 0 kalabilir
+- Ödeme testi yapıldı ama tam akış test edilmeli (sandbox)
 
-**Yeni Controller'lar:**
-- EmailAccountsController.cs (CRUD + copy + test)
-- EmailTemplatesController.cs (CRUD + translations + preview)
+**Test kartı bilgileri (iyzico sandbox):**
+- Kart: 5528790000000008, SKT: 12/30, CVV: 123, OTP: 123456
 
-**Yeni Admin Sayfalari:**
-- EmailAccounts.cshtml (Email hesap yonetimi)
-- EmailTemplates.cshtml (Email sablon yonetimi, 9 dil destegi)
-
-**Guncellenen Dosyalar:**
-- AppDbContext.cs (DbSet'ler, konfigurasyonlar, seed data)
-- IEmailService.cs, EmailService.cs (DB okuma, cache, template sistemi)
-- AdminController.cs (yeni action'lar)
-- _AdminLayout.cshtml (menu linkleri)
-- 9 localization dosyasi (Admin.EmailAccounts.*, Admin.EmailTemplates.* keyleri)
-- Migration: AddEmailManagementSystem
-
-**Siradaki is:** Email dogrulama veya Firma arama veya Kullanici avatar yukleme
+**Sıradaki işler:** Kullanıcının talebi bekleniyor
 
 ---
 
