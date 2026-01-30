@@ -5,9 +5,9 @@
 <div id="reservationsApp">
 <div class="d-flex justify-content-between align-items-center mb-4">
     <h1><i class="bi bi-calendar-check"></i> Rezervasyonlar</h1>
-    <button class="btn btn-primary" data-bind="click: openCreateModal">
-        <i class="bi bi-plus-circle"></i> Yeni Rezervasyon
-    </button>
+    <a href="/Tours" class="btn btn-outline-primary">
+        <i class="bi bi-map me-1"></i> <span data-t="Menu.Tours">Turlar</span>
+    </a>
 </div>
 
 <!-- Loading -->
@@ -24,13 +24,14 @@
             <table class="table table-hover">
                 <thead class="table-light">
                     <tr>
-                        <th>Ziyaretci</th>
+                        <th>Ziyaretçi</th>
                         <th>Tur</th>
                         <th>Tarih</th>
-                        <th>Kisi</th>
+                        <th>Kişi</th>
                         <th>Toplam</th>
+                        <th>Ödeme</th>
                         <th>Durum</th>
-                        <th style="width: 200px;">Islemler</th>
+                        <th style="width: 150px;">İşlemler</th>
                     </tr>
                 </thead>
                 <tbody data-bind="foreach: reservations">
@@ -48,20 +49,20 @@
                         <td data-bind="text: numberOfPeople"></td>
                         <td data-bind="text: totalPrice.toLocaleString('tr-TR', {style: 'currency', currency: 'TRY'})"></td>
                         <td>
+                            <span class="badge" data-bind="css: $parent.getPaymentClass(paymentStatus), text: $parent.getPaymentText(paymentStatus)"></span>
+                        </td>
+                        <td>
                             <span class="badge" data-bind="text: $parent.getStatusText(status), css: $parent.getStatusClass(status)"></span>
                         </td>
                         <td>
                             <div class="btn-group btn-group-sm">
-                                <button class="btn btn-outline-info" data-bind="click: $parent.showDetails">
+                                <button class="btn btn-outline-info" data-bind="click: $parent.showDetails" title="Detay">
                                     <i class="bi bi-eye"></i>
                                 </button>
-                                <button class="btn btn-outline-warning" data-bind="click: $parent.openEditModal">
-                                    <i class="bi bi-pencil"></i>
-                                </button>
-                                <button class="btn btn-outline-success" data-bind="visible: status === 0, click: function() { $parent.updateStatus($data, 1); }">
+                                <button class="btn btn-outline-success" data-bind="visible: status === 0, click: function() { $parent.updateStatus($data, 1); }" title="Onayla">
                                     <i class="bi bi-check-lg"></i>
                                 </button>
-                                <button class="btn btn-outline-danger" data-bind="visible: status === 0 || status === 1, click: function() { $parent.updateStatus($data, 2); }">
+                                <button class="btn btn-outline-danger" data-bind="visible: status === 0 || status === 1, click: function() { $parent.updateStatus($data, 2); }" title="Iptal">
                                     <i class="bi bi-x-lg"></i>
                                 </button>
                             </div>
@@ -76,78 +77,6 @@
 <!-- Bos Liste -->
 <div data-bind="visible: !isLoading() && reservations().length === 0" class="alert alert-info text-center">
     <i class="bi bi-info-circle"></i> Henuz rezervasyon bulunmamaktadir.
-    <a href="#" data-bind="click: openCreateModal" class="alert-link">Ilk rezervasyonu ekleyin</a>
-</div>
-
-<!-- Create/Edit Modal -->
-<div class="modal fade" id="formModal" tabindex="-1">
-    <div class="modal-dialog modal-lg">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" data-bind="text: isEditing() ? 'Rezervasyon Duzenle' : 'Yeni Rezervasyon'"></h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-            </div>
-            <div class="modal-body">
-                <form id="reservationForm">
-                    <input type="hidden" data-bind="value: formData().id" />
-
-                    <div class="row">
-                        <div class="col-md-6 mb-3">
-                            <label class="form-label">Ziyaretci *</label>
-                            <select class="form-select" data-bind="options: visitors, optionsText: function(item) { return item.firstName + ' ' + item.lastName; }, optionsValue: 'id', value: formData().visitorId, optionsCaption: '-- Ziyaretci Secin --'" required></select>
-                        </div>
-                        <div class="col-md-6 mb-3">
-                            <label class="form-label">Tur *</label>
-                            <select class="form-select" data-bind="options: tours, optionsText: 'name', optionsValue: 'id', value: formData().tourId, optionsCaption: '-- Tur Secin --', event: { change: calculatePrice }" required></select>
-                        </div>
-                    </div>
-
-                    <div class="row">
-                        <div class="col-md-6 mb-3">
-                            <label class="form-label">Baslangic Tarihi *</label>
-                            <input type="date" class="form-control" data-bind="value: formData().startDate" required />
-                        </div>
-                        <div class="col-md-6 mb-3">
-                            <label class="form-label">Bitis Tarihi *</label>
-                            <input type="date" class="form-control" data-bind="value: formData().endDate" required />
-                        </div>
-                    </div>
-
-                    <div class="row">
-                        <div class="col-md-4 mb-3">
-                            <label class="form-label">Kisi Sayisi *</label>
-                            <input type="number" min="1" class="form-control" data-bind="value: formData().numberOfPeople, event: { change: calculatePrice }" required />
-                        </div>
-                        <div class="col-md-4 mb-3">
-                            <label class="form-label">Toplam Fiyat (TL)</label>
-                            <input type="number" step="0.01" class="form-control" data-bind="value: formData().totalPrice" />
-                        </div>
-                        <div class="col-md-4 mb-3">
-                            <label class="form-label">Durum</label>
-                            <select class="form-select" data-bind="value: formData().status">
-                                <option value="0">Beklemede</option>
-                                <option value="1">Onaylandi</option>
-                                <option value="2">Iptal</option>
-                                <option value="3">Tamamlandi</option>
-                            </select>
-                        </div>
-                    </div>
-
-                    <div class="mb-3">
-                        <label class="form-label">Notlar</label>
-                        <textarea class="form-control" rows="2" data-bind="value: formData().notes"></textarea>
-                    </div>
-                </form>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Iptal</button>
-                <button type="button" class="btn btn-primary" data-bind="click: saveReservation, disable: isSaving">
-                    <span data-bind="visible: isSaving" class="spinner-border spinner-border-sm me-1"></span>
-                    <span data-bind="text: isEditing() ? 'Guncelle' : 'Kaydet'"></span>
-                </button>
-            </div>
-        </div>
-    </div>
 </div>
 
 <!-- Details Modal -->
@@ -193,11 +122,25 @@
                     <dt class="col-sm-3">Kisi Sayisi</dt>
                     <dd class="col-sm-9" data-bind="text: numberOfPeople"></dd>
                     <dt class="col-sm-3">Toplam Fiyat</dt>
-                    <dd class="col-sm-9"><span class="badge bg-success fs-6" data-bind="text: totalPrice.toLocaleString('tr-TR', {style: 'currency', currency: 'TRY'})"></span></dd>
+                    <dd class="col-sm-9"><span class="badge bg-primary fs-6" data-bind="text: totalPrice.toLocaleString('tr-TR', {style: 'currency', currency: 'TRY'})"></span></dd>
                     <dt class="col-sm-3">Durum</dt>
                     <dd class="col-sm-9"><span class="badge" data-bind="text: $parent.getStatusText(status), css: $parent.getStatusClass(status)"></span></dd>
                     <dt class="col-sm-3">Notlar</dt>
                     <dd class="col-sm-9" data-bind="text: notes || '-'"></dd>
+                </dl>
+                <hr>
+                <h6 class="text-muted">Odeme Bilgileri</h6>
+                <dl class="row">
+                    <dt class="col-sm-3">Odeme Durumu</dt>
+                    <dd class="col-sm-9"><span class="badge" data-bind="css: $parent.getPaymentClass(paymentStatus), text: $parent.getPaymentText(paymentStatus)"></span></dd>
+                    <dt class="col-sm-3">On Odeme</dt>
+                    <dd class="col-sm-9" data-bind="text: depositAmount ? depositAmount.toLocaleString('tr-TR', {style: 'currency', currency: 'TRY'}) : '-'"></dd>
+                    <dt class="col-sm-3">Odenen</dt>
+                    <dd class="col-sm-9"><span class="text-success fw-bold" data-bind="text: paidAmount ? paidAmount.toLocaleString('tr-TR', {style: 'currency', currency: 'TRY'}) : '-'"></span></dd>
+                    <dt class="col-sm-3">Kalan</dt>
+                    <dd class="col-sm-9"><span data-bind="css: {'text-danger fw-bold': (totalPrice - (paidAmount || 0)) > 0}, text: (totalPrice - (paidAmount || 0)) > 0 ? (totalPrice - (paidAmount || 0)).toLocaleString('tr-TR', {style: 'currency', currency: 'TRY'}) : 'Tamamlandi'"></span></dd>
+                    <dt class="col-sm-3">Odeme Tarihi</dt>
+                    <dd class="col-sm-9" data-bind="text: paidAt ? new Date(paidAt).toLocaleString('tr-TR') : '-'"></dd>
                 </dl>
             </div>
             <div class="modal-footer">
@@ -214,112 +157,41 @@ function ReservationsViewModel() {
     var self = this;
 
     self.reservations = ko.observableArray([]);
-    self.visitors = ko.observableArray([]);
-    self.tours = ko.observableArray([]);
     self.isLoading = ko.observable(true);
-    self.isSaving = ko.observable(false);
-    self.isEditing = ko.observable(false);
     self.selectedReservation = ko.observable(null);
 
-    self.formData = ko.observable({
-        id: 0,
-        visitorId: null,
-        tourId: null,
-        startDate: '',
-        endDate: '',
-        numberOfPeople: 1,
-        totalPrice: 0,
-        status: 0,
-        notes: ''
-    });
-
-    var formModal, detailsModal;
+    var detailsModal;
 
     self.getStatusText = function(status) {
-        switch(status) {
-            case 0: return 'Beklemede';
-            case 1: return 'Onaylandi';
-            case 2: return 'Iptal';
-            case 3: return 'Tamamlandi';
-            default: return 'Bilinmiyor';
-        }
+        return ['Beklemede', 'Onaylandi', 'Iptal', 'Tamamlandi'][status] || 'Bilinmiyor';
     };
 
     self.getStatusClass = function(status) {
-        switch(status) {
-            case 0: return 'bg-warning text-dark';
-            case 1: return 'bg-success';
-            case 2: return 'bg-danger';
-            case 3: return 'bg-info';
-            default: return 'bg-secondary';
-        }
+        return ['bg-warning text-dark', 'bg-success', 'bg-danger', 'bg-info'][status] || 'bg-secondary';
+    };
+
+    self.getPaymentText = function(status) {
+        return ['Bekliyor', 'On Odeme', 'Tam Odeme', 'Basarisiz', 'Iade'][status] || 'Bilinmiyor';
+    };
+
+    self.getPaymentClass = function(status) {
+        return ['bg-secondary', 'bg-warning text-dark', 'bg-success', 'bg-danger', 'bg-info'][status] || 'bg-secondary';
     };
 
     self.loadData = function() {
         self.isLoading(true);
-        $.when(
-            $.ajax({ url: apiBaseUrl + '/api/reservations', method: 'GET' }),
-            $.ajax({ url: apiBaseUrl + '/api/visitors', method: 'GET' }),
-            $.ajax({ url: apiBaseUrl + '/api/tours', method: 'GET' })
-        ).done(function(resRes, visRes, tourRes) {
-            self.reservations(resRes[0]);
-            self.visitors(visRes[0]);
-            self.tours(tourRes[0]);
-            self.isLoading(false);
-        }).fail(function() {
-            toastr.error('Veriler yuklenirken hata olustu');
-            self.isLoading(false);
-        });
-    };
-
-    self.calculatePrice = function() {
-        var data = self.formData();
-        var tourId = data.tourId;
-        var numberOfPeople = data.numberOfPeople || 1;
-
-        if (tourId) {
-            var tour = self.tours().find(function(t) { return t.id == tourId; });
-            if (tour) {
-                var newData = self.formData();
-                newData.totalPrice = tour.price * numberOfPeople;
-                self.formData(newData);
+        $.ajax({
+            url: apiBaseUrl + '/api/reservations',
+            method: 'GET',
+            success: function(data) {
+                self.reservations(data);
+                self.isLoading(false);
+            },
+            error: function() {
+                toastr.error('Veriler yuklenirken hata olustu');
+                self.isLoading(false);
             }
-        }
-    };
-
-    self.openCreateModal = function() {
-        self.isEditing(false);
-        var today = new Date().toISOString().split('T')[0];
-        self.formData({
-            id: 0,
-            visitorId: null,
-            tourId: null,
-            startDate: today,
-            endDate: today,
-            numberOfPeople: 1,
-            totalPrice: 0,
-            status: 0,
-            notes: ''
         });
-        formModal.show();
-    };
-
-    self.openEditModal = function(reservation) {
-        self.isEditing(true);
-        self.formData({
-            id: reservation.id,
-            visitorId: reservation.visitorId,
-            tourId: reservation.tourId,
-            startDate: reservation.startDate ? reservation.startDate.split('T')[0] : '',
-            endDate: reservation.endDate ? reservation.endDate.split('T')[0] : '',
-            numberOfPeople: reservation.numberOfPeople,
-            totalPrice: reservation.totalPrice,
-            status: reservation.status,
-            notes: reservation.notes,
-            createdAt: reservation.createdAt,
-            isActive: reservation.isActive
-        });
-        formModal.show();
     };
 
     self.showDetails = function(reservation) {
@@ -327,36 +199,10 @@ function ReservationsViewModel() {
         detailsModal.show();
     };
 
-    self.saveReservation = function() {
-        var form = document.getElementById('reservationForm');
-        if (!form.checkValidity()) {
-            form.reportValidity();
-            return;
-        }
-
-        self.isSaving(true);
-        var data = self.formData();
-        var isEdit = self.isEditing();
-
-        $.ajax({
-            url: apiBaseUrl + '/api/reservations' + (isEdit ? '/' + data.id : ''),
-            method: isEdit ? 'PUT' : 'POST',
-            contentType: 'application/json',
-            data: JSON.stringify(data),
-            success: function() {
-                formModal.hide();
-                self.loadData();
-                toastr.success(isEdit ? 'Rezervasyon guncellendi' : 'Rezervasyon eklendi');
-                self.isSaving(false);
-            },
-            error: function() {
-                toastr.error('Islem sirasinda hata olustu');
-                self.isSaving(false);
-            }
-        });
-    };
-
     self.updateStatus = function(reservation, newStatus) {
+        var statusText = newStatus === 1 ? 'onaylamak' : 'iptal etmek';
+        if (!confirm('Bu rezervasyonu ' + statusText + ' istediginize emin misiniz?')) return;
+
         $.ajax({
             url: apiBaseUrl + '/api/reservations/' + reservation.id,
             method: 'PUT',
@@ -376,7 +222,7 @@ function ReservationsViewModel() {
             }),
             success: function() {
                 self.loadData();
-                toastr.success('Durum guncellendi');
+                toastr.success(newStatus === 1 ? 'Rezervasyon onaylandi' : 'Rezervasyon iptal edildi');
             },
             error: function() {
                 toastr.error('Durum guncellenirken hata olustu');
@@ -385,7 +231,6 @@ function ReservationsViewModel() {
     };
 
     $(document).ready(function() {
-        formModal = new bootstrap.Modal(document.getElementById('formModal'));
         detailsModal = new bootstrap.Modal(document.getElementById('detailsModal'));
         self.loadData();
     });

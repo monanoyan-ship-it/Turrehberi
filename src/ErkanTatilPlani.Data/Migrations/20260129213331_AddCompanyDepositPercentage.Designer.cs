@@ -3,6 +3,7 @@ using System;
 using ErkanTatilPlani.Data.Context;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -11,9 +12,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace ErkanTatilPlani.Data.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260129213331_AddCompanyDepositPercentage")]
+    partial class AddCompanyDepositPercentage
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -1041,9 +1044,6 @@ namespace ErkanTatilPlani.Data.Migrations
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("timestamp with time zone");
 
-                    b.Property<decimal>("DepositAmount")
-                        .HasColumnType("numeric");
-
                     b.Property<DateTime>("EndDate")
                         .HasColumnType("timestamp with time zone");
 
@@ -1056,9 +1056,6 @@ namespace ErkanTatilPlani.Data.Migrations
 
                     b.Property<int>("NumberOfPeople")
                         .HasColumnType("integer");
-
-                    b.Property<decimal>("PaidAmount")
-                        .HasColumnType("numeric");
 
                     b.Property<DateTime?>("PaidAt")
                         .HasColumnType("timestamp with time zone");
@@ -1104,12 +1101,10 @@ namespace ErkanTatilPlani.Data.Migrations
                         {
                             Id = 1,
                             CreatedAt = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
-                            DepositAmount = 0m,
                             EndDate = new DateTime(2026, 2, 15, 0, 0, 0, 0, DateTimeKind.Utc),
                             IsActive = true,
                             Notes = "Ogle yemegi dahil",
                             NumberOfPeople = 2,
-                            PaidAmount = 0m,
                             PaymentStatus = 0,
                             StartDate = new DateTime(2026, 2, 15, 0, 0, 0, 0, DateTimeKind.Utc),
                             Status = 1,
@@ -1121,12 +1116,10 @@ namespace ErkanTatilPlani.Data.Migrations
                         {
                             Id = 2,
                             CreatedAt = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
-                            DepositAmount = 0m,
                             EndDate = new DateTime(2026, 3, 12, 0, 0, 0, 0, DateTimeKind.Utc),
                             IsActive = true,
                             Notes = "Aile gezisi",
                             NumberOfPeople = 4,
-                            PaidAmount = 0m,
                             PaymentStatus = 0,
                             StartDate = new DateTime(2026, 3, 10, 0, 0, 0, 0, DateTimeKind.Utc),
                             Status = 0,
@@ -1138,12 +1131,10 @@ namespace ErkanTatilPlani.Data.Migrations
                         {
                             Id = 3,
                             CreatedAt = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
-                            DepositAmount = 0m,
                             EndDate = new DateTime(2026, 4, 5, 0, 0, 0, 0, DateTimeKind.Utc),
                             IsActive = true,
                             Notes = "Balon ucusu sabah erken",
                             NumberOfPeople = 2,
-                            PaidAmount = 0m,
                             PaymentStatus = 0,
                             StartDate = new DateTime(2026, 4, 5, 0, 0, 0, 0, DateTimeKind.Utc),
                             Status = 1,
@@ -1155,12 +1146,10 @@ namespace ErkanTatilPlani.Data.Migrations
                         {
                             Id = 4,
                             CreatedAt = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
-                            DepositAmount = 0m,
                             EndDate = new DateTime(2026, 2, 20, 0, 0, 0, 0, DateTimeKind.Utc),
                             IsActive = true,
                             Notes = "",
                             NumberOfPeople = 3,
-                            PaidAmount = 0m,
                             PaymentStatus = 0,
                             StartDate = new DateTime(2026, 2, 20, 0, 0, 0, 0, DateTimeKind.Utc),
                             Status = 3,
@@ -1172,12 +1161,10 @@ namespace ErkanTatilPlani.Data.Migrations
                         {
                             Id = 5,
                             CreatedAt = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
-                            DepositAmount = 0m,
                             EndDate = new DateTime(2026, 5, 2, 0, 0, 0, 0, DateTimeKind.Utc),
                             IsActive = true,
                             Notes = "Balikadamla dalis isteniyor",
                             NumberOfPeople = 2,
-                            PaidAmount = 0m,
                             PaymentStatus = 0,
                             StartDate = new DateTime(2026, 5, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             Status = 1,
@@ -1189,12 +1176,10 @@ namespace ErkanTatilPlani.Data.Migrations
                         {
                             Id = 6,
                             CreatedAt = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
-                            DepositAmount = 0m,
                             EndDate = new DateTime(2026, 3, 25, 0, 0, 0, 0, DateTimeKind.Utc),
                             IsActive = true,
                             Notes = "Ozel kutlama",
                             NumberOfPeople = 5,
-                            PaidAmount = 0m,
                             PaymentStatus = 0,
                             StartDate = new DateTime(2026, 3, 25, 0, 0, 0, 0, DateTimeKind.Utc),
                             Status = 0,

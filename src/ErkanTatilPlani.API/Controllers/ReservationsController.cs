@@ -14,11 +14,19 @@ public class ReservationsController : ControllerBase
 {
     private readonly AppDbContext _context;
     private readonly IEmailService _emailService;
+    private readonly IPaymentService _paymentService;
+    private readonly IConfiguration _configuration;
 
-    public ReservationsController(AppDbContext context, IEmailService emailService)
+    public ReservationsController(
+        AppDbContext context,
+        IEmailService emailService,
+        IPaymentService paymentService,
+        IConfiguration configuration)
     {
         _context = context;
         _emailService = emailService;
+        _paymentService = paymentService;
+        _configuration = configuration;
     }
 
     [HttpGet]
@@ -268,6 +276,8 @@ public class ReservationsController : ControllerBase
                 r.UpdatedAt,
                 CanCancel = r.Status == ReservationStatus.Pending || r.Status == ReservationStatus.Confirmed,
                 // Odeme bilgileri
+                r.DepositAmount,
+                r.PaidAmount,
                 r.PaymentId,
                 PaymentStatus = r.PaymentStatus.ToString(),
                 PaymentStatusId = (int)r.PaymentStatus,
@@ -350,6 +360,291 @@ public class ReservationsController : ControllerBase
         return CreatedAtAction(nameof(GetReservation), new { id = reservation.Id }, reservation);
     }
 
+    // ===============================================
+    // PUBLIC REZERVASYON VE ODEME ISLEMLERI
+    // ===============================================
+
+    /// <summary>
+    /// Public rezervasyon olustur ve odeme baslat
+    /// </summary>
+    [HttpPost("public/create")]
+    public async Task<ActionResult<object>> CreatePublicReservation([FromBody] CreateReservationRequest request)
+    {
+        // Tur kontrolu
+        var tour = await _context.Tours
+            .Include(t => t.Company)
+            .FirstOrDefaultAsync(t => t.Id == request.TourId && t.IsActive);
+
+        if (tour == null)
+            return NotFound(new { message = "Tur bulunamadi" });
+
+        if (tour.Company == null || tour.Company.StatusId != Core.Enums.CompanyStatuses.Ids.Approved)
+            return BadRequest(new { message = "Bu tur su anda rezervasyona kapali" });
+
+        // Validasyon
+        if (string.IsNullOrWhiteSpace(request.FullName))
+            return BadRequest(new { message = "Ad soyad zorunludur" });
+        if (string.IsNullOrWhiteSpace(request.Email))
+            return BadRequest(new { message = "E-posta zorunludur" });
+        if (string.IsNullOrWhiteSpace(request.Phone))
+            return BadRequest(new { message = "Telefon zorunludur" });
+        if (request.NumberOfPeople < 1)
+            return BadRequest(new { message = "Kisi sayisi en az 1 olmalidir" });
+
+        // Giris yapmis kullanici mi kontrol et
+        int? visitorId = null;
+        var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+        if (!string.IsNullOrEmpty(userIdClaim))
+        {
+            visitorId = int.Parse(userIdClaim);
+        }
+        else
+        {
+            // Misafir kullanici - email ile mevcut kullanici var mi kontrol et
+            var existingVisitor = await _context.Visitors
+                .FirstOrDefaultAsync(v => v.Email == request.Email && v.IsActive);
+
+            if (existingVisitor != null)
+            {
+                visitorId = existingVisitor.Id;
+            }
+            else
+            {
+                // Yeni misafir kullanici olustur
+                var nameParts = request.FullName.Trim().Split(' ', 2);
+                var newVisitor = new Visitor
+                {
+                    FirstName = nameParts[0],
+                    LastName = nameParts.Length > 1 ? nameParts[1] : "",
+                    Email = request.Email,
+                    Phone = request.Phone,
+                    PasswordHash = "", // Misafir kullanici, sifre yok
+                    UserTypeId = Core.Enums.UserTypes.Ids.Visitor
+                };
+                _context.Visitors.Add(newVisitor);
+                await _context.SaveChangesAsync();
+                visitorId = newVisitor.Id;
+            }
+        }
+
+        // Toplam fiyat hesapla
+        var totalPrice = tour.Price * request.NumberOfPeople;
+
+        // On odeme tutarini hesapla (firmanin ayarlari)
+        var depositPercentage = tour.Company.DepositPercentage;
+        var depositAmount = totalPrice * depositPercentage / 100;
+
+        // Baslangic ve bitis tarihi (simdilik varsayilan)
+        var startDate = request.StartDate ?? DateTime.UtcNow.AddDays(7);
+        var endDate = startDate.AddDays(tour.DurationDays);
+
+        // Rezervasyon olustur
+        var reservation = new Reservation
+        {
+            TourId = request.TourId,
+            VisitorId = visitorId!.Value,
+            StartDate = startDate,
+            EndDate = endDate,
+            NumberOfPeople = request.NumberOfPeople,
+            TotalPrice = totalPrice,
+            DepositAmount = depositAmount,
+            PaidAmount = 0,
+            Status = ReservationStatus.Pending,
+            PaymentStatus = PaymentStatusEnum.Pending,
+            Notes = request.Notes ?? ""
+        };
+
+        _context.Reservations.Add(reservation);
+        await _context.SaveChangesAsync();
+
+        // Odeme baslatma
+        var webBaseUrl = _configuration["WebBaseUrl"] ?? "https://localhost:7080";
+        var callbackUrl = $"{webBaseUrl}/Account/PaymentResult?reservationId={reservation.Id}";
+
+        var nameParts2 = request.FullName.Trim().Split(' ', 2);
+        var paymentRequest = new PaymentRequest
+        {
+            ReservationId = reservation.Id,
+            Amount = depositAmount,
+            CustomerEmail = request.Email,
+            CustomerName = nameParts2[0],
+            CustomerSurname = nameParts2.Length > 1 ? nameParts2[1] : "",
+            CustomerPhone = request.Phone,
+            CustomerIp = HttpContext.Connection.RemoteIpAddress?.ToString() ?? "127.0.0.1",
+            CustomerAddress = request.Address ?? "Belirtilmedi",
+            ProductName = $"{tour.Name} - {tour.Destination} ({request.NumberOfPeople} kisi)",
+            ProductCategory = "Tur Rezervasyonu",
+            CallbackUrl = callbackUrl
+        };
+
+        var paymentResult = await _paymentService.InitializePaymentAsync(paymentRequest);
+
+        if (!paymentResult.Success)
+        {
+            // Odeme baslatma basarisiz, rezervasyonu sil
+            _context.Reservations.Remove(reservation);
+            await _context.SaveChangesAsync();
+
+            return BadRequest(new
+            {
+                message = "Odeme baslatilirken bir hata olustu",
+                error = paymentResult.ErrorMessage
+            });
+        }
+
+        // Payment token'i kaydet
+        reservation.PaymentToken = paymentResult.Token;
+        await _context.SaveChangesAsync();
+
+        return Ok(new
+        {
+            success = true,
+            reservationId = reservation.Id,
+            paymentPageUrl = paymentResult.PaymentPageUrl,
+            totalPrice,
+            depositAmount,
+            depositPercentage
+        });
+    }
+
+    /// <summary>
+    /// Odeme callback - iyzico'dan gelen sonucu isle
+    /// </summary>
+    [HttpPost("payment/callback")]
+    public async Task<ActionResult<object>> PaymentCallback([FromForm] string token, [FromForm] int? reservationId = null)
+    {
+        if (string.IsNullOrEmpty(token))
+            return BadRequest(new { message = "Token gerekli" });
+
+        var paymentResult = await _paymentService.ProcessCallbackAsync(token);
+
+        Reservation? reservation = null;
+
+        // 1. Oncelikle ConversationId'den gelen reservationId'yi dene
+        if (paymentResult.ReservationId > 0)
+        {
+            reservation = await _context.Reservations
+                .Include(r => r.Tour)
+                    .ThenInclude(t => t.Company)
+                .Include(r => r.Visitor)
+                .FirstOrDefaultAsync(r => r.Id == paymentResult.ReservationId);
+        }
+
+        // 2. ConversationId'den bulunamadiysa PaymentToken ile ara
+        if (reservation == null)
+        {
+            reservation = await _context.Reservations
+                .Include(r => r.Tour)
+                    .ThenInclude(t => t.Company)
+                .Include(r => r.Visitor)
+                .FirstOrDefaultAsync(r => r.PaymentToken == token);
+        }
+
+        // 3. Son cari - form'dan gelen reservationId ile ara
+        if (reservation == null && reservationId.HasValue && reservationId.Value > 0)
+        {
+            reservation = await _context.Reservations
+                .Include(r => r.Tour)
+                    .ThenInclude(t => t.Company)
+                .Include(r => r.Visitor)
+                .FirstOrDefaultAsync(r => r.Id == reservationId.Value);
+        }
+
+        if (reservation == null)
+            return NotFound(new { message = "Rezervasyon bulunamadi", token = token?.Substring(0, Math.Min(20, token?.Length ?? 0)) });
+
+        if (paymentResult.Success)
+        {
+            // Odeme basarili - odenen tutari guncelle
+            reservation.PaidAmount += paymentResult.PaidAmount ?? 0;
+            reservation.PaymentId = paymentResult.PaymentId;
+            reservation.PaidAt = DateTime.UtcNow;
+            reservation.Status = ReservationStatus.Confirmed;
+
+            // Tam odeme mi on odeme mi kontrol et
+            if (reservation.PaidAmount >= reservation.TotalPrice)
+            {
+                reservation.PaymentStatus = PaymentStatusEnum.FullyPaid;
+            }
+            else
+            {
+                reservation.PaymentStatus = PaymentStatusEnum.DepositPaid;
+            }
+
+            await _context.SaveChangesAsync();
+
+            // Onay emaili gonder
+            try
+            {
+                var emailModel = new ReservationEmailModel
+                {
+                    ToEmail = reservation.Visitor.Email,
+                    CustomerName = $"{reservation.Visitor.FirstName} {reservation.Visitor.LastName}",
+                    TourName = reservation.Tour.Name,
+                    CompanyName = reservation.Tour.Company.Name,
+                    Destination = reservation.Tour.Destination,
+                    StartDate = reservation.StartDate,
+                    EndDate = reservation.EndDate,
+                    NumberOfPeople = reservation.NumberOfPeople,
+                    TotalPrice = reservation.TotalPrice,
+                    Notes = reservation.Notes,
+                    PreferredLanguage = reservation.Visitor.PreferredLanguage ?? "tr"
+                };
+                await _emailService.SendReservationConfirmedEmailAsync(emailModel);
+            }
+            catch (Exception ex)
+            {
+                // Email hatasi rezervasyonu etkilemesin
+                Console.WriteLine($"Email gonderme hatasi: {ex.Message}");
+            }
+
+            return Ok(new
+            {
+                success = true,
+                message = "Odeme basarili",
+                reservationId = reservation.Id,
+                paymentId = paymentResult.PaymentId
+            });
+        }
+        else
+        {
+            // Odeme basarisiz
+            reservation.PaymentStatus = PaymentStatusEnum.Failed;
+            await _context.SaveChangesAsync();
+
+            return Ok(new
+            {
+                success = false,
+                message = paymentResult.ErrorMessage ?? "Odeme basarisiz",
+                reservationId = reservation.Id
+            });
+        }
+    }
+
+    /// <summary>
+    /// Odeme durumunu sorgula
+    /// </summary>
+    [HttpGet("payment/status/{reservationId}")]
+    public async Task<ActionResult<object>> GetPaymentStatus(int reservationId)
+    {
+        var reservation = await _context.Reservations
+            .Include(r => r.Tour)
+            .FirstOrDefaultAsync(r => r.Id == reservationId);
+
+        if (reservation == null)
+            return NotFound(new { message = "Rezervasyon bulunamadi" });
+
+        return Ok(new
+        {
+            reservationId = reservation.Id,
+            paymentStatus = reservation.PaymentStatus.ToString(),
+            reservationStatus = reservation.Status.ToString(),
+            totalPrice = reservation.TotalPrice,
+            paidAt = reservation.PaidAt,
+            tourName = reservation.Tour.Name
+        });
+    }
+
     [HttpPut("{id}")]
     public async Task<IActionResult> UpdateReservation(int id, Reservation reservation)
     {
@@ -376,4 +671,16 @@ public class UpdateStatusRequest
 {
     public string Status { get; set; } = string.Empty;
     public string? RejectionReason { get; set; }
+}
+
+public class CreateReservationRequest
+{
+    public int TourId { get; set; }
+    public string FullName { get; set; } = string.Empty;
+    public string Email { get; set; } = string.Empty;
+    public string Phone { get; set; } = string.Empty;
+    public int NumberOfPeople { get; set; } = 1;
+    public string? Notes { get; set; }
+    public string? Address { get; set; }
+    public DateTime? StartDate { get; set; }
 }

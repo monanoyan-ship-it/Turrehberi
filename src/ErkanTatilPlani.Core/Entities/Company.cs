@@ -113,6 +113,15 @@ public class Company : BaseEntity
     public DateTime? ContractUploadedAt { get; set; }
 
     // ===============================================
+    // REZERVASYON AYARLARI
+    // ===============================================
+
+    /// <summary>
+    /// On odeme yuzdesi (varsayilan %30)
+    /// </summary>
+    public int DepositPercentage { get; set; } = 30;
+
+    // ===============================================
 
     public virtual ICollection<Tour> Tours { get; set; } = new List<Tour>();
     public virtual ICollection<CompanyGalleryImage> GalleryImages { get; set; } = new List<CompanyGalleryImage>();

@@ -21,6 +21,16 @@
                     </select>
                 </div>
                 <div class="col-md-3">
+                    <select class="form-select" data-bind="value: filterPaymentStatus">
+                        <option value="">Tum Odemeler</option>
+                        <option value="0">Odeme Bekliyor</option>
+                        <option value="1">On Odeme Yapildi</option>
+                        <option value="2">Tam Odeme Yapildi</option>
+                        <option value="3">Basarisiz</option>
+                        <option value="4">Iade Edildi</option>
+                    </select>
+                </div>
+                <div class="col-md-3">
                     <select class="form-select" data-bind="options: tours, optionsText: 'name', optionsValue: 'id', value: filterTour, optionsCaption: 'Tum Turlar'"></select>
                 </div>
             </div>
@@ -39,6 +49,7 @@
                             <th>Tarih</th>
                             <th>Kisi</th>
                             <th>Toplam</th>
+                            <th>Odeme</th>
                             <th>Durum</th>
                             <th>Islemler</th>
                         </tr>
@@ -54,6 +65,9 @@
                             <td data-bind="text: new Date(startDate).toLocaleDateString('tr-TR')"></td>
                             <td data-bind="text: numberOfPeople"></td>
                             <td data-bind="text: totalPrice.toLocaleString('tr-TR', {style: 'currency', currency: 'TRY'})"></td>
+                            <td>
+                                <span class="badge" data-bind="css: $parent.getPaymentBadge(paymentStatus), text: $parent.getPaymentText(paymentStatus)"></span>
+                            </td>
                             <td>
                                 <span class="badge" data-bind="css: $parent.getStatusBadge(status), text: $parent.getStatusText(status)"></span>
                             </td>
@@ -81,7 +95,7 @@
 
     <!-- Details Modal -->
     <div class="modal fade" id="detailsModal" tabindex="-1">
-        <div class="modal-dialog">
+        <div class="modal-dialog modal-lg">
             <div class="modal-content">
                 <div class="modal-header">
                     <h5 class="modal-title">Rezervasyon Detayi</h5>
@@ -103,6 +117,28 @@
                         <dd class="col-sm-8" data-bind="text: totalPrice.toLocaleString('tr-TR', {style: 'currency', currency: 'TRY'})"></dd>
                         <dt class="col-sm-4">Notlar</dt>
                         <dd class="col-sm-8" data-bind="text: notes || '-'"></dd>
+                    </dl>
+                    <hr>
+                    <h6 class="mb-3"><i class="bi bi-credit-card me-2"></i>Odeme Bilgileri</h6>
+                    <dl class="row mb-0">
+                        <dt class="col-sm-4">Odeme Durumu</dt>
+                        <dd class="col-sm-8">
+                            <span class="badge" data-bind="css: $parent.getPaymentBadge(paymentStatus), text: $parent.getPaymentText(paymentStatus)"></span>
+                        </dd>
+                        <dt class="col-sm-4">On Odeme Tutari</dt>
+                        <dd class="col-sm-8" data-bind="text: depositAmount ? depositAmount.toLocaleString('tr-TR', {style: 'currency', currency: 'TRY'}) : '-'"></dd>
+                        <dt class="col-sm-4">Odenen Tutar</dt>
+                        <dd class="col-sm-8">
+                            <span class="text-success fw-bold" data-bind="text: paidAmount ? paidAmount.toLocaleString('tr-TR', {style: 'currency', currency: 'TRY'}) : '-'"></span>
+                        </dd>
+                        <dt class="col-sm-4">Kalan Tutar</dt>
+                        <dd class="col-sm-8">
+                            <span data-bind="css: { 'text-danger fw-bold': (totalPrice - (paidAmount || 0)) > 0 }, text: ((totalPrice - (paidAmount || 0)) > 0) ? (totalPrice - (paidAmount || 0)).toLocaleString('tr-TR', {style: 'currency', currency: 'TRY'}) : 'Tamamlandi'"></span>
+                        </dd>
+                        <dt class="col-sm-4">Odeme ID</dt>
+                        <dd class="col-sm-8" data-bind="text: paymentId || '-'"></dd>
+                        <dt class="col-sm-4">Odeme Tarihi</dt>
+                        <dd class="col-sm-8" data-bind="text: paidAt ? new Date(paidAt).toLocaleString('tr-TR') : '-'"></dd>
                     </dl>
                 </div>
                 <div class="modal-footer">

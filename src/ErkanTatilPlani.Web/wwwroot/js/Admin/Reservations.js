@@ -3,6 +3,7 @@ function AdminReservationsViewModel() {
     self.reservations = ko.observableArray([]);
     self.tours = ko.observableArray([]);
     self.filterStatus = ko.observable('');
+    self.filterPaymentStatus = ko.observable('');
     self.filterTour = ko.observable(null);
     self.selectedReservation = ko.observable(null);
     var detailsModal;
@@ -10,13 +11,18 @@ function AdminReservationsViewModel() {
     self.getStatusBadge = function(s) { return ['bg-warning text-dark', 'bg-success', 'bg-danger', 'bg-primary'][s] || 'bg-secondary'; };
     self.getStatusText = function(s) { return ['Beklemede', 'Onaylandi', 'Iptal', 'Tamamlandi'][s] || 'Bilinmiyor'; };
 
+    self.getPaymentBadge = function(s) { return ['bg-secondary', 'bg-warning text-dark', 'bg-success', 'bg-danger', 'bg-info'][s] || 'bg-secondary'; };
+    self.getPaymentText = function(s) { return ['Bekliyor', 'On Odeme', 'Tam Odeme', 'Basarisiz', 'Iade'][s] || 'Bilinmiyor'; };
+
     self.filteredReservations = ko.computed(function() {
         var status = self.filterStatus();
+        var paymentStatus = self.filterPaymentStatus();
         var tour = self.filterTour();
         return self.reservations().filter(function(r) {
             var matchStatus = status === '' || r.status.toString() === status;
+            var matchPayment = paymentStatus === '' || (r.paymentStatus !== undefined && r.paymentStatus.toString() === paymentStatus);
             var matchTour = !tour || r.tourId == tour;
-            return matchStatus && matchTour;
+            return matchStatus && matchPayment && matchTour;
         });
     });
 

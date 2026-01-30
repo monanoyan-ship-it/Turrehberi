@@ -496,8 +496,34 @@ public class CompaniesController : ControllerBase
             },
             recentReservations,
             recentReviews,
-            tourPerformance
+            tourPerformance,
+            settings = new
+            {
+                depositPercentage = company.DepositPercentage
+            }
         });
+    }
+
+    /// <summary>
+    /// Firma ayarlarini guncelle
+    /// </summary>
+    [HttpPut("{id}/settings")]
+    public async Task<IActionResult> UpdateCompanySettings(int id, [FromBody] UpdateCompanySettingsRequest request)
+    {
+        var company = await _context.Companies.FindAsync(id);
+        if (company == null)
+            return NotFound(new { message = "Firma bulunamadi" });
+
+        // Validasyon
+        if (request.DepositPercentage < 10 || request.DepositPercentage > 100)
+            return BadRequest(new { message = "On odeme yuzdesi 10 ile 100 arasinda olmalidir" });
+
+        company.DepositPercentage = request.DepositPercentage;
+        company.UpdatedAt = DateTime.UtcNow;
+
+        await _context.SaveChangesAsync();
+
+        return Ok(new { message = "Ayarlar guncellendi", depositPercentage = company.DepositPercentage });
     }
 
     /// <summary>
@@ -855,4 +881,9 @@ public class UpdateGalleryImageRequest
 public class ReorderGalleryRequest
 {
     public List<int> ImageIds { get; set; } = new();
+}
+
+public class UpdateCompanySettingsRequest
+{
+    public int DepositPercentage { get; set; }
 }

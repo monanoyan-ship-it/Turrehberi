@@ -51,8 +51,8 @@ public class PaymentsController : ControllerBase
         if (reservation == null)
             return NotFound(new { message = "Rezervasyon bulunamadi" });
 
-        // Zaten odenmis mi kontrol et
-        if (reservation.PaymentStatus == PaymentStatusEnum.Paid)
+        // Zaten tam odenmis mi kontrol et
+        if (reservation.PaymentStatus == PaymentStatusEnum.FullyPaid)
             return BadRequest(new { message = "Bu rezervasyon zaten odenmis" });
 
         // Rezervasyon durumu Pending veya Confirmed olmali
@@ -105,6 +105,82 @@ public class PaymentsController : ControllerBase
     }
 
     /// <summary>
+    /// Kalan odemeyi baslat (on odeme yapildiktan sonra)
+    /// </summary>
+    [HttpPost("initialize-remaining/{reservationId}")]
+    [Authorize]
+    public async Task<ActionResult<object>> InitializeRemainingPayment(int reservationId)
+    {
+        var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+        if (string.IsNullOrEmpty(userIdClaim))
+            return Unauthorized(new { message = "Giris yapmaniz gerekiyor" });
+
+        var visitorId = int.Parse(userIdClaim);
+
+        var reservation = await _context.Reservations
+            .Include(r => r.Tour)
+                .ThenInclude(t => t.Company)
+            .Include(r => r.Visitor)
+            .FirstOrDefaultAsync(r => r.Id == reservationId && r.VisitorId == visitorId && r.IsActive);
+
+        if (reservation == null)
+            return NotFound(new { message = "Rezervasyon bulunamadi" });
+
+        // On odeme yapilmis mi kontrol et
+        if (reservation.PaymentStatus != PaymentStatusEnum.DepositPaid)
+            return BadRequest(new { message = "Bu islem icin once on odeme yapilmis olmalidir" });
+
+        // Kalan tutari hesapla
+        var remainingAmount = reservation.TotalPrice - reservation.PaidAmount;
+        if (remainingAmount <= 0)
+            return BadRequest(new { message = "Odenecek tutar kalmadi" });
+
+        // Callback URL'i olustur
+        var callbackUrl = $"{Request.Scheme}://{Request.Host}/api/payments/callback";
+
+        var paymentRequest = new PaymentRequest
+        {
+            ReservationId = reservation.Id,
+            Amount = remainingAmount,
+            CustomerEmail = reservation.Visitor.Email,
+            CustomerName = reservation.Visitor.FirstName,
+            CustomerSurname = reservation.Visitor.LastName,
+            CustomerPhone = reservation.Visitor.Phone ?? "",
+            CustomerIp = HttpContext.Connection.RemoteIpAddress?.ToString() ?? "127.0.0.1",
+            CustomerAddress = reservation.Visitor.Address ?? "",
+            ProductName = $"{reservation.Tour.Name} - Kalan Odeme",
+            ProductCategory = "Tur",
+            CallbackUrl = callbackUrl
+        };
+
+        var result = await _paymentService.InitializePaymentAsync(paymentRequest);
+
+        if (result.Success)
+        {
+            reservation.PaymentToken = result.Token;
+            reservation.UpdatedAt = DateTime.UtcNow;
+            await _context.SaveChangesAsync();
+
+            return Ok(new
+            {
+                success = true,
+                paymentPageUrl = result.PaymentPageUrl,
+                token = result.Token,
+                remainingAmount
+            });
+        }
+        else
+        {
+            return BadRequest(new
+            {
+                success = false,
+                message = result.ErrorMessage,
+                errorCode = result.ErrorCode
+            });
+        }
+    }
+
+    /// <summary>
     /// Iyzico callback endpoint'i
     /// </summary>
     [HttpPost("callback")]
@@ -125,11 +201,23 @@ public class PaymentsController : ControllerBase
 
             if (reservation != null)
             {
+                // Odenen tutari guncelle
+                reservation.PaidAmount += result.PaidAmount ?? 0;
                 reservation.PaymentId = result.PaymentId;
-                reservation.PaymentStatus = PaymentStatusEnum.Paid;
                 reservation.PaidAt = DateTime.UtcNow;
-                reservation.Status = ReservationStatus.Confirmed; // Otomatik onayla
                 reservation.UpdatedAt = DateTime.UtcNow;
+
+                // Tam odeme mi on odeme mi kontrol et
+                if (reservation.PaidAmount >= reservation.TotalPrice)
+                {
+                    reservation.PaymentStatus = PaymentStatusEnum.FullyPaid;
+                }
+                else
+                {
+                    reservation.PaymentStatus = PaymentStatusEnum.DepositPaid;
+                }
+
+                reservation.Status = ReservationStatus.Confirmed; // Otomatik onayla
                 await _context.SaveChangesAsync();
 
                 // Basarili odeme emaili gonder

@@ -12,6 +12,8 @@ public class Reservation : BaseEntity
     public string Notes { get; set; } = string.Empty;
 
     // Odeme Bilgileri
+    public decimal DepositAmount { get; set; }  // Gereken on odeme tutari
+    public decimal PaidAmount { get; set; }     // Odenen toplam tutar
     public string? PaymentId { get; set; }
     public PaymentStatusEnum PaymentStatus { get; set; } = PaymentStatusEnum.Pending;
     public DateTime? PaidAt { get; set; }
@@ -32,7 +34,8 @@ public enum ReservationStatus
 public enum PaymentStatusEnum
 {
     Pending = 0,
-    Paid = 1,
-    Failed = 2,
-    Refunded = 3
+    DepositPaid = 1,   // On odeme yapildi
+    FullyPaid = 2,     // Tam odeme yapildi
+    Failed = 3,
+    Refunded = 4
 }

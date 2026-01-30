@@ -19,6 +19,12 @@ function CompanyDashboardViewModel() {
     self.recentReviews = ko.observableArray([]);
     self.tourPerformance = ko.observableArray([]);
 
+    // Firma ayarlari
+    self.companySettings = ko.observable({
+        depositPercentage: 30
+    });
+    self.isSavingSettings = ko.observable(false);
+
     // TODO: Gercek auth sisteminden alinacak
     self.companyId = ko.observable(null);
 
@@ -96,12 +102,51 @@ function CompanyDashboardViewModel() {
                 self.recentReservations(data.recentReservations || []);
                 self.recentReviews(data.recentReviews || []);
                 self.tourPerformance(data.tourPerformance || []);
+
+                // Firma ayarlarini yukle
+                if (data.settings) {
+                    self.companySettings({
+                        depositPercentage: data.settings.depositPercentage || 30
+                    });
+                }
+
                 self.isLoading(false);
             },
             error: function(xhr) {
                 console.error('Dashboard yuklenemedi:', xhr);
                 toastr.error(T('Common.Error'));
                 self.isLoading(false);
+            }
+        });
+    };
+
+    // Firma ayarlarini kaydet
+    self.saveCompanySettings = function() {
+        var settings = self.companySettings();
+
+        // Validasyon
+        if (settings.depositPercentage < 10 || settings.depositPercentage > 100) {
+            toastr.warning('On odeme yuzdesi 10 ile 100 arasinda olmalidir');
+            return;
+        }
+
+        self.isSavingSettings(true);
+
+        $.ajax({
+            url: apiBaseUrl + '/api/companies/' + self.companyId() + '/settings',
+            method: 'PUT',
+            contentType: 'application/json',
+            data: JSON.stringify({
+                depositPercentage: parseInt(settings.depositPercentage)
+            }),
+            success: function(response) {
+                toastr.success('Ayarlar kaydedildi');
+                self.isSavingSettings(false);
+            },
+            error: function(xhr) {
+                var msg = xhr.responseJSON ? xhr.responseJSON.message : 'Hata olustu';
+                toastr.error(msg);
+                self.isSavingSettings(false);
             }
         });
     };
