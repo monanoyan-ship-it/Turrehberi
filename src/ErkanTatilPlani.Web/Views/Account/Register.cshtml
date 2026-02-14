@@ -139,8 +139,6 @@
                         </div>
                     </div>
 
-                    <div class="alert alert-danger" data-bind="visible: errorMessage, text: errorMessage"></div>
-
                     <div class="form-check mb-3">
                         <input class="form-check-input" type="checkbox" id="termsCheck" data-bind="checked: acceptTerms">
                         <label class="form-check-label small" for="termsCheck">
@@ -201,42 +199,39 @@ function RegisterViewModel() {
 
     // Form durumu
     self.acceptTerms = ko.observable(false);
-    self.errorMessage = ko.observable('');
     self.isLoading = ko.observable(false);
 
     self.register = function() {
-        self.errorMessage('');
-
         // Genel validasyonlar
         if (!self.firstName() || !self.lastName()) {
-            self.errorMessage(T('Register.Error.NameRequired'));
+            toastr.error(T('Register.Error.NameRequired'));
             return;
         }
         if (!self.email()) {
-            self.errorMessage(T('Register.Error.EmailRequired'));
+            toastr.error(T('Register.Error.EmailRequired'));
             return;
         }
         if (!self.password() || self.password().length < 6) {
-            self.errorMessage(T('Register.Error.PasswordMin'));
+            toastr.error(T('Register.Error.PasswordMin'));
             return;
         }
         if (self.password() !== self.passwordConfirm()) {
-            self.errorMessage(T('Register.Error.PasswordMismatch'));
+            toastr.error(T('Register.Error.PasswordMismatch'));
             return;
         }
         if (!self.acceptTerms()) {
-            self.errorMessage(T('Register.Error.TermsRequired'));
+            toastr.error(T('Register.Error.TermsRequired'));
             return;
         }
 
         // Tur Sirketi icin ek validasyonlar
         if (self.userType() === '1') {
             if (!self.companyName()) {
-                self.errorMessage(T('Register.Error.CompanyNameRequired'));
+                toastr.error(T('Register.Error.CompanyNameRequired'));
                 return;
             }
             if (!self.companyTaxNumber()) {
-                self.errorMessage(T('Register.Error.TaxNumberRequired'));
+                toastr.error(T('Register.Error.TaxNumberRequired'));
                 return;
             }
         }
@@ -295,7 +290,7 @@ function RegisterViewModel() {
             },
             error: function(xhr) {
                 var msg = xhr.responseJSON?.error || T('Register.Error.Failed');
-                self.errorMessage(msg);
+                toastr.error(msg);
                 self.isLoading(false);
             }
         });

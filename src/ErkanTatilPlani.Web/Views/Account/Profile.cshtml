@@ -165,9 +165,6 @@
                             <input type="date" class="form-control" data-bind="value: birthDateFormatted" />
                         </div>
 
-                        <div class="alert alert-danger" data-bind="visible: profileError, text: profileError"></div>
-                        <div class="alert alert-success" data-bind="visible: profileSuccess, text: profileSuccess"></div>
-
                         <button class="btn btn-primary" data-bind="click: saveProfile, disable: isSavingProfile">
                             <span data-bind="visible: isSavingProfile" class="spinner-border spinner-border-sm me-2"></span>
                             <i class="bi bi-check-lg me-1" data-bind="visible: !isSavingProfile()"></i>
@@ -210,9 +207,6 @@
                                 </div>
                             </div>
                         </div>
-
-                        <div class="alert alert-danger" data-bind="visible: passwordError, text: passwordError"></div>
-                        <div class="alert alert-success" data-bind="visible: passwordSuccess, text: passwordSuccess"></div>
 
                         <button class="btn btn-warning" data-bind="click: changePassword, disable: isChangingPassword">
                             <span data-bind="visible: isChangingPassword" class="spinner-border spinner-border-sm me-2"></span>
@@ -287,11 +281,6 @@ function ProfileViewModel() {
     self.newPassword = ko.observable('');
     self.confirmPassword = ko.observable('');
 
-    // Messages
-    self.profileError = ko.observable('');
-    self.profileSuccess = ko.observable('');
-    self.passwordError = ko.observable('');
-    self.passwordSuccess = ko.observable('');
 
     // Load user data
     self.loadUser = function() {
@@ -336,15 +325,12 @@ function ProfileViewModel() {
 
     // Save profile
     self.saveProfile = function() {
-        self.profileError('');
-        self.profileSuccess('');
-
         if (!self.firstName().trim()) {
-            self.profileError(T('Register.Error.FirstNameRequired'));
+            toastr.error(T('Register.Error.FirstNameRequired'));
             return;
         }
         if (!self.lastName().trim()) {
-            self.profileError(T('Register.Error.LastNameRequired'));
+            toastr.error(T('Register.Error.LastNameRequired'));
             return;
         }
 
@@ -374,7 +360,6 @@ function ProfileViewModel() {
                 // Update avatar URL with new name
                 self.avatarUrl(user.avatarUrl || 'https://ui-avatars.com/api/?name=' + encodeURIComponent(user.firstName + '+' + user.lastName) + '&size=120&background=0d6efd&color=fff');
 
-                self.profileSuccess(T('Profile.ProfileUpdated'));
                 toastr.success(T('Profile.ProfileUpdated'));
                 self.isSavingProfile(false);
 
@@ -384,8 +369,7 @@ function ProfileViewModel() {
                 }
             },
             error: function(xhr) {
-                var msg = xhr.responseJSON?.error || T('Common.Error');
-                self.profileError(msg);
+                toastr.error(xhr.responseJSON?.error || T('Common.Error'));
                 self.isSavingProfile(false);
             }
         });
@@ -393,23 +377,20 @@ function ProfileViewModel() {
 
     // Change password
     self.changePassword = function() {
-        self.passwordError('');
-        self.passwordSuccess('');
-
         if (!self.currentPassword()) {
-            self.passwordError(T('Profile.CurrentPasswordRequired'));
+            toastr.error(T('Profile.CurrentPasswordRequired'));
             return;
         }
         if (!self.newPassword()) {
-            self.passwordError(T('Profile.NewPasswordRequired'));
+            toastr.error(T('Profile.NewPasswordRequired'));
             return;
         }
         if (self.newPassword().length < 6) {
-            self.passwordError(T('Register.Error.PasswordMin'));
+            toastr.error(T('Register.Error.PasswordMin'));
             return;
         }
         if (self.newPassword() !== self.confirmPassword()) {
-            self.passwordError(T('Profile.PasswordMismatch'));
+            toastr.error(T('Profile.PasswordMismatch'));
             return;
         }
 
@@ -425,7 +406,6 @@ function ProfileViewModel() {
                 newPassword: self.newPassword()
             }),
             success: function() {
-                self.passwordSuccess(T('Profile.PasswordChanged'));
                 toastr.success(T('Profile.PasswordChanged'));
                 self.currentPassword('');
                 self.newPassword('');
@@ -437,7 +417,7 @@ function ProfileViewModel() {
                 if (msg.indexOf('hatali') >= 0 || msg.indexOf('wrong') >= 0) {
                     msg = T('Profile.WrongPassword');
                 }
-                self.passwordError(msg);
+                toastr.error(msg);
                 self.isChangingPassword(false);
             }
         });

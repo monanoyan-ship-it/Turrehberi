@@ -29,8 +29,6 @@
                         </div>
                     </div>
 
-                    <div class="alert alert-danger" data-bind="visible: errorMessage, text: errorMessage"></div>
-
                     <button class="btn btn-primary w-100 py-2 mb-3" data-bind="click: login, disable: isLoading">
                         <span data-bind="visible: isLoading" class="spinner-border spinner-border-sm me-2"></span>
                         <i class="bi bi-box-arrow-in-right me-1" data-bind="visible: !isLoading()"></i>
@@ -76,14 +74,11 @@ function LoginViewModel() {
     var self = this;
     self.email = ko.observable('');
     self.password = ko.observable('');
-    self.errorMessage = ko.observable('');
     self.isLoading = ko.observable(false);
 
     self.login = function() {
-        self.errorMessage('');
-
         if (!self.email() || !self.password()) {
-            self.errorMessage('Email ve sifre zorunludur');
+            toastr.error('Email ve sifre zorunludur');
             return;
         }
 
@@ -114,7 +109,7 @@ function LoginViewModel() {
             },
             error: function(xhr) {
                 var msg = xhr.responseJSON?.error || 'Giris basarisiz';
-                self.errorMessage(msg);
+                toastr.error(msg);
                 self.isLoading(false);
             }
         });
