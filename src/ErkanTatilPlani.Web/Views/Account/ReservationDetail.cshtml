@@ -52,11 +52,11 @@
                                 <p class="card-text small text-muted" data-bind="text: tourDescription ? (tourDescription.length > 200 ? tourDescription.substring(0, 200) + '...' : tourDescription) : ''"></p>
 
                                 <div class="d-flex gap-3 mt-3">
-                                    <a class="btn btn-outline-primary btn-sm" data-bind="attr: { href: '/Turlar#tour-' + tourId }">
+                                    <a class="btn btn-outline-primary btn-sm" data-bind="attr: { href: '/Tours#tour-' + tourId }">
                                         <i class="bi bi-info-circle me-1"></i>
                                         <span data-t="ReservationDetail.ViewTour">Turu Gor</span>
                                     </a>
-                                    <a class="btn btn-outline-secondary btn-sm" data-bind="attr: { href: '/Firmalar/' + companySlug }">
+                                    <a class="btn btn-outline-secondary btn-sm" data-bind="attr: { href: '/Companies/Details/' + companySlug }">
                                         <i class="bi bi-building me-1"></i>
                                         <span data-bind="text: companyName"></span>
                                     </a>

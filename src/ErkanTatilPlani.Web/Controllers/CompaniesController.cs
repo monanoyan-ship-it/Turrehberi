@@ -19,9 +19,8 @@ public class CompaniesController : Controller
 
     /// <summary>
     /// Firma profil sayfasi - SEO-friendly URL
-    /// /Firmalar/{slug} veya /Companies/Details/{slug}
+    /// /Companies/Details/{slug}
     /// </summary>
-    [Route("Firmalar/{slug}")]
     [Route("Companies/Details/{slug}")]
     public IActionResult Details(string slug)
     {

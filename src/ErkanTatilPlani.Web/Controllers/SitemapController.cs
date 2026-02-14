@@ -61,7 +61,7 @@ public class SitemapController : Controller
                         if (!string.IsNullOrEmpty(company.Slug))
                         {
                             urlset.Add(new XElement(ns + "url",
-                                new XElement(ns + "loc", $"{baseUrl}/Firmalar/{company.Slug}"),
+                                new XElement(ns + "loc", $"{baseUrl}/Companies/Details/{company.Slug}"),
                                 new XElement(ns + "changefreq", "weekly"),
                                 new XElement(ns + "priority", "0.7")
                             ));

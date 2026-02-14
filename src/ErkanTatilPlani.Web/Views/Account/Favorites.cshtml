@@ -88,12 +88,12 @@
                         <!-- Company -->
                         <div class="small text-muted mb-3">
                             <i class="bi bi-building me-1"></i>
-                            <a data-bind="attr: { href: '/Firmalar/' + companySlug }, text: companyName" class="text-decoration-none"></a>
+                            <a data-bind="attr: { href: '/Companies/Details/' + companySlug }, text: companyName" class="text-decoration-none"></a>
                         </div>
 
                         <!-- Actions -->
                         <div class="d-flex gap-2">
-                            <a class="btn btn-primary flex-grow-1" data-bind="attr: { href: '/Turlar#tour-' + tourId }">
+                            <a class="btn btn-primary flex-grow-1" data-bind="attr: { href: '/Tours#tour-' + tourId }">
                                 <i class="bi bi-info-circle me-1"></i>
                                 <span data-t="Common.Details">Detay</span>
                             </a>
@@ -116,7 +116,7 @@
             <i class="bi bi-heart text-muted" style="font-size: 4rem;"></i>
             <h5 class="mt-3 text-muted" data-t="Favorites.NoFavorites">Henuz favori turunuz yok</h5>
             <p class="text-muted" data-t="Favorites.ExploreMessage">Turlar sayfasindan begendiklerinizi favorilere ekleyin!</p>
-            <a href="/Turlar" class="btn btn-primary">
+            <a href="/Tours" class="btn btn-primary">
                 <i class="bi bi-search me-1"></i>
                 <span data-t="Favorites.ExploreTours">Turlari Kesfet</span>
             </a>

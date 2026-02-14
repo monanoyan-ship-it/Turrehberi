@@ -1,0 +1,149 @@
+@{
+    ViewData["Title"] = "Iletisim";
+}
+
+<div class="container py-5">
+    <!-- Hero -->
+    <div class="text-center mb-5">
+        <h1 class="display-4 fw-bold text-primary">
+            <i class="bi bi-envelope me-2"></i>
+            <span data-t="Contact.Title">Iletisim</span>
+        </h1>
+        <p class="lead text-muted" data-t="Contact.Subtitle">Sorulariniz icin bize ulasin</p>
+    </div>
+
+    <div class="row g-5">
+        <!-- Contact Info -->
+        <div class="col-lg-5">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-body p-4">
+                    <h4 class="fw-bold mb-4" data-t="Contact.InfoTitle">Iletisim Bilgileri</h4>
+
+                    <div class="d-flex mb-4">
+                        <div class="bg-primary bg-opacity-10 rounded-circle d-flex align-items-center justify-content-center flex-shrink-0" style="width: 50px; height: 50px;">
+                            <i class="bi bi-geo-alt text-primary fs-5"></i>
+                        </div>
+                        <div class="ms-3">
+                            <h6 class="fw-bold mb-1" data-t="Contact.Address">Adres</h6>
+                            <p class="text-muted mb-0">Istanbul, Turkiye</p>
+                        </div>
+                    </div>
+
+                    <div class="d-flex mb-4">
+                        <div class="bg-success bg-opacity-10 rounded-circle d-flex align-items-center justify-content-center flex-shrink-0" style="width: 50px; height: 50px;">
+                            <i class="bi bi-envelope text-success fs-5"></i>
+                        </div>
+                        <div class="ms-3">
+                            <h6 class="fw-bold mb-1" data-t="Contact.Email">E-posta</h6>
+                            <p class="text-muted mb-0">info@erkantatilplani.com</p>
+                        </div>
+                    </div>
+
+                    <div class="d-flex mb-4">
+                        <div class="bg-warning bg-opacity-10 rounded-circle d-flex align-items-center justify-content-center flex-shrink-0" style="width: 50px; height: 50px;">
+                            <i class="bi bi-telephone text-warning fs-5"></i>
+                        </div>
+                        <div class="ms-3">
+                            <h6 class="fw-bold mb-1" data-t="Contact.Phone">Telefon</h6>
+                            <p class="text-muted mb-0">+90 (212) 000 00 00</p>
+                        </div>
+                    </div>
+
+                    <div class="d-flex">
+                        <div class="bg-info bg-opacity-10 rounded-circle d-flex align-items-center justify-content-center flex-shrink-0" style="width: 50px; height: 50px;">
+                            <i class="bi bi-clock text-info fs-5"></i>
+                        </div>
+                        <div class="ms-3">
+                            <h6 class="fw-bold mb-1" data-t="Contact.WorkingHours">Calisma Saatleri</h6>
+                            <p class="text-muted mb-0" data-t="Contact.WorkingHoursText">Pazartesi - Cuma: 09:00 - 18:00</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Contact Form -->
+        <div class="col-lg-7">
+            <div class="card border-0 shadow-sm">
+                <div class="card-body p-4">
+                    <h4 class="fw-bold mb-4" data-t="Contact.FormTitle">Bize Yazin</h4>
+
+                    <div id="contactApp">
+                        <div class="mb-3">
+                            <label class="form-label" data-t="Contact.Name">Ad Soyad</label>
+                            <input type="text" class="form-control" data-bind="value: name" placeholder="Adiniz Soyadiniz">
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label" data-t="Contact.EmailLabel">E-posta</label>
+                            <input type="email" class="form-control" data-bind="value: email" placeholder="ornek@email.com">
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label" data-t="Contact.Subject">Konu</label>
+                            <select class="form-select" data-bind="value: subject">
+                                <option value="" data-t="Contact.SelectSubject">Konu Secin</option>
+                                <option value="general" data-t="Contact.SubjectGeneral">Genel Bilgi</option>
+                                <option value="reservation" data-t="Contact.SubjectReservation">Rezervasyon</option>
+                                <option value="company" data-t="Contact.SubjectCompany">Firma Basvurusu</option>
+                                <option value="complaint" data-t="Contact.SubjectComplaint">Sikayet</option>
+                                <option value="other" data-t="Contact.SubjectOther">Diger</option>
+                            </select>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label" data-t="Contact.Message">Mesaj</label>
+                            <textarea class="form-control" rows="5" data-bind="value: message" placeholder="Mesajinizi yazin..."></textarea>
+                        </div>
+
+                        <button class="btn btn-primary btn-lg w-100" data-bind="click: send, enable: canSend">
+                            <i class="bi bi-send me-2"></i>
+                            <span data-t="Contact.Send">Gonder</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+<script>
+function ContactViewModel() {
+    var self = this;
+
+    self.name = ko.observable('');
+    self.email = ko.observable('');
+    self.subject = ko.observable('');
+    self.message = ko.observable('');
+
+    self.canSend = ko.computed(function() {
+        return self.name().trim() && self.email().trim() && self.subject() && self.message().trim();
+    });
+
+    self.send = function() {
+        if (!self.canSend()) return;
+        toastr.success(T('Contact.SuccessMessage') || 'Mesajiniz basariyla gonderildi. En kisa surede donus yapacagiz.');
+        self.name('');
+        self.email('');
+        self.subject('');
+        self.message('');
+    };
+
+    // Pre-fill if logged in
+    var token = localStorage.getItem('token');
+    if (token) {
+        $.ajax({
+            url: apiBaseUrl + '/api/auth/me',
+            headers: { 'Authorization': 'Bearer ' + token },
+            success: function(user) {
+                if (user.firstName) self.name(user.firstName + ' ' + (user.lastName || ''));
+                if (user.email) self.email(user.email);
+            }
+        });
+    }
+}
+
+ko.applyBindings(new ContactViewModel(), document.getElementById('contactApp'));
+</script>
+}
