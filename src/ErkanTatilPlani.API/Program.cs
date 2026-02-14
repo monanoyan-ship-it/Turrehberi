@@ -1,5 +1,6 @@
 using System.Reflection;
 using System.Threading.RateLimiting;
+using ErkanTatilPlani.API.DependencyInjection;
 using ErkanTatilPlani.API.Middleware;
 using ErkanTatilPlani.API.Services;
 using Microsoft.OpenApi.Models;
@@ -13,6 +14,11 @@ using Microsoft.IdentityModel.Tokens;
 using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
+
+// Service + Factory Katman DI
+builder.Services.AddInfrastructure();
+builder.Services.AddEntityServices();
+builder.Services.AddFactories();
 
 // Localization Service
 var localesPath = Path.Combine(builder.Environment.ContentRootPath, "Localization");

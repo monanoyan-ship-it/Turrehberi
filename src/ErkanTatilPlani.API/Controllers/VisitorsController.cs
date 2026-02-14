@@ -1,7 +1,6 @@
 using ErkanTatilPlani.Core.Entities;
-using ErkanTatilPlani.Data.Context;
+using ErkanTatilPlani.Core.Factories.Visitors;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 
 namespace ErkanTatilPlani.API.Controllers;
 
@@ -9,23 +8,23 @@ namespace ErkanTatilPlani.API.Controllers;
 [Route("api/[controller]")]
 public class VisitorsController : ControllerBase
 {
-    private readonly AppDbContext _context;
+    private readonly IVisitorFactory _visitorFactory;
 
-    public VisitorsController(AppDbContext context)
+    public VisitorsController(IVisitorFactory visitorFactory)
     {
-        _context = context;
+        _visitorFactory = visitorFactory;
     }
 
     [HttpGet]
     public async Task<ActionResult<IEnumerable<Visitor>>> GetVisitors()
     {
-        return await _context.Visitors.Where(v => v.IsActive).ToListAsync();
+        return Ok(await _visitorFactory.GetAllAsync());
     }
 
     [HttpGet("{id}")]
     public async Task<ActionResult<Visitor>> GetVisitor(int id)
     {
-        var visitor = await _context.Visitors.FindAsync(id);
+        var visitor = await _visitorFactory.GetByIdAsync(id);
         if (visitor == null) return NotFound();
         return visitor;
     }
@@ -33,18 +32,15 @@ public class VisitorsController : ControllerBase
     [HttpPost]
     public async Task<ActionResult<Visitor>> CreateVisitor(Visitor visitor)
     {
-        _context.Visitors.Add(visitor);
-        await _context.SaveChangesAsync();
-        return CreatedAtAction(nameof(GetVisitor), new { id = visitor.Id }, visitor);
+        var created = await _visitorFactory.CreateAsync(visitor);
+        return CreatedAtAction(nameof(GetVisitor), new { id = created.Id }, created);
     }
 
     [HttpPut("{id}")]
     public async Task<IActionResult> UpdateVisitor(int id, Visitor visitor)
     {
         if (id != visitor.Id) return BadRequest();
-        visitor.UpdatedAt = DateTime.UtcNow;
-        _context.Entry(visitor).State = EntityState.Modified;
-        await _context.SaveChangesAsync();
+        await _visitorFactory.UpdateAsync(id, visitor);
         return NoContent();
     }
 }
