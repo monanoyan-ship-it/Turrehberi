@@ -192,7 +192,7 @@ public class PaymentFactory : IPaymentFactory
             {
                 r.Id,
                 r.PaymentId,
-                PaymentStatus = (PaymentStatuses.GetById(r.PaymentStatus)?.SystemName ?? "Unknown"),
+                PaymentStatus = r.PaymentStatus == PaymentStatuses.Ids.Pending ? "Pending" : r.PaymentStatus == PaymentStatuses.Ids.DepositPaid ? "DepositPaid" : r.PaymentStatus == PaymentStatuses.Ids.FullyPaid ? "FullyPaid" : r.PaymentStatus == PaymentStatuses.Ids.Failed ? "Failed" : r.PaymentStatus == PaymentStatuses.Ids.Refunded ? "Refunded" : "Unknown",
                 PaymentStatusId = r.PaymentStatus,
                 r.PaidAt,
                 r.TotalPrice

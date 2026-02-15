@@ -49,7 +49,7 @@ public class VisitorReservationFactory : IVisitorReservationFactory
                 r.EndDate,
                 r.NumberOfPeople,
                 r.TotalPrice,
-                Status = (ReservationStatuses.GetById(r.Status)?.SystemName ?? "Unknown"),
+                Status = r.Status == ReservationStatuses.Ids.Pending ? "Pending" : r.Status == ReservationStatuses.Ids.Confirmed ? "Confirmed" : r.Status == ReservationStatuses.Ids.Cancelled ? "Cancelled" : r.Status == ReservationStatuses.Ids.Completed ? "Completed" : "Unknown",
                 StatusId = r.Status,
                 r.Notes,
                 r.CreatedAt
@@ -84,7 +84,7 @@ public class VisitorReservationFactory : IVisitorReservationFactory
                 r.EndDate,
                 r.NumberOfPeople,
                 r.TotalPrice,
-                Status = (ReservationStatuses.GetById(r.Status)?.SystemName ?? "Unknown"),
+                Status = r.Status == ReservationStatuses.Ids.Pending ? "Pending" : r.Status == ReservationStatuses.Ids.Confirmed ? "Confirmed" : r.Status == ReservationStatuses.Ids.Cancelled ? "Cancelled" : r.Status == ReservationStatuses.Ids.Completed ? "Completed" : "Unknown",
                 StatusId = r.Status,
                 r.Notes,
                 r.CreatedAt,
@@ -94,7 +94,7 @@ public class VisitorReservationFactory : IVisitorReservationFactory
                 r.DepositAmount,
                 r.PaidAmount,
                 r.PaymentId,
-                PaymentStatus = (PaymentStatuses.GetById(r.PaymentStatus)?.SystemName ?? "Unknown"),
+                PaymentStatus = r.PaymentStatus == PaymentStatuses.Ids.Pending ? "Pending" : r.PaymentStatus == PaymentStatuses.Ids.DepositPaid ? "DepositPaid" : r.PaymentStatus == PaymentStatuses.Ids.FullyPaid ? "FullyPaid" : r.PaymentStatus == PaymentStatuses.Ids.Failed ? "Failed" : r.PaymentStatus == PaymentStatuses.Ids.Refunded ? "Refunded" : "Unknown",
                 PaymentStatusId = r.PaymentStatus,
                 r.PaidAt
             })
@@ -183,7 +183,7 @@ public class VisitorReservationFactory : IVisitorReservationFactory
                 r.EndDate,
                 r.NumberOfPeople,
                 r.TotalPrice,
-                Status = (ReservationStatuses.GetById(r.Status)?.SystemName ?? "Unknown"),
+                Status = r.Status == ReservationStatuses.Ids.Pending ? "Pending" : r.Status == ReservationStatuses.Ids.Confirmed ? "Confirmed" : r.Status == ReservationStatuses.Ids.Cancelled ? "Cancelled" : r.Status == ReservationStatuses.Ids.Completed ? "Completed" : "Unknown",
                 StatusId = r.Status,
                 r.Notes,
                 r.CreatedAt

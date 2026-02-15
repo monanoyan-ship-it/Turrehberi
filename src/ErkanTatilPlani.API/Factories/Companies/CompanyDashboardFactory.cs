@@ -96,7 +96,7 @@ public class CompanyDashboardFactory : ICompanyDashboardFactory
                 r.StartDate,
                 r.NumberOfPeople,
                 r.TotalPrice,
-                Status = (ReservationStatuses.GetById(r.Status)?.SystemName ?? "Unknown"),
+                Status = r.Status == ReservationStatuses.Ids.Pending ? "Pending" : r.Status == ReservationStatuses.Ids.Confirmed ? "Confirmed" : r.Status == ReservationStatuses.Ids.Cancelled ? "Cancelled" : r.Status == ReservationStatuses.Ids.Completed ? "Completed" : "Unknown",
                 r.CreatedAt
             })
             .ToListAsync();
