@@ -191,7 +191,7 @@ public class ReservationsController : ControllerBase
     }
 
     [HttpPatch("{id}/status")]
-    public async Task<IActionResult> UpdateStatus(int id, [FromBody] ReservationStatus status)
+    public async Task<IActionResult> UpdateStatus(int id, [FromBody] int status)
     {
         var found = await _crud.UpdateStatusAsync(id, status);
         if (!found) return NotFound();

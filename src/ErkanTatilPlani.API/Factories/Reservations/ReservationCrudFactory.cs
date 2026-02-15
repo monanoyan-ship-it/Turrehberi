@@ -45,12 +45,12 @@ public class ReservationCrudFactory : IReservationCrudFactory
         await _unitOfWork.SaveChangesAsync();
     }
 
-    public async Task<bool> UpdateStatusAsync(int id, ReservationStatus status)
+    public async Task<bool> UpdateStatusAsync(int id, int statusId)
     {
         var reservation = await _reservationService.GetByIdAsync(id);
         if (reservation == null) return false;
 
-        reservation.Status = status;
+        reservation.Status = statusId;
         reservation.UpdatedAt = DateTime.UtcNow;
         await _unitOfWork.SaveChangesAsync();
         return true;

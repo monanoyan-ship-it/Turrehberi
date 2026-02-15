@@ -152,3 +152,43 @@ public static class TourStatuses
         public const int Completed = 4;
     }
 }
+
+// ============================================================
+// PAYMENT STATUSES (Odeme Durumlari)
+// ============================================================
+public static class PaymentStatuses
+{
+    public static readonly TypeItem Pending = new(0, "Pending", "PaymentStatus.Pending",
+        "Odeme bekliyor",
+        "bi-hourglass-split", "bg-warning text-dark", 1, isDefault: true);
+
+    public static readonly TypeItem DepositPaid = new(1, "DepositPaid", "PaymentStatus.DepositPaid",
+        "On odeme yapildi",
+        "bi-cash-stack", "bg-info", 2);
+
+    public static readonly TypeItem FullyPaid = new(2, "FullyPaid", "PaymentStatus.FullyPaid",
+        "Tam odeme yapildi",
+        "bi-check-circle-fill", "bg-success", 3);
+
+    public static readonly TypeItem Failed = new(3, "Failed", "PaymentStatus.Failed",
+        "Odeme basarisiz",
+        "bi-x-circle", "bg-danger", 4);
+
+    public static readonly TypeItem Refunded = new(4, "Refunded", "PaymentStatus.Refunded",
+        "Iade edildi",
+        "bi-arrow-counterclockwise", "bg-secondary", 5);
+
+    public static IEnumerable<TypeItem> All => new[] { Pending, DepositPaid, FullyPaid, Failed, Refunded };
+    public static TypeItem Default => All.First(x => x.IsDefault);
+    public static TypeItem? GetById(int id) => All.FirstOrDefault(x => x.Id == id);
+    public static TypeItem? GetBySystemName(string systemName) => All.FirstOrDefault(x => x.SystemName == systemName);
+
+    public static class Ids
+    {
+        public const int Pending = 0;
+        public const int DepositPaid = 1;
+        public const int FullyPaid = 2;
+        public const int Failed = 3;
+        public const int Refunded = 4;
+    }
+}

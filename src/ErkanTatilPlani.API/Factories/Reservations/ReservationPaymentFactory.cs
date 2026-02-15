@@ -115,8 +115,8 @@ public class ReservationPaymentFactory : IReservationPaymentFactory
             TotalPrice = totalPrice,
             DepositAmount = depositAmount,
             PaidAmount = 0,
-            Status = ReservationStatus.Pending,
-            PaymentStatus = PaymentStatusEnum.Pending,
+            Status = ReservationStatuses.Ids.Pending,
+            PaymentStatus = PaymentStatuses.Ids.Pending,
             Notes = notes ?? ""
         };
 
@@ -205,16 +205,16 @@ public class ReservationPaymentFactory : IReservationPaymentFactory
             reservation.PaidAmount += paymentResult.PaidAmount ?? 0;
             reservation.PaymentId = paymentResult.PaymentId;
             reservation.PaidAt = DateTime.UtcNow;
-            reservation.Status = ReservationStatus.Confirmed;
+            reservation.Status = ReservationStatuses.Ids.Confirmed;
 
             // Tam odeme mi on odeme mi kontrol et
             if (reservation.PaidAmount >= reservation.TotalPrice)
             {
-                reservation.PaymentStatus = PaymentStatusEnum.FullyPaid;
+                reservation.PaymentStatus = PaymentStatuses.Ids.FullyPaid;
             }
             else
             {
-                reservation.PaymentStatus = PaymentStatusEnum.DepositPaid;
+                reservation.PaymentStatus = PaymentStatuses.Ids.DepositPaid;
             }
 
             await _unitOfWork.SaveChangesAsync();
@@ -255,7 +255,7 @@ public class ReservationPaymentFactory : IReservationPaymentFactory
         else
         {
             // Odeme basarisiz
-            reservation.PaymentStatus = PaymentStatusEnum.Failed;
+            reservation.PaymentStatus = PaymentStatuses.Ids.Failed;
             await _unitOfWork.SaveChangesAsync();
 
             return (true, new
@@ -279,8 +279,8 @@ public class ReservationPaymentFactory : IReservationPaymentFactory
         return new
         {
             reservationId = reservation.Id,
-            paymentStatus = reservation.PaymentStatus.ToString(),
-            reservationStatus = reservation.Status.ToString(),
+            paymentStatus = (PaymentStatuses.GetById(reservation.PaymentStatus)?.SystemName ?? "Unknown"),
+            reservationStatus = (ReservationStatuses.GetById(reservation.Status)?.SystemName ?? "Unknown"),
             totalPrice = reservation.TotalPrice,
             paidAt = reservation.PaidAt,
             tourName = reservation.Tour.Name

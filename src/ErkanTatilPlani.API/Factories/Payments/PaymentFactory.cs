@@ -1,5 +1,6 @@
 using ErkanTatilPlani.Core.Entities;
 using ErkanTatilPlani.Core.EntityServices;
+using ErkanTatilPlani.Core.Enums;
 using ErkanTatilPlani.Core.Factories.Payments;
 using ErkanTatilPlani.Core.Infrastructure;
 using ErkanTatilPlani.Core.Services;
@@ -39,10 +40,10 @@ public class PaymentFactory : IPaymentFactory
         if (reservation == null)
             return (false, new { message = "Rezervasyon bulunamadi" }, 404);
 
-        if (reservation.PaymentStatus == PaymentStatusEnum.FullyPaid)
+        if (reservation.PaymentStatus == PaymentStatuses.Ids.FullyPaid)
             return (false, new { message = "Bu rezervasyon zaten odenmis" }, 400);
 
-        if (reservation.Status == ReservationStatus.Cancelled)
+        if (reservation.Status == ReservationStatuses.Ids.Cancelled)
             return (false, new { message = "Iptal edilmis rezervasyon icin odeme yapilamaz" }, 400);
 
         var callbackUrl = $"{scheme}://{host}/api/payments/callback";
@@ -84,7 +85,7 @@ public class PaymentFactory : IPaymentFactory
         if (reservation == null)
             return (false, new { message = "Rezervasyon bulunamadi" }, 404);
 
-        if (reservation.PaymentStatus != PaymentStatusEnum.DepositPaid)
+        if (reservation.PaymentStatus != PaymentStatuses.Ids.DepositPaid)
             return (false, new { message = "Bu islem icin once on odeme yapilmis olmalidir" }, 400);
 
         var remainingAmount = reservation.TotalPrice - reservation.PaidAmount;
@@ -138,10 +139,10 @@ public class PaymentFactory : IPaymentFactory
                 reservation.UpdatedAt = DateTime.UtcNow;
 
                 reservation.PaymentStatus = reservation.PaidAmount >= reservation.TotalPrice
-                    ? PaymentStatusEnum.FullyPaid
-                    : PaymentStatusEnum.DepositPaid;
+                    ? PaymentStatuses.Ids.FullyPaid
+                    : PaymentStatuses.Ids.DepositPaid;
 
-                reservation.Status = ReservationStatus.Confirmed;
+                reservation.Status = ReservationStatuses.Ids.Confirmed;
                 await _unitOfWork.SaveChangesAsync();
 
                 var emailModel = new ReservationEmailModel
@@ -170,7 +171,7 @@ public class PaymentFactory : IPaymentFactory
                 var reservation = await _reservationService.GetByIdAsync(result.ReservationId);
                 if (reservation != null)
                 {
-                    reservation.PaymentStatus = PaymentStatusEnum.Failed;
+                    reservation.PaymentStatus = PaymentStatuses.Ids.Failed;
                     reservation.UpdatedAt = DateTime.UtcNow;
                     await _unitOfWork.SaveChangesAsync();
                 }
@@ -191,8 +192,8 @@ public class PaymentFactory : IPaymentFactory
             {
                 r.Id,
                 r.PaymentId,
-                PaymentStatus = r.PaymentStatus.ToString(),
-                PaymentStatusId = (int)r.PaymentStatus,
+                PaymentStatus = (PaymentStatuses.GetById(r.PaymentStatus)?.SystemName ?? "Unknown"),
+                PaymentStatusId = r.PaymentStatus,
                 r.PaidAt,
                 r.TotalPrice
             })
@@ -203,7 +204,7 @@ public class PaymentFactory : IPaymentFactory
     {
         var reservations = await _reservationService.GetByVisitorId(visitorId)
             .Include(r => r.Tour)
-            .Where(r => r.PaymentStatus == PaymentStatusEnum.Pending && r.Status != ReservationStatus.Cancelled)
+            .Where(r => r.PaymentStatus == PaymentStatuses.Ids.Pending && r.Status != ReservationStatuses.Ids.Cancelled)
             .Select(r => new
             {
                 r.Id,

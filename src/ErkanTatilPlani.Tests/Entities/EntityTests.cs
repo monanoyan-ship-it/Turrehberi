@@ -45,7 +45,7 @@ public class EntityTests
         var reservation = new Reservation();
 
         // Assert
-        Assert.Equal(ReservationStatus.Pending, reservation.Status);
+        Assert.Equal(ReservationStatuses.Ids.Pending, reservation.Status);
     }
 
     [Fact]
@@ -147,11 +147,21 @@ public class CompanyStatusesTests
 public class ReservationStatusTests
 {
     [Fact]
-    public void ReservationStatus_Should_Have_Correct_Values()
+    public void ReservationStatuses_Should_Have_Correct_Values()
     {
-        Assert.Equal(0, (int)ReservationStatus.Pending);
-        Assert.Equal(1, (int)ReservationStatus.Confirmed);
-        Assert.Equal(2, (int)ReservationStatus.Cancelled);
-        Assert.Equal(3, (int)ReservationStatus.Completed);
+        Assert.Equal(0, ReservationStatuses.Ids.Pending);
+        Assert.Equal(1, ReservationStatuses.Ids.Confirmed);
+        Assert.Equal(2, ReservationStatuses.Ids.Cancelled);
+        Assert.Equal(3, ReservationStatuses.Ids.Completed);
+    }
+
+    [Fact]
+    public void PaymentStatuses_Should_Have_Correct_Values()
+    {
+        Assert.Equal(0, PaymentStatuses.Ids.Pending);
+        Assert.Equal(1, PaymentStatuses.Ids.DepositPaid);
+        Assert.Equal(2, PaymentStatuses.Ids.FullyPaid);
+        Assert.Equal(3, PaymentStatuses.Ids.Failed);
+        Assert.Equal(4, PaymentStatuses.Ids.Refunded);
     }
 }

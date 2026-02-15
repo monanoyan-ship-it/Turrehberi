@@ -159,7 +159,7 @@ public class TourReviewFactory : ITourReviewFactory
         // Dogrulanmis yorum kontrolu (rezervasyon yapti mi)
         var hasReservation = await _reservationService.GetActiveReservations()
             .AnyAsync(r => r.TourId == tourId && r.VisitorId == visitorId &&
-                         r.Status == ReservationStatus.Completed);
+                         r.Status == ReservationStatuses.Ids.Completed);
 
         var review = new TourReview
         {

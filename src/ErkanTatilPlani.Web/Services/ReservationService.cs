@@ -39,7 +39,7 @@ public class ReservationService : IReservationService
         return response.IsSuccessStatusCode;
     }
 
-    public async Task<bool> UpdateStatusAsync(int id, ReservationStatus status)
+    public async Task<bool> UpdateStatusAsync(int id, int status)
     {
         var response = await _httpClient.PatchAsJsonAsync($"api/reservations/{id}/status", status);
         return response.IsSuccessStatusCode;

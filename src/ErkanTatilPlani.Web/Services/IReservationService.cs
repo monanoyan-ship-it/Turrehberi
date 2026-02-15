@@ -8,5 +8,5 @@ public interface IReservationService
     Task<Reservation?> GetByIdAsync(int id);
     Task<Reservation?> CreateAsync(Reservation reservation);
     Task<bool> UpdateAsync(int id, Reservation reservation);
-    Task<bool> UpdateStatusAsync(int id, ReservationStatus status);
+    Task<bool> UpdateStatusAsync(int id, int status);
 }

@@ -57,19 +57,19 @@ public class CompanyDashboardFactory : ICompanyDashboardFactory
             .ToListAsync();
 
         var totalReservations = reservations.Count;
-        var pendingReservations = reservations.Count(r => r.Status == ReservationStatus.Pending);
-        var confirmedReservations = reservations.Count(r => r.Status == ReservationStatus.Confirmed);
-        var completedReservations = reservations.Count(r => r.Status == ReservationStatus.Completed);
+        var pendingReservations = reservations.Count(r => r.Status == ReservationStatuses.Ids.Pending);
+        var confirmedReservations = reservations.Count(r => r.Status == ReservationStatuses.Ids.Confirmed);
+        var completedReservations = reservations.Count(r => r.Status == ReservationStatuses.Ids.Completed);
 
         // Gelir hesaplamasi (onaylanmis ve tamamlanmis rezervasyonlar)
         var totalRevenue = reservations
-            .Where(r => r.Status == ReservationStatus.Confirmed || r.Status == ReservationStatus.Completed)
+            .Where(r => r.Status == ReservationStatuses.Ids.Confirmed || r.Status == ReservationStatuses.Ids.Completed)
             .Sum(r => r.TotalPrice);
 
         // Bu ayin geliri
         var startOfMonth = new DateTime(DateTime.UtcNow.Year, DateTime.UtcNow.Month, 1, 0, 0, 0, DateTimeKind.Utc);
         var monthlyRevenue = reservations
-            .Where(r => (r.Status == ReservationStatus.Confirmed || r.Status == ReservationStatus.Completed)
+            .Where(r => (r.Status == ReservationStatuses.Ids.Confirmed || r.Status == ReservationStatuses.Ids.Completed)
                 && r.CreatedAt >= startOfMonth)
             .Sum(r => r.TotalPrice);
 
@@ -96,7 +96,7 @@ public class CompanyDashboardFactory : ICompanyDashboardFactory
                 r.StartDate,
                 r.NumberOfPeople,
                 r.TotalPrice,
-                Status = r.Status.ToString(),
+                Status = (ReservationStatuses.GetById(r.Status)?.SystemName ?? "Unknown"),
                 r.CreatedAt
             })
             .ToListAsync();
@@ -133,7 +133,7 @@ public class CompanyDashboardFactory : ICompanyDashboardFactory
                 tour.Name,
                 ReservationCount = tourReservations.Count,
                 Revenue = tourReservations
-                    .Where(r => r.Status == ReservationStatus.Confirmed || r.Status == ReservationStatus.Completed)
+                    .Where(r => r.Status == ReservationStatuses.Ids.Confirmed || r.Status == ReservationStatuses.Ids.Completed)
                     .Sum(r => r.TotalPrice),
                 AverageRating = tourReviews.Any() ? Math.Round(tourReviews.Average(r => r.OverallRating), 1) : 0,
                 ReviewCount = tourReviews.Count

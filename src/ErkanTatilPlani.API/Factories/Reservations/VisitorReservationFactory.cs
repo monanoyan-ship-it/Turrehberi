@@ -4,6 +4,7 @@ using ErkanTatilPlani.Core.Factories.Reservations;
 using ErkanTatilPlani.Core.Infrastructure;
 using ErkanTatilPlani.Core.Services;
 using Microsoft.EntityFrameworkCore;
+using ErkanTatilPlani.Core.Enums;
 
 namespace ErkanTatilPlani.API.Factories.Reservations;
 
@@ -48,8 +49,8 @@ public class VisitorReservationFactory : IVisitorReservationFactory
                 r.EndDate,
                 r.NumberOfPeople,
                 r.TotalPrice,
-                Status = r.Status.ToString(),
-                StatusId = (int)r.Status,
+                Status = (ReservationStatuses.GetById(r.Status)?.SystemName ?? "Unknown"),
+                StatusId = r.Status,
                 r.Notes,
                 r.CreatedAt
             })
@@ -83,18 +84,18 @@ public class VisitorReservationFactory : IVisitorReservationFactory
                 r.EndDate,
                 r.NumberOfPeople,
                 r.TotalPrice,
-                Status = r.Status.ToString(),
-                StatusId = (int)r.Status,
+                Status = (ReservationStatuses.GetById(r.Status)?.SystemName ?? "Unknown"),
+                StatusId = r.Status,
                 r.Notes,
                 r.CreatedAt,
                 r.UpdatedAt,
-                CanCancel = r.Status == ReservationStatus.Pending || r.Status == ReservationStatus.Confirmed,
+                CanCancel = r.Status == ReservationStatuses.Ids.Pending || r.Status == ReservationStatuses.Ids.Confirmed,
                 // Odeme bilgileri
                 r.DepositAmount,
                 r.PaidAmount,
                 r.PaymentId,
-                PaymentStatus = r.PaymentStatus.ToString(),
-                PaymentStatusId = (int)r.PaymentStatus,
+                PaymentStatus = (PaymentStatuses.GetById(r.PaymentStatus)?.SystemName ?? "Unknown"),
+                PaymentStatusId = r.PaymentStatus,
                 r.PaidAt
             })
             .FirstOrDefaultAsync();
@@ -114,10 +115,10 @@ public class VisitorReservationFactory : IVisitorReservationFactory
             return (false, new { message = "Rezervasyon bulunamadi" }, 404);
 
         // Sadece Pending veya Confirmed durumundaki rezervasyonlar iptal edilebilir
-        if (reservation.Status != ReservationStatus.Pending && reservation.Status != ReservationStatus.Confirmed)
+        if (reservation.Status != ReservationStatuses.Ids.Pending && reservation.Status != ReservationStatuses.Ids.Confirmed)
             return (false, new { message = "Bu rezervasyon iptal edilemez" }, 400);
 
-        reservation.Status = ReservationStatus.Cancelled;
+        reservation.Status = ReservationStatuses.Ids.Cancelled;
         reservation.UpdatedAt = DateTime.UtcNow;
         await _unitOfWork.SaveChangesAsync();
 
@@ -160,9 +161,9 @@ public class VisitorReservationFactory : IVisitorReservationFactory
         IQueryable<Reservation> filteredQuery = query;
         if (!string.IsNullOrEmpty(status) && status != "all")
         {
-            if (Enum.TryParse<ReservationStatus>(status, true, out var statusEnum))
+            var statusItem = ReservationStatuses.GetBySystemName(status); if (statusItem != null)
             {
-                filteredQuery = filteredQuery.Where(r => r.Status == statusEnum);
+                filteredQuery = filteredQuery.Where(r => r.Status == statusItem!.Id);
             }
         }
 
@@ -182,8 +183,8 @@ public class VisitorReservationFactory : IVisitorReservationFactory
                 r.EndDate,
                 r.NumberOfPeople,
                 r.TotalPrice,
-                Status = r.Status.ToString(),
-                StatusId = (int)r.Status,
+                Status = (ReservationStatuses.GetById(r.Status)?.SystemName ?? "Unknown"),
+                StatusId = r.Status,
                 r.Notes,
                 r.CreatedAt
             })
@@ -195,10 +196,10 @@ public class VisitorReservationFactory : IVisitorReservationFactory
         var stats = new
         {
             total = allReservations.Count,
-            pending = allReservations.Count(r => r.Status == ReservationStatus.Pending),
-            confirmed = allReservations.Count(r => r.Status == ReservationStatus.Confirmed),
-            cancelled = allReservations.Count(r => r.Status == ReservationStatus.Cancelled),
-            completed = allReservations.Count(r => r.Status == ReservationStatus.Completed)
+            pending = allReservations.Count(r => r.Status == ReservationStatuses.Ids.Pending),
+            confirmed = allReservations.Count(r => r.Status == ReservationStatuses.Ids.Confirmed),
+            cancelled = allReservations.Count(r => r.Status == ReservationStatuses.Ids.Cancelled),
+            completed = allReservations.Count(r => r.Status == ReservationStatuses.Ids.Completed)
         };
 
         return (new { reservations, stats }, null, null, null);
@@ -220,16 +221,16 @@ public class VisitorReservationFactory : IVisitorReservationFactory
         if (reservation.Tour.CompanyId != visitor.Company.Id)
             return (false, new { message = "Bu rezervasyonu duzenleme yetkiniz yok" }, 403);
 
-        if (!Enum.TryParse<ReservationStatus>(status, true, out var newStatus))
+        var newStatusItem = ReservationStatuses.GetBySystemName(status); if (newStatusItem == null)
             return (false, new { message = "Gecersiz durum" }, 400);
 
         var oldStatus = reservation.Status;
-        reservation.Status = newStatus;
+        reservation.Status = newStatusItem!.Id;
         reservation.UpdatedAt = DateTime.UtcNow;
         await _unitOfWork.SaveChangesAsync();
 
         // Email bildirimi gonder
-        if (oldStatus != newStatus)
+        if (oldStatus != newStatusItem!.Id)
         {
             var emailModel = new ReservationEmailModel
             {
@@ -247,16 +248,16 @@ public class VisitorReservationFactory : IVisitorReservationFactory
                 PreferredLanguage = reservation.Visitor.PreferredLanguage ?? "tr"
             };
 
-            if (newStatus == ReservationStatus.Confirmed)
+            if (newStatusItem!.Id == ReservationStatuses.Ids.Confirmed)
             {
                 await _emailService.SendReservationConfirmedEmailAsync(emailModel);
             }
-            else if (newStatus == ReservationStatus.Cancelled)
+            else if (newStatusItem!.Id == ReservationStatuses.Ids.Cancelled)
             {
                 await _emailService.SendReservationCancelledEmailAsync(emailModel);
             }
         }
 
-        return (true, new { message = "Rezervasyon durumu guncellendi", status = newStatus.ToString() }, 200);
+        return (true, new { message = "Rezervasyon durumu guncellendi", status = newStatusItem!.SystemName }, 200);
     }
 }
