@@ -36,14 +36,32 @@
 
 ---
 
-## Proje Dokumanlari
+## ClaudeManager - Hafiza Sistemi (ZORUNLU)
 
-**Onemli:** Projeye baslarken asagidaki dosyalari oku:
+Bu proje ClaudeManager ile entegredir. **Session basladiginda ILKIS olarak** asagidaki komutu calistir:
 
-1. **PATTERNS.md** - Kod pattern'leri ve kurallar (JS ayrimi, ViewModel yapisi, API cagrilari)
-2. **PROJE_YAPISI.md** - Detayli proje yapisi, entity'ler, API endpoint'leri, mimari
-3. **TODO.md** - Yapilacaklar listesi (oncelikli gorevler)
-4. **COMPLETED.md** - Tamamlanan isler ve mevcut durum
+```bash
+curl -s http://127.0.0.1:41847/api/projects/14/patterns
+```
+
+Donen JSON'daki tum pattern'leri (rule, mistake, preference) oku ve session boyunca uygula. Bu adim ZORUNLUDUR - kullaniciya merhaba demeden once calistir.
+
+### Pattern kaydetme/guncelleme
+
+Kullanici yeni kural belirtirse, hata yaptigini soylerse veya tercih bildirirse kaydet:
+
+```bash
+# Kaydet (type: "rule" | "mistake" | "preference")
+curl -X POST http://127.0.0.1:41847/api/patterns -H "Content-Type: application/json" \
+  -d '{"project_id":14,"type":"TYPE","title":"BASLIK","description":"ACIKLAMA"}'
+
+# Guncelle
+curl -X PUT http://127.0.0.1:41847/api/patterns/ID -H "Content-Type: application/json" \
+  -d '{"title":"BASLIK","description":"ACIKLAMA"}'
+
+# Sil
+curl -X DELETE http://127.0.0.1:41847/api/patterns/ID
+```
 
 ---
 
@@ -128,30 +146,3 @@ _localizer.T("Register.Title")
 - Resimler picsum.photos'tan dinamik olarak yuklenir
 - Localization: JSON tabanli, 9 dil, RTL destekli. Yeni string eklerken TUM dil dosyalarini guncelle!
 
----
-
-## Son Durum (30 Ocak 2026)
-
-**Bugün yapılanlar:**
-- iyzico sandbox entegrasyonu (API Key: appsettings.json'da)
-- Ön ödeme / tam ödeme ayrımı (PaymentStatusEnum: Pending, DepositPaid, FullyPaid, Failed, Refunded)
-- Reservation entity: DepositAmount, PaidAmount alanları eklendi
-- Company entity: DepositPercentage alanı eklendi (firma bazlı ön ödeme yüzdesi)
-- /Tours sayfasında rezervasyon modalı ve ödeme akışı
-- /Account/ReservationDetail sayfasında ödeme bilgileri ve kalan ödeme butonu
-- /Admin/Reservations ve /Reservations sayfaları güncellendi (ödeme bilgileri eklendi)
-- /Reservations sayfası sadeleştirildi (sadece görüntüleme, düzenleme yok)
-- CompanyDashboard'da ön ödeme yüzdesi ayarı
-
-**Bilinen sorunlar / Eksikler:**
-- Migration sonrası mevcut verilerde depositAmount/paidAmount 0 kalabilir
-- Ödeme testi yapıldı ama tam akış test edilmeli (sandbox)
-
-**Test kartı bilgileri (iyzico sandbox):**
-- Kart: 5528790000000008, SKT: 12/30, CVV: 123, OTP: 123456
-
-**Sıradaki işler:** Kullanıcının talebi bekleniyor
-
----
-
-*Son Guncelleme: Ocak 2026*
