@@ -72,4 +72,6 @@ public class Visitor : BaseEntity
     public virtual ICollection<ReviewHelpful> HelpfulVotes { get; set; } = new List<ReviewHelpful>();
     public virtual ICollection<ReviewReply> ReviewReplies { get; set; } = new List<ReviewReply>();
     public virtual ICollection<FavoriteTour> FavoriteTours { get; set; } = new List<FavoriteTour>();
+    public virtual ICollection<BlogPost> BlogPosts { get; set; } = new List<BlogPost>();
+    public virtual ICollection<BlogComment> BlogComments { get; set; } = new List<BlogComment>();
 }

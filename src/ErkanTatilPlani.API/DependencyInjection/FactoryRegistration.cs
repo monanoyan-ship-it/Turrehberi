@@ -1,4 +1,5 @@
 using ErkanTatilPlani.API.Factories.Auth;
+using ErkanTatilPlani.API.Factories.Blogs;
 using ErkanTatilPlani.API.Factories.Companies;
 using ErkanTatilPlani.API.Factories.EmailAccounts;
 using ErkanTatilPlani.API.Factories.EmailTemplates;
@@ -10,6 +11,7 @@ using ErkanTatilPlani.API.Factories.Reviews;
 using ErkanTatilPlani.API.Factories.Tours;
 using ErkanTatilPlani.API.Factories.Visitors;
 using ErkanTatilPlani.Core.Factories.Auth;
+using ErkanTatilPlani.Core.Factories.Blogs;
 using ErkanTatilPlani.Core.Factories.Companies;
 using ErkanTatilPlani.Core.Factories.EmailAccounts;
 using ErkanTatilPlani.Core.Factories.EmailTemplates;
@@ -63,6 +65,10 @@ public static class FactoryRegistration
         services.AddScoped<ITourReviewFactory, TourReviewFactory>();
         services.AddScoped<IReviewInteractionFactory, ReviewInteractionFactory>();
         services.AddScoped<IAdminReviewFactory, AdminReviewFactory>();
+
+        // Blog factories (2)
+        services.AddScoped<IBlogFactory, BlogFactory>();
+        services.AddScoped<IBlogCommentFactory, BlogCommentFactory>();
 
         // Company factories (5)
         services.AddScoped<ICompanyCrudFactory, CompanyCrudFactory>();

@@ -17,6 +17,7 @@ public static class EntityServiceRegistration
         services.AddScoped<IEmailTemplateEntityService, EmailTemplateEntityService>();
         services.AddScoped<ILanguageEntityService, LanguageEntityService>();
         services.AddScoped<ICompanyGalleryEntityService, CompanyGalleryEntityService>();
+        services.AddScoped<IBlogEntityService, BlogEntityService>();
         return services;
     }
 }

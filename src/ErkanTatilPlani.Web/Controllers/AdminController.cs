@@ -114,6 +114,13 @@ public class AdminController : Controller
         return View();
     }
 
+    // Blog yonetimi (Staff ve Admin)
+    public IActionResult BlogPosts()
+    {
+        SetCommonViewData("BlogPosts", "Blog Yonetimi");
+        return View();
+    }
+
     // Yorum moderasyonu (Staff ve Admin)
     public IActionResult Reviews()
     {

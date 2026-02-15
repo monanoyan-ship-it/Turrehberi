@@ -1,0 +1,126 @@
+@{
+    ViewData["Title"] = "Blog";
+    ViewData["Description"] = "Seyahat ipuclari, gezi rehberleri, turizm haberleri ve daha fazlasi. Blog yazilarimizi kesfedin!";
+}
+
+<div id="blogApp">
+    <div class="mb-4">
+        <h1><i class="bi bi-journal-richtext"></i> <span data-t="Blog.Title">Blog</span></h1>
+        <p class="text-muted" data-t="Blog.Subtitle">Seyahat ilhami, gezi rehberleri ve turizm haberleri</p>
+    </div>
+
+    <!-- Arama ve Kategori Filtresi -->
+    <div class="row mb-4">
+        <div class="col-md-8">
+            <div class="input-group">
+                <span class="input-group-text"><i class="bi bi-search"></i></span>
+                <input type="text" class="form-control" data-bind="value: searchQuery, valueUpdate: 'afterkeydown'"
+                       placeholder="Blog yazisi ara..." data-t-placeholder="Blog.Search" />
+                <button class="btn btn-outline-secondary" type="button" data-bind="click: clearSearch, visible: searchQuery()">
+                    <i class="bi bi-x-lg"></i>
+                </button>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <select class="form-select" data-bind="value: selectedCategory">
+                <option value="" data-t="Blog.AllCategories">Tum Kategoriler</option>
+                <!-- ko foreach: categories -->
+                <option data-bind="value: id, text: $parent.getCategoryName(id)"></option>
+                <!-- /ko -->
+            </select>
+        </div>
+    </div>
+
+    <!-- Kategori Kartlari -->
+    <div class="row mb-4" data-bind="visible: categories().length > 0 && !searchQuery()">
+        <!-- ko foreach: categories -->
+        <div class="col-md-2 col-4 mb-2">
+            <div class="card text-center h-100" style="cursor: pointer;"
+                 data-bind="click: function() { $parent.selectedCategory(String(id)); }, css: { 'border-primary': String(id) === $parent.selectedCategory() }">
+                <div class="card-body py-2 px-1">
+                    <i class="bi fs-4" data-bind="css: icon"></i>
+                    <div class="small mt-1" data-bind="text: $parent.getCategoryName(id)"></div>
+                    <span class="badge bg-secondary" data-bind="text: postCount"></span>
+                </div>
+            </div>
+        </div>
+        <!-- /ko -->
+    </div>
+
+    <!-- Loading -->
+    <div class="text-center py-5" data-bind="visible: isLoading">
+        <div class="spinner-border text-primary" role="status"></div>
+        <p class="text-muted mt-2" data-t="Common.Loading">Yukleniyor...</p>
+    </div>
+
+    <!-- Blog Kartlari -->
+    <div class="row" data-bind="visible: !isLoading()">
+        <!-- ko foreach: posts -->
+        <div class="col-md-4 mb-4">
+            <div class="card h-100 shadow-sm">
+                <!-- ko if: imageUrl -->
+                <img class="card-img-top" style="height: 200px; object-fit: cover;"
+                     data-bind="attr: { src: imageUrl, alt: title }" />
+                <!-- /ko -->
+                <!-- ko ifnot: imageUrl -->
+                <div class="card-img-top bg-light d-flex align-items-center justify-content-center" style="height: 200px;">
+                    <i class="bi bi-image text-muted" style="font-size: 3rem;"></i>
+                </div>
+                <!-- /ko -->
+                <div class="card-body d-flex flex-column">
+                    <div class="mb-2">
+                        <span class="badge" data-bind="css: $parent.getCategoryBadgeClass(categoryId), text: $parent.getCategoryName(categoryId)"></span>
+                    </div>
+                    <h5 class="card-title">
+                        <a class="text-decoration-none text-dark" data-bind="text: title, attr: { href: '/Blog/' + slug }"></a>
+                    </h5>
+                    <p class="card-text text-muted flex-grow-1" data-bind="text: summary"></p>
+                    <div class="d-flex justify-content-between align-items-center mt-auto">
+                        <small class="text-muted">
+                            <i class="bi bi-person me-1"></i><span data-bind="text: authorName"></span>
+                        </small>
+                        <small class="text-muted">
+                            <i class="bi bi-eye me-1"></i><span data-bind="text: viewCount"></span>
+                            <i class="bi bi-chat ms-2 me-1"></i><span data-bind="text: commentCount"></span>
+                        </small>
+                    </div>
+                    <small class="text-muted mt-1">
+                        <i class="bi bi-calendar me-1"></i><span data-bind="text: $parent.formatDate(publishedAt)"></span>
+                    </small>
+                </div>
+            </div>
+        </div>
+        <!-- /ko -->
+    </div>
+
+    <!-- Bos Durum -->
+    <div class="text-center py-5" data-bind="visible: !isLoading() && posts().length === 0">
+        <i class="bi bi-journal-x text-muted" style="font-size: 3rem;"></i>
+        <p class="text-muted mt-2" data-t="Blog.NoResults">Blog yazisi bulunamadi</p>
+    </div>
+
+    <!-- Sayfalama -->
+    <nav data-bind="visible: totalPages() > 1">
+        <ul class="pagination justify-content-center">
+            <li class="page-item" data-bind="css: { disabled: currentPage() <= 1 }">
+                <a class="page-link" href="#" data-bind="click: function() { changePage(currentPage() - 1); }">
+                    <i class="bi bi-chevron-left"></i>
+                </a>
+            </li>
+            <!-- ko foreach: pageNumbers -->
+            <li class="page-item" data-bind="css: { active: $data === $parent.currentPage() }">
+                <a class="page-link" href="#" data-bind="text: $data, click: function() { $parent.changePage($data); }"></a>
+            </li>
+            <!-- /ko -->
+            <li class="page-item" data-bind="css: { disabled: currentPage() >= totalPages() }">
+                <a class="page-link" href="#" data-bind="click: function() { changePage(currentPage() + 1); }">
+                    <i class="bi bi-chevron-right"></i>
+                </a>
+            </li>
+        </ul>
+    </nav>
+</div>
+
+@section Scripts {
+<script src="~/js/Blog/Index.js"></script>
+}

@@ -33,6 +33,10 @@ public class AppDbContext : DbContext
     // Gallery
     public DbSet<CompanyGalleryImage> CompanyGalleryImages => Set<CompanyGalleryImage>();
 
+    // Blog
+    public DbSet<BlogPost> BlogPosts => Set<BlogPost>();
+    public DbSet<BlogComment> BlogComments => Set<BlogComment>();
+
     // Email Management
     public DbSet<EmailAccount> EmailAccounts => Set<EmailAccount>();
     public DbSet<EmailTemplate> EmailTemplates => Set<EmailTemplate>();
@@ -373,6 +377,58 @@ public class AppDbContext : DbContext
                   .OnDelete(DeleteBehavior.Cascade);
         });
 
+        // ===============================================
+        // BLOG SISTEMI
+        // ===============================================
+
+        modelBuilder.Entity<BlogPost>(entity =>
+        {
+            entity.HasKey(e => e.Id);
+            entity.Property(e => e.Title).IsRequired().HasMaxLength(200);
+            entity.Property(e => e.Slug).IsRequired().HasMaxLength(250);
+            entity.Property(e => e.Summary).IsRequired().HasMaxLength(500);
+            entity.Property(e => e.Content).IsRequired();
+            entity.Property(e => e.ImageUrl).HasMaxLength(500);
+            entity.Property(e => e.MetaTitle).HasMaxLength(100);
+            entity.Property(e => e.MetaDescription).HasMaxLength(300);
+            entity.Property(e => e.Tags).HasMaxLength(500);
+
+            entity.HasIndex(e => e.Slug).IsUnique();
+
+            entity.HasOne(e => e.Author)
+                  .WithMany(v => v.BlogPosts)
+                  .HasForeignKey(e => e.AuthorId)
+                  .OnDelete(DeleteBehavior.Restrict);
+
+            entity.HasOne(e => e.Company)
+                  .WithMany()
+                  .HasForeignKey(e => e.CompanyId)
+                  .IsRequired(false)
+                  .OnDelete(DeleteBehavior.SetNull);
+        });
+
+        modelBuilder.Entity<BlogComment>(entity =>
+        {
+            entity.HasKey(e => e.Id);
+            entity.Property(e => e.Content).IsRequired().HasMaxLength(1000);
+
+            entity.HasOne(e => e.BlogPost)
+                  .WithMany(p => p.Comments)
+                  .HasForeignKey(e => e.BlogPostId)
+                  .OnDelete(DeleteBehavior.Cascade);
+
+            entity.HasOne(e => e.Visitor)
+                  .WithMany(v => v.BlogComments)
+                  .HasForeignKey(e => e.VisitorId)
+                  .OnDelete(DeleteBehavior.Cascade);
+
+            entity.HasOne(e => e.ParentComment)
+                  .WithMany(c => c.Replies)
+                  .HasForeignKey(e => e.ParentCommentId)
+                  .IsRequired(false)
+                  .OnDelete(DeleteBehavior.Restrict);
+        });
+
         // Seed Data
         SeedData(modelBuilder);
     }
@@ -578,6 +634,95 @@ public class AppDbContext : DbContext
 
         // Email Sablon Cevirileri (Her sablon icin tr ve en)
         SeedEmailTemplateTranslations(modelBuilder, now);
+
+        // Blog Yazilari
+        var publishedAt = new DateTime(2026, 1, 15, 10, 0, 0, DateTimeKind.Utc);
+        var blogPosts = new[]
+        {
+            new BlogPost
+            {
+                Id = 1,
+                Title = "Kapadokya'da Balon Turu: Bilmeniz Gereken Her Sey",
+                Slug = "kapadokyada-balon-turu-bilmeniz-gereken-her-sey",
+                Summary = "Kapadokya balon turuna katilmadan once bilmeniz gereken ipuclari, en iyi sezon ve hazirlik onerileri.",
+                Content = "<h2>Kapadokya Balon Turu Rehberi</h2><p>Kapadokya'nin essiz peri bacalari uzerinde balon turu, dunyanin en etkileyici deneyimlerinden biridir. Bu yazida, balon turuna katilmadan once bilmeniz gereken her seyi paylasiyoruz.</p><h3>En Iyi Sezon</h3><p>Nisan-Kasim ayları arasinda hava kosullari balon ucuslari icin en uygun donemdir. Ozellikle Mayis-Haziran ve Eylul-Ekim aylarinda hava en stabil halindedir.</p><h3>Fiyatlar</h3><p>Standart ucuslar 150-250 Euro arasinda degismektedir. Ozel ucuslar ise 300 Euro'dan baslamaktadir.</p><h3>Hazirlik</h3><p>Sabah erken kalkmaniz gerekecektir. Rahat kiyafetler ve spor ayakkabi giyin. Kameranizi unutmayin!</p>",
+                ImageUrl = "https://picsum.photos/seed/blog-kapadokya/800/400",
+                CategoryId = BlogCategories.Ids.TravelTips,
+                StatusId = BlogStatuses.Ids.Published,
+                AuthorId = 1,
+                CompanyId = null,
+                ViewCount = 342,
+                PublishedAt = publishedAt,
+                Tags = "kapadokya,balon,seyahat ipucu",
+                CreatedAt = now,
+                IsActive = true
+            },
+            new BlogPost
+            {
+                Id = 2,
+                Title = "Ege'nin Saklı Koyları: Keşfedilmemiş Cennetler",
+                Slug = "egenin-sakli-koylari-kesfedilmemis-cennetler",
+                Summary = "Ege sahillerinde turistik kalabaliktan uzak, huzurlu ve dogal koylari kesfedin.",
+                Content = "<h2>Ege'nin Gizli Cennetleri</h2><p>Turkiye'nin Ege sahilleri, dunya uzerindeki en guzel kumsallara ve koylara ev sahipligi yapmaktadir. Bu yazida, henuz kesfedilmemis sakli koylari tanitiyoruz.</p><h3>1. Sazak Koyu - Mugla</h3><p>Berrak sulari ve bakir dogasiyla Sazak Koyu, huzur arayanlar icin ideal bir destinasyondur.</p><h3>2. Kabak Koyu - Fethiye</h3><p>Oludeniz'in guneybatisinda yer alan Kabak Koyu, dogal guzelligi ve sakli plajlariyla unlüdur.</p><h3>3. Hayıtbuku - Mugla</h3><p>Bodrum yakinlarindaki Hayitbuku, sakin atmosferi ve lezzetli deniz urunleriyle bilinir.</p>",
+                ImageUrl = "https://picsum.photos/seed/blog-ege/800/400",
+                CategoryId = BlogCategories.Ids.Destinations,
+                StatusId = BlogStatuses.Ids.Published,
+                AuthorId = 3,
+                CompanyId = 1,
+                ViewCount = 215,
+                PublishedAt = new DateTime(2026, 1, 20, 14, 0, 0, DateTimeKind.Utc),
+                Tags = "ege,koy,deniz,doga",
+                CreatedAt = now,
+                IsActive = true
+            },
+            new BlogPost
+            {
+                Id = 3,
+                Title = "2026 Yilinda Turkiye Turizm Trendleri",
+                Slug = "2026-yilinda-turkiye-turizm-trendleri",
+                Summary = "2026 yilinda Turkiye turizmini sekillendiren trendler ve yenilikler hakkinda detayli analiz.",
+                Content = "<h2>2026 Turizm Trendleri</h2><p>Turkiye turizm sektoru hizla gelismektedir. Iste 2026 yilinin one cikan trendleri:</p><h3>Eko-Turizm Yukseliste</h3><p>Surdurulebilir turizm anlayisi giderek yayginlasmaktadir. Dogayla uyumlu konaklama tesisleri ve karbon ayak izini azaltan tur programlari populerlesmektedir.</p><h3>Dijital Deneyimler</h3><p>Sanal gerceklik turlari ve arttirilmis gerceklik uygulamalari turizm sektorunde yeni firsatlar sunmaktadir.</p><h3>Gastronomi Turizmi</h3><p>Yerel lezzetleri kesfetmek amaciyla yapilan seyahatler her gecen gun artmaktadir.</p>",
+                ImageUrl = "https://picsum.photos/seed/blog-trends/800/400",
+                CategoryId = BlogCategories.Ids.News,
+                StatusId = BlogStatuses.Ids.Published,
+                AuthorId = 1,
+                CompanyId = null,
+                ViewCount = 178,
+                PublishedAt = new DateTime(2026, 2, 1, 9, 0, 0, DateTimeKind.Utc),
+                Tags = "turizm,trend,2026",
+                CreatedAt = now,
+                IsActive = true
+            },
+            new BlogPost
+            {
+                Id = 4,
+                Title = "Karadeniz Yaylalarinda Lezzet Duragi",
+                Slug = "karadeniz-yaylalarinda-lezzet-duragi",
+                Summary = "Karadeniz mutfagininin en ozel lezzetlerini yaylalarda tatma rehberi.",
+                Content = "<h2>Karadeniz Lezzetleri</h2><p>Karadeniz mutfagi, Turkiye'nin en zengin ve ozgun mutfaklarindan biridir.</p><h3>Muhlama</h3><p>Karadeniz'in en meshur lezzeti muhlama, tereyagi ve peynirle yapilan essiz bir yemektir.</p><h3>Kuymak</h3><p>Misir unu ve peynirle hazirlanan kuymak, ozellikle kis aylarinda tercih edilir.</p><h3>Hamsi</h3><p>Karadeniz denince akla ilk gelen balik olan hamsi, tava, pilav ve hatta tatli olarak bile hazirlanir.</p>",
+                ImageUrl = "https://picsum.photos/seed/blog-karadeniz/800/400",
+                CategoryId = BlogCategories.Ids.FoodAndDrink,
+                StatusId = BlogStatuses.Ids.Published,
+                AuthorId = 4,
+                CompanyId = 2,
+                ViewCount = 124,
+                PublishedAt = new DateTime(2026, 2, 5, 11, 0, 0, DateTimeKind.Utc),
+                Tags = "karadeniz,yemek,lezzet,yayla",
+                CreatedAt = now,
+                IsActive = true
+            }
+        };
+        modelBuilder.Entity<BlogPost>().HasData(blogPosts);
+
+        // Blog Yorumlari
+        var blogComments = new[]
+        {
+            new BlogComment { Id = 1, BlogPostId = 1, VisitorId = 8, Content = "Cok faydali bir yazi olmus, tesekkurler! Kapadokya'ya gitmeden once mutlaka okunsun.", CreatedAt = now, IsActive = true },
+            new BlogComment { Id = 2, BlogPostId = 1, VisitorId = 9, Content = "Gecen yil gittik, gercekten harikaydı. Eylul ayini tavsiye ederim.", CreatedAt = now, IsActive = true },
+            new BlogComment { Id = 3, BlogPostId = 2, VisitorId = 10, Content = "Kabak Koyu gercekten muhtesem! Herkesin gitmesi lazim.", CreatedAt = now, IsActive = true },
+            new BlogComment { Id = 4, BlogPostId = 3, VisitorId = 11, Content = "Eko-turizm trendi cok guzel, doga korundukca turizm de gelisir.", CreatedAt = now, IsActive = true }
+        };
+        modelBuilder.Entity<BlogComment>().HasData(blogComments);
     }
 
     private void SeedEmailTemplateTranslations(ModelBuilder modelBuilder, DateTime now)
