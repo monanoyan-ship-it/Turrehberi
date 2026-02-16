@@ -50,6 +50,11 @@ Donen JSON'daki tum pattern'leri (rule, mistake, preference) oku ve session boyu
 
 Kullanici yeni kural belirtirse, hata yaptigini soylerse veya tercih bildirirse kaydet:
 
+- Pattern tipleri: sadece `"rule"`, `"mistake"`, `"preference"` kabul edilir (`"pattern"` tipi kaldirildi)
+- Kullanici bir hata yaptigini soylerse → `"mistake"` olarak kaydet
+- Kullanici bir tercih belirtirse → `"preference"` olarak kaydet
+- Tekrarlanan bir pattern fark edersen → `"rule"` olarak kaydet
+
 ```bash
 # Kaydet (type: "rule" | "mistake" | "preference")
 curl -X POST http://127.0.0.1:41847/api/patterns -H "Content-Type: application/json" \
@@ -62,6 +67,28 @@ curl -X PUT http://127.0.0.1:41847/api/patterns/ID -H "Content-Type: application
 # Sil
 curl -X DELETE http://127.0.0.1:41847/api/patterns/ID
 ```
+
+### Journal - Gunluk bilgiler
+
+Gunluk nitelikli bilgiler (kredi durumu, domain, vize vs.) icin journal endpoint'ini kullan:
+
+```bash
+curl -X POST http://127.0.0.1:41847/api/journal -H "Content-Type: application/json" \
+  -d '{"project_id":14,"content":"ICERIK"}'
+```
+
+### Notes - Kritik bilgiler
+
+Hesap bilgileri, API key'ler, sifreler, krediler gibi kritik bilgileri Notes'a kaydet. Yeni bir hesap/servis olusturulursa bilgileri hemen yaz - sonra unutulur:
+
+```bash
+curl -X POST http://127.0.0.1:41847/api/notes -H "Content-Type: application/json" \
+  -d '{"project_id":14,"category":"teknik","title":"BASLIK","content":"ICERIK"}'
+```
+
+### Dashboard
+
+ClaudeManager dashboard: `http://127.0.0.1:41847/`
 
 ---
 
