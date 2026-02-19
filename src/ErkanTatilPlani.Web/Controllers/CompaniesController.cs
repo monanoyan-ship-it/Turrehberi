@@ -19,9 +19,9 @@ public class CompaniesController : Controller
 
     /// <summary>
     /// Firma profil sayfasi - SEO-friendly URL
-    /// /Companies/Details/{slug}
+    /// /{slug}
     /// </summary>
-    [Route("Companies/Details/{slug}")]
+    [Route("{slug:companySlug}")]
     public IActionResult Details(string slug)
     {
         ViewBag.ApiBaseUrl = _configuration["ApiBaseUrl"];
@@ -31,9 +31,9 @@ public class CompaniesController : Controller
 
     /// <summary>
     /// Firma ozel sayfasi
-    /// /Companies/{slug}/page/{pageSlug}
+    /// /{slug}/page/{pageSlug}
     /// </summary>
-    [Route("Companies/{slug}/page/{pageSlug}")]
+    [Route("{slug:companySlug}/page/{pageSlug}")]
     public IActionResult Page(string slug, string pageSlug)
     {
         ViewBag.ApiBaseUrl = _configuration["ApiBaseUrl"];
@@ -44,9 +44,9 @@ public class CompaniesController : Controller
 
     /// <summary>
     /// Firma blog listesi
-    /// /Companies/{slug}/blog
+    /// /{slug}/blog
     /// </summary>
-    [Route("Companies/{slug}/blog")]
+    [Route("{slug:companySlug}/blog")]
     public IActionResult Blog(string slug)
     {
         ViewBag.ApiBaseUrl = _configuration["ApiBaseUrl"];
@@ -56,9 +56,9 @@ public class CompaniesController : Controller
 
     /// <summary>
     /// Firma blog detay
-    /// /Companies/{slug}/blog/{postSlug}
+    /// /{slug}/blog/{postSlug}
     /// </summary>
-    [Route("Companies/{slug}/blog/{postSlug}")]
+    [Route("{slug:companySlug}/blog/{postSlug}")]
     public IActionResult BlogDetail(string slug, string postSlug)
     {
         ViewBag.ApiBaseUrl = _configuration["ApiBaseUrl"];

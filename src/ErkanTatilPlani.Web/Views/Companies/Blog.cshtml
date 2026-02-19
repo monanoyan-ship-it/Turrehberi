@@ -22,12 +22,12 @@
                     <!-- /ko -->
                     <div>
                         <h5 class="mb-0">
-                            <a data-bind="text: companyInfo() ? companyInfo().name : '', attr: { href: '/Companies/Details/' + companySlug }" class="text-decoration-none"></a>
+                            <a data-bind="text: companyInfo() ? companyInfo().name : '', attr: { href: '/' + companySlug }" class="text-decoration-none"></a>
                         </h5>
                         <small class="text-muted">Blog Yazilari</small>
                     </div>
                 </div>
-                <a data-bind="attr: { href: '/Companies/Details/' + companySlug }" class="btn btn-outline-primary btn-sm">
+                <a data-bind="attr: { href: '/' + companySlug }" class="btn btn-outline-primary btn-sm">
                     <i class="bi bi-arrow-left me-1"></i> Firma Profili
                 </a>
             </div>
@@ -48,7 +48,7 @@
                     <div class="card-body">
                         <span class="badge mb-2" data-bind="css: $parent.getCategoryBadgeClass(categoryId), text: $parent.getCategoryName(categoryId)"></span>
                         <h5 class="card-title">
-                            <a data-bind="text: title, attr: { href: '/Companies/' + $parent.companySlug + '/blog/' + slug }" class="text-decoration-none text-dark"></a>
+                            <a data-bind="text: title, attr: { href: '/' + $parent.companySlug + '/blog/' + slug }" class="text-decoration-none text-dark"></a>
                         </h5>
                         <p class="card-text text-muted" data-bind="text: summary"></p>
                     </div>

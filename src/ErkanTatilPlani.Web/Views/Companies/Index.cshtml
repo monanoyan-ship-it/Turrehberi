@@ -160,7 +160,7 @@
 
                 <div class="card-footer bg-transparent border-0 pt-0">
                     <div class="d-flex gap-2">
-                        <a class="btn btn-outline-primary flex-grow-1" data-bind="attr: { href: '/Companies/Details/' + slug }">
+                        <a class="btn btn-outline-primary flex-grow-1" data-bind="attr: { href: '/' + slug }">
                             <i class="bi bi-eye me-1"></i>
                             <span data-t="Companies.ViewProfile">Profili Gor</span>
                         </a>
@@ -231,7 +231,7 @@ function CompaniesViewModel() {
 
     // Firma paylas
     self.shareCompany = function(company, platform) {
-        var shareUrl = window.location.origin + '/Companies/Details/' + company.slug;
+        var shareUrl = window.location.origin + '/' + company.slug;
         var shareText = company.name + ' - ' + (company.tagline || 'Tur Firmasi') + ' | Erkan Tatil Plani';
 
         if (platform === 'copy') {

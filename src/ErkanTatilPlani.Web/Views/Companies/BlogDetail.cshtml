@@ -16,7 +16,7 @@
     <div data-bind="visible: !isLoading() && !post()" class="text-center py-5">
         <i class="bi bi-exclamation-triangle-fill text-muted" style="font-size: 3rem;"></i>
         <h4 class="mt-3">Yazi Bulunamadi</h4>
-        <a data-bind="attr: { href: '/Companies/' + companySlug + '/blog' }" class="btn btn-primary mt-2">Blog'a Don</a>
+        <a data-bind="attr: { href: '/' + companySlug + '/blog' }" class="btn btn-primary mt-2">Blog'a Don</a>
     </div>
 
     <!-- Post Content -->
@@ -28,12 +28,12 @@
                     <!-- ko if: post() && post().companyName -->
                     <div>
                         <h6 class="mb-0">
-                            <a data-bind="text: post().companyName, attr: { href: '/Companies/Details/' + (post().companySlug || companySlug) }" class="text-decoration-none"></a>
+                            <a data-bind="text: post().companyName, attr: { href: '/' + (post().companySlug || companySlug) }" class="text-decoration-none"></a>
                         </h6>
                     </div>
                     <!-- /ko -->
                 </div>
-                <a data-bind="attr: { href: '/Companies/' + companySlug + '/blog' }" class="btn btn-outline-primary btn-sm">
+                <a data-bind="attr: { href: '/' + companySlug + '/blog' }" class="btn btn-outline-primary btn-sm">
                     <i class="bi bi-arrow-left me-1"></i> Tum Yazilar
                 </a>
             </div>
@@ -43,8 +43,8 @@
         <nav aria-label="breadcrumb" class="mb-3">
             <ol class="breadcrumb">
                 <li class="breadcrumb-item"><a href="/Companies">Firmalar</a></li>
-                <li class="breadcrumb-item"><a data-bind="attr: { href: '/Companies/Details/' + companySlug }, text: post() ? post().companyName : ''"></a></li>
-                <li class="breadcrumb-item"><a data-bind="attr: { href: '/Companies/' + companySlug + '/blog' }">Blog</a></li>
+                <li class="breadcrumb-item"><a data-bind="attr: { href: '/' + companySlug }, text: post() ? post().companyName : ''"></a></li>
+                <li class="breadcrumb-item"><a data-bind="attr: { href: '/' + companySlug + '/blog' }">Blog</a></li>
                 <li class="breadcrumb-item active" data-bind="text: post() ? post().title : ''"></li>
             </ol>
         </nav>

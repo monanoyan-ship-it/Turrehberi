@@ -1,9 +1,14 @@
+using ErkanTatilPlani.Web.Routing;
 using ErkanTatilPlani.Web.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddControllersWithViews();
+builder.Services.AddRouting(options =>
+{
+    options.ConstraintMap.Add("companySlug", typeof(CompanySlugConstraint));
+});
 
 // API Base URL
 var apiBaseUrl = builder.Configuration["ApiBaseUrl"] ?? "https://localhost:7001";
