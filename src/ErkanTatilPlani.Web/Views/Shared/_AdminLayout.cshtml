@@ -22,18 +22,6 @@
                     <li class="nav-item">
                         <a class="nav-link" href="/Admin"><i class="bi bi-speedometer2 me-1"></i>Dashboard</a>
                     </li>
-                    <li class="nav-item dropdown" id="companyOwnerMenu">
-                        <a class="nav-link dropdown-toggle" href="#" data-bs-toggle="dropdown">Firmam</a>
-                        <ul class="dropdown-menu">
-                            <li><a class="dropdown-item" href="/Admin/CompanyDashboard">Dashboard</a></li>
-                            <li><a class="dropdown-item" href="/Admin/MyTours">Turlarim</a></li>
-                            <li><a class="dropdown-item" href="/Admin/MyReservations">Rezervasyonlarim</a></li>
-                            <li><a class="dropdown-item" href="/Admin/MyReviews">Yorumlar</a></li>
-                            <li><hr class="dropdown-divider" /></li>
-                            <li><a class="dropdown-item" href="/Admin/CompanyPages">Sayfalarim</a></li>
-                            <li><a class="dropdown-item" href="/Admin/CompanyBlog">Blogum</a></li>
-                        </ul>
-                    </li>
                     <li class="nav-item dropdown" id="staffMenu">
                         <a class="nav-link dropdown-toggle" href="#" data-bs-toggle="dropdown">Yonetim</a>
                         <ul class="dropdown-menu">
@@ -80,12 +68,8 @@
         // Menu visibility
         var currentUserRole = '@(ViewBag.UserRole ?? "Admin")';
         $(document).ready(function() {
-            if (currentUserRole === 'CompanyOwner') {
-                $('#staffMenu, #adminMenu').hide();
-            } else if (currentUserRole === 'Staff') {
-                $('#companyOwnerMenu, #adminMenu').hide();
-            } else if (currentUserRole === 'Admin') {
-                $('#companyOwnerMenu').hide();
+            if (currentUserRole === 'Staff') {
+                $('#adminMenu').hide();
             }
         });
     </script>

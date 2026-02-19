@@ -1,5 +1,5 @@
 @{
-    Layout = "_AdminLayout";
+    Layout = "_CompanyLayout";
 }
 
 <div id="companyDashboardApp">
@@ -119,7 +119,7 @@
                 <div class="card h-100">
                     <div class="card-header d-flex justify-content-between align-items-center">
                         <span><i class="bi bi-calendar-check me-2"></i><span data-t="Dashboard.RecentReservations">Son Rezervasyonlar</span></span>
-                        <a href="/Admin/MyReservations" class="btn btn-sm btn-outline-primary" data-t="Dashboard.ViewAll">Tumu</a>
+                        <a href="/MyCompany/MyReservations" class="btn btn-sm btn-outline-primary" data-t="Dashboard.ViewAll">Tumu</a>
                     </div>
                     <div class="card-body p-0">
                         <!-- Veri yok -->
@@ -274,5 +274,5 @@
 </div>
 
 @section Scripts {
-<script src="~/js/Admin/CompanyDashboard.js"></script>
+<script src="~/js/MyCompany/CompanyDashboard.js"></script>
 }

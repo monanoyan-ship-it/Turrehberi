@@ -1,4 +1,3 @@
-using ErkanTatilPlani.Core.Enums;
 using Microsoft.AspNetCore.Mvc;
 
 namespace ErkanTatilPlani.Web.Controllers;
@@ -17,66 +16,13 @@ public class AdminController : Controller
         ViewData["ActiveMenu"] = activeMenu;
         ViewData["Title"] = title;
         ViewBag.ApiBaseUrl = _configuration["ApiBaseUrl"];
-        // TODO: Gercek auth sistemi kuruldugunda session'dan alinacak
-        ViewBag.UserRole = "Admin"; // Admin, Staff, CompanyOwner
+        ViewBag.UserRole = "Admin";
     }
 
     // Dashboard - Tum roller erisebilir
     public IActionResult Index()
     {
         SetCommonViewData("Dashboard", "Kontrol Paneli");
-        return View();
-    }
-
-    // ============================================
-    // FIRMA SAHIBI SAYFALARI
-    // ============================================
-
-    // Firma sahibi dashboard'u
-    public IActionResult CompanyDashboard()
-    {
-        SetCommonViewData("CompanyDashboard", "Dashboard");
-        ViewBag.UserRole = "CompanyOwner";
-        return View();
-    }
-
-    // Firma sahibinin kendi turlari
-    public IActionResult MyTours()
-    {
-        SetCommonViewData("MyTours", "Turlarim");
-        ViewBag.UserRole = "CompanyOwner";
-        return View();
-    }
-
-    // Firma sahibinin kendi rezervasyonlari
-    public IActionResult MyReservations()
-    {
-        SetCommonViewData("MyReservations", "Rezervasyonlarim");
-        ViewBag.UserRole = "CompanyOwner";
-        return View();
-    }
-
-    // Firma sahibinin turlarindaki yorumlar
-    public IActionResult MyReviews()
-    {
-        SetCommonViewData("MyReviews", "Yorumlar");
-        ViewBag.UserRole = "CompanyOwner";
-        return View();
-    }
-
-    // Firma sahibinin sayfalari
-    public IActionResult CompanyPages()
-    {
-        SetCommonViewData("CompanyPages", "Sayfalarim");
-        ViewBag.UserRole = "CompanyOwner";
-        return View();
-    }
-
-    // Firma sahibinin blogu
-    public IActionResult CompanyBlog()
-    {
-        SetCommonViewData("CompanyBlog", "Blogum");
-        ViewBag.UserRole = "CompanyOwner";
         return View();
     }
 

@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - Firma Paneli</title>
+    <link rel="stylesheet" href="~/lib/bootstrap/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="~/lib/bootstrap-icons/font/bootstrap-icons.css" />
+    <link rel="stylesheet" href="~/lib/toastr/toastr.min.css" />
+    @await RenderSectionAsync("Styles", required: false)
+</head>
+<body>
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="/MyCompany"><i class="bi bi-building me-2"></i>Firma Paneli</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#companyNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="companyNav">
+                <ul class="navbar-nav me-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="/MyCompany"><i class="bi bi-speedometer2 me-1"></i>Dashboard</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/MyCompany/MyTours"><i class="bi bi-geo-alt me-1"></i>Turlarim</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/MyCompany/MyReservations"><i class="bi bi-calendar-check me-1"></i>Rezervasyonlarim</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/MyCompany/MyReviews"><i class="bi bi-chat-square-text me-1"></i>Yorumlar</a>
+                    </li>
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" data-bs-toggle="dropdown"><i class="bi bi-palette me-1"></i>Mini-Site</a>
+                        <ul class="dropdown-menu">
+                            <li><a class="dropdown-item" href="/MyCompany/CompanyPages"><i class="bi bi-file-earmark-text me-1"></i>Sayfalarim</a></li>
+                            <li><a class="dropdown-item" href="/MyCompany/CompanyBlog"><i class="bi bi-journal-text me-1"></i>Blogum</a></li>
+                        </ul>
+                    </li>
+                </ul>
+                <div class="d-flex align-items-center">
+                    <span class="text-light me-3" id="currentUserName">Firma Sahibi</span>
+                    <a href="/" class="btn btn-outline-light btn-sm me-2">Siteye Don</a>
+                    <a href="/Account/Profile" class="btn btn-outline-light btn-sm">Profilim</a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Content -->
+    <div class="container-fluid py-4">
+        <h4 class="mb-4">@ViewData["Title"]</h4>
+        @RenderBody()
+    </div>
+
+    <script src="~/lib/jquery/jquery.min.js"></script>
+    <script src="~/lib/bootstrap/js/bootstrap.bundle.min.js"></script>
+    <script src="~/lib/knockout/knockout-latest.min.js"></script>
+    <script src="~/lib/toastr/toastr.min.js"></script>
+    <script>
+        toastr.options = { "closeButton": true, "progressBar": true, "positionClass": "toast-top-right", "timeOut": "3000" };
+        var apiBaseUrl = '@Html.Raw(ViewBag.ApiBaseUrl ?? "https://localhost:7078")';
+
+        // Auth token
+        $(document).ready(function() {
+            var token = localStorage.getItem('authToken');
+            var visitor = localStorage.getItem('visitor');
+            if (visitor) {
+                try {
+                    var v = JSON.parse(visitor);
+                    $('#currentUserName').text(v.firstName + ' ' + v.lastName);
+                } catch(e) {}
+            }
+        });
+    </script>
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>
