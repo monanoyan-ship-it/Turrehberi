@@ -637,5 +637,25 @@
   "Blog.MyPosts": "مقالات من",
   "Blog.Tags": "برچسب‌ها",
   "Blog.Author": "نویسنده",
-  "Blog.RelatedPosts": "مقالات مرتبط"
+  "Blog.RelatedPosts": "مقالات مرتبط",
+
+  "CompanyPage.Title": "صفحات شرکت",
+  "CompanyPage.Create": "صفحه جدید",
+  "CompanyPage.Edit": "ویرایش صفحه",
+  "CompanyPage.Delete": "حذف صفحه",
+  "CompanyPage.DeleteConfirm": "آیا مطمئن هستید که می‌خواهید این صفحه را حذف کنید؟",
+  "CompanyPage.Published": "منتشر شده",
+  "CompanyPage.Draft": "پیش‌نویس",
+  "CompanyPage.Reorder": "مرتب‌سازی",
+  "CompanyPage.NoPages": "هنوز صفحه‌ای ایجاد نشده است",
+  "CompanyBlog.Title": "وبلاگ شرکت",
+  "CompanyBlog.Create": "مطلب جدید",
+  "CompanyBlog.NoPosts": "هنوز مطلبی در وبلاگ نیست",
+  "CompanyBlog.AllPosts": "همه مطالب",
+  "CompanyMiniSite.Pages": "صفحات ما",
+  "CompanyMiniSite.BlogPosts": "آخرین مطالب وبلاگ",
+  "CompanyMiniSite.BackToProfile": "پروفایل شرکت",
+  "CompanyMiniSite.BackToBlog": "همه مطالب",
+  "Admin.CompanyPages": "صفحات من",
+  "Admin.CompanyBlog": "وبلاگ من"
 }

@@ -637,5 +637,25 @@
   "Blog.MyPosts": "مقالاتي",
   "Blog.Tags": "الوسوم",
   "Blog.Author": "الكاتب",
-  "Blog.RelatedPosts": "مقالات ذات صلة"
+  "Blog.RelatedPosts": "مقالات ذات صلة",
+
+  "CompanyPage.Title": "صفحات الشركة",
+  "CompanyPage.Create": "صفحة جديدة",
+  "CompanyPage.Edit": "تعديل الصفحة",
+  "CompanyPage.Delete": "حذف الصفحة",
+  "CompanyPage.DeleteConfirm": "هل أنت متأكد أنك تريد حذف هذه الصفحة؟",
+  "CompanyPage.Published": "منشور",
+  "CompanyPage.Draft": "مسودة",
+  "CompanyPage.Reorder": "إعادة الترتيب",
+  "CompanyPage.NoPages": "لم يتم إنشاء أي صفحات بعد",
+  "CompanyBlog.Title": "مدونة الشركة",
+  "CompanyBlog.Create": "مقال جديد",
+  "CompanyBlog.NoPosts": "لا توجد مقالات بعد",
+  "CompanyBlog.AllPosts": "جميع المقالات",
+  "CompanyMiniSite.Pages": "صفحاتنا",
+  "CompanyMiniSite.BlogPosts": "أحدث مقالات المدونة",
+  "CompanyMiniSite.BackToProfile": "ملف الشركة",
+  "CompanyMiniSite.BackToBlog": "جميع المقالات",
+  "Admin.CompanyPages": "صفحاتي",
+  "Admin.CompanyBlog": "مدونتي"
 }

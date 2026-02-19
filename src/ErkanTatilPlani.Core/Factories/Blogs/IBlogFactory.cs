@@ -13,4 +13,8 @@ public interface IBlogFactory
     Task<(bool success, bool notFound, string? errorMessage, string? errorCode, int? statusCode)> DeletePostAsync(int visitorId, int id);
     Task<object> GetAllPostsAsync(int? statusId, int? categoryId, string? search, int page, int pageSize);
     Task<(bool success, string? errorMessage, string? errorCode, int? statusCode)> UpdatePostStatusAsync(int id, int statusId);
+
+    // Firma blog metodlari
+    Task<object> GetCompanyBlogPostsAsync(int companyId, int page, int pageSize);
+    Task<(object? result, string? errorMessage, string? errorCode, int? statusCode)> GetCompanyDraftPostsAsync(int visitorId, int companyId);
 }

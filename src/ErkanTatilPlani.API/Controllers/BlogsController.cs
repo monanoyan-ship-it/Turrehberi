@@ -163,6 +163,35 @@ public class BlogsController : ControllerBase
     }
 
     // ============================================
+    // FIRMA BLOG ENDPOINTS
+    // ============================================
+
+    [HttpGet("company/{companyId:int}")]
+    public async Task<ActionResult<object>> GetCompanyPosts(
+        int companyId,
+        [FromQuery] int page = 1,
+        [FromQuery] int pageSize = 9)
+    {
+        return Ok(await _blogFactory.GetCompanyBlogPostsAsync(companyId, page, pageSize));
+    }
+
+    [HttpGet("company/{companyId:int}/manage")]
+    [Authorize]
+    public async Task<IActionResult> GetCompanyDraftPosts(int companyId)
+    {
+        var visitorId = GetVisitorId();
+        if (visitorId == null) return Unauthorized(new { message = "Giris yapmaniz gerekiyor" });
+
+        var (result, errorMessage, errorCode, statusCode) = await _blogFactory.GetCompanyDraftPostsAsync(visitorId.Value, companyId);
+        if (errorMessage != null)
+        {
+            var error = errorCode != null ? new { message = errorMessage, code = errorCode } : (object)new { message = errorMessage };
+            return StatusCode(statusCode ?? 400, error);
+        }
+        return Ok(result);
+    }
+
+    // ============================================
     // ADMIN ENDPOINTS
     // ============================================
 

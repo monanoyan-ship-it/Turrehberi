@@ -637,5 +637,25 @@
   "Blog.MyPosts": "My Posts",
   "Blog.Tags": "Tags",
   "Blog.Author": "Author",
-  "Blog.RelatedPosts": "Related Posts"
+  "Blog.RelatedPosts": "Related Posts",
+
+  "CompanyPage.Title": "Company Pages",
+  "CompanyPage.Create": "New Page",
+  "CompanyPage.Edit": "Edit Page",
+  "CompanyPage.Delete": "Delete Page",
+  "CompanyPage.DeleteConfirm": "Are you sure you want to delete this page?",
+  "CompanyPage.Published": "Published",
+  "CompanyPage.Draft": "Draft",
+  "CompanyPage.Reorder": "Reorder",
+  "CompanyPage.NoPages": "No pages created yet",
+  "CompanyBlog.Title": "Company Blog",
+  "CompanyBlog.Create": "New Post",
+  "CompanyBlog.NoPosts": "No blog posts yet",
+  "CompanyBlog.AllPosts": "All Posts",
+  "CompanyMiniSite.Pages": "Our Pages",
+  "CompanyMiniSite.BlogPosts": "Latest Blog Posts",
+  "CompanyMiniSite.BackToProfile": "Company Profile",
+  "CompanyMiniSite.BackToBlog": "All Posts",
+  "Admin.CompanyPages": "My Pages",
+  "Admin.CompanyBlog": "My Blog"
 }

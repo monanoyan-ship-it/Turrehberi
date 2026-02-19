@@ -113,6 +113,42 @@
                         <p class="mb-0" data-bind="text: company().description"></p>
                     </div>
 
+                    <!-- Company Pages Section -->
+                    <div class="bg-white rounded-3 shadow-sm p-4 mb-4" data-bind="visible: companyPages().length > 0">
+                        <h2 class="h5 mb-3"><i class="bi bi-file-earmark-text me-2"></i>Sayfalarimiz</h2>
+                        <div class="list-group list-group-flush" data-bind="foreach: companyPages">
+                            <a class="list-group-item list-group-item-action d-flex align-items-center" data-bind="attr: { href: '/Companies/' + $parent.company().slug + '/page/' + slug }">
+                                <i data-bind="attr: { 'class': 'bi bi-' + (icon || 'file-text') + ' me-2' }"></i>
+                                <span data-bind="text: title"></span>
+                            </a>
+                        </div>
+                    </div>
+
+                    <!-- Company Blog Section -->
+                    <div class="bg-white rounded-3 shadow-sm p-4 mb-4" data-bind="visible: companyBlogPosts().length > 0">
+                        <div class="d-flex justify-content-between align-items-center mb-3">
+                            <h2 class="h5 mb-0"><i class="bi bi-journal-text me-2"></i>Son Blog Yazilari</h2>
+                            <a class="btn btn-outline-primary btn-sm" data-bind="attr: { href: '/Companies/' + company().slug + '/blog' }">
+                                Tum Yazilar <i class="bi bi-arrow-right ms-1"></i>
+                            </a>
+                        </div>
+                        <div class="row g-3" data-bind="foreach: companyBlogPosts">
+                            <div class="col-md-6">
+                                <div class="card h-100 border-0 shadow-sm">
+                                    <!-- ko if: imageUrl -->
+                                    <img data-bind="attr: { src: imageUrl, alt: title }" class="card-img-top" style="height: 120px; object-fit: cover;" loading="lazy" />
+                                    <!-- /ko -->
+                                    <div class="card-body">
+                                        <h6 class="card-title mb-1">
+                                            <a data-bind="text: title, attr: { href: '/Companies/' + $parent.company().slug + '/blog/' + slug }" class="text-decoration-none text-dark"></a>
+                                        </h6>
+                                        <p class="text-muted small mb-0" data-bind="text: summary ? summary.substring(0, 100) + '...' : ''"></p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
                     <!-- Tours Section -->
                     <div class="bg-white rounded-3 shadow-sm p-4 mb-4">
                         <div class="d-flex justify-content-between align-items-center mb-3">
@@ -383,6 +419,8 @@ function CompanyProfileViewModel() {
     self.tourCount = ko.observable(0);
     self.stats = ko.observable({ totalReviews: 0, averageRating: 0, ratingDistribution: { fiveStar: 0, fourStar: 0, threeStar: 0, twoStar: 0, oneStar: 0 } });
     self.recentReviews = ko.observableArray([]);
+    self.companyPages = ko.observableArray([]);
+    self.companyBlogPosts = ko.observableArray([]);
 
     // Schema.org JSON-LD for SEO
     self.schemaOrgJson = ko.computed(function() {
@@ -483,6 +521,23 @@ function CompanyProfileViewModel() {
 
             // Update meta tags after data loads
             self.updateMetaTags();
+
+            // Firma sayfalarini yukle
+            $.ajax({
+                url: apiBaseUrl + '/api/companies/pages/' + data.company.slug,
+                method: 'GET'
+            }).done(function(pages) {
+                self.companyPages(pages);
+            });
+
+            // Firma blog yazilarini yukle (son 4)
+            $.ajax({
+                url: apiBaseUrl + '/api/blogs/company/' + data.company.id,
+                method: 'GET',
+                data: { page: 1, pageSize: 4 }
+            }).done(function(blogData) {
+                self.companyBlogPosts(blogData.posts || []);
+            });
 
             // Render share buttons
             var shareUrl = window.location.href;

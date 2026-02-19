@@ -637,5 +637,25 @@
   "Blog.MyPosts": "Yazilarim",
   "Blog.Tags": "Etiketler",
   "Blog.Author": "Yazar",
-  "Blog.RelatedPosts": "Ilgili Yazilar"
+  "Blog.RelatedPosts": "Ilgili Yazilar",
+
+  "CompanyPage.Title": "Firma Sayfalari",
+  "CompanyPage.Create": "Yeni Sayfa",
+  "CompanyPage.Edit": "Sayfa Duzenle",
+  "CompanyPage.Delete": "Sayfa Sil",
+  "CompanyPage.DeleteConfirm": "Bu sayfayi silmek istediginizden emin misiniz?",
+  "CompanyPage.Published": "Yayinda",
+  "CompanyPage.Draft": "Taslak",
+  "CompanyPage.Reorder": "Sirala",
+  "CompanyPage.NoPages": "Henuz sayfa olusturulmamis",
+  "CompanyBlog.Title": "Firma Blogu",
+  "CompanyBlog.Create": "Yeni Yazi",
+  "CompanyBlog.NoPosts": "Henuz blog yazisi yok",
+  "CompanyBlog.AllPosts": "Tum Yazilar",
+  "CompanyMiniSite.Pages": "Sayfalarimiz",
+  "CompanyMiniSite.BlogPosts": "Son Blog Yazilari",
+  "CompanyMiniSite.BackToProfile": "Firma Profili",
+  "CompanyMiniSite.BackToBlog": "Tum Yazilar",
+  "Admin.CompanyPages": "Sayfalarim",
+  "Admin.CompanyBlog": "Blogum"
 }

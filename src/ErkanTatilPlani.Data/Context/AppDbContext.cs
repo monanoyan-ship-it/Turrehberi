@@ -37,6 +37,9 @@ public class AppDbContext : DbContext
     public DbSet<BlogPost> BlogPosts => Set<BlogPost>();
     public DbSet<BlogComment> BlogComments => Set<BlogComment>();
 
+    // Company Pages
+    public DbSet<CompanyPage> CompanyPages => Set<CompanyPage>();
+
     // Email Management
     public DbSet<EmailAccount> EmailAccounts => Set<EmailAccount>();
     public DbSet<EmailTemplate> EmailTemplates => Set<EmailTemplate>();
@@ -427,6 +430,28 @@ public class AppDbContext : DbContext
                   .HasForeignKey(e => e.ParentCommentId)
                   .IsRequired(false)
                   .OnDelete(DeleteBehavior.Restrict);
+        });
+
+        // ===============================================
+        // FIRMA SAYFALARI
+        // ===============================================
+
+        modelBuilder.Entity<CompanyPage>(entity =>
+        {
+            entity.HasKey(e => e.Id);
+            entity.Property(e => e.Title).IsRequired().HasMaxLength(200);
+            entity.Property(e => e.Slug).IsRequired().HasMaxLength(250);
+            entity.Property(e => e.Content).IsRequired();
+            entity.Property(e => e.Icon).HasMaxLength(50);
+            entity.Property(e => e.MetaTitle).HasMaxLength(100);
+            entity.Property(e => e.MetaDescription).HasMaxLength(300);
+
+            entity.HasIndex(e => new { e.CompanyId, e.Slug }).IsUnique();
+
+            entity.HasOne(e => e.Company)
+                  .WithMany(c => c.Pages)
+                  .HasForeignKey(e => e.CompanyId)
+                  .OnDelete(DeleteBehavior.Cascade);
         });
 
         // Seed Data

@@ -247,6 +247,52 @@ public class BlogFactory : IBlogFactory
         return (true, null, null, null);
     }
 
+    public async Task<object> GetCompanyBlogPostsAsync(int companyId, int page, int pageSize)
+    {
+        var query = _blogService.GetPublishedPosts()
+            .Where(p => p.CompanyId == companyId);
+
+        var totalCount = await query.CountAsync();
+        var posts = await query
+            .OrderByDescending(p => p.PublishedAt)
+            .Skip((page - 1) * pageSize)
+            .Take(pageSize)
+            .Select(p => new
+            {
+                p.Id, p.Title, p.Slug, p.Summary, p.ImageUrl, p.CategoryId, p.ViewCount,
+                p.PublishedAt, p.Tags,
+                AuthorName = p.Author.FirstName + " " + p.Author.LastName,
+                CommentCount = p.Comments.Count(c => c.IsActive)
+            })
+            .ToListAsync();
+
+        return new { posts, totalCount, page, pageSize, totalPages = (int)Math.Ceiling((double)totalCount / pageSize) };
+    }
+
+    public async Task<(object? result, string? errorMessage, string? errorCode, int? statusCode)> GetCompanyDraftPostsAsync(int visitorId, int companyId)
+    {
+        var visitor = await _visitorService.GetByIdWithCompanyAsync(visitorId);
+        if (visitor == null)
+            return (null, "Kullanici bulunamadi", null, 401);
+
+        if (visitor.UserTypeId < UserTypes.Ids.Staff && visitor.CompanyId != companyId)
+            return (null, "Bu firmaya erisim yetkiniz yok", "NO_PERMISSION", 403);
+
+        var posts = await _blogService.GetActivePosts()
+            .Where(p => p.CompanyId == companyId)
+            .OrderByDescending(p => p.CreatedAt)
+            .Select(p => new
+            {
+                p.Id, p.Title, p.Slug, p.Summary, p.ImageUrl, p.CategoryId, p.StatusId,
+                p.ViewCount, p.PublishedAt, p.Tags, p.CreatedAt,
+                AuthorName = p.Author.FirstName + " " + p.Author.LastName,
+                CommentCount = p.Comments.Count(c => c.IsActive)
+            })
+            .ToListAsync();
+
+        return (posts, null, null, null);
+    }
+
     private static string GenerateSlug(string title)
     {
         var slug = title.ToLowerInvariant();

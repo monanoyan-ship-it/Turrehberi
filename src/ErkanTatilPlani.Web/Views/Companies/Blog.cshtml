@@ -1,0 +1,95 @@
+@{
+    Layout = "_Layout";
+    ViewData["Title"] = "Firma Blog";
+    var companySlug = ViewBag.CompanySlug as string;
+}
+
+<div id="companyBlogListApp">
+    <!-- Loading State -->
+    <div data-bind="visible: isLoading" class="text-center py-5">
+        <div class="spinner-border text-primary" role="status"></div>
+        <p class="mt-2 text-muted">Yukleniyor...</p>
+    </div>
+
+    <!-- Content -->
+    <div data-bind="visible: !isLoading()">
+        <!-- Firma Header -->
+        <div class="bg-light rounded-3 p-3 mb-4">
+            <div class="d-flex align-items-center justify-content-between">
+                <div class="d-flex align-items-center">
+                    <!-- ko if: companyInfo() && companyInfo().logoUrl -->
+                    <img data-bind="attr: { src: companyInfo().logoUrl }" class="rounded-circle me-3" style="width: 48px; height: 48px; object-fit: cover;" />
+                    <!-- /ko -->
+                    <div>
+                        <h5 class="mb-0">
+                            <a data-bind="text: companyInfo() ? companyInfo().name : '', attr: { href: '/Companies/Details/' + companySlug }" class="text-decoration-none"></a>
+                        </h5>
+                        <small class="text-muted">Blog Yazilari</small>
+                    </div>
+                </div>
+                <a data-bind="attr: { href: '/Companies/Details/' + companySlug }" class="btn btn-outline-primary btn-sm">
+                    <i class="bi bi-arrow-left me-1"></i> Firma Profili
+                </a>
+            </div>
+        </div>
+
+        <!-- Blog Posts -->
+        <div class="row" data-bind="foreach: posts">
+            <div class="col-md-4 mb-4">
+                <div class="card h-100">
+                    <!-- ko if: imageUrl -->
+                    <img data-bind="attr: { src: imageUrl, alt: title }" class="card-img-top" style="height: 200px; object-fit: cover;" loading="lazy" />
+                    <!-- /ko -->
+                    <!-- ko ifnot: imageUrl -->
+                    <div class="card-img-top bg-light d-flex align-items-center justify-content-center" style="height: 200px;">
+                        <i class="bi bi-journal-text text-muted" style="font-size: 3rem;"></i>
+                    </div>
+                    <!-- /ko -->
+                    <div class="card-body">
+                        <span class="badge mb-2" data-bind="css: $parent.getCategoryBadgeClass(categoryId), text: $parent.getCategoryName(categoryId)"></span>
+                        <h5 class="card-title">
+                            <a data-bind="text: title, attr: { href: '/Companies/' + $parent.companySlug + '/blog/' + slug }" class="text-decoration-none text-dark"></a>
+                        </h5>
+                        <p class="card-text text-muted" data-bind="text: summary"></p>
+                    </div>
+                    <div class="card-footer bg-transparent">
+                        <small class="text-muted">
+                            <span data-bind="text: authorName"></span> &middot;
+                            <i class="bi bi-eye me-1"></i><span data-bind="text: viewCount"></span> &middot;
+                            <i class="bi bi-chat me-1"></i><span data-bind="text: commentCount"></span>
+                        </small>
+                        <br />
+                        <small class="text-muted" data-bind="text: $parent.formatDate(publishedAt)"></small>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Empty State -->
+        <div class="text-center py-5" data-bind="visible: posts().length === 0 && !isLoading()">
+            <i class="bi bi-journal-x text-muted" style="font-size: 3rem;"></i>
+            <p class="text-muted mt-2">Henuz blog yazisi yok</p>
+        </div>
+
+        <!-- Pagination -->
+        <nav class="mt-3" data-bind="visible: totalPages() > 1">
+            <ul class="pagination justify-content-center">
+                <li class="page-item" data-bind="css: { disabled: currentPage() <= 1 }">
+                    <a class="page-link" href="#" data-bind="click: function() { changePage(currentPage() - 1); }"><i class="bi bi-chevron-left"></i></a>
+                </li>
+                <!-- ko foreach: pageNumbers -->
+                <li class="page-item" data-bind="css: { active: $data === $parent.currentPage() }">
+                    <a class="page-link" href="#" data-bind="text: $data, click: function() { $parent.changePage($data); }"></a>
+                </li>
+                <!-- /ko -->
+                <li class="page-item" data-bind="css: { disabled: currentPage() >= totalPages() }">
+                    <a class="page-link" href="#" data-bind="click: function() { changePage(currentPage() + 1); }"><i class="bi bi-chevron-right"></i></a>
+                </li>
+            </ul>
+        </nav>
+    </div>
+</div>
+
+@section Scripts {
+<script src="~/js/Companies/Blog.js"></script>
+}

@@ -70,12 +70,13 @@ public static class FactoryRegistration
         services.AddScoped<IBlogFactory, BlogFactory>();
         services.AddScoped<IBlogCommentFactory, BlogCommentFactory>();
 
-        // Company factories (5)
+        // Company factories (6)
         services.AddScoped<ICompanyCrudFactory, CompanyCrudFactory>();
         services.AddScoped<ICompanyProfileFactory, CompanyProfileFactory>();
         services.AddScoped<ICompanyApprovalFactory, CompanyApprovalFactory>();
         services.AddScoped<ICompanyDashboardFactory, CompanyDashboardFactory>();
         services.AddScoped<ICompanyGalleryFactory, CompanyGalleryFactory>();
+        services.AddScoped<ICompanyPageFactory, CompanyPageFactory>();
 
         return services;
     }

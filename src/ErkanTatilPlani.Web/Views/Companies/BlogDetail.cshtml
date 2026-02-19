@@ -1,0 +1,125 @@
+@{
+    Layout = "_Layout";
+    ViewData["Title"] = "Blog Yazisi";
+    var companySlug = ViewBag.CompanySlug as string;
+    var postSlug = ViewBag.PostSlug as string;
+}
+
+<div id="companyBlogDetailApp">
+    <!-- Loading State -->
+    <div data-bind="visible: isLoading" class="text-center py-5">
+        <div class="spinner-border text-primary" role="status"></div>
+        <p class="mt-2 text-muted">Yukleniyor...</p>
+    </div>
+
+    <!-- Not Found -->
+    <div data-bind="visible: !isLoading() && !post()" class="text-center py-5">
+        <i class="bi bi-exclamation-triangle-fill text-muted" style="font-size: 3rem;"></i>
+        <h4 class="mt-3">Yazi Bulunamadi</h4>
+        <a data-bind="attr: { href: '/Companies/' + companySlug + '/blog' }" class="btn btn-primary mt-2">Blog'a Don</a>
+    </div>
+
+    <!-- Post Content -->
+    <div data-bind="visible: !isLoading() && post()">
+        <!-- Firma Header -->
+        <div class="bg-light rounded-3 p-3 mb-4">
+            <div class="d-flex align-items-center justify-content-between">
+                <div class="d-flex align-items-center">
+                    <!-- ko if: post() && post().companyName -->
+                    <div>
+                        <h6 class="mb-0">
+                            <a data-bind="text: post().companyName, attr: { href: '/Companies/Details/' + (post().companySlug || companySlug) }" class="text-decoration-none"></a>
+                        </h6>
+                    </div>
+                    <!-- /ko -->
+                </div>
+                <a data-bind="attr: { href: '/Companies/' + companySlug + '/blog' }" class="btn btn-outline-primary btn-sm">
+                    <i class="bi bi-arrow-left me-1"></i> Tum Yazilar
+                </a>
+            </div>
+        </div>
+
+        <!-- Breadcrumb -->
+        <nav aria-label="breadcrumb" class="mb-3">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="/Companies">Firmalar</a></li>
+                <li class="breadcrumb-item"><a data-bind="attr: { href: '/Companies/Details/' + companySlug }, text: post() ? post().companyName : ''"></a></li>
+                <li class="breadcrumb-item"><a data-bind="attr: { href: '/Companies/' + companySlug + '/blog' }">Blog</a></li>
+                <li class="breadcrumb-item active" data-bind="text: post() ? post().title : ''"></li>
+            </ol>
+        </nav>
+
+        <!-- Category & Date -->
+        <div class="mb-3" data-bind="if: post()">
+            <span class="badge me-2" data-bind="css: getCategoryBadgeClass(post().categoryId), text: getCategoryName(post().categoryId)"></span>
+            <small class="text-muted">
+                <i class="bi bi-calendar me-1"></i><span data-bind="text: formatDate(post().publishedAt)"></span>
+                &middot; <i class="bi bi-eye me-1"></i><span data-bind="text: post().viewCount"></span>
+            </small>
+        </div>
+
+        <!-- Title -->
+        <h1 data-bind="text: post() ? post().title : ''"></h1>
+
+        <!-- Author -->
+        <div class="d-flex align-items-center mb-4" data-bind="if: post()">
+            <div class="bg-primary text-white rounded-circle d-flex align-items-center justify-content-center me-2" style="width: 36px; height: 36px;">
+                <!-- ko if: post().authorAvatar -->
+                <img data-bind="attr: { src: post().authorAvatar }" class="rounded-circle" style="width: 36px; height: 36px; object-fit: cover;" />
+                <!-- /ko -->
+                <!-- ko ifnot: post().authorAvatar -->
+                <i class="bi bi-person-fill"></i>
+                <!-- /ko -->
+            </div>
+            <span data-bind="text: post().authorName"></span>
+        </div>
+
+        <!-- Cover Image -->
+        <!-- ko if: post() && post().imageUrl -->
+        <div class="mb-4">
+            <img data-bind="attr: { src: post().imageUrl, alt: post().title }" class="img-fluid rounded" style="max-height: 400px; width: 100%; object-fit: cover;" loading="lazy" />
+        </div>
+        <!-- /ko -->
+
+        <!-- Summary -->
+        <p class="lead text-muted" data-bind="text: post() ? post().summary : ''"></p>
+
+        <!-- Content -->
+        <div class="mb-4" data-bind="html: post() ? post().content : ''"></div>
+
+        <!-- Tags -->
+        <div class="mb-4" data-bind="if: post() && post().tags">
+            <i class="bi bi-tags me-1"></i>
+            <!-- ko foreach: (post() && post().tags) ? post().tags.split(',') : [] -->
+            <span class="badge bg-light text-dark me-1" data-bind="text: $data.trim()"></span>
+            <!-- /ko -->
+        </div>
+
+        <!-- Comments -->
+        <hr />
+        <h4><i class="bi bi-chat-dots me-2"></i>Yorumlar <span class="badge bg-secondary" data-bind="text: comments().length"></span></h4>
+
+        <div data-bind="foreach: comments" class="mt-3">
+            <div class="d-flex mb-3">
+                <div class="bg-secondary text-white rounded-circle d-flex align-items-center justify-content-center me-2 flex-shrink-0" style="width: 36px; height: 36px;">
+                    <i class="bi bi-person-fill"></i>
+                </div>
+                <div class="flex-grow-1">
+                    <div class="bg-light rounded p-3">
+                        <strong data-bind="text: visitorName"></strong>
+                        <small class="text-muted ms-2" data-bind="text: $parent.formatDate(createdAt)"></small>
+                        <p class="mb-0 mt-1" data-bind="text: content"></p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div data-bind="visible: comments().length === 0" class="text-center text-muted py-3">
+            <i class="bi bi-chat"></i> Henuz yorum yok
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+<script src="~/js/Companies/BlogDetail.js"></script>
+}

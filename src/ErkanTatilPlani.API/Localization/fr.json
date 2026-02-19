@@ -637,5 +637,25 @@
   "Blog.MyPosts": "Mes articles",
   "Blog.Tags": "Tags",
   "Blog.Author": "Auteur",
-  "Blog.RelatedPosts": "Articles similaires"
+  "Blog.RelatedPosts": "Articles similaires",
+
+  "CompanyPage.Title": "Pages de l'entreprise",
+  "CompanyPage.Create": "Nouvelle page",
+  "CompanyPage.Edit": "Modifier la page",
+  "CompanyPage.Delete": "Supprimer la page",
+  "CompanyPage.DeleteConfirm": "Etes-vous sur de vouloir supprimer cette page?",
+  "CompanyPage.Published": "Publie",
+  "CompanyPage.Draft": "Brouillon",
+  "CompanyPage.Reorder": "Reordonner",
+  "CompanyPage.NoPages": "Aucune page creee pour le moment",
+  "CompanyBlog.Title": "Blog de l'entreprise",
+  "CompanyBlog.Create": "Nouvel article",
+  "CompanyBlog.NoPosts": "Aucun article de blog pour le moment",
+  "CompanyBlog.AllPosts": "Tous les articles",
+  "CompanyMiniSite.Pages": "Nos pages",
+  "CompanyMiniSite.BlogPosts": "Derniers articles du blog",
+  "CompanyMiniSite.BackToProfile": "Profil de l'entreprise",
+  "CompanyMiniSite.BackToBlog": "Tous les articles",
+  "Admin.CompanyPages": "Mes pages",
+  "Admin.CompanyBlog": "Mon blog"
 }

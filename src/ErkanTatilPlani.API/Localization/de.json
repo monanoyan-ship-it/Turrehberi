@@ -637,5 +637,25 @@
   "Blog.MyPosts": "Meine Beitrage",
   "Blog.Tags": "Tags",
   "Blog.Author": "Autor",
-  "Blog.RelatedPosts": "Ahnliche Beitrage"
+  "Blog.RelatedPosts": "Ahnliche Beitrage",
+
+  "CompanyPage.Title": "Unternehmensseiten",
+  "CompanyPage.Create": "Neue Seite",
+  "CompanyPage.Edit": "Seite bearbeiten",
+  "CompanyPage.Delete": "Seite loeschen",
+  "CompanyPage.DeleteConfirm": "Sind Sie sicher, dass Sie diese Seite loeschen moechten?",
+  "CompanyPage.Published": "Veroeffentlicht",
+  "CompanyPage.Draft": "Entwurf",
+  "CompanyPage.Reorder": "Sortieren",
+  "CompanyPage.NoPages": "Noch keine Seiten erstellt",
+  "CompanyBlog.Title": "Firmenblog",
+  "CompanyBlog.Create": "Neuer Beitrag",
+  "CompanyBlog.NoPosts": "Noch keine Blogbeitraege",
+  "CompanyBlog.AllPosts": "Alle Beitraege",
+  "CompanyMiniSite.Pages": "Unsere Seiten",
+  "CompanyMiniSite.BlogPosts": "Neueste Blogbeitraege",
+  "CompanyMiniSite.BackToProfile": "Firmenprofil",
+  "CompanyMiniSite.BackToBlog": "Alle Beitraege",
+  "Admin.CompanyPages": "Meine Seiten",
+  "Admin.CompanyBlog": "Mein Blog"
 }

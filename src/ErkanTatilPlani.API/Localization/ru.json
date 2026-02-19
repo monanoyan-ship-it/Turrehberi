@@ -637,5 +637,25 @@
   "Blog.MyPosts": "Мои статьи",
   "Blog.Tags": "Теги",
   "Blog.Author": "Автор",
-  "Blog.RelatedPosts": "Похожие статьи"
+  "Blog.RelatedPosts": "Похожие статьи",
+
+  "CompanyPage.Title": "Страницы компании",
+  "CompanyPage.Create": "Новая страница",
+  "CompanyPage.Edit": "Редактировать страницу",
+  "CompanyPage.Delete": "Удалить страницу",
+  "CompanyPage.DeleteConfirm": "Вы уверены, что хотите удалить эту страницу?",
+  "CompanyPage.Published": "Опубликовано",
+  "CompanyPage.Draft": "Черновик",
+  "CompanyPage.Reorder": "Сортировка",
+  "CompanyPage.NoPages": "Страницы еще не созданы",
+  "CompanyBlog.Title": "Блог компании",
+  "CompanyBlog.Create": "Новая запись",
+  "CompanyBlog.NoPosts": "Записей в блоге пока нет",
+  "CompanyBlog.AllPosts": "Все записи",
+  "CompanyMiniSite.Pages": "Наши страницы",
+  "CompanyMiniSite.BlogPosts": "Последние записи блога",
+  "CompanyMiniSite.BackToProfile": "Профиль компании",
+  "CompanyMiniSite.BackToBlog": "Все записи",
+  "Admin.CompanyPages": "Мои страницы",
+  "Admin.CompanyBlog": "Мой блог"
 }

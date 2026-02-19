@@ -125,4 +125,5 @@ public class Company : BaseEntity
 
     public virtual ICollection<Tour> Tours { get; set; } = new List<Tour>();
     public virtual ICollection<CompanyGalleryImage> GalleryImages { get; set; } = new List<CompanyGalleryImage>();
+    public virtual ICollection<CompanyPage> Pages { get; set; } = new List<CompanyPage>();
 }

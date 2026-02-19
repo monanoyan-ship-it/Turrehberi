@@ -64,6 +64,22 @@ public class AdminController : Controller
         return View();
     }
 
+    // Firma sahibinin sayfalari
+    public IActionResult CompanyPages()
+    {
+        SetCommonViewData("CompanyPages", "Sayfalarim");
+        ViewBag.UserRole = "CompanyOwner";
+        return View();
+    }
+
+    // Firma sahibinin blogu
+    public IActionResult CompanyBlog()
+    {
+        SetCommonViewData("CompanyBlog", "Blogum");
+        ViewBag.UserRole = "CompanyOwner";
+        return View();
+    }
+
     // ============================================
     // STAFF VE ADMIN SAYFALARI
     // ============================================
