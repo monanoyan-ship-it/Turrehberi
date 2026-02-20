@@ -56,6 +56,10 @@ public class AppDbContext : DbContext
     public DbSet<TourWatch> TourWatches => Set<TourWatch>();
     public DbSet<Notification> Notifications => Set<Notification>();
 
+    // Guides
+    public DbSet<Guide> Guides => Set<Guide>();
+    public DbSet<TourGuideAssignment> TourGuideAssignments => Set<TourGuideAssignment>();
+
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         base.OnModelCreating(modelBuilder);
@@ -575,6 +579,47 @@ public class AppDbContext : DbContext
             entity.HasOne(e => e.Visitor)
                   .WithMany(v => v.Notifications)
                   .HasForeignKey(e => e.VisitorId)
+                  .OnDelete(DeleteBehavior.Cascade);
+        });
+
+        // ===============================================
+        // REHBER SISTEMI
+        // ===============================================
+
+        modelBuilder.Entity<Guide>(entity =>
+        {
+            entity.HasKey(e => e.Id);
+            entity.Property(e => e.FirstName).IsRequired().HasMaxLength(100);
+            entity.Property(e => e.LastName).IsRequired().HasMaxLength(100);
+            entity.Property(e => e.Phone).HasMaxLength(20);
+            entity.Property(e => e.Email).HasMaxLength(100);
+            entity.Property(e => e.PhotoUrl).HasMaxLength(500);
+            entity.Property(e => e.Languages).HasMaxLength(200);
+            entity.Property(e => e.Bio).HasMaxLength(2000);
+            entity.Property(e => e.AverageRating).HasPrecision(3, 2);
+
+            entity.HasOne(e => e.Company)
+                  .WithMany(c => c.Guides)
+                  .HasForeignKey(e => e.CompanyId)
+                  .OnDelete(DeleteBehavior.Cascade);
+        });
+
+        modelBuilder.Entity<TourGuideAssignment>(entity =>
+        {
+            entity.HasKey(e => e.Id);
+            entity.Property(e => e.Notes).HasMaxLength(500);
+
+            // Ayni rehber ayni tarihe bir kez atanabilir
+            entity.HasIndex(e => new { e.GuideId, e.TourDateId }).IsUnique();
+
+            entity.HasOne(e => e.Guide)
+                  .WithMany(g => g.Assignments)
+                  .HasForeignKey(e => e.GuideId)
+                  .OnDelete(DeleteBehavior.Cascade);
+
+            entity.HasOne(e => e.TourDate)
+                  .WithMany(td => td.GuideAssignments)
+                  .HasForeignKey(e => e.TourDateId)
                   .OnDelete(DeleteBehavior.Cascade);
         });
 

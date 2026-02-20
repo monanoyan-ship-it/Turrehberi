@@ -4,6 +4,7 @@ using ErkanTatilPlani.API.Factories.Companies;
 using ErkanTatilPlani.API.Factories.EmailAccounts;
 using ErkanTatilPlani.API.Factories.EmailTemplates;
 using ErkanTatilPlani.API.Factories.Favorites;
+using ErkanTatilPlani.API.Factories.Guides;
 using ErkanTatilPlani.API.Factories.Languages;
 using ErkanTatilPlani.API.Factories.Notifications;
 using ErkanTatilPlani.API.Factories.Payments;
@@ -20,6 +21,7 @@ using ErkanTatilPlani.Core.Factories.Companies;
 using ErkanTatilPlani.Core.Factories.EmailAccounts;
 using ErkanTatilPlani.Core.Factories.EmailTemplates;
 using ErkanTatilPlani.Core.Factories.Favorites;
+using ErkanTatilPlani.Core.Factories.Guides;
 using ErkanTatilPlani.Core.Factories.Languages;
 using ErkanTatilPlani.Core.Factories.Notifications;
 using ErkanTatilPlani.Core.Factories.Payments;
@@ -46,8 +48,9 @@ public static class FactoryRegistration
         // Tour factories (1)
         services.AddScoped<ITourFactory, TourFactory>();
 
-        // TourDate factories (1)
+        // TourDate factories (2)
         services.AddScoped<ITourDateFactory, TourDateFactory>();
+        services.AddScoped<ITourCalendarFactory, TourCalendarFactory>();
 
         // Payment factories (1)
         services.AddScoped<IPaymentFactory, PaymentFactory>();
@@ -91,13 +94,17 @@ public static class FactoryRegistration
         // Notification factories (1)
         services.AddScoped<INotificationFactory, NotificationFactory>();
 
-        // Company factories (6)
+        // Guide factories (1)
+        services.AddScoped<IGuideFactory, GuideFactory>();
+
+        // Company factories (7)
         services.AddScoped<ICompanyCrudFactory, CompanyCrudFactory>();
         services.AddScoped<ICompanyProfileFactory, CompanyProfileFactory>();
         services.AddScoped<ICompanyApprovalFactory, CompanyApprovalFactory>();
         services.AddScoped<ICompanyDashboardFactory, CompanyDashboardFactory>();
         services.AddScoped<ICompanyGalleryFactory, CompanyGalleryFactory>();
         services.AddScoped<ICompanyPageFactory, CompanyPageFactory>();
+        services.AddScoped<ICompanyAnalyticsFactory, CompanyAnalyticsFactory>();
 
         return services;
     }

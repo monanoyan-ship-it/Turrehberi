@@ -10,4 +10,5 @@ public interface ITourDateFactory
     Task<(bool success, string? errorMessage, string? errorCode, int? statusCode)> UpdateTourDateAsync(int visitorId, int id, TourDate tourDate);
     Task<(bool success, bool notFound, string? errorMessage, string? errorCode, int? statusCode)> DeleteTourDateAsync(int visitorId, int id);
     Task<IEnumerable<object>> GetCheapestDatesAsync(int tourId, string month);
+    Task<(bool success, object result, int statusCode)> GetCapacitySummaryAsync(int visitorId, int tourId);
 }

@@ -66,4 +66,25 @@ public class MyCompanyController : Controller
         SetCommonViewData("Promotions", "Promosyonlarim");
         return View();
     }
+
+    // Firma rehberleri
+    public IActionResult Guides()
+    {
+        SetCommonViewData("Guides", "Rehberlerim");
+        return View();
+    }
+
+    // Tur takvimi
+    public IActionResult TourCalendar()
+    {
+        SetCommonViewData("TourCalendar", "Tur Takvimi");
+        return View();
+    }
+
+    // Analitik
+    public IActionResult Analytics()
+    {
+        SetCommonViewData("Analytics", "Analitik");
+        return View();
+    }
 }

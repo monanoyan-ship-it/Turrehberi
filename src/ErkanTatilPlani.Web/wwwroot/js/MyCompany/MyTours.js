@@ -58,6 +58,19 @@ function MyToursViewModel() {
         return new Intl.NumberFormat('tr-TR', { style: 'decimal' }).format(value) + ' TL';
     };
 
+    // Capacity helpers
+    self.capacityPercent = function(dateItem) {
+        if (!dateItem.maxCapacity || dateItem.maxCapacity === 0) return 0;
+        return Math.round((dateItem.bookedCount / dateItem.maxCapacity) * 100);
+    };
+
+    self.capacityColor = function(dateItem) {
+        var pct = self.capacityPercent(dateItem);
+        if (pct >= 80) return 'bg-danger';
+        if (pct >= 50) return 'bg-warning';
+        return 'bg-success';
+    };
+
     // Turlari yukle
     self.loadTours = function() {
         self.isLoading(true);

@@ -120,6 +120,47 @@ public class TourDateFactory : ITourDateFactory
             .ToListAsync();
     }
 
+    public async Task<(bool success, object result, int statusCode)> GetCapacitySummaryAsync(int visitorId, int tourId)
+    {
+        var check = await CheckTourOwnership(visitorId, tourId);
+        if (check.errorMessage != null) return (false, new { message = check.errorMessage }, check.statusCode ?? 400);
+
+        var dates = await _tourDateService.GetByTourId(tourId)
+            .Where(td => td.StartDate >= DateTime.UtcNow)
+            .Select(td => new
+            {
+                td.Id, td.StartDate, td.EndDate, td.Price,
+                td.MaxCapacity, td.BookedCount, td.IsAvailable
+            })
+            .OrderBy(td => td.StartDate)
+            .ToListAsync();
+
+        var totalCapacity = dates.Sum(d => d.MaxCapacity ?? 0);
+        var totalBooked = dates.Sum(d => d.BookedCount);
+        var fullDates = dates.Count(d => d.MaxCapacity.HasValue && d.BookedCount >= d.MaxCapacity.Value);
+        var occupancyRate = totalCapacity > 0 ? Math.Round((decimal)totalBooked / totalCapacity * 100, 1) : 0;
+
+        var datesWithCapacity = dates.Select(d => new
+        {
+            d.Id, d.StartDate, d.EndDate, d.Price,
+            d.MaxCapacity, d.BookedCount, d.IsAvailable,
+            Remaining = d.MaxCapacity.HasValue ? d.MaxCapacity.Value - d.BookedCount : (int?)null,
+            OccupancyPercent = d.MaxCapacity.HasValue && d.MaxCapacity.Value > 0
+                ? Math.Round((decimal)d.BookedCount / d.MaxCapacity.Value * 100, 1) : 0
+        });
+
+        return (true, new
+        {
+            tourId,
+            totalDates = dates.Count,
+            totalCapacity,
+            totalBooked,
+            fullDates,
+            occupancyRate,
+            dates = datesWithCapacity
+        }, 200);
+    }
+
     private async Task<(string? errorMessage, string? errorCode, int? statusCode)> CheckTourOwnership(int visitorId, int tourId)
     {
         var visitor = await _visitorService.GetByIdWithCompanyAsync(visitorId);

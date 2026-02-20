@@ -11,10 +11,12 @@ namespace ErkanTatilPlani.API.Controllers;
 public class TourDatesController : ControllerBase
 {
     private readonly ITourDateFactory _tourDateFactory;
+    private readonly ITourCalendarFactory _tourCalendarFactory;
 
-    public TourDatesController(ITourDateFactory tourDateFactory)
+    public TourDatesController(ITourDateFactory tourDateFactory, ITourCalendarFactory tourCalendarFactory)
     {
         _tourDateFactory = tourDateFactory;
+        _tourCalendarFactory = tourCalendarFactory;
     }
 
     private int? GetVisitorId()
@@ -93,6 +95,28 @@ public class TourDatesController : ControllerBase
             return StatusCode(statusCode ?? 400, error);
         }
         return NoContent();
+    }
+
+    [HttpGet("tour-calendar")]
+    [Authorize]
+    public async Task<IActionResult> GetCalendarData([FromQuery] int year, [FromQuery] int month, [FromQuery] int? tourId = null)
+    {
+        var visitorId = GetVisitorId();
+        if (visitorId == null) return Unauthorized(new { message = "Giris yapmaniz gerekiyor" });
+
+        var (success, result, statusCode) = await _tourCalendarFactory.GetCalendarDataAsync(visitorId.Value, year, month, tourId);
+        return StatusCode(statusCode, result);
+    }
+
+    [HttpGet("tours/{tourId}/dates/capacity-summary")]
+    [Authorize]
+    public async Task<IActionResult> GetCapacitySummary(int tourId)
+    {
+        var visitorId = GetVisitorId();
+        if (visitorId == null) return Unauthorized(new { message = "Giris yapmaniz gerekiyor" });
+
+        var (success, result, statusCode) = await _tourDateFactory.GetCapacitySummaryAsync(visitorId.Value, tourId);
+        return StatusCode(statusCode, result);
     }
 
     [HttpGet("tours/{tourId}/dates/cheapest")]

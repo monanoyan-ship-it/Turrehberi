@@ -9,6 +9,7 @@ public interface ITourEntityService
     Task<Tour?> GetByIdAsync(int id);
     Task<Tour?> GetByIdWithCompanyAsync(int id);
     Task<IEnumerable<Tour>> GetByCompanyIdAsync(int companyId);
+    IQueryable<Tour> GetByCompanyId(int companyId);
     void Add(Tour tour);
     void Update(Tour tour);
 }

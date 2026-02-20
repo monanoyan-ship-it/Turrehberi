@@ -37,4 +37,6 @@ public class TourDate : BaseEntity
     /// Musait mi?
     /// </summary>
     public bool IsAvailable { get; set; } = true;
+
+    public virtual ICollection<TourGuideAssignment> GuideAssignments { get; set; } = new List<TourGuideAssignment>();
 }

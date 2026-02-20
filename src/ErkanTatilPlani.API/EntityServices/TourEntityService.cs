@@ -29,6 +29,9 @@ public class TourEntityService : ITourEntityService
     public async Task<IEnumerable<Tour>> GetByCompanyIdAsync(int companyId)
         => await _context.Tours.Where(t => t.CompanyId == companyId && t.IsActive).ToListAsync();
 
+    public IQueryable<Tour> GetByCompanyId(int companyId)
+        => _context.Tours.Where(t => t.CompanyId == companyId && t.IsActive);
+
     public void Add(Tour tour) => _context.Tours.Add(tour);
 
     public void Update(Tour tour) => _context.Entry(tour).State = EntityState.Modified;

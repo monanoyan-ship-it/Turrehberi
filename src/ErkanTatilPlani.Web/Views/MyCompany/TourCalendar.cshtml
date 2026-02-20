@@ -1,0 +1,144 @@
+@{
+    Layout = "_CompanyLayout";
+}
+
+<div id="tourCalendarApp">
+    <!-- Yukleniyor -->
+    <div data-bind="visible: isLoading()" class="text-center py-5">
+        <div class="spinner-border text-primary" role="status">
+            <span class="visually-hidden">Yukleniyor...</span>
+        </div>
+    </div>
+
+    <!-- Ana Icerik -->
+    <div data-bind="visible: !isLoading()">
+        <!-- Kontroller -->
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <div class="d-flex align-items-center gap-2">
+                <button class="btn btn-outline-primary btn-sm" data-bind="click: prevMonth">
+                    <i class="bi bi-chevron-left"></i>
+                </button>
+                <h5 class="mb-0" data-bind="text: monthYearLabel()"></h5>
+                <button class="btn btn-outline-primary btn-sm" data-bind="click: nextMonth">
+                    <i class="bi bi-chevron-right"></i>
+                </button>
+                <button class="btn btn-outline-secondary btn-sm" data-bind="click: goToday">
+                    <span data-t="Calendar.Today">Bugun</span>
+                </button>
+            </div>
+            <div>
+                <select class="form-select form-select-sm" style="width: auto; display: inline-block;" data-bind="options: tours, optionsText: 'name', optionsValue: 'id', optionsCaption: 'Tum Turlar', value: selectedTourId"></select>
+            </div>
+        </div>
+
+        <!-- Renk Aciklama -->
+        <div class="d-flex gap-3 mb-2 small">
+            <span><span class="badge bg-success">&nbsp;</span> <span data-t="Calendar.Available">Musait</span></span>
+            <span><span class="badge bg-warning">&nbsp;</span> <span data-t="Calendar.FillingUp">Doluyor</span></span>
+            <span><span class="badge bg-danger">&nbsp;</span> <span data-t="Calendar.AlmostFull">Dolmak uzere</span></span>
+            <span><span class="badge bg-secondary">&nbsp;</span> <span data-t="Calendar.Past">Gecmis</span></span>
+        </div>
+
+        <!-- Takvim Grid -->
+        <div class="card">
+            <div class="card-body p-0">
+                <table class="table table-bordered mb-0">
+                    <thead class="table-light">
+                        <tr>
+                            <th class="text-center py-2" data-t="Calendar.Sun">Paz</th>
+                            <th class="text-center py-2" data-t="Calendar.Mon">Pzt</th>
+                            <th class="text-center py-2" data-t="Calendar.Tue">Sal</th>
+                            <th class="text-center py-2" data-t="Calendar.Wed">Car</th>
+                            <th class="text-center py-2" data-t="Calendar.Thu">Per</th>
+                            <th class="text-center py-2" data-t="Calendar.Fri">Cum</th>
+                            <th class="text-center py-2" data-t="Calendar.Sat">Cmt</th>
+                        </tr>
+                    </thead>
+                    <tbody data-bind="foreach: calendarWeeks">
+                        <tr>
+                            <!-- ko foreach: $data -->
+                            <td class="p-1" style="min-height: 80px; vertical-align: top;" data-bind="css: { 'bg-light': !day }">
+                                <!-- ko if: day -->
+                                <div class="small fw-bold mb-1" data-bind="text: day, css: { 'text-muted': isPast }"></div>
+                                <!-- ko foreach: tours -->
+                                <div class="mb-1" data-bind="click: $parents[1].showTourDatePopover" style="cursor: pointer;">
+                                    <span class="badge w-100 text-truncate" style="font-size: 0.7em; max-width: 100%;"
+                                          data-bind="text: tourName, css: $parents[1].getBadgeClass($data), attr: { title: tourName + ' (' + bookedCount + '/' + (maxCapacity || '∞') + ')' }"></span>
+                                </div>
+                                <!-- /ko -->
+                                <!-- /ko -->
+                            </td>
+                            <!-- /ko -->
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Tarih Detay Modal -->
+    <div class="modal fade" id="dateDetailModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">
+                        <i class="bi bi-calendar-event me-2"></i>
+                        <span data-bind="text: selectedDateDetail() ? selectedDateDetail().tourName : ''"></span>
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body" data-bind="if: selectedDateDetail()">
+                    <div class="row g-2">
+                        <div class="col-6">
+                            <div class="card text-center">
+                                <div class="card-body py-2">
+                                    <small class="text-muted" data-t="TourDate.StartDate">Baslangic</small>
+                                    <div class="fw-bold" data-bind="text: new Date(selectedDateDetail().startDate).toLocaleDateString('tr-TR')"></div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <div class="card text-center">
+                                <div class="card-body py-2">
+                                    <small class="text-muted" data-t="TourDate.EndDate">Bitis</small>
+                                    <div class="fw-bold" data-bind="text: new Date(selectedDateDetail().endDate).toLocaleDateString('tr-TR')"></div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <div class="card text-center">
+                                <div class="card-body py-2">
+                                    <small class="text-muted" data-t="TourDate.Price">Fiyat</small>
+                                    <div class="fw-bold" data-bind="text: selectedDateDetail().price ? selectedDateDetail().price.toLocaleString('tr-TR') + ' TL' : '-'"></div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <div class="card text-center">
+                                <div class="card-body py-2">
+                                    <small class="text-muted" data-t="TourDate.Capacity">Kapasite</small>
+                                    <div class="fw-bold" data-bind="text: selectedDateDetail().bookedCount + '/' + (selectedDateDetail().maxCapacity || '∞')"></div>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- ko if: selectedDateDetail().maxCapacity -->
+                        <div class="col-12">
+                            <div class="progress" style="height: 20px;">
+                                <div class="progress-bar" data-bind="style: { width: selectedDateDetail().occupancyPercent + '%' }, css: getBadgeClass(selectedDateDetail()), text: selectedDateDetail().occupancyPercent + '%'"></div>
+                            </div>
+                            <small class="text-muted" data-bind="text: selectedDateDetail().remaining + ' kisi daha alinabilir'"></small>
+                        </div>
+                        <!-- /ko -->
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" data-t="Common.Close">Kapat</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+<script src="~/js/MyCompany/TourCalendar.js"></script>
+}

@@ -340,3 +340,33 @@ public static class PromotionStatuses
         public const int Expired = 2;
     }
 }
+
+// ============================================================
+// GUIDE ASSIGNMENT STATUSES (Rehber Atama Durumlari)
+// ============================================================
+public static class GuideAssignmentStatuses
+{
+    public static readonly TypeItem Pending = new(0, "Pending", "GuideAssignmentStatus.Pending",
+        "Onay bekliyor",
+        "bi-hourglass-split", "bg-warning text-dark", 1, isDefault: true);
+
+    public static readonly TypeItem Confirmed = new(1, "Confirmed", "GuideAssignmentStatus.Confirmed",
+        "Onaylandi",
+        "bi-check-circle", "bg-success", 2);
+
+    public static readonly TypeItem Rejected = new(2, "Rejected", "GuideAssignmentStatus.Rejected",
+        "Reddedildi",
+        "bi-x-circle", "bg-danger", 3);
+
+    public static IEnumerable<TypeItem> All => new[] { Pending, Confirmed, Rejected };
+    public static TypeItem Default => All.First(x => x.IsDefault);
+    public static TypeItem? GetById(int id) => All.FirstOrDefault(x => x.Id == id);
+    public static TypeItem? GetBySystemName(string systemName) => All.FirstOrDefault(x => x.SystemName == systemName);
+
+    public static class Ids
+    {
+        public const int Pending = 0;
+        public const int Confirmed = 1;
+        public const int Rejected = 2;
+    }
+}

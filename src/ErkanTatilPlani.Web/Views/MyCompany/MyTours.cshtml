@@ -312,7 +312,20 @@
                                     <td><small data-bind="text: new Date(startDate).toLocaleDateString('tr-TR')"></small></td>
                                     <td><small data-bind="text: new Date(endDate).toLocaleDateString('tr-TR')"></small></td>
                                     <td data-bind="text: price ? price.toLocaleString('tr-TR', {style:'currency', currency:'TRY'}) : '-'"></td>
-                                    <td data-bind="text: maxCapacity || '-'"></td>
+                                    <td>
+                                        <!-- ko if: maxCapacity -->
+                                        <div class="d-flex align-items-center">
+                                            <div class="progress flex-grow-1 me-2" style="height: 8px; min-width: 60px;">
+                                                <div class="progress-bar" data-bind="style: { width: $parent.capacityPercent($data) + '%' }, css: $parent.capacityColor($data)"></div>
+                                            </div>
+                                            <small data-bind="text: bookedCount + '/' + maxCapacity"></small>
+                                        </div>
+                                        <small class="text-muted" data-bind="text: (maxCapacity - bookedCount) + ' kalan'"></small>
+                                        <!-- /ko -->
+                                        <!-- ko ifnot: maxCapacity -->
+                                        <span>-</span>
+                                        <!-- /ko -->
+                                    </td>
                                     <td data-bind="text: bookedCount"></td>
                                     <td>
                                         <span class="badge" data-bind="css: isAvailable ? 'bg-success' : 'bg-secondary', text: isAvailable ? 'Musait' : 'Dolu'"></span>

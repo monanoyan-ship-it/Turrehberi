@@ -23,6 +23,9 @@ public class TourDateEntityService : ITourDateEntityService
     public async Task<TourDate?> GetByIdAsync(int id)
         => await _context.TourDates.FindAsync(id);
 
+    public IQueryable<TourDate> GetByTourIds(IEnumerable<int> tourIds)
+        => _context.TourDates.Where(td => tourIds.Contains(td.TourId) && td.IsActive);
+
     public void Add(TourDate tourDate) => _context.TourDates.Add(tourDate);
 
     public void Update(TourDate tourDate) => _context.Entry(tourDate).State = EntityState.Modified;

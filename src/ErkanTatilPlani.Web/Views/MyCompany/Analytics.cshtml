@@ -1,0 +1,79 @@
+@{
+    Layout = "_CompanyLayout";
+}
+
+<div id="analyticsApp">
+    <!-- Yukleniyor -->
+    <div data-bind="visible: isLoading()" class="text-center py-5">
+        <div class="spinner-border text-primary" role="status">
+            <span class="visually-hidden">Yukleniyor...</span>
+        </div>
+    </div>
+
+    <!-- Ana Icerik -->
+    <div data-bind="visible: !isLoading()">
+        <!-- Donem Secici -->
+        <div class="d-flex justify-content-end mb-3">
+            <select class="form-select form-select-sm" style="width: auto;" data-bind="value: selectedMonths">
+                <option value="6">Son 6 Ay</option>
+                <option value="12">Son 12 Ay</option>
+            </select>
+        </div>
+
+        <!-- Grafikler -->
+        <div class="row g-3">
+            <!-- Gelir Grafigi -->
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-header">
+                        <h6 class="mb-0"><i class="bi bi-currency-lira me-1"></i> <span data-t="Analytics.Revenue">Gelir</span></h6>
+                    </div>
+                    <div class="card-body">
+                        <canvas id="revenueChart" height="250"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Doluluk Grafigi -->
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-header">
+                        <h6 class="mb-0"><i class="bi bi-people me-1"></i> <span data-t="Analytics.Occupancy">Doluluk Orani</span></h6>
+                    </div>
+                    <div class="card-body">
+                        <canvas id="occupancyChart" height="250"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Iptal Grafigi -->
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-header">
+                        <h6 class="mb-0"><i class="bi bi-x-circle me-1"></i> <span data-t="Analytics.Cancellations">Iptal Orani</span></h6>
+                    </div>
+                    <div class="card-body">
+                        <canvas id="cancellationChart" height="250"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tur Karsilastirma -->
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-header">
+                        <h6 class="mb-0"><i class="bi bi-bar-chart me-1"></i> <span data-t="Analytics.TourComparison">Tur Karsilastirma</span></h6>
+                    </div>
+                    <div class="card-body">
+                        <canvas id="tourComparisonChart" height="250"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+<script src="~/js/MyCompany/Analytics.js"></script>
+}

@@ -1,5 +1,7 @@
+using System.Security.Claims;
 using ErkanTatilPlani.Core.Entities;
 using ErkanTatilPlani.Core.Factories.Companies;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace ErkanTatilPlani.API.Controllers;
@@ -13,19 +15,28 @@ public class CompaniesController : ControllerBase
     private readonly ICompanyApprovalFactory _approval;
     private readonly ICompanyDashboardFactory _dashboard;
     private readonly ICompanyGalleryFactory _gallery;
+    private readonly ICompanyAnalyticsFactory _analytics;
 
     public CompaniesController(
         ICompanyCrudFactory crud,
         ICompanyProfileFactory profile,
         ICompanyApprovalFactory approval,
         ICompanyDashboardFactory dashboard,
-        ICompanyGalleryFactory gallery)
+        ICompanyGalleryFactory gallery,
+        ICompanyAnalyticsFactory analytics)
     {
         _crud = crud;
         _profile = profile;
         _approval = approval;
         _dashboard = dashboard;
         _gallery = gallery;
+        _analytics = analytics;
+    }
+
+    private int? GetVisitorId()
+    {
+        var claim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+        return string.IsNullOrEmpty(claim) ? null : int.Parse(claim);
     }
 
     [HttpGet]
@@ -261,6 +272,49 @@ public class CompaniesController : ControllerBase
     public async Task<IActionResult> ReorderGalleryImages(int id, [FromBody] ReorderGalleryRequest request)
     {
         var (success, result, statusCode) = await _gallery.ReorderGalleryImagesAsync(id, request.ImageIds);
+        return StatusCode(statusCode, result);
+    }
+    // ===============================================
+    // ANALITIK ISLEMLERI
+    // ===============================================
+
+    [HttpGet("analytics/revenue")]
+    [Authorize]
+    public async Task<IActionResult> GetRevenueChart([FromQuery] int months = 12)
+    {
+        var visitorId = GetVisitorId();
+        if (visitorId == null) return Unauthorized();
+        var (success, result, statusCode) = await _analytics.GetRevenueChartAsync(visitorId.Value, months);
+        return StatusCode(statusCode, result);
+    }
+
+    [HttpGet("analytics/occupancy")]
+    [Authorize]
+    public async Task<IActionResult> GetOccupancyChart([FromQuery] int months = 12)
+    {
+        var visitorId = GetVisitorId();
+        if (visitorId == null) return Unauthorized();
+        var (success, result, statusCode) = await _analytics.GetOccupancyChartAsync(visitorId.Value, months);
+        return StatusCode(statusCode, result);
+    }
+
+    [HttpGet("analytics/cancellations")]
+    [Authorize]
+    public async Task<IActionResult> GetCancellationChart([FromQuery] int months = 12)
+    {
+        var visitorId = GetVisitorId();
+        if (visitorId == null) return Unauthorized();
+        var (success, result, statusCode) = await _analytics.GetCancellationChartAsync(visitorId.Value, months);
+        return StatusCode(statusCode, result);
+    }
+
+    [HttpGet("analytics/tour-comparison")]
+    [Authorize]
+    public async Task<IActionResult> GetTourComparison()
+    {
+        var visitorId = GetVisitorId();
+        if (visitorId == null) return Unauthorized();
+        var (success, result, statusCode) = await _analytics.GetTourComparisonAsync(visitorId.Value);
         return StatusCode(statusCode, result);
     }
 }
