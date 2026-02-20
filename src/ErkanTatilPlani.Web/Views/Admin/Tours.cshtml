@@ -152,6 +152,45 @@
                         </div>
 
                         <div class="row">
+                            <div class="col-md-4 mb-3">
+                                <label class="form-label">Zorluk Seviyesi</label>
+                                <select class="form-select" data-bind="value: formData().difficultyId">
+                                    <option value="0">Kolay</option>
+                                    <option value="1">Orta</option>
+                                    <option value="2">Zor</option>
+                                    <option value="3">Uzman</option>
+                                </select>
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <label class="form-label">Kategori</label>
+                                <select class="form-select" data-bind="value: formData().categoryId">
+                                    <option value="0">Macera</option>
+                                    <option value="1">Kultur</option>
+                                    <option value="2">Yeme-Icme</option>
+                                    <option value="3">Doga</option>
+                                    <option value="4">Tarih</option>
+                                    <option value="5">Deniz</option>
+                                    <option value="6">Sehir</option>
+                                </select>
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <label class="form-label">Rehber Dilleri</label>
+                                <input type="text" class="form-control" data-bind="value: formData().guideLanguages" placeholder="tr,en,de" />
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Dahil Olan</label>
+                                <textarea class="form-control" rows="3" data-bind="value: formData().inclusions" placeholder="Her satira bir madde"></textarea>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Dahil Olmayan</label>
+                                <textarea class="form-control" rows="3" data-bind="value: formData().exclusions" placeholder="Her satira bir madde"></textarea>
+                            </div>
+                        </div>
+
+                        <div class="row">
                             <div class="col-md-6">
                                 <div class="form-check form-switch">
                                     <input class="form-check-input" type="checkbox" id="isFeatured" data-bind="checked: formData().isFeatured" />

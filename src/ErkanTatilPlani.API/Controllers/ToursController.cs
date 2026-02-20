@@ -29,9 +29,17 @@ public class ToursController : ControllerBase
         [FromQuery] decimal? minPrice = null, [FromQuery] decimal? maxPrice = null,
         [FromQuery] int? minDays = null, [FromQuery] int? maxDays = null,
         [FromQuery] int? companyId = null, [FromQuery] bool? featured = null,
-        [FromQuery] string? sort = null)
+        [FromQuery] string? sort = null,
+        [FromQuery] int? difficulty = null, [FromQuery] int? category = null,
+        [FromQuery] string? guideLanguage = null)
     {
-        return Ok(await _tourFactory.GetToursAsync(search, destination, minPrice, maxPrice, minDays, maxDays, companyId, featured, sort));
+        return Ok(await _tourFactory.GetToursAsync(search, destination, minPrice, maxPrice, minDays, maxDays, companyId, featured, sort, difficulty, category, guideLanguage));
+    }
+
+    [HttpGet("categories")]
+    public async Task<ActionResult<IEnumerable<object>>> GetTourCategories()
+    {
+        return Ok(await _tourFactory.GetTourCategoriesAsync());
     }
 
     [HttpGet("featured")]

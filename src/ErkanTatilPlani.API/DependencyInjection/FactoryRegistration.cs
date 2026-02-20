@@ -8,6 +8,7 @@ using ErkanTatilPlani.API.Factories.Languages;
 using ErkanTatilPlani.API.Factories.Payments;
 using ErkanTatilPlani.API.Factories.Reservations;
 using ErkanTatilPlani.API.Factories.Reviews;
+using ErkanTatilPlani.API.Factories.TourDates;
 using ErkanTatilPlani.API.Factories.Tours;
 using ErkanTatilPlani.API.Factories.Visitors;
 using ErkanTatilPlani.Core.Factories.Auth;
@@ -20,6 +21,7 @@ using ErkanTatilPlani.Core.Factories.Languages;
 using ErkanTatilPlani.Core.Factories.Payments;
 using ErkanTatilPlani.Core.Factories.Reservations;
 using ErkanTatilPlani.Core.Factories.Reviews;
+using ErkanTatilPlani.Core.Factories.TourDates;
 using ErkanTatilPlani.Core.Factories.Tours;
 using ErkanTatilPlani.Core.Factories.Visitors;
 
@@ -37,6 +39,9 @@ public static class FactoryRegistration
 
         // Tour factories (1)
         services.AddScoped<ITourFactory, TourFactory>();
+
+        // TourDate factories (1)
+        services.AddScoped<ITourDateFactory, TourDateFactory>();
 
         // Payment factories (1)
         services.AddScoped<IPaymentFactory, PaymentFactory>();

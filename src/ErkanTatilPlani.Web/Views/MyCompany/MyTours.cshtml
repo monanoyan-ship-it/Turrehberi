@@ -87,6 +87,9 @@
                                 </td>
                                 <td class="text-center">
                                     <div class="btn-group btn-group-sm">
+                                        <button class="btn btn-outline-info" data-bind="click: $parent.openDateManageModal, enable: $parent.canManageTours()" title="Tarihleri Yonet">
+                                            <i class="bi bi-calendar3"></i>
+                                        </button>
                                         <button class="btn btn-outline-primary" data-bind="click: $parent.openEditModal, enable: $parent.canManageTours()" title="Duzenle">
                                             <i class="bi bi-pencil"></i>
                                         </button>
@@ -160,6 +163,44 @@
                                 <small class="text-muted" data-t="MyTours.ImageUrlHint">Bos birakirsaniz varsayilan resim kullanilir</small>
                             </div>
 
+                            <!-- Zorluk ve Kategori -->
+                            <div class="col-md-4">
+                                <label class="form-label" data-t="Tour.Difficulty">Zorluk Seviyesi</label>
+                                <select class="form-select" data-bind="value: formData().difficultyId">
+                                    <option value="0" data-t="TourDifficulty.Easy">Kolay</option>
+                                    <option value="1" data-t="TourDifficulty.Moderate">Orta</option>
+                                    <option value="2" data-t="TourDifficulty.Challenging">Zor</option>
+                                    <option value="3" data-t="TourDifficulty.Expert">Uzman</option>
+                                </select>
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label" data-t="Tour.Category">Kategori</label>
+                                <select class="form-select" data-bind="value: formData().categoryId">
+                                    <option value="0" data-t="TourCategory.Adventure">Macera</option>
+                                    <option value="1" data-t="TourCategory.Culture">Kultur</option>
+                                    <option value="2" data-t="TourCategory.Food">Yeme-Icme</option>
+                                    <option value="3" data-t="TourCategory.Nature">Doga</option>
+                                    <option value="4" data-t="TourCategory.History">Tarih</option>
+                                    <option value="5" data-t="TourCategory.Beach">Deniz</option>
+                                    <option value="6" data-t="TourCategory.City">Sehir</option>
+                                </select>
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label" data-t="Tour.GuideLanguages">Rehber Dilleri</label>
+                                <input type="text" class="form-control" data-bind="value: formData().guideLanguages" placeholder="tr,en,de">
+                                <small class="text-muted">Virgullu ayrilmis (tr,en,de)</small>
+                            </div>
+
+                            <!-- Dahil Olan / Olmayan -->
+                            <div class="col-md-6">
+                                <label class="form-label" data-t="Tour.Inclusions">Dahil Olan</label>
+                                <textarea class="form-control" rows="3" data-bind="value: formData().inclusions" placeholder="Her satira bir madde yazin"></textarea>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label" data-t="Tour.Exclusions">Dahil Olmayan</label>
+                                <textarea class="form-control" rows="3" data-bind="value: formData().exclusions" placeholder="Her satira bir madde yazin"></textarea>
+                            </div>
+
                             <!-- One Cikan -->
                             <div class="col-12">
                                 <div class="form-check">
@@ -177,6 +218,99 @@
                         <span data-bind="visible: isSaving()" class="spinner-border spinner-border-sm me-1"></span>
                         <span data-t="Common.Save">Kaydet</span>
                     </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Tarih Yonetim Modal -->
+    <div class="modal fade" id="dateManageModal" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">
+                        <i class="bi bi-calendar3 me-2"></i>
+                        <span data-t="TourDate.ManageDates">Tarihleri Yonet</span>
+                        - <span data-bind="text: managingTourName()"></span>
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <!-- Yeni Tarih Ekle -->
+                    <div class="card mb-3">
+                        <div class="card-header">
+                            <h6 class="mb-0"><i class="bi bi-plus-circle me-1"></i> <span data-t="TourDate.AddDate">Tarih Ekle</span></h6>
+                        </div>
+                        <div class="card-body">
+                            <div class="row g-2">
+                                <div class="col-md-3">
+                                    <label class="form-label small" data-t="TourDate.StartDate">Baslangic</label>
+                                    <input type="date" class="form-control form-control-sm" data-bind="value: dateFormData().startDate">
+                                </div>
+                                <div class="col-md-3">
+                                    <label class="form-label small" data-t="TourDate.EndDate">Bitis</label>
+                                    <input type="date" class="form-control form-control-sm" data-bind="value: dateFormData().endDate">
+                                </div>
+                                <div class="col-md-2">
+                                    <label class="form-label small" data-t="TourDate.Price">Fiyat</label>
+                                    <input type="number" class="form-control form-control-sm" data-bind="value: dateFormData().price" min="0" step="0.01">
+                                </div>
+                                <div class="col-md-2">
+                                    <label class="form-label small" data-t="TourDate.Capacity">Kapasite</label>
+                                    <input type="number" class="form-control form-control-sm" data-bind="value: dateFormData().maxCapacity" min="1">
+                                </div>
+                                <div class="col-md-2 d-flex align-items-end">
+                                    <button class="btn btn-primary btn-sm w-100" data-bind="click: saveTourDate, enable: !isSavingDate()">
+                                        <span data-bind="visible: isSavingDate()" class="spinner-border spinner-border-sm me-1"></span>
+                                        <i class="bi bi-plus"></i> <span data-t="Common.Add">Ekle</span>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Tarih Listesi -->
+                    <div data-bind="visible: isLoadingDates()" class="text-center py-3">
+                        <div class="spinner-border spinner-border-sm text-primary"></div>
+                    </div>
+                    <div data-bind="visible: !isLoadingDates() && managedDates().length === 0" class="text-center text-muted py-3">
+                        <i class="bi bi-calendar-x"></i> <span data-t="TourDate.NoDates">Henuz tarih eklenmemis</span>
+                    </div>
+                    <div class="table-responsive" data-bind="visible: !isLoadingDates() && managedDates().length > 0">
+                        <table class="table table-sm table-hover mb-0">
+                            <thead class="table-light">
+                                <tr>
+                                    <th data-t="TourDate.StartDate">Baslangic</th>
+                                    <th data-t="TourDate.EndDate">Bitis</th>
+                                    <th data-t="TourDate.Price">Fiyat</th>
+                                    <th data-t="TourDate.Capacity">Kapasite</th>
+                                    <th data-t="TourDate.BookedCount">Rezerve</th>
+                                    <th>Durum</th>
+                                    <th></th>
+                                </tr>
+                            </thead>
+                            <tbody data-bind="foreach: managedDates">
+                                <tr>
+                                    <td><small data-bind="text: new Date(startDate).toLocaleDateString('tr-TR')"></small></td>
+                                    <td><small data-bind="text: new Date(endDate).toLocaleDateString('tr-TR')"></small></td>
+                                    <td data-bind="text: price ? price.toLocaleString('tr-TR', {style:'currency', currency:'TRY'}) : '-'"></td>
+                                    <td data-bind="text: maxCapacity || '-'"></td>
+                                    <td data-bind="text: bookedCount"></td>
+                                    <td>
+                                        <span class="badge" data-bind="css: isAvailable ? 'bg-success' : 'bg-secondary', text: isAvailable ? 'Musait' : 'Dolu'"></span>
+                                    </td>
+                                    <td>
+                                        <button class="btn btn-outline-danger btn-sm" data-bind="click: $parent.deleteTourDate" title="Sil">
+                                            <i class="bi bi-trash"></i>
+                                        </button>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" data-t="Common.Close">Kapat</button>
                 </div>
             </div>
         </div>

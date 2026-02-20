@@ -24,7 +24,12 @@ function AdminToursViewModel() {
         maxCapacity: 0,
         imageUrl: '',
         isFeatured: false,
-        isActive: true
+        isActive: true,
+        difficultyId: '1',
+        categoryId: '0',
+        guideLanguages: '',
+        inclusions: '',
+        exclusions: ''
     });
 
     var formModal, deleteModal;
@@ -73,7 +78,12 @@ function AdminToursViewModel() {
             maxCapacity: 0,
             imageUrl: '',
             isFeatured: false,
-            isActive: true
+            isActive: true,
+            difficultyId: '1',
+            categoryId: '0',
+            guideLanguages: '',
+            inclusions: '',
+            exclusions: ''
         });
         formModal.show();
     };
@@ -92,7 +102,12 @@ function AdminToursViewModel() {
             imageUrl: tour.imageUrl,
             isFeatured: tour.isFeatured,
             isActive: tour.isActive,
-            createdAt: tour.createdAt
+            createdAt: tour.createdAt,
+            difficultyId: String(tour.difficultyId || 1),
+            categoryId: String(tour.categoryId || 0),
+            guideLanguages: tour.guideLanguages || '',
+            inclusions: tour.inclusions || '',
+            exclusions: tour.exclusions || ''
         });
         formModal.show();
     };
@@ -111,6 +126,8 @@ function AdminToursViewModel() {
 
         self.isSaving(true);
         var data = self.formData();
+        data.difficultyId = parseInt(data.difficultyId) || 1;
+        data.categoryId = parseInt(data.categoryId) || 0;
         var isEdit = self.isEditing();
 
         $.ajax({

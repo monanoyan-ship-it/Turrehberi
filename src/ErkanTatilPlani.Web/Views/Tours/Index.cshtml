@@ -29,6 +29,22 @@
     <p class="text-muted" data-t="Tours.Subtitle">Sizin icin en uygun turu secin ve hayalinizdeki tatile baslayin!</p>
 </div>
 
+<!-- Kategori Kartlari -->
+<div class="mb-4" data-bind="visible: categories().length > 0">
+    <div class="d-flex flex-wrap gap-2 justify-content-center">
+        <button class="btn btn-outline-secondary rounded-pill" data-bind="click: function() { filterCategory(''); applyFilters(); }, css: { 'active btn-secondary text-white': !filterCategory() }">
+            <i class="bi bi-grid-3x3-gap me-1"></i> <span data-t="Tours.AllCategories">Tum Kategoriler</span>
+        </button>
+        <!-- ko foreach: categories -->
+        <button class="btn rounded-pill" data-bind="click: function() { $parent.filterCategory(id.toString()); $parent.applyFilters(); },
+            css: $parent.filterCategory() == id.toString() ? 'btn-' + (cssClass || 'secondary').replace('bg-', '').replace(' text-dark', '') + ' text-white' : 'btn-outline-secondary'">
+            <i class="bi" data-bind="css: icon"></i>
+            <span data-bind="text: T(nameResourceKey) || systemName"></span>
+        </button>
+        <!-- /ko -->
+    </div>
+</div>
+
 <!-- Arama ve Filtreler -->
 <div class="card shadow-sm mb-4">
     <div class="card-body">
@@ -125,6 +141,47 @@
                 </div>
             </div>
 
+            <!-- Ek Filtreler (Zorluk, Kategori, Rehber Dili) -->
+            <div class="row g-3 pt-3">
+                <!-- Zorluk Seviyesi -->
+                <div class="col-md-3">
+                    <label class="form-label small fw-semibold"><i class="bi bi-speedometer2"></i> <span data-t="Tours.FilterDifficulty">Zorluk Seviyesi</span></label>
+                    <select class="form-select" data-bind="value: filterDifficulty">
+                        <option value="" data-t="Tours.AllDifficulties">Tum Zorluklar</option>
+                        <option value="0" data-t="TourDifficulty.Easy">Kolay</option>
+                        <option value="1" data-t="TourDifficulty.Moderate">Orta</option>
+                        <option value="2" data-t="TourDifficulty.Challenging">Zor</option>
+                        <option value="3" data-t="TourDifficulty.Expert">Uzman</option>
+                    </select>
+                </div>
+
+                <!-- Kategori -->
+                <div class="col-md-3">
+                    <label class="form-label small fw-semibold"><i class="bi bi-tag"></i> <span data-t="Tours.FilterCategory">Kategori</span></label>
+                    <select class="form-select" data-bind="value: filterCategory">
+                        <option value="" data-t="Tours.AllCategories">Tum Kategoriler</option>
+                        <!-- ko foreach: categories -->
+                        <option data-bind="value: id, text: T(nameResourceKey) || systemName"></option>
+                        <!-- /ko -->
+                    </select>
+                </div>
+
+                <!-- Rehber Dili -->
+                <div class="col-md-3">
+                    <label class="form-label small fw-semibold"><i class="bi bi-translate"></i> <span data-t="Tours.FilterGuideLanguage">Rehber Dili</span></label>
+                    <select class="form-select" data-bind="value: filterGuideLanguage">
+                        <option value="" data-t="Tours.AllLanguages">Tum Diller</option>
+                        <option value="tr">Turkce</option>
+                        <option value="en">English</option>
+                        <option value="de">Deutsch</option>
+                        <option value="ru">Русский</option>
+                        <option value="es">Espanol</option>
+                        <option value="fr">Francais</option>
+                        <option value="ar">العربية</option>
+                    </select>
+                </div>
+            </div>
+
             <!-- Filtre Butonlari -->
             <div class="d-flex justify-content-between mt-3 pt-3 border-top">
                 <button class="btn btn-outline-secondary btn-sm" data-bind="click: clearFilters">
@@ -202,6 +259,10 @@
             </div>
             <div class="card-body">
                 <h5 class="card-title" data-bind="text: name"></h5>
+                <div class="mb-2">
+                    <span class="badge" data-bind="css: $parent.getCategoryBadgeClass(categoryId), html: '<i class=\'bi ' + ($parent.getCategoryIcon(categoryId) || '') + '\'></i> ' + ($parent.getCategoryName(categoryId) || '')"></span>
+                    <span class="badge" data-bind="css: $parent.getDifficultyBadgeClass(difficultyId), text: $parent.getDifficultyName(difficultyId)"></span>
+                </div>
                 <p class="card-text mb-1" data-bind="visible: company">
                     <small class="text-muted"><i class="bi bi-building"></i> <span data-bind="text: company ? company.name : ''"></span></small>
                 </p>
@@ -317,6 +378,78 @@
                         <div class="mt-3">
                             <small class="text-muted d-block mb-2"><i class="bi bi-share"></i> <span data-t="Share.Title">Paylas</span></small>
                             <div id="tourShareButtons"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Dahil Olan / Olmayan Bolumu -->
+                <!-- ko if: inclusions || exclusions -->
+                <div class="row mb-4">
+                    <!-- ko if: inclusions -->
+                    <div class="col-md-6">
+                        <div class="card border-success h-100">
+                            <div class="card-header bg-success text-white">
+                                <h6 class="mb-0"><i class="bi bi-check-circle"></i> <span data-t="Tour.Inclusions">Dahil Olan</span></h6>
+                            </div>
+                            <div class="card-body">
+                                <ul class="list-unstyled mb-0" data-bind="foreach: inclusions.split('\\n').filter(function(s){ return s.trim(); })">
+                                    <li class="mb-1"><i class="bi bi-check-lg text-success me-2"></i><span data-bind="text: $data"></span></li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- /ko -->
+                    <!-- ko if: exclusions -->
+                    <div class="col-md-6">
+                        <div class="card border-danger h-100">
+                            <div class="card-header bg-danger text-white">
+                                <h6 class="mb-0"><i class="bi bi-x-circle"></i> <span data-t="Tour.Exclusions">Dahil Olmayan</span></h6>
+                            </div>
+                            <div class="card-body">
+                                <ul class="list-unstyled mb-0" data-bind="foreach: exclusions.split('\\n').filter(function(s){ return s.trim(); })">
+                                    <li class="mb-1"><i class="bi bi-x-lg text-danger me-2"></i><span data-bind="text: $data"></span></li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- /ko -->
+                </div>
+                <!-- /ko -->
+
+                <!-- Musaitlik Takvimi -->
+                <div class="mb-4">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <h5 class="mb-0"><i class="bi bi-calendar3"></i> <span data-t="TourDate.Title">Musaitlik Takvimi</span></h5>
+                        <div class="d-flex gap-2">
+                            <button class="btn btn-outline-primary btn-sm" data-bind="click: function() { $parent.changeCalendarMonth(-1) }">
+                                <i class="bi bi-chevron-left"></i>
+                            </button>
+                            <span class="fw-semibold" data-bind="text: $parent.calendarMonthLabel()"></span>
+                            <button class="btn btn-outline-primary btn-sm" data-bind="click: function() { $parent.changeCalendarMonth(1) }">
+                                <i class="bi bi-chevron-right"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <div data-bind="visible: $parent.isLoadingDates" class="text-center py-3">
+                        <div class="spinner-border spinner-border-sm text-primary"></div>
+                    </div>
+                    <div data-bind="visible: !$parent.isLoadingDates() && $parent.tourDates().length === 0" class="text-center text-muted py-3">
+                        <i class="bi bi-calendar-x"></i> <span data-t="TourDate.NoDates">Henuz tarih eklenmemis</span>
+                    </div>
+                    <div class="row g-2" data-bind="visible: !$parent.isLoadingDates(), foreach: $parent.tourDates">
+                        <div class="col-md-4 col-sm-6">
+                            <div class="card h-100" data-bind="css: { 'border-success': isAvailable, 'border-secondary opacity-50': !isAvailable }">
+                                <div class="card-body p-2">
+                                    <div class="d-flex justify-content-between align-items-center mb-1">
+                                        <small class="fw-semibold" data-bind="text: new Date(startDate).toLocaleDateString('tr-TR', {day:'numeric', month:'short'}) + ' - ' + new Date(endDate).toLocaleDateString('tr-TR', {day:'numeric', month:'short'})"></small>
+                                        <span class="badge" data-bind="css: isAvailable ? 'bg-success' : 'bg-secondary', text: isAvailable ? (T('TourDate.Available') || 'Musait') : (T('TourDate.NotAvailable') || 'Dolu')"></span>
+                                    </div>
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <span class="fw-bold text-primary" data-bind="text: price ? price.toLocaleString('tr-TR', {style:'currency', currency:'TRY'}) : ''"></span>
+                                        <small class="text-muted" data-bind="text: bookedCount + '/' + (maxCapacity || '∞')"></small>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -925,11 +1058,15 @@ function ToursViewModel() {
     self.filterMaxDays = ko.observable('');
     self.filterCompanyId = ko.observable('');
     self.filterFeatured = ko.observable(false);
+    self.filterDifficulty = ko.observable('');
+    self.filterCategory = ko.observable('');
+    self.filterGuideLanguage = ko.observable('');
     self.sortBy = ko.observable('');
 
     // Filtre secenekleri (API'den yuklenecek)
     self.destinations = ko.observableArray([]);
     self.companies = ko.observableArray([]);
+    self.categories = ko.observableArray([]);
     self.priceRange = ko.observable({ min: 0, max: 100000 });
     self.durationRange = ko.observable({ min: 1, max: 30 });
 
@@ -1016,8 +1153,63 @@ function ToursViewModel() {
         if (self.filterMaxDays()) count++;
         if (self.filterCompanyId()) count++;
         if (self.filterFeatured()) count++;
+        if (self.filterDifficulty()) count++;
+        if (self.filterCategory()) count++;
+        if (self.filterGuideLanguage()) count++;
         return count;
     });
+
+    // Tur tarihleri (musaitlik takvimi)
+    self.tourDates = ko.observableArray([]);
+    self.isLoadingDates = ko.observable(false);
+    self.calendarMonth = ko.observable(new Date().toISOString().substring(0, 7)); // "2026-02"
+    self.calendarMonthLabel = ko.computed(function() {
+        var parts = self.calendarMonth().split('-');
+        var months = ['Ocak','Subat','Mart','Nisan','Mayis','Haziran','Temmuz','Agustos','Eylul','Ekim','Kasim','Aralik'];
+        return months[parseInt(parts[1]) - 1] + ' ' + parts[0];
+    });
+
+    self.loadTourDates = function(tourId) {
+        self.isLoadingDates(true);
+        $.ajax({
+            url: apiBaseUrl + '/api/tours/' + tourId + '/dates',
+            method: 'GET',
+            success: function(data) {
+                self.tourDates(data);
+                self.isLoadingDates(false);
+            },
+            error: function() {
+                self.tourDates([]);
+                self.isLoadingDates(false);
+            }
+        });
+    };
+
+    self.changeCalendarMonth = function(delta) {
+        var parts = self.calendarMonth().split('-');
+        var d = new Date(parseInt(parts[0]), parseInt(parts[1]) - 1 + delta, 1);
+        self.calendarMonth(d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0'));
+        if (self.selectedTour()) {
+            self.loadCheapestDates(self.selectedTour().id);
+        }
+    };
+
+    self.loadCheapestDates = function(tourId) {
+        self.isLoadingDates(true);
+        $.ajax({
+            url: apiBaseUrl + '/api/tours/' + tourId + '/dates/cheapest',
+            method: 'GET',
+            data: { month: self.calendarMonth() },
+            success: function(data) {
+                self.tourDates(data);
+                self.isLoadingDates(false);
+            },
+            error: function() {
+                self.tourDates([]);
+                self.isLoadingDates(false);
+            }
+        });
+    };
 
     // Yorum verileri
     self.reviews = ko.observableArray([]);
@@ -1129,6 +1321,9 @@ function ToursViewModel() {
         if (self.filterMaxDays()) params.maxDays = self.filterMaxDays();
         if (self.filterCompanyId()) params.companyId = self.filterCompanyId();
         if (self.filterFeatured()) params.featured = true;
+        if (self.filterDifficulty()) params.difficulty = self.filterDifficulty();
+        if (self.filterCategory()) params.category = self.filterCategory();
+        if (self.filterGuideLanguage()) params.guideLanguage = self.filterGuideLanguage();
         if (self.sortBy()) params.sort = self.sortBy();
 
         $.ajax({
@@ -1183,6 +1378,9 @@ function ToursViewModel() {
         self.filterMaxDays('');
         self.filterCompanyId('');
         self.filterFeatured(false);
+        self.filterDifficulty('');
+        self.filterCategory('');
+        self.filterGuideLanguage('');
         self.sortBy('');
         self.loadData();
     };
@@ -1352,6 +1550,7 @@ function ToursViewModel() {
     self.showDetails = function(tour) {
         self.selectedTour(tour);
         self.loadReviews(tour.id, false);
+        self.loadTourDates(tour.id);
 
         // Render share buttons
         var shareUrl = window.location.origin + '/Tours?id=' + tour.id;
@@ -1688,6 +1887,45 @@ function ToursViewModel() {
         });
     };
 
+    // Kategori ve Zorluk helper fonksiyonlari
+    var difficultyMap = {
+        0: { name: T('TourDifficulty.Easy') || 'Kolay', css: 'bg-success', icon: 'bi-emoji-smile' },
+        1: { name: T('TourDifficulty.Moderate') || 'Orta', css: 'bg-info', icon: 'bi-emoji-neutral' },
+        2: { name: T('TourDifficulty.Challenging') || 'Zor', css: 'bg-warning text-dark', icon: 'bi-emoji-frown' },
+        3: { name: T('TourDifficulty.Expert') || 'Uzman', css: 'bg-danger', icon: 'bi-exclamation-triangle' }
+    };
+
+    self.getDifficultyName = function(id) {
+        return difficultyMap[id] ? difficultyMap[id].name : '';
+    };
+    self.getDifficultyBadgeClass = function(id) {
+        return difficultyMap[id] ? difficultyMap[id].css : 'bg-secondary';
+    };
+
+    self.getCategoryName = function(id) {
+        var cat = self.categories().find(function(c) { return c.id === id; });
+        return cat ? (T(cat.nameResourceKey) || cat.systemName) : '';
+    };
+    self.getCategoryIcon = function(id) {
+        var cat = self.categories().find(function(c) { return c.id === id; });
+        return cat ? cat.icon : '';
+    };
+    self.getCategoryBadgeClass = function(id) {
+        var cat = self.categories().find(function(c) { return c.id === id; });
+        return cat ? cat.cssClass : 'bg-secondary';
+    };
+
+    // Kategorileri yukle
+    self.loadCategories = function() {
+        $.ajax({
+            url: apiBaseUrl + '/api/tours/categories',
+            method: 'GET',
+            success: function(data) {
+                self.categories(data);
+            }
+        });
+    };
+
     // Sayfa yuklendiginde
     $(document).ready(function() {
         detailsModal = new bootstrap.Modal(document.getElementById('detailsModal'));
@@ -1697,6 +1935,7 @@ function ToursViewModel() {
         reportModal = new bootstrap.Modal(document.getElementById('reportModal'));
         self.loadData();
         self.loadCompanies();
+        self.loadCategories();
     });
 }
 

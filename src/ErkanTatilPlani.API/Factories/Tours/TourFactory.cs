@@ -30,7 +30,7 @@ public class TourFactory : ITourFactory
         _unitOfWork = unitOfWork;
     }
 
-    public async Task<object> GetToursAsync(string? search, string? destination, decimal? minPrice, decimal? maxPrice, int? minDays, int? maxDays, int? companyId, bool? featured, string? sort)
+    public async Task<object> GetToursAsync(string? search, string? destination, decimal? minPrice, decimal? maxPrice, int? minDays, int? maxDays, int? companyId, bool? featured, string? sort, int? difficulty, int? category, string? guideLanguage)
     {
         var query = _tourService.GetActiveToursWithCompany()
             .Where(t => t.Company!.StatusId == CompanyStatuses.Ids.Approved);
@@ -55,6 +55,13 @@ public class TourFactory : ITourFactory
         if (maxDays.HasValue) query = query.Where(t => t.DurationDays <= maxDays.Value);
         if (companyId.HasValue) query = query.Where(t => t.CompanyId == companyId.Value);
         if (featured.HasValue && featured.Value) query = query.Where(t => t.IsFeatured);
+        if (difficulty.HasValue) query = query.Where(t => t.DifficultyId == difficulty.Value);
+        if (category.HasValue) query = query.Where(t => t.CategoryId == category.Value);
+        if (!string.IsNullOrWhiteSpace(guideLanguage))
+        {
+            var lang = guideLanguage.ToLower();
+            query = query.Where(t => t.GuideLanguages != null && t.GuideLanguages.ToLower().Contains(lang));
+        }
 
         query = sort?.ToLower() switch
         {
@@ -78,6 +85,14 @@ public class TourFactory : ITourFactory
         var durationRange = new { min = allTours.Any() ? allTours.Min(t => t.DurationDays) : 1, max = allTours.Any() ? allTours.Max(t => t.DurationDays) : 30 };
 
         return new { tours, filters = new { destinations, priceRange, durationRange }, totalCount = tours.Count };
+    }
+
+    public async Task<IEnumerable<object>> GetTourCategoriesAsync()
+    {
+        return await Task.FromResult(TourCategories.All.Select(c => new
+        {
+            c.Id, c.SystemName, c.NameResourceKey, c.Icon, c.CssClass
+        }).ToList());
     }
 
     public async Task<IEnumerable<Tour>> GetFeaturedToursAsync()

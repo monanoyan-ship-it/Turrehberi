@@ -40,6 +40,9 @@ public class AppDbContext : DbContext
     // Company Pages
     public DbSet<CompanyPage> CompanyPages => Set<CompanyPage>();
 
+    // Tour Dates (Musaitlik Takvimi)
+    public DbSet<TourDate> TourDates => Set<TourDate>();
+
     // Email Management
     public DbSet<EmailAccount> EmailAccounts => Set<EmailAccount>();
     public DbSet<EmailTemplate> EmailTemplates => Set<EmailTemplate>();
@@ -76,9 +79,21 @@ public class AppDbContext : DbContext
             entity.HasKey(e => e.Id);
             entity.Property(e => e.Name).IsRequired().HasMaxLength(200);
             entity.Property(e => e.Price).HasPrecision(18, 2);
+            entity.Property(e => e.GuideLanguages).HasMaxLength(200);
             entity.HasOne(e => e.Company)
                   .WithMany(c => c.Tours)
                   .HasForeignKey(e => e.CompanyId);
+        });
+
+        modelBuilder.Entity<TourDate>(entity =>
+        {
+            entity.HasKey(e => e.Id);
+            entity.Property(e => e.Price).HasPrecision(18, 2);
+
+            entity.HasOne(e => e.Tour)
+                  .WithMany(t => t.TourDates)
+                  .HasForeignKey(e => e.TourId)
+                  .OnDelete(DeleteBehavior.Cascade);
         });
 
         modelBuilder.Entity<Visitor>(entity =>

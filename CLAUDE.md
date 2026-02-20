@@ -73,8 +73,8 @@ curl -X DELETE http://127.0.0.1:41847/api/patterns/ID
 Gunluk nitelikli bilgiler (kredi durumu, domain, vize vs.) icin journal endpoint'ini kullan:
 
 ```bash
-curl -X POST http://127.0.0.1:41847/api/journal -H "Content-Type: application/json" \
-  -d '{"project_id":14,"content":"ICERIK"}'
+curl -X POST http://127.0.0.1:41847/api/projects/14/journal -H "Content-Type: application/json" \
+  -d '{"title":"BASLIK","content":"ICERIK"}'
 ```
 
 ### Notes - Kritik bilgiler
@@ -82,9 +82,25 @@ curl -X POST http://127.0.0.1:41847/api/journal -H "Content-Type: application/js
 Hesap bilgileri, API key'ler, sifreler, krediler gibi kritik bilgileri Notes'a kaydet. Yeni bir hesap/servis olusturulursa bilgileri hemen yaz - sonra unutulur:
 
 ```bash
-curl -X POST http://127.0.0.1:41847/api/notes -H "Content-Type: application/json" \
-  -d '{"project_id":14,"category":"teknik","title":"BASLIK","content":"ICERIK"}'
+curl -X POST http://127.0.0.1:41847/api/projects/14/notes -H "Content-Type: application/json" \
+  -d '{"category":"teknik","title":"BASLIK","content":"ICERIK"}'
 ```
+
+### Roadmap (Fazlar ve Gorevler)
+
+Roadmap ClaudeManager dashboard'unda fazlar halinde tutulur. TODO.md YOKTUR.
+
+```bash
+# Tum fazlari ve gorevleri gor
+curl -s http://127.0.0.1:41847/api/projects/14/roadmap
+
+# Gorevi tamamlandi olarak isaretle
+curl -X PUT http://127.0.0.1:41847/api/tasks/TASK_ID -H "Content-Type: application/json" \
+  -d '{"status":"completed"}'
+```
+
+- Yeni is tamamlandiginda ilgili task'i `completed` olarak guncelle
+- Mevcut Faz 7 (Gelecek Isler): SSS sayfasi, canli destek, firma iletisim formu, integration testler, swagger gruplama
 
 ### Dashboard
 

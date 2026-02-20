@@ -25,6 +25,35 @@ public class Tour : BaseEntity
     /// </summary>
     public double? Longitude { get; set; }
 
+    // ===============================================
+    // GELISMIS OZELLIKLER (Faz 8)
+    // ===============================================
+
+    /// <summary>
+    /// Zorluk seviyesi (TourDifficulties TypeDefinition)
+    /// </summary>
+    public int DifficultyId { get; set; } = 1; // Moderate (default)
+
+    /// <summary>
+    /// Kategori (TourCategories TypeDefinition)
+    /// </summary>
+    public int CategoryId { get; set; } = 0; // Adventure (default)
+
+    /// <summary>
+    /// Rehber dilleri (virgullu ayrilmis: "tr,en,de")
+    /// </summary>
+    public string? GuideLanguages { get; set; }
+
+    /// <summary>
+    /// Dahil olan hizmetler (her satir bir madde, newline ile ayrilmis)
+    /// </summary>
+    public string? Inclusions { get; set; }
+
+    /// <summary>
+    /// Dahil olmayan hizmetler (her satir bir madde, newline ile ayrilmis)
+    /// </summary>
+    public string? Exclusions { get; set; }
+
     public int CompanyId { get; set; }
     public virtual Company Company { get; set; } = null!;
 
@@ -49,4 +78,5 @@ public class Tour : BaseEntity
     public virtual ICollection<Reservation> Reservations { get; set; } = new List<Reservation>();
     public virtual ICollection<TourReview> Reviews { get; set; } = new List<TourReview>();
     public virtual ICollection<FavoriteTour> FavoritedBy { get; set; } = new List<FavoriteTour>();
+    public virtual ICollection<TourDate> TourDates { get; set; } = new List<TourDate>();
 }

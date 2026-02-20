@@ -20,15 +20,34 @@ function MyToursViewModel() {
         durationDays: 1,
         maxCapacity: 20,
         imageUrl: '',
-        isFeatured: false
+        isFeatured: false,
+        difficultyId: '1',
+        categoryId: '0',
+        guideLanguages: '',
+        inclusions: '',
+        exclusions: ''
     });
 
     // Delete
     self.deletingTour = ko.observable(null);
 
+    // Date management
+    self.managingTourId = ko.observable(null);
+    self.managingTourName = ko.observable('');
+    self.managedDates = ko.observableArray([]);
+    self.isLoadingDates = ko.observable(false);
+    self.isSavingDate = ko.observable(false);
+    self.dateFormData = ko.observable({
+        startDate: '',
+        endDate: '',
+        price: '',
+        maxCapacity: ''
+    });
+
     // Modals
     var tourModal = null;
     var deleteModal = null;
+    var dateManageModal = null;
 
     // Helper functions
     self.formatCurrency = function(value) {
@@ -79,7 +98,12 @@ function MyToursViewModel() {
             durationDays: 1,
             maxCapacity: 20,
             imageUrl: '',
-            isFeatured: false
+            isFeatured: false,
+            difficultyId: '1',
+            categoryId: '0',
+            guideLanguages: '',
+            inclusions: '',
+            exclusions: ''
         });
         tourModal.show();
     };
@@ -96,7 +120,12 @@ function MyToursViewModel() {
             durationDays: tour.durationDays,
             maxCapacity: tour.maxCapacity,
             imageUrl: tour.imageUrl,
-            isFeatured: tour.isFeatured
+            isFeatured: tour.isFeatured,
+            difficultyId: String(tour.difficultyId || 1),
+            categoryId: String(tour.categoryId || 0),
+            guideLanguages: tour.guideLanguages || '',
+            inclusions: tour.inclusions || '',
+            exclusions: tour.exclusions || ''
         });
         tourModal.show();
     };
@@ -122,6 +151,10 @@ function MyToursViewModel() {
                 data.companyId = user.companyId;
             } catch (e) {}
         }
+
+        // Yeni alanlari int'e cevir
+        data.difficultyId = parseInt(data.difficultyId) || 1;
+        data.categoryId = parseInt(data.categoryId) || 0;
 
         var isEdit = self.isEditing();
         var url = isEdit ? apiBaseUrl + '/api/tours/' + self.editingTourId() : apiBaseUrl + '/api/tours';
@@ -185,10 +218,90 @@ function MyToursViewModel() {
         });
     };
 
+    // Tarih yonetim modalini ac
+    self.openDateManageModal = function(tour) {
+        self.managingTourId(tour.id);
+        self.managingTourName(tour.name);
+        self.dateFormData({ startDate: '', endDate: '', price: '', maxCapacity: '' });
+        self.loadManagedDates(tour.id);
+        dateManageModal.show();
+    };
+
+    // Yonetim tarihlerini yukle
+    self.loadManagedDates = function(tourId) {
+        self.isLoadingDates(true);
+        var token = localStorage.getItem('authToken');
+        $.ajax({
+            url: apiBaseUrl + '/api/tours/' + tourId + '/dates/manage',
+            method: 'GET',
+            headers: token ? { 'Authorization': 'Bearer ' + token } : {},
+            success: function(data) {
+                self.managedDates(data);
+                self.isLoadingDates(false);
+            },
+            error: function() {
+                self.managedDates([]);
+                self.isLoadingDates(false);
+            }
+        });
+    };
+
+    // Yeni tarih kaydet
+    self.saveTourDate = function() {
+        var data = self.dateFormData();
+        if (!data.startDate || !data.endDate) {
+            toastr.warning(T('Common.Required') || 'Baslangic ve bitis tarihi zorunlu');
+            return;
+        }
+        self.isSavingDate(true);
+        var token = localStorage.getItem('authToken');
+        $.ajax({
+            url: apiBaseUrl + '/api/tours/' + self.managingTourId() + '/dates',
+            method: 'POST',
+            headers: token ? { 'Authorization': 'Bearer ' + token } : {},
+            contentType: 'application/json',
+            data: JSON.stringify({
+                startDate: data.startDate,
+                endDate: data.endDate,
+                price: data.price ? parseFloat(data.price) : null,
+                maxCapacity: data.maxCapacity ? parseInt(data.maxCapacity) : null,
+                isAvailable: true
+            }),
+            success: function() {
+                toastr.success(T('TourDate.AddDate') || 'Tarih eklendi');
+                self.dateFormData({ startDate: '', endDate: '', price: '', maxCapacity: '' });
+                self.loadManagedDates(self.managingTourId());
+                self.isSavingDate(false);
+            },
+            error: function(xhr) {
+                toastr.error(xhr.responseJSON?.message || T('Common.Error') || 'Hata olustu');
+                self.isSavingDate(false);
+            }
+        });
+    };
+
+    // Tarih sil
+    self.deleteTourDate = function(dateItem) {
+        var token = localStorage.getItem('authToken');
+        $.ajax({
+            url: apiBaseUrl + '/api/tour-dates/' + dateItem.id,
+            method: 'DELETE',
+            headers: token ? { 'Authorization': 'Bearer ' + token } : {},
+            success: function() {
+                toastr.success(T('Common.Delete') || 'Tarih silindi');
+                self.loadManagedDates(self.managingTourId());
+            },
+            error: function(xhr) {
+                toastr.error(xhr.responseJSON?.message || T('Common.Error') || 'Hata olustu');
+            }
+        });
+    };
+
     // Init
     $(document).ready(function() {
         tourModal = new bootstrap.Modal(document.getElementById('tourModal'));
         deleteModal = new bootstrap.Modal(document.getElementById('deleteModal'));
+        dateManageModal = new bootstrap.Modal(document.getElementById('dateManageModal'));
         self.loadTours();
     });
 }
