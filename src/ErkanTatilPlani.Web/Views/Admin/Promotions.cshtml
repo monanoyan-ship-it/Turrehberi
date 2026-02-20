@@ -1,0 +1,99 @@
+@{
+    Layout = "_AdminLayout";
+}
+
+<div id="adminPromotionsApp">
+    <!-- Yukleniyor -->
+    <div data-bind="visible: isLoading()" class="text-center py-5">
+        <div class="spinner-border text-primary" role="status">
+            <span class="visually-hidden">Yukleniyor...</span>
+        </div>
+    </div>
+
+    <!-- Ana Icerik -->
+    <div data-bind="visible: !isLoading()">
+        <!-- Filtreler -->
+        <div class="row mb-3">
+            <div class="col-md-3">
+                <select class="form-select form-select-sm" data-bind="value: companyFilter">
+                    <option value="">Tum Firmalar</option>
+                </select>
+            </div>
+            <div class="col-md-3">
+                <select class="form-select form-select-sm" data-bind="value: typeFilter">
+                    <option value="">Tum Tipler</option>
+                    <option value="0">Kupon</option>
+                    <option value="1">Erken Rez.</option>
+                    <option value="2">Son Dakika</option>
+                    <option value="3">Grup Ind.</option>
+                    <option value="4">Flash Sale</option>
+                    <option value="5">Paket</option>
+                    <option value="6">Dinamik Fiyat.</option>
+                </select>
+            </div>
+            <div class="col-md-3">
+                <select class="form-select form-select-sm" data-bind="value: statusFilter">
+                    <option value="">Tum Durumlar</option>
+                    <option value="0">Aktif</option>
+                    <option value="1">Devre Disi</option>
+                    <option value="2">Suresi Dolmus</option>
+                </select>
+            </div>
+        </div>
+
+        <!-- Promosyon Tablosu -->
+        <div class="card">
+            <div class="card-header">
+                <i class="bi bi-ticket-perforated me-2"></i><span data-t="Admin.Promotions.Title">Tum Promosyonlar</span>
+                <span class="badge bg-primary ms-2" data-bind="text: promotions().length"></span>
+            </div>
+            <div class="card-body p-0">
+                <div data-bind="visible: promotions().length === 0" class="text-center text-muted py-5">
+                    <i class="bi bi-ticket-perforated fs-1"></i>
+                    <p class="mt-3">Promosyon bulunamadi</p>
+                </div>
+
+                <div class="table-responsive" data-bind="visible: promotions().length > 0">
+                    <table class="table table-hover table-sm mb-0">
+                        <thead class="table-light">
+                            <tr>
+                                <th>ID</th>
+                                <th>Firma</th>
+                                <th>Ad</th>
+                                <th>Tip</th>
+                                <th>Deger</th>
+                                <th>Kod</th>
+                                <th>Kullanim</th>
+                                <th>Tarih</th>
+                                <th>Durum</th>
+                            </tr>
+                        </thead>
+                        <tbody data-bind="foreach: promotions">
+                            <tr>
+                                <td data-bind="text: id"></td>
+                                <td data-bind="text: companyName"></td>
+                                <td data-bind="text: name"></td>
+                                <td>
+                                    <span class="badge" data-bind="text: promotionType, css: $parent.getTypeBadgeClass(promotionTypeId)"></span>
+                                </td>
+                                <td data-bind="text: $parent.formatDiscount(discountTypeId, discountValue)"></td>
+                                <td><code data-bind="text: code || '-'"></code></td>
+                                <td data-bind="text: usageCount + '/' + (usageLimit || '∞')"></td>
+                                <td>
+                                    <small data-bind="text: $parent.formatDateRange(startDate, endDate)"></small>
+                                </td>
+                                <td>
+                                    <span class="badge" data-bind="text: status, css: $parent.getStatusBadgeClass(statusId)"></span>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="~/js/Admin/Promotions.js"></script>
+}

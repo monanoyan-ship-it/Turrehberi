@@ -43,6 +43,10 @@ public class AppDbContext : DbContext
     // Tour Dates (Musaitlik Takvimi)
     public DbSet<TourDate> TourDates => Set<TourDate>();
 
+    // Promotions
+    public DbSet<Promotion> Promotions => Set<Promotion>();
+    public DbSet<PromotionUsage> PromotionUsages => Set<PromotionUsage>();
+
     // Email Management
     public DbSet<EmailAccount> EmailAccounts => Set<EmailAccount>();
     public DbSet<EmailTemplate> EmailTemplates => Set<EmailTemplate>();
@@ -111,12 +115,19 @@ public class AppDbContext : DbContext
         {
             entity.HasKey(e => e.Id);
             entity.Property(e => e.TotalPrice).HasPrecision(18, 2);
+            entity.Property(e => e.DiscountAmount).HasPrecision(18, 2);
+            entity.Property(e => e.CouponCode).HasMaxLength(50);
             entity.HasOne(e => e.Tour)
                   .WithMany(t => t.Reservations)
                   .HasForeignKey(e => e.TourId);
             entity.HasOne(e => e.Visitor)
                   .WithMany(v => v.Reservations)
                   .HasForeignKey(e => e.VisitorId);
+            entity.HasOne(e => e.Promotion)
+                  .WithMany()
+                  .HasForeignKey(e => e.PromotionId)
+                  .IsRequired(false)
+                  .OnDelete(DeleteBehavior.SetNull);
         });
 
         modelBuilder.Entity<Language>(entity =>
@@ -467,6 +478,59 @@ public class AppDbContext : DbContext
                   .WithMany(c => c.Pages)
                   .HasForeignKey(e => e.CompanyId)
                   .OnDelete(DeleteBehavior.Cascade);
+        });
+
+        // ===============================================
+        // PROMOSYON SISTEMI
+        // ===============================================
+
+        modelBuilder.Entity<Promotion>(entity =>
+        {
+            entity.HasKey(e => e.Id);
+            entity.Property(e => e.Name).IsRequired().HasMaxLength(200);
+            entity.Property(e => e.Description).HasMaxLength(1000);
+            entity.Property(e => e.DiscountValue).HasPrecision(18, 2);
+            entity.Property(e => e.Code).HasMaxLength(50);
+            entity.Property(e => e.MinOrderAmount).HasPrecision(18, 2);
+            entity.Property(e => e.MaxDiscountAmount).HasPrecision(18, 2);
+            entity.Property(e => e.WeekendMultiplier).HasPrecision(18, 4);
+            entity.Property(e => e.HighDemandMultiplier).HasPrecision(18, 4);
+
+            entity.HasIndex(e => new { e.CompanyId, e.Code }).IsUnique()
+                  .HasFilter("\"Code\" IS NOT NULL");
+
+            entity.HasOne(e => e.Company)
+                  .WithMany()
+                  .HasForeignKey(e => e.CompanyId)
+                  .OnDelete(DeleteBehavior.Cascade);
+
+            entity.HasOne(e => e.CreatedByVisitor)
+                  .WithMany()
+                  .HasForeignKey(e => e.CreatedByVisitorId)
+                  .OnDelete(DeleteBehavior.Restrict);
+        });
+
+        modelBuilder.Entity<PromotionUsage>(entity =>
+        {
+            entity.HasKey(e => e.Id);
+            entity.Property(e => e.DiscountAmount).HasPrecision(18, 2);
+            entity.Property(e => e.AppliedRule).HasMaxLength(500);
+
+            entity.HasOne(e => e.Promotion)
+                  .WithMany(p => p.Usages)
+                  .HasForeignKey(e => e.PromotionId)
+                  .OnDelete(DeleteBehavior.Cascade);
+
+            entity.HasOne(e => e.Reservation)
+                  .WithMany()
+                  .HasForeignKey(e => e.ReservationId)
+                  .OnDelete(DeleteBehavior.Cascade);
+
+            entity.HasOne(e => e.Visitor)
+                  .WithMany()
+                  .HasForeignKey(e => e.VisitorId)
+                  .IsRequired(false)
+                  .OnDelete(DeleteBehavior.SetNull);
         });
 
         // Seed Data

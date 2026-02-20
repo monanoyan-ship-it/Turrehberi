@@ -249,6 +249,12 @@
                 <!-- ko if: isFeatured -->
                 <span class="badge bg-warning text-dark position-absolute top-0 start-0 m-2"><i class="bi bi-star-fill"></i> One Cikan</span>
                 <!-- /ko -->
+                <!-- Promosyon Badge'leri -->
+                <!-- ko if: $parent.getPromoBadges(id).length > 0 -->
+                <div class="position-absolute bottom-0 start-0 m-2" data-bind="foreach: $parent.getPromoBadges(id)">
+                    <span class="badge me-1" data-bind="text: label, css: cssClass"></span>
+                </div>
+                <!-- /ko -->
                 <!-- Favori Butonu -->
                 <button class="btn btn-sm position-absolute top-0 end-0 m-2 favorite-btn"
                         data-bind="click: $parent.toggleFavorite,
@@ -883,10 +889,33 @@
                                         <span>Kisi Sayisi:</span>
                                         <span data-bind="text: numberOfPeople() + ' kisi'"></span>
                                     </div>
+                                    <!-- Kupon Kodu -->
+                                    <div class="mb-2">
+                                        <label class="form-label small mb-1"><i class="bi bi-ticket-perforated me-1"></i>Kupon Kodu</label>
+                                        <div class="input-group input-group-sm">
+                                            <input type="text" class="form-control" placeholder="INDIRIM20" data-bind="value: couponCode" />
+                                            <button class="btn btn-outline-primary" type="button" data-bind="click: applyCoupon">Uygula</button>
+                                        </div>
+                                        <small class="text-success" data-bind="visible: couponDiscount() > 0, text: 'Kupon indirimi: -' + couponDiscount().toLocaleString('tr-TR', {style: 'currency', currency: 'TRY'})"></small>
+                                    </div>
+                                    <!-- Promosyon Bilgileri -->
+                                    <div data-bind="visible: appliedDiscounts().length > 0" class="mb-2">
+                                        <small class="text-muted">Uygulanan Indirimler:</small>
+                                        <div data-bind="foreach: appliedDiscounts" class="small">
+                                            <div class="d-flex justify-content-between text-success">
+                                                <span data-bind="text: promotionName"></span>
+                                                <span data-bind="text: '-' + discountAmount.toLocaleString('tr-TR', {style: 'currency', currency: 'TRY'})"></span>
+                                            </div>
+                                        </div>
+                                    </div>
                                     <hr />
                                     <div class="d-flex justify-content-between mb-2 fw-bold">
                                         <span>Toplam Tutar:</span>
                                         <span class="text-primary fs-5" data-bind="text: calculateTotal()"></span>
+                                    </div>
+                                    <div data-bind="visible: totalDiscount() > 0" class="d-flex justify-content-between mb-2 text-success">
+                                        <span>Toplam Indirim:</span>
+                                        <span data-bind="text: '-' + totalDiscount().toLocaleString('tr-TR', {style: 'currency', currency: 'TRY'})"></span>
                                     </div>
                                     <hr />
                                     <div class="alert alert-warning mb-2 py-2">
@@ -1254,6 +1283,32 @@ function ToursViewModel() {
     // Kisi sayisi icin ayri observable (fiyat hesaplamasi icin)
     self.numberOfPeople = ko.observable(1);
 
+    // Kupon ve indirim
+    self.couponCode = ko.observable('');
+    self.couponDiscount = ko.observable(0);
+    self.appliedDiscounts = ko.observableArray([]);
+    self.totalDiscount = ko.observable(0);
+
+    // Promosyon badge'leri
+    self.promoBadges = ko.observable({});
+    self.getPromoBadges = function(tourId) {
+        return self.promoBadges()[tourId] || [];
+    };
+    self.loadPromoBadges = function(tourIds) {
+        tourIds.forEach(function(tourId) {
+            $.ajax({
+                url: apiBaseUrl + '/api/tours/' + tourId + '/promotion-badges',
+                method: 'GET'
+            }).done(function(badges) {
+                if (badges && badges.length > 0) {
+                    var current = self.promoBadges();
+                    current[tourId] = badges;
+                    self.promoBadges(Object.assign({}, current));
+                }
+            });
+        });
+    };
+
     // Odeme adimi gosterimi
     self.showPaymentStep = ko.observable(false);
 
@@ -1333,6 +1388,10 @@ function ToursViewModel() {
             success: function(response) {
                 self.tours(response.tours);
                 self.totalCount(response.totalCount);
+
+                // Promosyon badge'lerini yukle
+                var tourIds = response.tours.map(function(t) { return t.id; });
+                self.loadPromoBadges(tourIds);
 
                 // Filtre seceneklerini guncelle (ilk yuklemede)
                 if (response.filters) {
@@ -1809,6 +1868,40 @@ function ToursViewModel() {
         return remaining.toLocaleString('tr-TR', {style: 'currency', currency: 'TRY'});
     });
 
+    // Kupon uygula
+    self.applyCoupon = function() {
+        var tour = self.selectedTour();
+        var code = self.couponCode();
+        if (!tour || !code) {
+            toastr.warning('Lutfen bir kupon kodu girin');
+            return;
+        }
+        $.ajax({
+            url: apiBaseUrl + '/api/tours/' + tour.id + '/calculate-price',
+            method: 'POST',
+            contentType: 'application/json',
+            data: JSON.stringify({
+                numberOfPeople: self.numberOfPeople() || 1,
+                couponCode: code
+            })
+        }).done(function(result) {
+            if (result.totalDiscount > 0) {
+                self.totalDiscount(result.totalDiscount);
+                self.appliedDiscounts(result.appliedDiscounts || []);
+                var couponDisc = (result.appliedDiscounts || []).filter(function(d) { return d.promotionType === 'Coupon'; });
+                self.couponDiscount(couponDisc.length > 0 ? couponDisc[0].discountAmount : 0);
+                toastr.success('Kupon uygulandı');
+            } else {
+                self.couponDiscount(0);
+                self.totalDiscount(0);
+                self.appliedDiscounts([]);
+                toastr.warning('Bu kupon gecerli degil veya indirim uygulanamadi');
+            }
+        }).fail(function() {
+            toastr.error('Kupon dogrulanamadi');
+        });
+    };
+
     // Step 1'den Step 2'ye gec (form validasyonu yapip odeme ekranina)
     self.goToPaymentStep = function() {
         var form = document.getElementById('reservationForm');
@@ -1852,7 +1945,8 @@ function ToursViewModel() {
             email: data.email,
             phone: data.phone,
             numberOfPeople: self.numberOfPeople(),
-            notes: data.notes || ''
+            notes: data.notes || '',
+            couponCode: self.couponCode() || null
         };
 
         $.ajax({

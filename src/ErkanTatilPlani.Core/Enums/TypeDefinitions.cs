@@ -192,3 +192,112 @@ public static class PaymentStatuses
         public const int Refunded = 4;
     }
 }
+
+// ============================================================
+// PROMOTION TYPES (Promosyon Tipleri)
+// ============================================================
+public static class PromotionTypes
+{
+    public static readonly TypeItem Coupon = new(0, "Coupon", "PromotionType.Coupon",
+        "Kupon kodu ile indirim",
+        "bi-ticket-perforated", "bg-primary", 1);
+
+    public static readonly TypeItem EarlyBird = new(1, "EarlyBird", "PromotionType.EarlyBird",
+        "Erken rezervasyon indirimi",
+        "bi-alarm", "bg-info", 2);
+
+    public static readonly TypeItem LastMinute = new(2, "LastMinute", "PromotionType.LastMinute",
+        "Son dakika firsati",
+        "bi-lightning", "bg-warning text-dark", 3);
+
+    public static readonly TypeItem GroupDiscount = new(3, "GroupDiscount", "PromotionType.GroupDiscount",
+        "Grup indirimi",
+        "bi-people", "bg-success", 4);
+
+    public static readonly TypeItem FlashSale = new(4, "FlashSale", "PromotionType.FlashSale",
+        "Flash sale - sinirli sureli kampanya",
+        "bi-stopwatch", "bg-danger", 5);
+
+    public static readonly TypeItem Bundle = new(5, "Bundle", "PromotionType.Bundle",
+        "Paket fiyatlandirma",
+        "bi-box-seam", "bg-dark", 6);
+
+    public static readonly TypeItem DynamicPricing = new(6, "DynamicPricing", "PromotionType.DynamicPricing",
+        "Dinamik fiyatlandirma",
+        "bi-graph-up-arrow", "bg-secondary", 7);
+
+    public static IEnumerable<TypeItem> All => new[] { Coupon, EarlyBird, LastMinute, GroupDiscount, FlashSale, Bundle, DynamicPricing };
+    public static TypeItem? GetById(int id) => All.FirstOrDefault(x => x.Id == id);
+    public static TypeItem? GetBySystemName(string systemName) => All.FirstOrDefault(x => x.SystemName == systemName);
+
+    public static class Ids
+    {
+        public const int Coupon = 0;
+        public const int EarlyBird = 1;
+        public const int LastMinute = 2;
+        public const int GroupDiscount = 3;
+        public const int FlashSale = 4;
+        public const int Bundle = 5;
+        public const int DynamicPricing = 6;
+    }
+}
+
+// ============================================================
+// DISCOUNT TYPES (Indirim Tipleri)
+// ============================================================
+public static class DiscountTypes
+{
+    public static readonly TypeItem Percentage = new(0, "Percentage", "DiscountType.Percentage",
+        "Yuzdelik indirim",
+        "bi-percent", "bg-primary", 1, isDefault: true);
+
+    public static readonly TypeItem FixedAmount = new(1, "FixedAmount", "DiscountType.FixedAmount",
+        "Sabit tutar indirimi",
+        "bi-currency-lira", "bg-success", 2);
+
+    public static readonly TypeItem Multiplier = new(2, "Multiplier", "DiscountType.Multiplier",
+        "Carpan (dinamik fiyatlandirma icin)",
+        "bi-x-diamond", "bg-info", 3);
+
+    public static IEnumerable<TypeItem> All => new[] { Percentage, FixedAmount, Multiplier };
+    public static TypeItem Default => All.First(x => x.IsDefault);
+    public static TypeItem? GetById(int id) => All.FirstOrDefault(x => x.Id == id);
+    public static TypeItem? GetBySystemName(string systemName) => All.FirstOrDefault(x => x.SystemName == systemName);
+
+    public static class Ids
+    {
+        public const int Percentage = 0;
+        public const int FixedAmount = 1;
+        public const int Multiplier = 2;
+    }
+}
+
+// ============================================================
+// PROMOTION STATUSES (Promosyon Durumlari)
+// ============================================================
+public static class PromotionStatuses
+{
+    public static readonly TypeItem Active = new(0, "Active", "PromotionStatus.Active",
+        "Aktif promosyon",
+        "bi-check-circle", "bg-success", 1, isDefault: true);
+
+    public static readonly TypeItem Disabled = new(1, "Disabled", "PromotionStatus.Disabled",
+        "Devre disi birakilmis",
+        "bi-pause-circle", "bg-secondary", 2);
+
+    public static readonly TypeItem Expired = new(2, "Expired", "PromotionStatus.Expired",
+        "Suresi dolmus",
+        "bi-clock-history", "bg-warning text-dark", 3);
+
+    public static IEnumerable<TypeItem> All => new[] { Active, Disabled, Expired };
+    public static TypeItem Default => All.First(x => x.IsDefault);
+    public static TypeItem? GetById(int id) => All.FirstOrDefault(x => x.Id == id);
+    public static TypeItem? GetBySystemName(string systemName) => All.FirstOrDefault(x => x.SystemName == systemName);
+
+    public static class Ids
+    {
+        public const int Active = 0;
+        public const int Disabled = 1;
+        public const int Expired = 2;
+    }
+}

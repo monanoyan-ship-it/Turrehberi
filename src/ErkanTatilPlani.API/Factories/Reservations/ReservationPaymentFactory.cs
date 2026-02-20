@@ -1,11 +1,13 @@
 using ErkanTatilPlani.Core.Entities;
 using ErkanTatilPlani.Core.EntityServices;
 using ErkanTatilPlani.Core.Enums;
+using ErkanTatilPlani.Core.Factories.Promotions;
 using ErkanTatilPlani.Core.Factories.Reservations;
 using ErkanTatilPlani.Core.Infrastructure;
 using ErkanTatilPlani.Core.Services;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
+using System.Text.Json;
 
 namespace ErkanTatilPlani.API.Factories.Reservations;
 
@@ -18,6 +20,8 @@ public class ReservationPaymentFactory : IReservationPaymentFactory
     private readonly IPaymentService _paymentService;
     private readonly IEmailService _emailService;
     private readonly IConfiguration _configuration;
+    private readonly IPromotionCalculationFactory _promotionCalculation;
+    private readonly IPromotionEntityService _promotionService;
 
     public ReservationPaymentFactory(
         ITourEntityService tourService,
@@ -26,7 +30,9 @@ public class ReservationPaymentFactory : IReservationPaymentFactory
         IUnitOfWork unitOfWork,
         IPaymentService paymentService,
         IEmailService emailService,
-        IConfiguration configuration)
+        IConfiguration configuration,
+        IPromotionCalculationFactory promotionCalculation,
+        IPromotionEntityService promotionService)
     {
         _tourService = tourService;
         _visitorService = visitorService;
@@ -35,6 +41,8 @@ public class ReservationPaymentFactory : IReservationPaymentFactory
         _paymentService = paymentService;
         _emailService = emailService;
         _configuration = configuration;
+        _promotionCalculation = promotionCalculation;
+        _promotionService = promotionService;
     }
 
     public async Task<(bool success, object result, int statusCode)> CreatePublicReservationAsync(
@@ -47,7 +55,8 @@ public class ReservationPaymentFactory : IReservationPaymentFactory
         string? notes,
         string? address,
         DateTime? startDate,
-        string customerIp)
+        string customerIp,
+        string? couponCode = null)
     {
         // Tur kontrolu
         var tour = await _tourService.GetByIdWithCompanyAsync(tourId);
@@ -93,16 +102,17 @@ public class ReservationPaymentFactory : IReservationPaymentFactory
             }
         }
 
-        // Toplam fiyat hesapla
-        var totalPrice = tour.Price * numberOfPeople;
-
-        // On odeme tutarini hesapla
-        var depositPercentage = tour.Company.DepositPercentage;
-        var depositAmount = totalPrice * depositPercentage / 100;
-
         // Baslangic ve bitis tarihi
         var resolvedStartDate = startDate ?? DateTime.UtcNow.AddDays(7);
         var endDate = resolvedStartDate.AddDays(tour.DurationDays);
+
+        // Promosyon destekli fiyat hesaplama
+        var priceResult = await _promotionCalculation.CalculatePriceAsync(
+            tourId, numberOfPeople, resolvedStartDate, couponCode, visitorId);
+
+        var totalPrice = priceResult.FinalPrice;
+        var depositAmount = priceResult.DepositAmount;
+        var discountAmount = priceResult.TotalDiscount;
 
         // Rezervasyon olustur
         var reservation = new Reservation
@@ -114,6 +124,14 @@ public class ReservationPaymentFactory : IReservationPaymentFactory
             NumberOfPeople = numberOfPeople,
             TotalPrice = totalPrice,
             DepositAmount = depositAmount,
+            DiscountAmount = discountAmount,
+            CouponCode = couponCode,
+            AppliedPromotions = priceResult.AppliedDiscounts.Count > 0
+                ? JsonSerializer.Serialize(priceResult.AppliedDiscounts)
+                : null,
+            PromotionId = priceResult.AppliedDiscounts.Count > 0
+                ? priceResult.AppliedDiscounts.First().PromotionId
+                : null,
             PaidAmount = 0,
             Status = ReservationStatuses.Ids.Pending,
             PaymentStatus = PaymentStatuses.Ids.Pending,
@@ -121,6 +139,48 @@ public class ReservationPaymentFactory : IReservationPaymentFactory
         };
 
         _reservationService.Add(reservation);
+        await _unitOfWork.SaveChangesAsync();
+
+        // Promosyon kullanim kaydlari
+        foreach (var applied in priceResult.AppliedDiscounts)
+        {
+            _promotionService.AddUsage(new PromotionUsage
+            {
+                PromotionId = applied.PromotionId,
+                ReservationId = reservation.Id,
+                VisitorId = visitorId,
+                DiscountAmount = applied.DiscountAmount,
+                AppliedRule = applied.Rule
+            });
+        }
+
+        // Kupon kullanim sayacini artir
+        if (!string.IsNullOrEmpty(couponCode))
+        {
+            var couponPromo = priceResult.AppliedDiscounts
+                .FirstOrDefault(d => d.PromotionType == "Coupon");
+            if (couponPromo != null)
+            {
+                var coupon = await _promotionService.GetByIdAsync(couponPromo.PromotionId);
+                if (coupon != null)
+                {
+                    coupon.UsageCount++;
+                    _promotionService.Update(coupon);
+                }
+            }
+        }
+
+        // Flash sale sold count artir
+        foreach (var fs in priceResult.AppliedDiscounts.Where(d => d.PromotionType == "FlashSale"))
+        {
+            var flashPromo = await _promotionService.GetByIdAsync(fs.PromotionId);
+            if (flashPromo != null)
+            {
+                flashPromo.FlashSaleSoldCount++;
+                _promotionService.Update(flashPromo);
+            }
+        }
+
         await _unitOfWork.SaveChangesAsync();
 
         // Odeme baslatma
@@ -168,7 +228,10 @@ public class ReservationPaymentFactory : IReservationPaymentFactory
             paymentPageUrl = paymentResult.PaymentPageUrl,
             totalPrice,
             depositAmount,
-            depositPercentage
+            depositPercentage = priceResult.DepositPercentage,
+            discountAmount,
+            originalPrice = priceResult.SubTotal,
+            appliedDiscounts = priceResult.AppliedDiscounts
         }, 200);
     }
 

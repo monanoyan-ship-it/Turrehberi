@@ -59,4 +59,11 @@ public class MyCompanyController : Controller
         SetCommonViewData("CompanyBlog", "Blogum");
         return View();
     }
+
+    // Firma promosyonlari
+    public IActionResult Promotions()
+    {
+        SetCommonViewData("Promotions", "Promosyonlarim");
+        return View();
+    }
 }

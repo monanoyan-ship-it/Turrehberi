@@ -21,6 +21,13 @@ public class Reservation : BaseEntity
     public DateTime? PaidAt { get; set; }
     public string? PaymentToken { get; set; }
 
+    // Promosyon Bilgileri
+    public decimal DiscountAmount { get; set; }
+    public int? PromotionId { get; set; }
+    public string? AppliedPromotions { get; set; }
+    public string? CouponCode { get; set; }
+
     public virtual Tour Tour { get; set; } = null!;
     public virtual Visitor Visitor { get; set; } = null!;
+    public virtual Promotion? Promotion { get; set; }
 }

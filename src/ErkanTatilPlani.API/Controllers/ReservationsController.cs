@@ -151,7 +151,8 @@ public class ReservationsController : ControllerBase
             request.Notes,
             request.Address,
             request.StartDate,
-            customerIp);
+            customerIp,
+            request.CouponCode);
 
         return StatusCode(statusCode, result);
     }
@@ -215,4 +216,5 @@ public class CreateReservationRequest
     public string? Notes { get; set; }
     public string? Address { get; set; }
     public DateTime? StartDate { get; set; }
+    public string? CouponCode { get; set; }
 }

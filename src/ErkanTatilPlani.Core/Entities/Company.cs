@@ -122,6 +122,15 @@ public class Company : BaseEntity
     public int DepositPercentage { get; set; } = 30;
 
     // ===============================================
+    // PROMOSYON AYARLARI
+    // ===============================================
+
+    public bool EarlyBirdEnabled { get; set; }
+    public string? EarlyBirdRules { get; set; }
+    public bool GroupDiscountEnabled { get; set; }
+    public string? GroupDiscountRules { get; set; }
+
+    // ===============================================
 
     public virtual ICollection<Tour> Tours { get; set; } = new List<Tour>();
     public virtual ICollection<CompanyGalleryImage> GalleryImages { get; set; } = new List<CompanyGalleryImage>();

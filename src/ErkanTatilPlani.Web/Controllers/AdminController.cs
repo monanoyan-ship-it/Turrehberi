@@ -103,4 +103,11 @@ public class AdminController : Controller
         SetCommonViewData("EmailTemplates", "Email Sablonlari");
         return View();
     }
+
+    // Promosyon yonetimi (Staff ve Admin)
+    public IActionResult Promotions()
+    {
+        SetCommonViewData("Promotions", "Promosyon Yonetimi");
+        return View();
+    }
 }

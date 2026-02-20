@@ -1,0 +1,266 @@
+@{
+    Layout = "_CompanyLayout";
+}
+
+<div id="promotionsApp">
+    <!-- Yukleniyor -->
+    <div data-bind="visible: isLoading()" class="text-center py-5">
+        <div class="spinner-border text-primary" role="status">
+            <span class="visually-hidden">Yukleniyor...</span>
+        </div>
+        <p class="mt-3 text-muted" data-t="Common.Loading">Yukleniyor...</p>
+    </div>
+
+    <!-- Ana Icerik -->
+    <div data-bind="visible: !isLoading()">
+        <!-- Filtreler -->
+        <div class="row mb-3">
+            <div class="col-md-3">
+                <select class="form-select form-select-sm" data-bind="value: typeFilter">
+                    <option value="">Tum Tipler</option>
+                    <option value="0">Kupon</option>
+                    <option value="1">Erken Rez.</option>
+                    <option value="2">Son Dakika</option>
+                    <option value="3">Grup Ind.</option>
+                    <option value="4">Flash Sale</option>
+                    <option value="5">Paket</option>
+                    <option value="6">Dinamik Fiyat.</option>
+                </select>
+            </div>
+            <div class="col-md-3">
+                <select class="form-select form-select-sm" data-bind="value: statusFilter">
+                    <option value="">Tum Durumlar</option>
+                    <option value="0">Aktif</option>
+                    <option value="1">Devre Disi</option>
+                    <option value="2">Suresi Dolmus</option>
+                </select>
+            </div>
+        </div>
+
+        <!-- Promosyon Listesi -->
+        <div class="card">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <span><i class="bi bi-ticket-perforated me-2"></i><span data-t="Menu.MyPromotions">Promosyonlarim</span></span>
+                <button class="btn btn-sm btn-primary" data-bind="click: openAddModal">
+                    <i class="bi bi-plus me-1"></i><span data-t="Promotion.Create">Promosyon Olustur</span>
+                </button>
+            </div>
+            <div class="card-body p-0">
+                <!-- Veri yok -->
+                <div data-bind="visible: promotions().length === 0" class="text-center text-muted py-5">
+                    <i class="bi bi-ticket-perforated fs-1"></i>
+                    <p class="mt-3" data-t="Promotion.Create">Henuz promosyon eklenmemis</p>
+                </div>
+
+                <!-- Tablo -->
+                <div class="table-responsive" data-bind="visible: promotions().length > 0">
+                    <table class="table table-hover mb-0">
+                        <thead class="table-light">
+                            <tr>
+                                <th data-t="Promotion.Name">Ad</th>
+                                <th>Tip</th>
+                                <th data-t="Promotion.DiscountValue">Deger</th>
+                                <th data-t="Promotion.Code">Kod</th>
+                                <th data-t="Promotion.UsageCount">Kullanim</th>
+                                <th>Tarih</th>
+                                <th>Durum</th>
+                                <th></th>
+                            </tr>
+                        </thead>
+                        <tbody data-bind="foreach: promotions">
+                            <tr>
+                                <td data-bind="text: name"></td>
+                                <td>
+                                    <span class="badge" data-bind="text: promotionType, css: $parent.getTypeBadgeClass(promotionTypeId)"></span>
+                                </td>
+                                <td>
+                                    <span data-bind="text: $parent.formatDiscount(discountTypeId, discountValue)"></span>
+                                </td>
+                                <td>
+                                    <code data-bind="text: code || '-'"></code>
+                                </td>
+                                <td>
+                                    <span data-bind="text: usageCount + '/' + (usageLimit || '∞')"></span>
+                                </td>
+                                <td>
+                                    <small data-bind="text: $parent.formatDateRange(startDate, endDate)"></small>
+                                </td>
+                                <td>
+                                    <span class="badge" data-bind="text: status, css: $parent.getStatusBadgeClass(statusId)"></span>
+                                </td>
+                                <td>
+                                    <div class="btn-group btn-group-sm">
+                                        <button class="btn btn-outline-primary" data-bind="click: $parent.openEditModal" title="Duzenle">
+                                            <i class="bi bi-pencil"></i>
+                                        </button>
+                                        <button class="btn btn-outline-warning" data-bind="click: $parent.toggleStatus" title="Durum Degistir">
+                                            <i class="bi bi-toggle-on"></i>
+                                        </button>
+                                        <button class="btn btn-outline-danger" data-bind="click: $parent.deletePromotion" title="Sil">
+                                            <i class="bi bi-trash"></i>
+                                        </button>
+                                    </div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Promosyon Modal -->
+    <div class="modal fade" id="formModal" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" data-bind="text: isEditing() ? 'Promosyon Duzenle' : 'Yeni Promosyon'"></h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="row g-3">
+                        <!-- Temel Alanlar -->
+                        <div class="col-md-6">
+                            <label class="form-label" data-t="Promotion.Name">Promosyon Adi</label>
+                            <input type="text" class="form-control" data-bind="value: formData().name" />
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Promosyon Tipi</label>
+                            <select class="form-select" data-bind="value: formData().promotionTypeId, event: { change: onTypeChange }">
+                                <option value="0">Kupon</option>
+                                <option value="1">Erken Rezervasyon</option>
+                                <option value="2">Son Dakika</option>
+                                <option value="3">Grup Indirimi</option>
+                                <option value="4">Flash Sale</option>
+                                <option value="5">Paket</option>
+                                <option value="6">Dinamik Fiyatlandirma</option>
+                            </select>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Indirim Tipi</label>
+                            <select class="form-select" data-bind="value: formData().discountTypeId">
+                                <option value="0">Yuzde (%)</option>
+                                <option value="1">Sabit Tutar (TL)</option>
+                                <option value="2">Carpan</option>
+                            </select>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label" data-t="Promotion.DiscountValue">Indirim Degeri</label>
+                            <input type="number" class="form-control" step="0.01" data-bind="value: formData().discountValue" />
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label" data-t="Promotion.StartDate">Baslangic Tarihi</label>
+                            <input type="datetime-local" class="form-control" data-bind="value: formData().startDate" />
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label" data-t="Promotion.EndDate">Bitis Tarihi</label>
+                            <input type="datetime-local" class="form-control" data-bind="value: formData().endDate" />
+                        </div>
+                        <div class="col-12">
+                            <label class="form-label" data-t="Promotion.Description">Aciklama</label>
+                            <textarea class="form-control" rows="2" data-bind="value: formData().description"></textarea>
+                        </div>
+
+                        <!-- Kupon Alanlari -->
+                        <div data-bind="visible: formData().promotionTypeId == '0'" class="col-12">
+                            <hr />
+                            <h6><i class="bi bi-ticket-perforated me-1"></i>Kupon Ayarlari</h6>
+                            <div class="row g-3">
+                                <div class="col-md-4">
+                                    <label class="form-label" data-t="Promotion.Code">Kupon Kodu</label>
+                                    <input type="text" class="form-control" data-bind="value: formData().code" placeholder="INDIRIM20" />
+                                </div>
+                                <div class="col-md-4">
+                                    <label class="form-label" data-t="Promotion.UsageLimit">Kullanim Limiti</label>
+                                    <input type="number" class="form-control" data-bind="value: formData().usageLimit" />
+                                </div>
+                                <div class="col-md-4">
+                                    <label class="form-label" data-t="Promotion.UsageLimitPerUser">Kullanici Basi Limit</label>
+                                    <input type="number" class="form-control" data-bind="value: formData().usageLimitPerUser" />
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label" data-t="Promotion.MinOrderAmount">Min. Siparis Tutari</label>
+                                    <input type="number" class="form-control" step="0.01" data-bind="value: formData().minOrderAmount" />
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label" data-t="Promotion.MaxDiscountAmount">Max. Indirim Tutari</label>
+                                    <input type="number" class="form-control" step="0.01" data-bind="value: formData().maxDiscountAmount" />
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Erken Rezervasyon Alanlari -->
+                        <div data-bind="visible: formData().promotionTypeId == '1'" class="col-12">
+                            <hr />
+                            <h6><i class="bi bi-alarm me-1"></i>Erken Rezervasyon Ayarlari</h6>
+                            <div class="col-md-6">
+                                <label class="form-label" data-t="Promotion.MinDaysAhead">Min. Gun Oncesi</label>
+                                <input type="number" class="form-control" data-bind="value: formData().minDaysAhead" />
+                            </div>
+                        </div>
+
+                        <!-- Son Dakika Alanlari -->
+                        <div data-bind="visible: formData().promotionTypeId == '2'" class="col-12">
+                            <hr />
+                            <h6><i class="bi bi-lightning me-1"></i>Son Dakika Ayarlari</h6>
+                            <div class="row g-3">
+                                <div class="col-md-6">
+                                    <label class="form-label" data-t="Promotion.MaxHoursBeforeStart">Max. Saat Oncesi</label>
+                                    <input type="number" class="form-control" data-bind="value: formData().maxHoursBeforeStart" />
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label">Min. Bos Kapasite %</label>
+                                    <input type="number" class="form-control" data-bind="value: formData().minAvailableCapacityPercent" />
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Grup Indirimi Alanlari -->
+                        <div data-bind="visible: formData().promotionTypeId == '3'" class="col-12">
+                            <hr />
+                            <h6><i class="bi bi-people me-1"></i>Grup Indirimi Ayarlari</h6>
+                            <div class="row g-3">
+                                <div class="col-md-6">
+                                    <label class="form-label" data-t="Promotion.MinGroupSize">Min. Grup Buyuklugu</label>
+                                    <input type="number" class="form-control" data-bind="value: formData().minGroupSize" />
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label" data-t="Promotion.MaxGroupSize">Max. Grup Buyuklugu</label>
+                                    <input type="number" class="form-control" data-bind="value: formData().maxGroupSize" />
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Flash Sale Alanlari -->
+                        <div data-bind="visible: formData().promotionTypeId == '4'" class="col-12">
+                            <hr />
+                            <h6><i class="bi bi-stopwatch me-1"></i>Flash Sale Ayarlari</h6>
+                            <div class="col-md-6">
+                                <label class="form-label" data-t="Promotion.FlashSaleStock">Stok Adedi</label>
+                                <input type="number" class="form-control" data-bind="value: formData().flashSaleStock" />
+                            </div>
+                        </div>
+
+                        <!-- Gecerli Turlar -->
+                        <div class="col-12">
+                            <hr />
+                            <label class="form-label" data-t="Promotion.ApplicableTours">Gecerli Turlar (bos = tum turlar)</label>
+                            <input type="text" class="form-control" data-bind="value: formData().applicableTourIds" placeholder="[1, 2, 3] veya bos birakin" />
+                            <small class="text-muted">JSON formatinda tur ID listesi. Bos birakirsaniz tum turlarda gecerli olur.</small>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" data-t="Common.Cancel">Iptal</button>
+                    <button type="button" class="btn btn-primary" data-bind="click: savePromotion">
+                        <i class="bi bi-check-lg me-1"></i><span data-t="Common.Save">Kaydet</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="~/js/MyCompany/Promotions.js"></script>
+}
