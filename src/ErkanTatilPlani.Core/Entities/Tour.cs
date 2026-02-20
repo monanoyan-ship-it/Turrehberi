@@ -54,6 +54,14 @@ public class Tour : BaseEntity
     /// </summary>
     public string? Exclusions { get; set; }
 
+    // ===============================================
+    // BULUSMA NOKTASI
+    // ===============================================
+
+    public double? MeetingPointLat { get; set; }
+    public double? MeetingPointLng { get; set; }
+    public string? MeetingPointAddress { get; set; }
+
     public int CompanyId { get; set; }
     public virtual Company Company { get; set; } = null!;
 
@@ -79,4 +87,5 @@ public class Tour : BaseEntity
     public virtual ICollection<TourReview> Reviews { get; set; } = new List<TourReview>();
     public virtual ICollection<FavoriteTour> FavoritedBy { get; set; } = new List<FavoriteTour>();
     public virtual ICollection<TourDate> TourDates { get; set; } = new List<TourDate>();
+    public virtual ICollection<TourWatch> TourWatches { get; set; } = new List<TourWatch>();
 }

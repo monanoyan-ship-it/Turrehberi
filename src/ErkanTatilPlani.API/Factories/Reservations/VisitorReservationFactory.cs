@@ -260,4 +260,38 @@ public class VisitorReservationFactory : IVisitorReservationFactory
 
         return (true, new { message = "Rezervasyon durumu guncellendi", status = newStatusItem!.SystemName }, 200);
     }
+
+    public async Task<(bool success, string message)> ChangeDateAsync(int visitorId, int reservationId, DateTime newStartDate)
+    {
+        var reservation = await _reservationService.GetByIdAsync(reservationId);
+        if (reservation == null || reservation.VisitorId != visitorId)
+            return (false, "Rezervasyon bulunamadi");
+
+        if (reservation.Status != ReservationStatuses.Ids.Confirmed)
+            return (false, "Sadece onaylanmis rezervasyonlar icin tarih degistirilebilir");
+
+        var tour = await _tourService.GetByIdAsync(reservation.TourId);
+        if (tour == null)
+            return (false, "Tur bulunamadi");
+
+        reservation.StartDate = DateTime.SpecifyKind(newStartDate, DateTimeKind.Utc);
+        reservation.EndDate = DateTime.SpecifyKind(newStartDate.AddDays(tour.DurationDays - 1), DateTimeKind.Utc);
+        reservation.UpdatedAt = DateTime.UtcNow;
+
+        await _unitOfWork.SaveChangesAsync();
+        return (true, "Tarih basariyla degistirildi");
+    }
+
+    public async Task<(bool success, string message)> UpdatePhotoLinkAsync(int reservationId, string photoLink)
+    {
+        var reservation = await _reservationService.GetByIdAsync(reservationId);
+        if (reservation == null)
+            return (false, "Rezervasyon bulunamadi");
+
+        reservation.PhotoLink = photoLink;
+        reservation.UpdatedAt = DateTime.UtcNow;
+
+        await _unitOfWork.SaveChangesAsync();
+        return (true, "Fotograf linki guncellendi");
+    }
 }

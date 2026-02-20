@@ -313,6 +313,59 @@
                     </div>
                 </div>
 
+                <!-- QR Kod Bilet -->
+                <div class="card shadow-sm border-0 mb-4" data-bind="visible: qrToken">
+                    <div class="card-header bg-white border-0">
+                        <h5 class="mb-0">
+                            <i class="bi bi-qr-code me-2 text-primary"></i>
+                            <span data-t="QrCode.Title">QR Kod Biletiniz</span>
+                        </h5>
+                    </div>
+                    <div class="card-body text-center">
+                        <div id="qrCodeContainer" class="mb-2"></div>
+                        <small class="text-muted" data-t="QrCode.Scan">Giris icin bu kodu okutunuz</small>
+                    </div>
+                </div>
+
+                <!-- Fotograf Linki -->
+                <div class="card shadow-sm border-0 mb-4" data-bind="visible: photoLink && statusId === 3">
+                    <div class="card-header bg-white border-0">
+                        <h5 class="mb-0">
+                            <i class="bi bi-camera me-2 text-primary"></i>
+                            <span data-t="PhotoLink.Title">Tur Fotograflari</span>
+                        </h5>
+                    </div>
+                    <div class="card-body text-center">
+                        <a data-bind="attr: { href: photoLink }" target="_blank" class="btn btn-outline-primary">
+                            <i class="bi bi-images me-1"></i> <span data-t="PhotoLink.View">Fotograflari Gor</span>
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Tarih Degistir -->
+                <div class="card shadow-sm border-0 mb-4" data-bind="visible: statusId === 1">
+                    <div class="card-header bg-white border-0">
+                        <h5 class="mb-0">
+                            <i class="bi bi-calendar-range me-2 text-primary"></i>
+                            <span data-t="DateChange.Title">Tarih Degistir</span>
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="mb-3">
+                            <label class="form-label small" data-t="DateChange.SelectNew">Yeni tarih seciniz</label>
+                            <input type="date" class="form-control" data-bind="value: $parent.newDate" />
+                        </div>
+                        <button class="btn btn-outline-primary w-100" data-bind="click: $parent.changeDate, disable: $parent.isChangingDate">
+                            <span data-bind="visible: !$parent.isChangingDate()">
+                                <i class="bi bi-calendar-check me-1"></i> <span data-t="DateChange.Title">Tarih Degistir</span>
+                            </span>
+                            <span data-bind="visible: $parent.isChangingDate">
+                                <span class="spinner-border spinner-border-sm me-1"></span>
+                            </span>
+                        </button>
+                    </div>
+                </div>
+
                 <!-- Actions Card -->
                 <div class="card shadow-sm border-0" data-bind="visible: canCancel">
                     <div class="card-header bg-white border-0">
@@ -354,6 +407,7 @@
 </div>
 
 @section Scripts {
+<script src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js"></script>
 <script>
 function ReservationDetailViewModel() {
     var self = this;
@@ -464,6 +518,58 @@ function ReservationDetailViewModel() {
             }
         });
     };
+
+    // Tarih degistirme
+    self.newDate = ko.observable('');
+    self.isChangingDate = ko.observable(false);
+
+    self.changeDate = function() {
+        if (!self.newDate()) {
+            toastr.warning(T('DateChange.SelectNew'));
+            return;
+        }
+
+        self.isChangingDate(true);
+        $.ajax({
+            url: apiBaseUrl + '/api/reservations/visitor/my/' + reservationId + '/change-date',
+            method: 'PUT',
+            contentType: 'application/json',
+            data: JSON.stringify({ newStartDate: self.newDate() }),
+            headers: { 'Authorization': 'Bearer ' + localStorage.getItem('token') }
+        }).done(function() {
+            toastr.success(T('DateChange.Success'));
+            self.loadReservation();
+            self.isChangingDate(false);
+        }).fail(function(xhr) {
+            toastr.error(xhr.responseJSON?.message || T('Common.Error'));
+            self.isChangingDate(false);
+        });
+    };
+
+    // QR kod olusturma (client-side)
+    self.generateQrCode = function() {
+        var r = self.reservation();
+        if (r && r.qrToken && typeof QRCode !== 'undefined') {
+            var container = document.getElementById('qrCodeContainer');
+            if (container) {
+                container.innerHTML = '';
+                new QRCode(container, {
+                    text: window.location.origin + '/api/reservations/' + reservationId + '/verify?token=' + r.qrToken,
+                    width: 180,
+                    height: 180,
+                    colorDark: '#000000',
+                    colorLight: '#ffffff'
+                });
+            }
+        }
+    };
+
+    // Reservation yuklendikten sonra QR kod olustur
+    self.reservation.subscribe(function(r) {
+        if (r && r.qrToken) {
+            setTimeout(function() { self.generateQrCode(); }, 100);
+        }
+    });
 
     // Initialize
     if (reservationId > 0) {

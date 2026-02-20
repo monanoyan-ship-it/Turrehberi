@@ -74,4 +74,6 @@ public class Visitor : BaseEntity
     public virtual ICollection<FavoriteTour> FavoriteTours { get; set; } = new List<FavoriteTour>();
     public virtual ICollection<BlogPost> BlogPosts { get; set; } = new List<BlogPost>();
     public virtual ICollection<BlogComment> BlogComments { get; set; } = new List<BlogComment>();
+    public virtual ICollection<TourWatch> TourWatches { get; set; } = new List<TourWatch>();
+    public virtual ICollection<Notification> Notifications { get; set; } = new List<Notification>();
 }

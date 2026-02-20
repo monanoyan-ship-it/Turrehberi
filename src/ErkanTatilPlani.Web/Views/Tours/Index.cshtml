@@ -262,6 +262,14 @@
                         title="Favorilere Ekle">
                     <i class="bi" data-bind="css: { 'bi-heart-fill': $parent.isFavorite(id), 'bi-heart': !$parent.isFavorite(id) }"></i>
                 </button>
+                <!-- Takip Et Butonu -->
+                <button class="btn btn-sm position-absolute top-0 end-0 m-2"
+                        style="margin-top: 36px !important;"
+                        data-bind="click: function() { $parent.openWatchPopover($data) },
+                                   css: { 'btn-info': $parent.isWatching(id), 'btn-outline-light': !$parent.isWatching(id) }"
+                        title="Takip Et">
+                    <i class="bi" data-bind="css: { 'bi-eye-fill': $parent.isWatching(id), 'bi-eye': !$parent.isWatching(id) }"></i>
+                </button>
             </div>
             <div class="card-body">
                 <h5 class="card-title" data-bind="text: name"></h5>
@@ -289,6 +297,12 @@
                     <!-- /ko -->
                 </p>
                 <p class="card-text" data-bind="text: description"></p>
+                <!-- Kitlik Badge -->
+                <!-- ko if: $parent.getRemainingSlots($data) > 0 && $parent.getRemainingSlots($data) <= 5 -->
+                <div class="mb-2">
+                    <span class="badge bg-danger"><i class="bi bi-exclamation-triangle"></i> <span data-bind="text: T('Scarcity.Badge').replace('{0}', $parent.getRemainingSlots($data))"></span></span>
+                </div>
+                <!-- /ko -->
                 <div class="d-flex justify-content-between align-items-center">
                     <span class="badge bg-primary fs-6" data-bind="text: price.toLocaleString('tr-TR', {style: 'currency', currency: 'TRY'})"></span>
                     <span class="text-muted"><i class="bi bi-calendar"></i> <span data-bind="text: durationDays"></span> gun</span>
@@ -872,6 +886,46 @@
                                     <label class="form-label">Not (Opsiyonel)</label>
                                     <textarea class="form-control" rows="2" data-bind="value: reservationData().notes" placeholder="Ozel isteklerinizi yazabilirsiniz..."></textarea>
                                 </div>
+                                <!-- Katilimci Bilgileri Accordion -->
+                                <div class="accordion mb-3" id="participantAccordion">
+                                    <div class="accordion-item">
+                                        <h2 class="accordion-header">
+                                            <button class="accordion-button collapsed py-2" type="button" data-bs-toggle="collapse" data-bs-target="#participantPanel">
+                                                <i class="bi bi-people me-2"></i> <span data-t="Participant.Title">Katilimci Bilgileri</span>
+                                                <span class="badge bg-secondary ms-2" data-bind="text: participants().length"></span>
+                                            </button>
+                                        </h2>
+                                        <div id="participantPanel" class="accordion-collapse collapse">
+                                            <div class="accordion-body p-2">
+                                                <div data-bind="foreach: participants">
+                                                    <div class="card mb-2">
+                                                        <div class="card-body p-2">
+                                                            <div class="d-flex justify-content-between align-items-center mb-1">
+                                                                <small class="fw-semibold">Katilimci <span data-bind="text: $index() + 1"></span></small>
+                                                                <button class="btn btn-outline-danger btn-sm py-0" data-bind="click: $parent.removeParticipant"><i class="bi bi-x"></i></button>
+                                                            </div>
+                                                            <div class="row g-1">
+                                                                <div class="col-6">
+                                                                    <input type="text" class="form-control form-control-sm" data-bind="value: name" placeholder="Ad Soyad" />
+                                                                </div>
+                                                                <div class="col-2">
+                                                                    <input type="number" class="form-control form-control-sm" data-bind="value: age" placeholder="Yas" min="0" max="120" />
+                                                                </div>
+                                                                <div class="col-4">
+                                                                    <input type="text" class="form-control form-control-sm" data-bind="value: diet" placeholder="Diyet" />
+                                                                </div>
+                                                            </div>
+                                                            <input type="text" class="form-control form-control-sm mt-1" data-bind="value: health" placeholder="Saglik notu (opsiyonel)" />
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <button class="btn btn-outline-primary btn-sm w-100" data-bind="click: addParticipant">
+                                                    <i class="bi bi-plus"></i> <span data-t="Participant.Add">Katilimci Ekle</span>
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
                             </form>
                         </div>
                         <!-- Sag Kolon - Fiyat Ozeti -->
@@ -1056,6 +1110,32 @@
 #toursMap .leaflet-popup-content-wrapper { border-radius: 8px; }
 </style>
 
+<!-- Takip Et Modal -->
+<div class="modal fade" id="watchModal" tabindex="-1">
+    <div class="modal-dialog modal-sm modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h6 class="modal-title"><i class="bi bi-eye"></i> <span data-t="Watch.Title">Tur Takip</span></h6>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body" data-bind="with: watchTarget">
+                <p class="mb-2 fw-semibold" data-bind="text: name"></p>
+                <label class="form-label small" data-t="Watch.HowManyDays">Kac gun takip etmek istiyorsunuz?</label>
+                <div class="input-group input-group-sm mb-3">
+                    <input type="number" class="form-control" min="1" max="90" data-bind="value: $parent.watchDays" />
+                    <span class="input-group-text" data-t="Watch.Days">Gun</span>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal" data-t="Common.Cancel">Iptal</button>
+                <button type="button" class="btn btn-info btn-sm" data-bind="click: toggleWatch">
+                    <i class="bi bi-eye"></i> <span data-t="Watch.Button">Takip Et</span>
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
 @section Scripts {
 <script>
 function ToursViewModel() {
@@ -1125,6 +1205,98 @@ function ToursViewModel() {
                 self.favoriteIds(response.favoriteIds || []);
             }
         });
+    };
+
+    // ===============================================
+    // TUR TAKIP (WATCH) SISTEMI
+    // ===============================================
+    self.watchedIds = ko.observableArray([]);
+    self.watchTarget = ko.observable(null);
+    self.watchDays = ko.observable(7);
+
+    self.isWatching = function(tourId) {
+        return self.watchedIds().indexOf(tourId) !== -1;
+    };
+
+    self.loadWatches = function() {
+        var token = localStorage.getItem('token');
+        if (!token) return;
+
+        var tourIds = self.tours().map(function(t) { return t.id; });
+        if (tourIds.length === 0) return;
+
+        $.ajax({
+            url: apiBaseUrl + '/api/watches/check-multiple',
+            method: 'POST',
+            contentType: 'application/json',
+            data: JSON.stringify(tourIds),
+            headers: { 'Authorization': 'Bearer ' + token },
+            success: function(response) {
+                self.watchedIds(response.watchedIds || []);
+            }
+        });
+    };
+
+    self.openWatchPopover = function(tour) {
+        if (!isLoggedIn()) {
+            toastr.warning(T('Common.LoginRequired') || 'Giris yapmaniz gerekiyor');
+            window.location.href = '/Account/Login';
+            return;
+        }
+        // Zaten takip ediyorsa direkt kaldir
+        if (self.isWatching(tour.id)) {
+            self.removeWatch(tour);
+            return;
+        }
+        self.watchTarget(tour);
+        self.watchDays(7);
+        watchModal.show();
+    };
+
+    self.toggleWatch = function() {
+        var tour = self.watchTarget();
+        if (!tour) return;
+
+        $.ajax({
+            url: apiBaseUrl + '/api/watches/' + tour.id + '/toggle',
+            method: 'POST',
+            contentType: 'application/json',
+            data: JSON.stringify({ watchDays: parseInt(self.watchDays()) })
+        }).done(function(response) {
+            if (response.isWatching) {
+                if (self.watchedIds().indexOf(tour.id) === -1) {
+                    self.watchedIds.push(tour.id);
+                }
+                toastr.success(T('Watch.Added'));
+            } else {
+                self.watchedIds.remove(tour.id);
+                toastr.success(T('Watch.Removed'));
+            }
+            watchModal.hide();
+        }).fail(function(xhr) {
+            toastr.error(xhr.responseJSON?.message || T('Common.Error'));
+        });
+    };
+
+    self.removeWatch = function(tour) {
+        $.ajax({
+            url: apiBaseUrl + '/api/watches/' + tour.id,
+            method: 'DELETE'
+        }).done(function() {
+            self.watchedIds.remove(tour.id);
+            toastr.success(T('Watch.Removed'));
+        }).fail(function(xhr) {
+            toastr.error(xhr.responseJSON?.message || T('Common.Error'));
+        });
+    };
+
+    // ===============================================
+    // KITLIK (SCARCITY)
+    // ===============================================
+    self.getRemainingSlots = function(tour) {
+        if (!tour.maxCapacity) return 999;
+        var activeReservations = tour.activeReservationCount || 0;
+        return tour.maxCapacity - activeReservations;
     };
 
     // Favori toggle
@@ -1280,6 +1452,17 @@ function ToursViewModel() {
         notes: ''
     });
 
+    // Katilimci bilgileri
+    self.participants = ko.observableArray([]);
+
+    self.addParticipant = function() {
+        self.participants.push({ name: ko.observable(''), age: ko.observable(''), diet: ko.observable(''), health: ko.observable('') });
+    };
+
+    self.removeParticipant = function(participant) {
+        self.participants.remove(participant);
+    };
+
     // Kisi sayisi icin ayri observable (fiyat hesaplamasi icin)
     self.numberOfPeople = ko.observable(1);
 
@@ -1320,7 +1503,7 @@ function ToursViewModel() {
     };
 
     // Modal referanslari
-    var detailsModal, reservationModal, writeReviewModal, replyModal, reportModal;
+    var detailsModal, reservationModal, writeReviewModal, replyModal, reportModal, watchModal;
 
     // Seyahat tipi isimleri
     var travelTypes = {
@@ -1532,8 +1715,9 @@ function ToursViewModel() {
         if (self.viewMode() === 'map' && self.map) {
             self.updateMarkers();
         }
-        // Favorileri yukle
+        // Favorileri ve takipleri yukle
         self.loadFavorites();
+        self.loadWatches();
     });
 
     // Siralama degistiginde otomatik yukle
@@ -1939,6 +2123,14 @@ function ToursViewModel() {
 
         self.isSaving(true);
 
+        // Katilimci bilgilerini JSON olarak hazirla
+        var participantInfo = null;
+        if (self.participants().length > 0) {
+            participantInfo = JSON.stringify(self.participants().map(function(p) {
+                return { name: p.name(), age: p.age(), diet: p.diet(), health: p.health() };
+            }));
+        }
+
         var requestData = {
             tourId: tour.id,
             fullName: data.fullName,
@@ -1946,7 +2138,8 @@ function ToursViewModel() {
             phone: data.phone,
             numberOfPeople: self.numberOfPeople(),
             notes: data.notes || '',
-            couponCode: self.couponCode() || null
+            couponCode: self.couponCode() || null,
+            participantInfo: participantInfo
         };
 
         $.ajax({
@@ -2027,6 +2220,7 @@ function ToursViewModel() {
         writeReviewModal = new bootstrap.Modal(document.getElementById('writeReviewModal'));
         replyModal = new bootstrap.Modal(document.getElementById('replyModal'));
         reportModal = new bootstrap.Modal(document.getElementById('reportModal'));
+        watchModal = new bootstrap.Modal(document.getElementById('watchModal'));
         self.loadData();
         self.loadCompanies();
         self.loadCategories();

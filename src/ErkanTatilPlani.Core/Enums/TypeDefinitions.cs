@@ -194,6 +194,45 @@ public static class PaymentStatuses
 }
 
 // ============================================================
+// NOTIFICATION TYPES (Bildirim Tipleri)
+// ============================================================
+public static class NotificationTypes
+{
+    public static readonly TypeItem Scarcity = new(0, "Scarcity", "NotificationType.Scarcity",
+        "Son X yer kaldi bildirimi",
+        "bi-exclamation-triangle", "bg-warning text-dark", 1);
+
+    public static readonly TypeItem PriceChange = new(1, "PriceChange", "NotificationType.PriceChange",
+        "Fiyat degisikligi bildirimi",
+        "bi-graph-down-arrow", "bg-info", 2);
+
+    public static readonly TypeItem NewDate = new(2, "NewDate", "NotificationType.NewDate",
+        "Yeni tarih eklendi bildirimi",
+        "bi-calendar-plus", "bg-success", 3);
+
+    public static readonly TypeItem Reservation = new(3, "Reservation", "NotificationType.Reservation",
+        "Rezervasyon bildirimi",
+        "bi-calendar-check", "bg-primary", 4);
+
+    public static readonly TypeItem System = new(4, "System", "NotificationType.System",
+        "Genel sistem bildirimi",
+        "bi-bell", "bg-secondary", 5);
+
+    public static IEnumerable<TypeItem> All => new[] { Scarcity, PriceChange, NewDate, Reservation, System };
+    public static TypeItem? GetById(int id) => All.FirstOrDefault(x => x.Id == id);
+    public static TypeItem? GetBySystemName(string systemName) => All.FirstOrDefault(x => x.SystemName == systemName);
+
+    public static class Ids
+    {
+        public const int Scarcity = 0;
+        public const int PriceChange = 1;
+        public const int NewDate = 2;
+        public const int Reservation = 3;
+        public const int System = 4;
+    }
+}
+
+// ============================================================
 // PROMOTION TYPES (Promosyon Tipleri)
 // ============================================================
 public static class PromotionTypes

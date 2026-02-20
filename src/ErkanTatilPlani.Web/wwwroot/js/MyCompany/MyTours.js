@@ -25,7 +25,10 @@ function MyToursViewModel() {
         categoryId: '0',
         guideLanguages: '',
         inclusions: '',
-        exclusions: ''
+        exclusions: '',
+        meetingPointLat: '',
+        meetingPointLng: '',
+        meetingPointAddress: ''
     });
 
     // Delete
@@ -125,7 +128,10 @@ function MyToursViewModel() {
             categoryId: String(tour.categoryId || 0),
             guideLanguages: tour.guideLanguages || '',
             inclusions: tour.inclusions || '',
-            exclusions: tour.exclusions || ''
+            exclusions: tour.exclusions || '',
+            meetingPointLat: tour.meetingPointLat || '',
+            meetingPointLng: tour.meetingPointLng || '',
+            meetingPointAddress: tour.meetingPointAddress || ''
         });
         tourModal.show();
     };
@@ -155,6 +161,11 @@ function MyToursViewModel() {
         // Yeni alanlari int'e cevir
         data.difficultyId = parseInt(data.difficultyId) || 1;
         data.categoryId = parseInt(data.categoryId) || 0;
+
+        // Meeting point alanlari
+        data.meetingPointLat = data.meetingPointLat ? parseFloat(data.meetingPointLat) : null;
+        data.meetingPointLng = data.meetingPointLng ? parseFloat(data.meetingPointLng) : null;
+        data.meetingPointAddress = data.meetingPointAddress || null;
 
         var isEdit = self.isEditing();
         var url = isEdit ? apiBaseUrl + '/api/tours/' + self.editingTourId() : apiBaseUrl + '/api/tours';

@@ -5,11 +5,13 @@ using ErkanTatilPlani.API.Factories.EmailAccounts;
 using ErkanTatilPlani.API.Factories.EmailTemplates;
 using ErkanTatilPlani.API.Factories.Favorites;
 using ErkanTatilPlani.API.Factories.Languages;
+using ErkanTatilPlani.API.Factories.Notifications;
 using ErkanTatilPlani.API.Factories.Payments;
 using ErkanTatilPlani.API.Factories.Reservations;
 using ErkanTatilPlani.API.Factories.Reviews;
 using ErkanTatilPlani.API.Factories.TourDates;
 using ErkanTatilPlani.API.Factories.Tours;
+using ErkanTatilPlani.API.Factories.TourWatches;
 using ErkanTatilPlani.API.Factories.Promotions;
 using ErkanTatilPlani.API.Factories.Visitors;
 using ErkanTatilPlani.Core.Factories.Auth;
@@ -19,12 +21,14 @@ using ErkanTatilPlani.Core.Factories.EmailAccounts;
 using ErkanTatilPlani.Core.Factories.EmailTemplates;
 using ErkanTatilPlani.Core.Factories.Favorites;
 using ErkanTatilPlani.Core.Factories.Languages;
+using ErkanTatilPlani.Core.Factories.Notifications;
 using ErkanTatilPlani.Core.Factories.Payments;
 using ErkanTatilPlani.Core.Factories.Promotions;
 using ErkanTatilPlani.Core.Factories.Reservations;
 using ErkanTatilPlani.Core.Factories.Reviews;
 using ErkanTatilPlani.Core.Factories.TourDates;
 using ErkanTatilPlani.Core.Factories.Tours;
+using ErkanTatilPlani.Core.Factories.TourWatches;
 using ErkanTatilPlani.Core.Factories.Visitors;
 
 namespace ErkanTatilPlani.API.DependencyInjection;
@@ -80,6 +84,12 @@ public static class FactoryRegistration
         // Promotion factories (2)
         services.AddScoped<IPromotionCrudFactory, PromotionCrudFactory>();
         services.AddScoped<IPromotionCalculationFactory, PromotionCalculationFactory>();
+
+        // TourWatch factories (1)
+        services.AddScoped<ITourWatchFactory, TourWatchFactory>();
+
+        // Notification factories (1)
+        services.AddScoped<INotificationFactory, NotificationFactory>();
 
         // Company factories (6)
         services.AddScoped<ICompanyCrudFactory, CompanyCrudFactory>();

@@ -1,6 +1,7 @@
 using ErkanTatilPlani.Core.Entities;
 using ErkanTatilPlani.Core.EntityServices;
 using ErkanTatilPlani.Core.Enums;
+using ErkanTatilPlani.Core.Factories.Notifications;
 using ErkanTatilPlani.Core.Factories.Promotions;
 using ErkanTatilPlani.Core.Factories.Reservations;
 using ErkanTatilPlani.Core.Infrastructure;
@@ -22,6 +23,7 @@ public class ReservationPaymentFactory : IReservationPaymentFactory
     private readonly IConfiguration _configuration;
     private readonly IPromotionCalculationFactory _promotionCalculation;
     private readonly IPromotionEntityService _promotionService;
+    private readonly INotificationFactory _notificationFactory;
 
     public ReservationPaymentFactory(
         ITourEntityService tourService,
@@ -32,7 +34,8 @@ public class ReservationPaymentFactory : IReservationPaymentFactory
         IEmailService emailService,
         IConfiguration configuration,
         IPromotionCalculationFactory promotionCalculation,
-        IPromotionEntityService promotionService)
+        IPromotionEntityService promotionService,
+        INotificationFactory notificationFactory)
     {
         _tourService = tourService;
         _visitorService = visitorService;
@@ -43,6 +46,7 @@ public class ReservationPaymentFactory : IReservationPaymentFactory
         _configuration = configuration;
         _promotionCalculation = promotionCalculation;
         _promotionService = promotionService;
+        _notificationFactory = notificationFactory;
     }
 
     public async Task<(bool success, object result, int statusCode)> CreatePublicReservationAsync(
@@ -270,6 +274,9 @@ public class ReservationPaymentFactory : IReservationPaymentFactory
             reservation.PaidAt = DateTime.UtcNow;
             reservation.Status = ReservationStatuses.Ids.Confirmed;
 
+            // QR token olustur
+            reservation.QrToken = Guid.NewGuid().ToString("N");
+
             // Tam odeme mi on odeme mi kontrol et
             if (reservation.PaidAmount >= reservation.TotalPrice)
             {
@@ -281,6 +288,35 @@ public class ReservationPaymentFactory : IReservationPaymentFactory
             }
 
             await _unitOfWork.SaveChangesAsync();
+
+            // Rezervasyon onay bildirimi
+            try
+            {
+                await _notificationFactory.CreateReservationNotificationAsync(
+                    reservation.VisitorId, reservation.Id, "confirmed");
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Bildirim hatasi: {ex.Message}");
+            }
+
+            // Kitlik bildirimi - kalan yer kontrolu
+            try
+            {
+                var activeCount = await _reservationService.GetActiveReservations()
+                    .CountAsync(r => r.TourId == reservation.TourId
+                        && (r.Status == ReservationStatuses.Ids.Pending || r.Status == ReservationStatuses.Ids.Confirmed));
+                var tour = reservation.Tour;
+                var remaining = tour.MaxCapacity - activeCount;
+                if (remaining > 0 && remaining <= 5)
+                {
+                    await _notificationFactory.CreateScarcityNotificationsAsync(tour.Id, remaining);
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Kitlik bildirimi hatasi: {ex.Message}");
+            }
 
             // Onay emaili gonder
             try
@@ -312,7 +348,8 @@ public class ReservationPaymentFactory : IReservationPaymentFactory
                 success = true,
                 message = "Odeme basarili",
                 reservationId = reservation.Id,
-                paymentId = paymentResult.PaymentId
+                paymentId = paymentResult.PaymentId,
+                qrToken = reservation.QrToken
             }, 200);
         }
         else

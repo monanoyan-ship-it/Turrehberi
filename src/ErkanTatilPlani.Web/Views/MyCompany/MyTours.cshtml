@@ -201,6 +201,24 @@
                                 <textarea class="form-control" rows="3" data-bind="value: formData().exclusions" placeholder="Her satira bir madde yazin"></textarea>
                             </div>
 
+                            <!-- Bulusma Noktasi -->
+                            <div class="col-12">
+                                <hr class="my-2">
+                                <h6 class="text-muted"><i class="bi bi-geo-alt-fill me-1"></i><span data-t="MeetingPoint.Title">Bulusma Noktasi</span></h6>
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label" data-t="MeetingPoint.Lat">Enlem</label>
+                                <input type="number" class="form-control" data-bind="value: formData().meetingPointLat" step="0.000001" placeholder="41.0082">
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label" data-t="MeetingPoint.Lng">Boylam</label>
+                                <input type="number" class="form-control" data-bind="value: formData().meetingPointLng" step="0.000001" placeholder="28.9784">
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label" data-t="MeetingPoint.Address">Adres</label>
+                                <input type="text" class="form-control" data-bind="value: formData().meetingPointAddress" placeholder="Sultanahmet Meydani">
+                            </div>
+
                             <!-- One Cikan -->
                             <div class="col-12">
                                 <div class="form-check">

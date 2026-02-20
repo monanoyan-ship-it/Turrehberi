@@ -27,6 +27,12 @@ public class Reservation : BaseEntity
     public string? AppliedPromotions { get; set; }
     public string? CouponCode { get; set; }
 
+    // Katilimci ve Bilet Bilgileri
+    public string? ParticipantInfo { get; set; }
+    public string? QrCode { get; set; }
+    public string? QrToken { get; set; }
+    public string? PhotoLink { get; set; }
+
     public virtual Tour Tour { get; set; } = null!;
     public virtual Visitor Visitor { get; set; } = null!;
     public virtual Promotion? Promotion { get; set; }

@@ -21,6 +21,8 @@ public static class EntityServiceRegistration
         services.AddScoped<ICompanyPageEntityService, CompanyPageEntityService>();
         services.AddScoped<ITourDateEntityService, TourDateEntityService>();
         services.AddScoped<IPromotionEntityService, PromotionEntityService>();
+        services.AddScoped<ITourWatchEntityService, TourWatchEntityService>();
+        services.AddScoped<INotificationEntityService, NotificationEntityService>();
         return services;
     }
 }

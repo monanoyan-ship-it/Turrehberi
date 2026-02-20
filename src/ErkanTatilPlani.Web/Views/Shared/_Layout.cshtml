@@ -140,6 +140,27 @@
                             <!-- Dinamik olarak doldurulacak -->
                         </ul>
                     </div>
+                    <!-- Bildirim Zili (Sadece giris yapmis kullanicilar) -->
+                    <div id="notificationBell" class="dropdown me-2" style="display: none;">
+                        <button class="btn btn-outline-secondary btn-sm position-relative" type="button" data-bs-toggle="dropdown" aria-expanded="false" id="notificationBellBtn">
+                            <i class="bi bi-bell"></i>
+                            <span id="notificationBadge" class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger" style="display: none; font-size: 0.6rem;">
+                                0
+                            </span>
+                        </button>
+                        <div class="dropdown-menu dropdown-menu-end p-0" style="width: 320px; max-height: 400px;" id="notificationDropdown">
+                            <div class="d-flex justify-content-between align-items-center px-3 py-2 border-bottom">
+                                <strong data-t="Notification.Title">Bildirimler</strong>
+                                <button class="btn btn-link btn-sm text-decoration-none p-0" onclick="markAllNotificationsRead()" data-t="Notification.MarkAllRead">Tumunu Okundu Isaretle</button>
+                            </div>
+                            <div id="notificationList" class="overflow-auto" style="max-height: 300px;">
+                                <div class="text-center text-muted py-3" data-t="Notification.Empty">Bildiriminiz bulunmuyor</div>
+                            </div>
+                            <div class="border-top text-center py-2">
+                                <a href="/Account/Notifications" class="text-decoration-none small" data-t="Notification.ViewAll">Tumunu Gor</a>
+                            </div>
+                        </div>
+                    </div>
                     <!-- Auth Buttons -->
                     <div id="authButtons">
                         <!-- Giris yapilmamis durum -->
@@ -388,11 +409,107 @@
                 if (user.userTypeId >= 1) {
                     $('#adminMenuItem').show();
                 }
+                // Bildirim zili goster ve yukle
+                $('#notificationBell').show();
+                loadNotificationCount();
             } else {
                 $('#notLoggedIn').show();
                 $('#loggedIn').hide();
+                $('#notificationBell').hide();
             }
         }
+
+        // ===============================================
+        // BILDIRIM SISTEMI
+        // ===============================================
+        function loadNotificationCount() {
+            $.ajax({
+                url: apiBaseUrl + '/api/notifications/unread-count',
+                method: 'GET'
+            }).done(function(data) {
+                var count = data.count || 0;
+                if (count > 0) {
+                    $('#notificationBadge').text(count > 99 ? '99+' : count).show();
+                } else {
+                    $('#notificationBadge').hide();
+                }
+            });
+        }
+
+        function loadNotificationDropdown() {
+            $.ajax({
+                url: apiBaseUrl + '/api/notifications?page=1&pageSize=5',
+                method: 'GET'
+            }).done(function(data) {
+                var list = $('#notificationList');
+                if (!data.notifications || data.notifications.length === 0) {
+                    list.html('<div class="text-center text-muted py-3">' + T('Notification.Empty') + '</div>');
+                    return;
+                }
+                var html = '';
+                data.notifications.forEach(function(n) {
+                    var icon = n.notificationIcon || 'bi-bell';
+                    var css = n.notificationCss || 'bg-secondary';
+                    var title = T(n.titleKey) || n.titleKey;
+                    var msg = T(n.messageKey) || n.messageKey;
+                    if (n.messageParams) {
+                        try {
+                            var params = JSON.parse(n.messageParams);
+                            Object.keys(params).forEach(function(k) {
+                                msg = msg.replace('{' + k + '}', params[k]);
+                            });
+                        } catch(e) {}
+                    }
+                    var readClass = n.isRead ? 'opacity-50' : '';
+                    var ago = timeAgo(n.createdAt);
+                    html += '<a href="#" class="dropdown-item border-bottom px-3 py-2 ' + readClass + '" onclick="markNotificationRead(' + n.id + ', this)">' +
+                        '<div class="d-flex align-items-start">' +
+                        '<span class="badge ' + css + ' me-2 mt-1"><i class="bi ' + icon + '"></i></span>' +
+                        '<div class="flex-grow-1">' +
+                        '<div class="fw-semibold small">' + title + '</div>' +
+                        '<div class="text-muted small text-wrap">' + msg + '</div>' +
+                        '<div class="text-muted small">' + ago + '</div>' +
+                        '</div></div></a>';
+                });
+                list.html(html);
+            });
+        }
+
+        function markNotificationRead(id, el) {
+            $.ajax({
+                url: apiBaseUrl + '/api/notifications/' + id + '/read',
+                method: 'PUT'
+            }).done(function() {
+                if (el) $(el).addClass('opacity-50');
+                loadNotificationCount();
+            });
+        }
+
+        function markAllNotificationsRead() {
+            $.ajax({
+                url: apiBaseUrl + '/api/notifications/read-all',
+                method: 'PUT'
+            }).done(function() {
+                loadNotificationCount();
+                loadNotificationDropdown();
+                toastr.success(T('Notification.MarkAllRead'));
+            });
+        }
+
+        function timeAgo(dateStr) {
+            var now = new Date();
+            var date = new Date(dateStr);
+            var diff = Math.floor((now - date) / 1000);
+            if (diff < 60) return diff + 's';
+            if (diff < 3600) return Math.floor(diff/60) + 'm';
+            if (diff < 86400) return Math.floor(diff/3600) + 'h';
+            return Math.floor(diff/86400) + 'd';
+        }
+
+        // Dropdown acildiginda bildirimleri yukle
+        $(document).on('show.bs.dropdown', '#notificationBell', function() {
+            loadNotificationDropdown();
+        });
 
         // Add auth header to all AJAX requests
         $.ajaxSetup({

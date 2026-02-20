@@ -106,6 +106,10 @@ curl -X PUT http://127.0.0.1:41847/api/tasks/TASK_ID -H "Content-Type: applicati
 
 ClaudeManager dashboard: `http://127.0.0.1:41847/`
 
+### Bash + Node.js Uyari
+
+Windows bash ortaminda `!` karakteri escape edilir (`\!`). Node.js inline `-e` kullanirken `!==` gibi ifadeler bozulur. Cozum: JS kodunu gecici dosyaya yaz, `node dosya.js` ile calistir. Ayrica `/tmp` yolu Windows'ta `$TEMP` olarak cevrilir, `node` icin tam Windows yolu kullan (`C:\\Users\\...`).
+
 ---
 
 ## Gelistirme Kurallari

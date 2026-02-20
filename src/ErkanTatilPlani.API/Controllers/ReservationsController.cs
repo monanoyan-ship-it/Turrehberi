@@ -113,6 +113,27 @@ public class ReservationsController : ControllerBase
         return StatusCode(statusCode, result);
     }
 
+    [HttpPut("visitor/my/{id}/change-date")]
+    [Authorize]
+    public async Task<IActionResult> ChangeDateVisitorReservation(int id, [FromBody] ChangeDateRequest request)
+    {
+        var visitorId = GetVisitorId();
+        if (visitorId == null) return Unauthorized(new { message = "Giris yapmaniz gerekiyor" });
+
+        var (success, message) = await _visitor.ChangeDateAsync(visitorId.Value, id, request.NewStartDate);
+        if (!success) return BadRequest(new { message });
+        return Ok(new { message });
+    }
+
+    [HttpPut("{id}/photo-link")]
+    [Authorize]
+    public async Task<IActionResult> UpdatePhotoLink(int id, [FromBody] PhotoLinkRequest request)
+    {
+        var (success, message) = await _visitor.UpdatePhotoLinkAsync(id, request.PhotoLink);
+        if (!success) return BadRequest(new { message });
+        return Ok(new { message });
+    }
+
     [HttpGet("{id}")]
     public async Task<ActionResult<Reservation>> GetReservation(int id)
     {
@@ -217,4 +238,15 @@ public class CreateReservationRequest
     public string? Address { get; set; }
     public DateTime? StartDate { get; set; }
     public string? CouponCode { get; set; }
+    public string? ParticipantInfo { get; set; }
+}
+
+public class ChangeDateRequest
+{
+    public DateTime NewStartDate { get; set; }
+}
+
+public class PhotoLinkRequest
+{
+    public string PhotoLink { get; set; } = string.Empty;
 }

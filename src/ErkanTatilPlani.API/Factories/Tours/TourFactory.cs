@@ -74,7 +74,29 @@ public class TourFactory : ITourFactory
             _ => query.OrderByDescending(t => t.IsFeatured).ThenByDescending(t => t.AverageRating)
         };
 
-        var tours = await query.ToListAsync();
+        // Aktif rezervasyon sayilarini da getir (kitlik badge icin)
+        var toursWithReservations = await query
+            .Select(t => new
+            {
+                Tour = t,
+                ActiveReservationCount = t.Reservations.Count(r => r.IsActive && (r.Status == ReservationStatuses.Ids.Pending || r.Status == ReservationStatuses.Ids.Confirmed))
+            })
+            .ToListAsync();
+
+        var tours = toursWithReservations.Select(t => new
+        {
+            t.Tour.Id, t.Tour.Name, t.Tour.Description, t.Tour.Destination,
+            t.Tour.Price, t.Tour.DurationDays, t.Tour.MaxCapacity,
+            t.Tour.ImageUrl, t.Tour.IsFeatured,
+            t.Tour.Latitude, t.Tour.Longitude,
+            t.Tour.DifficultyId, t.Tour.CategoryId,
+            t.Tour.GuideLanguages, t.Tour.Inclusions, t.Tour.Exclusions,
+            t.Tour.MeetingPointLat, t.Tour.MeetingPointLng, t.Tour.MeetingPointAddress,
+            t.Tour.CompanyId, Company = t.Tour.Company,
+            t.Tour.ReviewCount, t.Tour.AverageRating,
+            t.ActiveReservationCount,
+            t.Tour.CreatedAt, t.Tour.IsActive
+        }).ToList();
 
         var allTours = await _tourService.GetActiveToursWithCompany()
             .Where(t => t.Company!.StatusId == CompanyStatuses.Ids.Approved)

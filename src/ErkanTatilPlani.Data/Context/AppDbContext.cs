@@ -52,6 +52,10 @@ public class AppDbContext : DbContext
     public DbSet<EmailTemplate> EmailTemplates => Set<EmailTemplate>();
     public DbSet<EmailTemplateTranslation> EmailTemplateTranslations => Set<EmailTemplateTranslation>();
 
+    // Tour Watch & Notifications
+    public DbSet<TourWatch> TourWatches => Set<TourWatch>();
+    public DbSet<Notification> Notifications => Set<Notification>();
+
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         base.OnModelCreating(modelBuilder);
@@ -531,6 +535,61 @@ public class AppDbContext : DbContext
                   .HasForeignKey(e => e.VisitorId)
                   .IsRequired(false)
                   .OnDelete(DeleteBehavior.SetNull);
+        });
+
+        // ===============================================
+        // TUR TAKIP (TOUR WATCH)
+        // ===============================================
+
+        modelBuilder.Entity<TourWatch>(entity =>
+        {
+            entity.HasKey(e => e.Id);
+            entity.HasIndex(e => new { e.VisitorId, e.TourId }).IsUnique();
+
+            entity.HasOne(e => e.Visitor)
+                  .WithMany(v => v.TourWatches)
+                  .HasForeignKey(e => e.VisitorId)
+                  .OnDelete(DeleteBehavior.Cascade);
+
+            entity.HasOne(e => e.Tour)
+                  .WithMany(t => t.TourWatches)
+                  .HasForeignKey(e => e.TourId)
+                  .OnDelete(DeleteBehavior.Cascade);
+        });
+
+        // ===============================================
+        // BILDIRIMLER (NOTIFICATIONS)
+        // ===============================================
+
+        modelBuilder.Entity<Notification>(entity =>
+        {
+            entity.HasKey(e => e.Id);
+            entity.Property(e => e.TitleKey).IsRequired().HasMaxLength(200);
+            entity.Property(e => e.MessageKey).IsRequired().HasMaxLength(200);
+            entity.Property(e => e.MessageParams).HasMaxLength(1000);
+            entity.Property(e => e.RelatedEntityType).HasMaxLength(50);
+
+            entity.HasIndex(e => new { e.VisitorId, e.IsRead });
+            entity.HasIndex(e => e.CreatedAt);
+
+            entity.HasOne(e => e.Visitor)
+                  .WithMany(v => v.Notifications)
+                  .HasForeignKey(e => e.VisitorId)
+                  .OnDelete(DeleteBehavior.Cascade);
+        });
+
+        // Reservation - yeni alanlar
+        modelBuilder.Entity<Reservation>(entity =>
+        {
+            entity.Property(e => e.QrCode).HasMaxLength(500);
+            entity.Property(e => e.QrToken).HasMaxLength(100);
+            entity.Property(e => e.PhotoLink).HasMaxLength(500);
+        });
+
+        // Tour - bulusma noktasi
+        modelBuilder.Entity<Tour>(entity =>
+        {
+            entity.Property(e => e.MeetingPointAddress).HasMaxLength(500);
         });
 
         // Seed Data
