@@ -32,7 +32,7 @@ public class TourDatesController : ControllerBase
     }
 
     [HttpGet("tours/{tourId}/dates/manage")]
-    [Authorize]
+    [Authorize(Roles = "CompanyOwner,Staff,Admin")]
     public async Task<ActionResult<object>> ManageTourDates(int tourId)
     {
         var visitorId = GetVisitorId();
@@ -48,7 +48,7 @@ public class TourDatesController : ControllerBase
     }
 
     [HttpPost("tours/{tourId}/dates")]
-    [Authorize]
+    [Authorize(Roles = "CompanyOwner,Staff,Admin")]
     public async Task<ActionResult<TourDate>> CreateTourDate(int tourId, TourDate tourDate)
     {
         var visitorId = GetVisitorId();
@@ -65,7 +65,7 @@ public class TourDatesController : ControllerBase
     }
 
     [HttpPut("tour-dates/{id}")]
-    [Authorize]
+    [Authorize(Roles = "CompanyOwner,Staff,Admin")]
     public async Task<IActionResult> UpdateTourDate(int id, TourDate tourDate)
     {
         var visitorId = GetVisitorId();
@@ -81,7 +81,7 @@ public class TourDatesController : ControllerBase
     }
 
     [HttpDelete("tour-dates/{id}")]
-    [Authorize]
+    [Authorize(Roles = "CompanyOwner,Staff,Admin")]
     public async Task<IActionResult> DeleteTourDate(int id)
     {
         var visitorId = GetVisitorId();
@@ -98,7 +98,7 @@ public class TourDatesController : ControllerBase
     }
 
     [HttpGet("tour-calendar")]
-    [Authorize]
+    [Authorize(Roles = "CompanyOwner,Staff,Admin")]
     public async Task<IActionResult> GetCalendarData([FromQuery] int year, [FromQuery] int month, [FromQuery] int? tourId = null)
     {
         var visitorId = GetVisitorId();
@@ -109,7 +109,7 @@ public class TourDatesController : ControllerBase
     }
 
     [HttpGet("tours/{tourId}/dates/capacity-summary")]
-    [Authorize]
+    [Authorize(Roles = "CompanyOwner,Staff,Admin")]
     public async Task<IActionResult> GetCapacitySummary(int tourId)
     {
         var visitorId = GetVisitorId();

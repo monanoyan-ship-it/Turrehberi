@@ -1,4 +1,5 @@
 using ErkanTatilPlani.Core.Factories.Reviews;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace ErkanTatilPlani.API.Controllers;
@@ -45,6 +46,7 @@ public class ReviewsController : ControllerBase
     /// Yeni yorum ekle
     /// </summary>
     [HttpPost("tours/{tourId}/reviews")]
+    [Authorize]
     public async Task<ActionResult<object>> CreateReview(int tourId, [FromBody] CreateReviewRequest request)
     {
         var ipAddress = HttpContext.Connection.RemoteIpAddress?.ToString() ?? string.Empty;
@@ -64,6 +66,7 @@ public class ReviewsController : ControllerBase
     /// Yorum guncelle
     /// </summary>
     [HttpPut("reviews/{id}")]
+    [Authorize]
     public async Task<IActionResult> UpdateReview(int id, [FromBody] UpdateReviewRequest request)
     {
         var (result, errorMessage, statusCode) = await _tourReview.UpdateReviewAsync(
@@ -81,6 +84,7 @@ public class ReviewsController : ControllerBase
     /// Yorum sil
     /// </summary>
     [HttpDelete("reviews/{id}")]
+    [Authorize]
     public async Task<IActionResult> DeleteReview(int id, [FromQuery] int visitorId)
     {
         var (result, errorMessage, statusCode) = await _tourReview.DeleteReviewAsync(id, visitorId);
@@ -97,6 +101,7 @@ public class ReviewsController : ControllerBase
     /// Yorumu yardimci/yardimci degil olarak oyla
     /// </summary>
     [HttpPost("reviews/{id}/helpful")]
+    [Authorize]
     public async Task<IActionResult> VoteHelpful(int id, [FromBody] VoteHelpfulRequest request)
     {
         var ipAddress = HttpContext.Connection.RemoteIpAddress?.ToString() ?? string.Empty;
@@ -113,6 +118,7 @@ public class ReviewsController : ControllerBase
     /// Yoruma yanit ekle
     /// </summary>
     [HttpPost("reviews/{id}/reply")]
+    [Authorize]
     public async Task<ActionResult<object>> AddReply(int id, [FromBody] AddReplyRequest request)
     {
         var ipAddress = HttpContext.Connection.RemoteIpAddress?.ToString() ?? string.Empty;
@@ -129,6 +135,7 @@ public class ReviewsController : ControllerBase
     /// Yoruma resim yukle
     /// </summary>
     [HttpPost("reviews/{id}/images")]
+    [Authorize]
     public async Task<ActionResult<object>> UploadReviewImage(int id, [FromForm] IFormFile file, [FromForm] int visitorId, [FromForm] string? caption = null)
     {
         if (file == null || file.Length == 0)
@@ -156,6 +163,7 @@ public class ReviewsController : ControllerBase
     /// Yorum resmini sil
     /// </summary>
     [HttpDelete("reviews/{reviewId}/images/{imageId}")]
+    [Authorize]
     public async Task<IActionResult> DeleteReviewImage(int reviewId, int imageId, [FromQuery] int visitorId)
     {
         var (result, errorMessage, statusCode) = await _reviewInteraction.DeleteReviewImageAsync(reviewId, imageId, visitorId);
@@ -172,6 +180,7 @@ public class ReviewsController : ControllerBase
     /// Yorum sikayet et
     /// </summary>
     [HttpPost("reviews/{id}/report")]
+    [Authorize]
     public async Task<IActionResult> ReportReview(int id, [FromBody] ReportRequest request)
     {
         var ipAddress = HttpContext.Connection.RemoteIpAddress?.ToString() ?? string.Empty;
@@ -188,6 +197,7 @@ public class ReviewsController : ControllerBase
     /// Firma sahibinin turlarina yapilan yorumlari listele
     /// </summary>
     [HttpGet("reviews/my")]
+    [Authorize(Roles = "CompanyOwner,Staff,Admin")]
     public async Task<ActionResult<object>> GetMyReviews([FromQuery] int companyId, [FromQuery] bool? hasReply = null)
     {
         return Ok(await _tourReview.GetMyReviewsAsync(companyId, hasReply));
@@ -201,6 +211,7 @@ public class ReviewsController : ControllerBase
     /// Tum yorumlari listele (Admin)
     /// </summary>
     [HttpGet("admin/reviews")]
+    [Authorize(Roles = "Admin,Staff")]
     public async Task<ActionResult<object>> GetAllReviews(
         [FromQuery] int? statusId = null,
         [FromQuery] string? search = null,
@@ -214,6 +225,7 @@ public class ReviewsController : ControllerBase
     /// Yorum onayla (Admin)
     /// </summary>
     [HttpPost("reviews/{id}/approve")]
+    [Authorize(Roles = "Admin,Staff")]
     public async Task<IActionResult> ApproveReview(int id, [FromBody] ModerateReviewRequest request)
     {
         var (result, errorMessage, statusCode) = await _adminReview.ApproveReviewAsync(id, request.ModeratedById, request.Note);
@@ -225,6 +237,7 @@ public class ReviewsController : ControllerBase
     /// Yorum reddet (Admin)
     /// </summary>
     [HttpPost("reviews/{id}/reject")]
+    [Authorize(Roles = "Admin,Staff")]
     public async Task<IActionResult> RejectReview(int id, [FromBody] RejectReviewRequest request)
     {
         var (result, errorMessage, statusCode) = await _adminReview.RejectReviewAsync(id, request.ModeratedById, request.RejectionReason, request.Note);
@@ -236,6 +249,7 @@ public class ReviewsController : ControllerBase
     /// Yorumu incelemeye al (Flagged durumuna getir)
     /// </summary>
     [HttpPost("reviews/{id}/flag")]
+    [Authorize(Roles = "Admin,Staff")]
     public async Task<IActionResult> FlagReview(int id, [FromBody] ModerateReviewRequest request)
     {
         var (result, errorMessage, statusCode) = await _adminReview.FlagReviewAsync(id, request.ModeratedById, request.Note);
@@ -247,6 +261,7 @@ public class ReviewsController : ControllerBase
     /// Sikayet raporlarini listele (Admin)
     /// </summary>
     [HttpGet("admin/reports")]
+    [Authorize(Roles = "Admin,Staff")]
     public async Task<ActionResult<object>> GetReports([FromQuery] int? statusId = null)
     {
         return Ok(await _adminReview.GetReportsAsync(statusId));
@@ -256,6 +271,7 @@ public class ReviewsController : ControllerBase
     /// Sikayet coz (Admin)
     /// </summary>
     [HttpPost("reports/{id}/resolve")]
+    [Authorize(Roles = "Admin,Staff")]
     public async Task<IActionResult> ResolveReport(int id, [FromBody] ResolveReportRequest request)
     {
         var (result, errorMessage, statusCode) = await _adminReview.ResolveReportAsync(id, request.ReviewedById, request.RemoveReview, request.Note);

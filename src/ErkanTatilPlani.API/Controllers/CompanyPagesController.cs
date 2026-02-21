@@ -28,7 +28,7 @@ public class CompanyPagesController : ControllerBase
     // ============================================
 
     [HttpGet("{companyId:int}/pages")]
-    [Authorize]
+    [Authorize(Roles = "CompanyOwner,Staff,Admin")]
     public async Task<IActionResult> GetPages(int companyId)
     {
         var visitorId = GetVisitorId();
@@ -44,7 +44,7 @@ public class CompanyPagesController : ControllerBase
     }
 
     [HttpGet("{companyId:int}/pages/{id:int}")]
-    [Authorize]
+    [Authorize(Roles = "CompanyOwner,Staff,Admin")]
     public async Task<IActionResult> GetPage(int companyId, int id)
     {
         var visitorId = GetVisitorId();
@@ -60,7 +60,7 @@ public class CompanyPagesController : ControllerBase
     }
 
     [HttpPost("{companyId:int}/pages")]
-    [Authorize]
+    [Authorize(Roles = "CompanyOwner,Staff,Admin")]
     public async Task<IActionResult> CreatePage(int companyId, [FromBody] CompanyPage page)
     {
         var visitorId = GetVisitorId();
@@ -76,7 +76,7 @@ public class CompanyPagesController : ControllerBase
     }
 
     [HttpPut("{companyId:int}/pages/{id:int}")]
-    [Authorize]
+    [Authorize(Roles = "CompanyOwner,Staff,Admin")]
     public async Task<IActionResult> UpdatePage(int companyId, int id, [FromBody] CompanyPage page)
     {
         var visitorId = GetVisitorId();
@@ -92,7 +92,7 @@ public class CompanyPagesController : ControllerBase
     }
 
     [HttpDelete("{companyId:int}/pages/{id:int}")]
-    [Authorize]
+    [Authorize(Roles = "CompanyOwner,Staff,Admin")]
     public async Task<IActionResult> DeletePage(int companyId, int id)
     {
         var visitorId = GetVisitorId();
@@ -108,7 +108,7 @@ public class CompanyPagesController : ControllerBase
     }
 
     [HttpPut("{companyId:int}/pages/reorder")]
-    [Authorize]
+    [Authorize(Roles = "CompanyOwner,Staff,Admin")]
     public async Task<IActionResult> ReorderPages(int companyId, [FromBody] List<int> pageIds)
     {
         var visitorId = GetVisitorId();

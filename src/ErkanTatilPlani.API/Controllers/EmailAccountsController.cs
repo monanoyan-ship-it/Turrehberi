@@ -1,10 +1,12 @@
 using ErkanTatilPlani.Core.Factories.EmailAccounts;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace ErkanTatilPlani.API.Controllers;
 
 [Route("api/admin/email-accounts")]
 [ApiController]
+[Authorize(Roles = "Admin,Staff")]
 public class EmailAccountsController : ControllerBase
 {
     private readonly IEmailAccountFactory _emailAccountFactory;

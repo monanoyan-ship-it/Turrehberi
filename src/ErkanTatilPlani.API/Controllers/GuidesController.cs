@@ -8,7 +8,7 @@ namespace ErkanTatilPlani.API.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
-[Authorize]
+[Authorize(Roles = "CompanyOwner,Staff,Admin")]
 public class GuidesController : ControllerBase
 {
     private readonly IGuideFactory _guideFactory;

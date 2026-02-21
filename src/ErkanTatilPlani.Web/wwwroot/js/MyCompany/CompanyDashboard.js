@@ -77,7 +77,7 @@ function CompanyDashboardViewModel() {
         self.isLoading(true);
 
         // Firma ID'sini al (localStorage'dan veya session'dan)
-        var userStr = localStorage.getItem('currentUser');
+        var userStr = localStorage.getItem('user');
         if (userStr) {
             try {
                 var user = JSON.parse(userStr);

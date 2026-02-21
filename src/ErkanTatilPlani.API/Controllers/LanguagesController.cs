@@ -1,5 +1,6 @@
 using ErkanTatilPlani.Core.Entities;
 using ErkanTatilPlani.Core.Factories.Languages;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace ErkanTatilPlani.API.Controllers;
@@ -28,6 +29,7 @@ public class LanguagesController : ControllerBase
     }
 
     [HttpPost]
+    [Authorize(Roles = "Admin,Staff")]
     public async Task<ActionResult<Language>> CreateLanguage(Language language)
     {
         var created = await _languageFactory.CreateLanguageAsync(language);
@@ -35,6 +37,7 @@ public class LanguagesController : ControllerBase
     }
 
     [HttpPut("{id}")]
+    [Authorize(Roles = "Admin,Staff")]
     public async Task<IActionResult> UpdateLanguage(int id, Language language)
     {
         var (success, message, statusCode) = await _languageFactory.UpdateLanguageAsync(id, language);
@@ -43,6 +46,7 @@ public class LanguagesController : ControllerBase
     }
 
     [HttpDelete("{id}")]
+    [Authorize(Roles = "Admin,Staff")]
     public async Task<IActionResult> DeleteLanguage(int id)
     {
         var (success, message, statusCode) = await _languageFactory.DeleteLanguageAsync(id);
@@ -51,6 +55,7 @@ public class LanguagesController : ControllerBase
     }
 
     [HttpPut("{id}/set-default")]
+    [Authorize(Roles = "Admin,Staff")]
     public async Task<IActionResult> SetDefault(int id)
     {
         var (success, message, statusCode) = await _languageFactory.SetDefaultAsync(id);

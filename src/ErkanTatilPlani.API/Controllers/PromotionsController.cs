@@ -31,7 +31,7 @@ public class PromotionsController : ControllerBase
     // ===== CRUD (Auth) =====
 
     [HttpGet]
-    [Authorize]
+    [Authorize(Roles = "CompanyOwner,Staff,Admin")]
     public async Task<IActionResult> GetCompanyPromotions(
         [FromQuery] int? type = null, [FromQuery] int? status = null)
     {
@@ -43,7 +43,7 @@ public class PromotionsController : ControllerBase
     }
 
     [HttpGet("{id}")]
-    [Authorize]
+    [Authorize(Roles = "CompanyOwner,Staff,Admin")]
     public async Task<IActionResult> GetPromotion(int id)
     {
         var visitorId = GetVisitorId();
@@ -54,7 +54,7 @@ public class PromotionsController : ControllerBase
     }
 
     [HttpPost]
-    [Authorize]
+    [Authorize(Roles = "CompanyOwner,Staff,Admin")]
     public async Task<IActionResult> CreatePromotion([FromBody] Promotion promotion)
     {
         var visitorId = GetVisitorId();
@@ -65,7 +65,7 @@ public class PromotionsController : ControllerBase
     }
 
     [HttpPut("{id}")]
-    [Authorize]
+    [Authorize(Roles = "CompanyOwner,Staff,Admin")]
     public async Task<IActionResult> UpdatePromotion(int id, [FromBody] Promotion promotion)
     {
         var visitorId = GetVisitorId();
@@ -76,7 +76,7 @@ public class PromotionsController : ControllerBase
     }
 
     [HttpDelete("{id}")]
-    [Authorize]
+    [Authorize(Roles = "CompanyOwner,Staff,Admin")]
     public async Task<IActionResult> DeletePromotion(int id)
     {
         var visitorId = GetVisitorId();
@@ -87,7 +87,7 @@ public class PromotionsController : ControllerBase
     }
 
     [HttpPut("{id}/toggle")]
-    [Authorize]
+    [Authorize(Roles = "CompanyOwner,Staff,Admin")]
     public async Task<IActionResult> ToggleStatus(int id)
     {
         var visitorId = GetVisitorId();
@@ -100,7 +100,7 @@ public class PromotionsController : ControllerBase
     // ===== Admin =====
 
     [HttpGet("/api/admin/promotions")]
-    [Authorize]
+    [Authorize(Roles = "Admin,Staff")]
     public async Task<IActionResult> GetAllPromotions(
         [FromQuery] int? companyId = null, [FromQuery] int? type = null, [FromQuery] int? status = null)
     {

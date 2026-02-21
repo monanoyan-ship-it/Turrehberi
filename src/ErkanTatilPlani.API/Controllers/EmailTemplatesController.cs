@@ -1,10 +1,12 @@
 using ErkanTatilPlani.Core.Factories.EmailTemplates;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace ErkanTatilPlani.API.Controllers;
 
 [Route("api/admin/email-templates")]
 [ApiController]
+[Authorize(Roles = "Admin,Staff")]
 public class EmailTemplatesController : ControllerBase
 {
     private readonly IEmailTemplateFactory _emailTemplateFactory;

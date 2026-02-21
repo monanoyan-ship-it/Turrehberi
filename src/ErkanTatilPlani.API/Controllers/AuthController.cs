@@ -1,4 +1,5 @@
 using ErkanTatilPlani.Core.Factories.Auth;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.RateLimiting;
 
@@ -53,6 +54,7 @@ public class AuthController : ControllerBase
     }
 
     [HttpGet("me")]
+    [Authorize]
     public async Task<IActionResult> GetCurrentUser()
     {
         var (success, result, statusCode) = await _profileFactory.GetCurrentUserAsync();
@@ -62,6 +64,7 @@ public class AuthController : ControllerBase
     }
 
     [HttpPut("profile")]
+    [Authorize]
     public async Task<IActionResult> UpdateProfile([FromBody] UpdateProfileRequest request)
     {
         var (success, result, statusCode) = await _profileFactory.UpdateProfileAsync(
@@ -72,6 +75,7 @@ public class AuthController : ControllerBase
     }
 
     [HttpPut("change-password")]
+    [Authorize]
     public async Task<IActionResult> ChangePassword([FromBody] ChangePasswordRequest request)
     {
         var (success, result, statusCode) = await _profileFactory.ChangePasswordAsync(
@@ -82,6 +86,7 @@ public class AuthController : ControllerBase
     }
 
     [HttpPut("language")]
+    [Authorize]
     public async Task<IActionResult> UpdateLanguage([FromBody] UpdateLanguageRequest request)
     {
         var (success, result, statusCode) = await _profileFactory.UpdatePreferredLanguageAsync(request.Language);
@@ -127,6 +132,7 @@ public class AuthController : ControllerBase
     /// Email dogrulama linki gonder
     /// </summary>
     [HttpPost("send-verification-email")]
+    [Authorize]
     public async Task<IActionResult> SendVerificationEmail([FromBody] SendVerificationEmailRequest request)
     {
         var (success, result, statusCode) = await _accountSecurityFactory.SendVerificationEmailAsync(request.BaseUrl);
@@ -159,6 +165,7 @@ public class AuthController : ControllerBase
     /// Profil resmi yukle
     /// </summary>
     [HttpPost("avatar")]
+    [Authorize]
     public async Task<IActionResult> UploadAvatar(IFormFile file)
     {
         if (file == null || file.Length == 0)
@@ -176,6 +183,7 @@ public class AuthController : ControllerBase
     /// Profil resmini sil
     /// </summary>
     [HttpDelete("avatar")]
+    [Authorize]
     public async Task<IActionResult> DeleteAvatar()
     {
         var (success, result, statusCode) = await _profileFactory.DeleteAvatarAsync();

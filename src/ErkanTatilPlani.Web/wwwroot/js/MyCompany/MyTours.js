@@ -159,7 +159,7 @@ function MyToursViewModel() {
         self.isSaving(true);
 
         // CompanyId'yi ekle
-        var userStr = localStorage.getItem('currentUser');
+        var userStr = localStorage.getItem('user');
         if (userStr) {
             try {
                 var user = JSON.parse(userStr);

@@ -98,7 +98,7 @@ public class BlogsController : ControllerBase
     }
 
     [HttpGet("my")]
-    [Authorize]
+    [Authorize(Roles = "CompanyOwner,Staff,Admin")]
     public async Task<ActionResult<object>> GetMyPosts()
     {
         var visitorId = GetVisitorId();
@@ -114,7 +114,7 @@ public class BlogsController : ControllerBase
     }
 
     [HttpPost]
-    [Authorize]
+    [Authorize(Roles = "CompanyOwner,Staff,Admin")]
     public async Task<ActionResult<BlogPost>> CreatePost(BlogPost post)
     {
         var visitorId = GetVisitorId();
@@ -130,7 +130,7 @@ public class BlogsController : ControllerBase
     }
 
     [HttpPut("{id}")]
-    [Authorize]
+    [Authorize(Roles = "CompanyOwner,Staff,Admin")]
     public async Task<IActionResult> UpdatePost(int id, BlogPost post)
     {
         var visitorId = GetVisitorId();
@@ -146,7 +146,7 @@ public class BlogsController : ControllerBase
     }
 
     [HttpDelete("{id}")]
-    [Authorize]
+    [Authorize(Roles = "CompanyOwner,Staff,Admin")]
     public async Task<IActionResult> DeletePost(int id)
     {
         var visitorId = GetVisitorId();
@@ -176,7 +176,7 @@ public class BlogsController : ControllerBase
     }
 
     [HttpGet("company/{companyId:int}/manage")]
-    [Authorize]
+    [Authorize(Roles = "CompanyOwner,Staff,Admin")]
     public async Task<IActionResult> GetCompanyDraftPosts(int companyId)
     {
         var visitorId = GetVisitorId();
@@ -196,7 +196,7 @@ public class BlogsController : ControllerBase
     // ============================================
 
     [HttpGet("admin")]
-    [Authorize]
+    [Authorize(Roles = "Admin,Staff")]
     public async Task<ActionResult<object>> GetAllPosts(
         [FromQuery] int? statusId = null,
         [FromQuery] int? categoryId = null,
@@ -208,7 +208,7 @@ public class BlogsController : ControllerBase
     }
 
     [HttpPut("admin/{id}/status")]
-    [Authorize]
+    [Authorize(Roles = "Admin,Staff")]
     public async Task<IActionResult> UpdatePostStatus(int id, [FromBody] BlogStatusRequest request)
     {
         var (success, errorMessage, errorCode, statusCode) = await _blogFactory.UpdatePostStatusAsync(id, request.StatusId);
@@ -221,7 +221,7 @@ public class BlogsController : ControllerBase
     }
 
     [HttpDelete("admin/comments/{id}")]
-    [Authorize]
+    [Authorize(Roles = "Admin,Staff")]
     public async Task<IActionResult> AdminDeleteComment(int id)
     {
         var (success, notFound, errorMessage, errorCode, statusCode) = await _commentFactory.AdminDeleteCommentAsync(id);

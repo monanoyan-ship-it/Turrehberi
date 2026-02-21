@@ -76,7 +76,7 @@
 
         // Auth token
         $(document).ready(function() {
-            var token = localStorage.getItem('authToken');
+            var token = localStorage.getItem('token');
             if (!token) {
                 window.location.href = '/Account/Login';
                 return;
@@ -84,7 +84,7 @@
             $.ajaxSetup({
                 headers: { 'Authorization': 'Bearer ' + token }
             });
-            var visitor = localStorage.getItem('visitor');
+            var visitor = localStorage.getItem('user');
             if (visitor) {
                 try {
                     var v = JSON.parse(visitor);

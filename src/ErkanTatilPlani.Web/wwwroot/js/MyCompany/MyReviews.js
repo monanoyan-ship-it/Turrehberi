@@ -38,7 +38,7 @@ function MyReviewsViewModel() {
         self.isLoading(true);
 
         // Company ID'yi al
-        var userStr = localStorage.getItem('currentUser');
+        var userStr = localStorage.getItem('user');
         if (userStr) {
             try {
                 var user = JSON.parse(userStr);
@@ -104,7 +104,7 @@ function MyReviewsViewModel() {
 
         // Visitor ID'yi al
         var visitorId = null;
-        var userStr = localStorage.getItem('currentUser');
+        var userStr = localStorage.getItem('user');
         if (userStr) {
             try {
                 var user = JSON.parse(userStr);

@@ -64,7 +64,7 @@ public class ToursController : ControllerBase
     }
 
     [HttpGet("my")]
-    [Authorize]
+    [Authorize(Roles = "CompanyOwner,Staff,Admin")]
     public async Task<ActionResult<object>> GetMyTours()
     {
         var visitorId = GetVisitorId();
@@ -80,7 +80,7 @@ public class ToursController : ControllerBase
     }
 
     [HttpPost]
-    [Authorize]
+    [Authorize(Roles = "CompanyOwner,Staff,Admin")]
     public async Task<ActionResult<Tour>> CreateTour(Tour tour)
     {
         var visitorId = GetVisitorId();
@@ -96,7 +96,7 @@ public class ToursController : ControllerBase
     }
 
     [HttpPut("{id}")]
-    [Authorize]
+    [Authorize(Roles = "CompanyOwner,Staff,Admin")]
     public async Task<IActionResult> UpdateTour(int id, Tour tour)
     {
         if (id != tour.Id) return BadRequest();
@@ -113,7 +113,7 @@ public class ToursController : ControllerBase
     }
 
     [HttpDelete("{id}")]
-    [Authorize]
+    [Authorize(Roles = "CompanyOwner,Staff,Admin")]
     public async Task<IActionResult> DeleteTour(int id)
     {
         var visitorId = GetVisitorId();

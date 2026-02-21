@@ -9,7 +9,7 @@ namespace ErkanTatilPlani.API.Controllers;
 /// </summary>
 [ApiController]
 [Route("api/[controller]")]
-[Authorize]
+[Authorize(Roles = "Admin,Staff")]
 public class CacheController : ControllerBase
 {
     private readonly ICacheService _cache;

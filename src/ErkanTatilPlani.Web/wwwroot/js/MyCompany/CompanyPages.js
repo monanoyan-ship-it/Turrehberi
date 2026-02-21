@@ -143,7 +143,6 @@ function CompanyPagesViewModel() {
                 url: apiBaseUrl + '/api/companies/' + companyId + '/pages/' + self.selectedPage().id,
                 method: 'PUT',
                 contentType: 'application/json',
-                headers: { 'Authorization': 'Bearer ' + (localStorage.getItem('token') || '') },
                 data: JSON.stringify(pageData)
             }).done(function () {
                 toastr.success('Sayfa guncellendi');
@@ -159,7 +158,6 @@ function CompanyPagesViewModel() {
                 url: apiBaseUrl + '/api/companies/' + companyId + '/pages',
                 method: 'POST',
                 contentType: 'application/json',
-                headers: { 'Authorization': 'Bearer ' + (localStorage.getItem('token') || '') },
                 data: JSON.stringify(pageData)
             }).done(function () {
                 toastr.success('Sayfa olusturuldu');

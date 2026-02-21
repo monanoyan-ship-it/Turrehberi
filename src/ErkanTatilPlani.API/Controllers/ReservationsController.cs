@@ -31,6 +31,7 @@ public class ReservationsController : ControllerBase
     }
 
     [HttpGet]
+    [Authorize(Roles = "Admin,Staff")]
     public async Task<ActionResult<IEnumerable<Reservation>>> GetReservations()
     {
         return Ok(await _crud.GetAllAsync());
@@ -40,7 +41,7 @@ public class ReservationsController : ControllerBase
     /// Firma sahibinin kendi turlarına yapilan rezervasyonlari listele
     /// </summary>
     [HttpGet("my")]
-    [Authorize]
+    [Authorize(Roles = "CompanyOwner,Staff,Admin")]
     public async Task<ActionResult<object>> GetMyReservations([FromQuery] string? status = null)
     {
         var visitorId = GetVisitorId();
@@ -59,7 +60,7 @@ public class ReservationsController : ControllerBase
     /// Firma sahibi rezervasyon durumunu degistir
     /// </summary>
     [HttpPatch("my/{id}/status")]
-    [Authorize]
+    [Authorize(Roles = "CompanyOwner,Staff,Admin")]
     public async Task<IActionResult> UpdateMyReservationStatus(int id, [FromBody] UpdateStatusRequest request)
     {
         var visitorId = GetVisitorId();
@@ -126,7 +127,7 @@ public class ReservationsController : ControllerBase
     }
 
     [HttpPut("{id}/photo-link")]
-    [Authorize]
+    [Authorize(Roles = "CompanyOwner,Staff,Admin")]
     public async Task<IActionResult> UpdatePhotoLink(int id, [FromBody] PhotoLinkRequest request)
     {
         var (success, message) = await _visitor.UpdatePhotoLinkAsync(id, request.PhotoLink);
@@ -135,6 +136,7 @@ public class ReservationsController : ControllerBase
     }
 
     [HttpGet("{id}")]
+    [Authorize(Roles = "Admin,Staff")]
     public async Task<ActionResult<Reservation>> GetReservation(int id)
     {
         var reservation = await _crud.GetByIdAsync(id);
@@ -143,6 +145,7 @@ public class ReservationsController : ControllerBase
     }
 
     [HttpPost]
+    [Authorize(Roles = "Admin,Staff")]
     public async Task<ActionResult<Reservation>> CreateReservation(Reservation reservation)
     {
         var created = await _crud.CreateAsync(reservation);
@@ -205,6 +208,7 @@ public class ReservationsController : ControllerBase
     }
 
     [HttpPut("{id}")]
+    [Authorize(Roles = "Admin,Staff")]
     public async Task<IActionResult> UpdateReservation(int id, Reservation reservation)
     {
         if (id != reservation.Id) return BadRequest();
@@ -213,6 +217,7 @@ public class ReservationsController : ControllerBase
     }
 
     [HttpPatch("{id}/status")]
+    [Authorize(Roles = "Admin,Staff")]
     public async Task<IActionResult> UpdateStatus(int id, [FromBody] int status)
     {
         var found = await _crud.UpdateStatusAsync(id, status);

@@ -40,6 +40,7 @@ public class CompaniesController : ControllerBase
     }
 
     [HttpGet]
+    [Authorize(Roles = "Admin,Staff")]
     public async Task<ActionResult<IEnumerable<Company>>> GetCompanies()
     {
         return Ok(await _crud.GetCompaniesAsync());
@@ -89,6 +90,7 @@ public class CompaniesController : ControllerBase
     }
 
     [HttpPost]
+    [Authorize(Roles = "Admin,Staff")]
     public async Task<ActionResult<Company>> CreateCompany(Company company)
     {
         var created = await _crud.CreateCompanyAsync(company);
@@ -96,6 +98,7 @@ public class CompaniesController : ControllerBase
     }
 
     [HttpPut("{id}")]
+    [Authorize(Roles = "Admin,Staff")]
     public async Task<IActionResult> UpdateCompany(int id, Company company)
     {
         if (id != company.Id) return BadRequest();
@@ -104,6 +107,7 @@ public class CompaniesController : ControllerBase
     }
 
     [HttpDelete("{id}")]
+    [Authorize(Roles = "Admin,Staff")]
     public async Task<IActionResult> DeleteCompany(int id)
     {
         var found = await _crud.DeleteCompanyAsync(id);
@@ -119,6 +123,7 @@ public class CompaniesController : ControllerBase
     /// Onay bekleyen firmalari listele
     /// </summary>
     [HttpGet("pending")]
+    [Authorize(Roles = "Admin,Staff")]
     public async Task<ActionResult<IEnumerable<Company>>> GetPendingCompanies()
     {
         return Ok(await _approval.GetPendingCompaniesAsync());
@@ -128,6 +133,7 @@ public class CompaniesController : ControllerBase
     /// Firma onayla
     /// </summary>
     [HttpPost("{id}/approve")]
+    [Authorize(Roles = "Admin,Staff")]
     public async Task<IActionResult> ApproveCompany(int id, [FromBody] ApproveCompanyRequest request)
     {
         var (success, result, statusCode) = await _approval.ApproveCompanyAsync(id, request.ReviewedById, request.ReviewNotes);
@@ -138,6 +144,7 @@ public class CompaniesController : ControllerBase
     /// Firma reddet
     /// </summary>
     [HttpPost("{id}/reject")]
+    [Authorize(Roles = "Admin,Staff")]
     public async Task<IActionResult> RejectCompany(int id, [FromBody] RejectCompanyRequest request)
     {
         var (success, result, statusCode) = await _approval.RejectCompanyAsync(id, request.ReviewedById, request.RejectionReason, request.ReviewNotes);
@@ -148,6 +155,7 @@ public class CompaniesController : ControllerBase
     /// Firma askiya al
     /// </summary>
     [HttpPost("{id}/suspend")]
+    [Authorize(Roles = "Admin,Staff")]
     public async Task<IActionResult> SuspendCompany(int id, [FromBody] SuspendCompanyRequest request)
     {
         var (success, result, statusCode) = await _approval.SuspendCompanyAsync(id, request.ReviewedById, request.Reason);
@@ -162,6 +170,7 @@ public class CompaniesController : ControllerBase
     /// Firma sahibi icin dashboard istatistikleri
     /// </summary>
     [HttpGet("{id}/dashboard")]
+    [Authorize(Roles = "CompanyOwner,Staff,Admin")]
     public async Task<ActionResult<object>> GetCompanyDashboard(int id)
     {
         var (found, result) = await _dashboard.GetCompanyDashboardAsync(id);
@@ -174,6 +183,7 @@ public class CompaniesController : ControllerBase
     /// Firma ayarlarini guncelle
     /// </summary>
     [HttpPut("{id}/settings")]
+    [Authorize(Roles = "CompanyOwner,Staff,Admin")]
     public async Task<IActionResult> UpdateCompanySettings(int id, [FromBody] UpdateCompanySettingsRequest request)
     {
         var (success, result, statusCode) = await _dashboard.UpdateCompanySettingsAsync(id, request.DepositPercentage);
@@ -184,6 +194,7 @@ public class CompaniesController : ControllerBase
     /// Askiya alinan firmayi tekrar aktifle
     /// </summary>
     [HttpPost("{id}/reactivate")]
+    [Authorize(Roles = "Admin,Staff")]
     public async Task<IActionResult> ReactivateCompany(int id, [FromBody] ReactivateCompanyRequest request)
     {
         var (success, result, statusCode) = await _approval.ReactivateCompanyAsync(id, request.ReviewedById, request.ReviewNotes);
@@ -198,6 +209,7 @@ public class CompaniesController : ControllerBase
     /// Firma sozlesmesi yukle (PDF, max 10MB)
     /// </summary>
     [HttpPost("{id}/upload-contract")]
+    [Authorize(Roles = "CompanyOwner,Staff,Admin")]
     public async Task<IActionResult> UploadContract(int id, IFormFile file)
     {
         using var stream = file?.OpenReadStream() ?? Stream.Null;
@@ -210,6 +222,7 @@ public class CompaniesController : ControllerBase
     /// Firma sozlesmesini sil
     /// </summary>
     [HttpDelete("{id}/contract")]
+    [Authorize(Roles = "CompanyOwner,Staff,Admin")]
     public async Task<IActionResult> DeleteContract(int id)
     {
         var (success, result, statusCode) = await _dashboard.DeleteContractAsync(id);
@@ -224,6 +237,7 @@ public class CompaniesController : ControllerBase
     /// Firma galerisine resim yukle
     /// </summary>
     [HttpPost("{id}/gallery")]
+    [Authorize(Roles = "CompanyOwner,Staff,Admin")]
     public async Task<ActionResult<object>> UploadGalleryImage(int id, [FromForm] IFormFile file, [FromForm] string? title = null, [FromForm] string? description = null, [FromForm] bool isFeatured = false)
     {
         using var stream = file?.OpenReadStream() ?? Stream.Null;
@@ -248,6 +262,7 @@ public class CompaniesController : ControllerBase
     /// Galeri resmini guncelle
     /// </summary>
     [HttpPut("{companyId}/gallery/{imageId}")]
+    [Authorize(Roles = "CompanyOwner,Staff,Admin")]
     public async Task<IActionResult> UpdateGalleryImage(int companyId, int imageId, [FromBody] UpdateGalleryImageRequest request)
     {
         var (success, result, statusCode) = await _gallery.UpdateGalleryImageAsync(
@@ -259,6 +274,7 @@ public class CompaniesController : ControllerBase
     /// Galeri resmini sil
     /// </summary>
     [HttpDelete("{companyId}/gallery/{imageId}")]
+    [Authorize(Roles = "CompanyOwner,Staff,Admin")]
     public async Task<IActionResult> DeleteGalleryImage(int companyId, int imageId)
     {
         var (success, result, statusCode) = await _gallery.DeleteGalleryImageAsync(companyId, imageId);
@@ -269,6 +285,7 @@ public class CompaniesController : ControllerBase
     /// Galeri resim siralamasini guncelle
     /// </summary>
     [HttpPut("{id}/gallery/reorder")]
+    [Authorize(Roles = "CompanyOwner,Staff,Admin")]
     public async Task<IActionResult> ReorderGalleryImages(int id, [FromBody] ReorderGalleryRequest request)
     {
         var (success, result, statusCode) = await _gallery.ReorderGalleryImagesAsync(id, request.ImageIds);
@@ -279,7 +296,7 @@ public class CompaniesController : ControllerBase
     // ===============================================
 
     [HttpGet("analytics/revenue")]
-    [Authorize]
+    [Authorize(Roles = "CompanyOwner,Staff,Admin")]
     public async Task<IActionResult> GetRevenueChart([FromQuery] int months = 12)
     {
         var visitorId = GetVisitorId();
@@ -289,7 +306,7 @@ public class CompaniesController : ControllerBase
     }
 
     [HttpGet("analytics/occupancy")]
-    [Authorize]
+    [Authorize(Roles = "CompanyOwner,Staff,Admin")]
     public async Task<IActionResult> GetOccupancyChart([FromQuery] int months = 12)
     {
         var visitorId = GetVisitorId();
@@ -299,7 +316,7 @@ public class CompaniesController : ControllerBase
     }
 
     [HttpGet("analytics/cancellations")]
-    [Authorize]
+    [Authorize(Roles = "CompanyOwner,Staff,Admin")]
     public async Task<IActionResult> GetCancellationChart([FromQuery] int months = 12)
     {
         var visitorId = GetVisitorId();
@@ -309,7 +326,7 @@ public class CompaniesController : ControllerBase
     }
 
     [HttpGet("analytics/tour-comparison")]
-    [Authorize]
+    [Authorize(Roles = "CompanyOwner,Staff,Admin")]
     public async Task<IActionResult> GetTourComparison()
     {
         var visitorId = GetVisitorId();

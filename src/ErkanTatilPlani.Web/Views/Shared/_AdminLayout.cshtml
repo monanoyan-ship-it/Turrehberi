@@ -71,7 +71,7 @@
         // Auth + Menu visibility
         var currentUserRole = '@(ViewBag.UserRole ?? "Admin")';
         $(document).ready(function() {
-            var token = localStorage.getItem('authToken');
+            var token = localStorage.getItem('token');
             if (!token) {
                 window.location.href = '/Account/Login';
                 return;

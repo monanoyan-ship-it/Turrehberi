@@ -1,11 +1,13 @@
 using ErkanTatilPlani.Core.Entities;
 using ErkanTatilPlani.Core.Factories.Visitors;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace ErkanTatilPlani.API.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
+[Authorize(Roles = "Admin,Staff")]
 public class VisitorsController : ControllerBase
 {
     private readonly IVisitorFactory _visitorFactory;

@@ -187,7 +187,6 @@ function CompanyBlogViewModel() {
                 url: apiBaseUrl + '/api/blogs/' + self.selectedPost().id,
                 method: 'PUT',
                 contentType: 'application/json',
-                headers: { 'Authorization': 'Bearer ' + (localStorage.getItem('token') || '') },
                 data: JSON.stringify(postData)
             }).done(function () {
                 toastr.success('Yazi guncellendi');
@@ -203,7 +202,6 @@ function CompanyBlogViewModel() {
                 url: apiBaseUrl + '/api/blogs',
                 method: 'POST',
                 contentType: 'application/json',
-                headers: { 'Authorization': 'Bearer ' + (localStorage.getItem('token') || '') },
                 data: JSON.stringify(postData)
             }).done(function () {
                 toastr.success('Yazi olusturuldu');

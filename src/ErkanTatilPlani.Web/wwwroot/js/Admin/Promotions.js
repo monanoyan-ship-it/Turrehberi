@@ -44,7 +44,7 @@ function AdminPromotionsViewModel() {
         $.ajax({
             url: url,
             method: 'GET',
-            headers: { 'Authorization': 'Bearer ' + localStorage.getItem('authToken') }
+            headers: { 'Authorization': 'Bearer ' + localStorage.getItem('token') }
         }).done(function (data) {
             self.promotions(data);
         }).fail(function (xhr) {
