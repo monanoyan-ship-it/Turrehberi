@@ -185,6 +185,7 @@
                                     <li><hr class="dropdown-divider"></li>
                                     <li><a class="dropdown-item" href="/Account/Profile"><i class="bi bi-person me-2"></i><span data-t="Menu.Profile">Profilim</span></a></li>
                                     <li><a class="dropdown-item" href="/Account/Reservations"><i class="bi bi-calendar-check me-2"></i><span data-t="Menu.MyReservations">Rezervasyonlarim</span></a></li>
+                                    <li id="companyMenuItem" style="display: none;"><a class="dropdown-item" href="/MyCompany"><i class="bi bi-building me-2"></i><span data-t="Menu.CompanyPanel">Firma Paneli</span></a></li>
                                     <li id="adminMenuItem" style="display: none;"><a class="dropdown-item" href="/Admin"><i class="bi bi-gear me-2"></i><span data-t="Menu.AdminPanel">Yonetim Paneli</span></a></li>
                                     <li><hr class="dropdown-divider"></li>
                                     <li><a class="dropdown-item text-danger" href="#" onclick="logout()"><i class="bi bi-box-arrow-right me-2"></i><span data-t="Menu.Logout">Cikis Yap</span></a></li>
@@ -407,7 +408,10 @@
                 $('#loggedIn').show();
                 $('#userName').text(user.firstName + ' ' + user.lastName);
                 $('#userEmail').text(user.email);
-                if (user.userTypeId >= 1) {
+                if (user.userTypeId === 1) {
+                    $('#companyMenuItem').show();
+                }
+                if (user.userTypeId >= 2) {
                     $('#adminMenuItem').show();
                 }
                 // Bildirim zili goster ve yukle

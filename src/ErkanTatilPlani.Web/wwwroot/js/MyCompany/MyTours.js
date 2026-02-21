@@ -76,12 +76,9 @@ function MyToursViewModel() {
         self.isLoading(true);
 
         // Token'i al
-        var token = localStorage.getItem('authToken');
-
         $.ajax({
             url: apiBaseUrl + '/api/tours/my',
             method: 'GET',
-            headers: token ? { 'Authorization': 'Bearer ' + token } : {},
             success: function(data) {
                 self.tours(data.tours || []);
                 self.canManageTours(data.canManageTours);
@@ -160,7 +157,6 @@ function MyToursViewModel() {
         }
 
         self.isSaving(true);
-        var token = localStorage.getItem('authToken');
 
         // CompanyId'yi ekle
         var userStr = localStorage.getItem('currentUser');
@@ -191,7 +187,6 @@ function MyToursViewModel() {
         $.ajax({
             url: url,
             method: method,
-            headers: token ? { 'Authorization': 'Bearer ' + token } : {},
             contentType: 'application/json',
             data: JSON.stringify(data),
             success: function() {
@@ -220,12 +215,10 @@ function MyToursViewModel() {
         if (!self.deletingTour()) return;
 
         self.isDeleting(true);
-        var token = localStorage.getItem('authToken');
 
         $.ajax({
             url: apiBaseUrl + '/api/tours/' + self.deletingTour().id,
             method: 'DELETE',
-            headers: token ? { 'Authorization': 'Bearer ' + token } : {},
             success: function() {
                 toastr.success(T('MyTours.DeleteSuccess') || 'Tur silindi');
                 deleteModal.hide();
@@ -254,11 +247,9 @@ function MyToursViewModel() {
     // Yonetim tarihlerini yukle
     self.loadManagedDates = function(tourId) {
         self.isLoadingDates(true);
-        var token = localStorage.getItem('authToken');
         $.ajax({
             url: apiBaseUrl + '/api/tours/' + tourId + '/dates/manage',
             method: 'GET',
-            headers: token ? { 'Authorization': 'Bearer ' + token } : {},
             success: function(data) {
                 self.managedDates(data);
                 self.isLoadingDates(false);
@@ -278,11 +269,9 @@ function MyToursViewModel() {
             return;
         }
         self.isSavingDate(true);
-        var token = localStorage.getItem('authToken');
         $.ajax({
             url: apiBaseUrl + '/api/tours/' + self.managingTourId() + '/dates',
             method: 'POST',
-            headers: token ? { 'Authorization': 'Bearer ' + token } : {},
             contentType: 'application/json',
             data: JSON.stringify({
                 startDate: data.startDate,
@@ -306,11 +295,9 @@ function MyToursViewModel() {
 
     // Tarih sil
     self.deleteTourDate = function(dateItem) {
-        var token = localStorage.getItem('authToken');
         $.ajax({
             url: apiBaseUrl + '/api/tour-dates/' + dateItem.id,
             method: 'DELETE',
-            headers: token ? { 'Authorization': 'Bearer ' + token } : {},
             success: function() {
                 toastr.success(T('Common.Delete') || 'Tarih silindi');
                 self.loadManagedDates(self.managingTourId());

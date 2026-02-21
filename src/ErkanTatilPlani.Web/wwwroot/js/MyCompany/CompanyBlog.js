@@ -63,7 +63,6 @@ function CompanyBlogViewModel() {
         $.ajax({
             url: apiBaseUrl + '/api/blogs/company/' + companyId + '/manage',
             method: 'GET',
-            headers: { 'Authorization': 'Bearer ' + (localStorage.getItem('token') || '') }
         }).done(function (data) {
             self.allPosts(data);
             self.isLoading(false);
@@ -225,7 +224,6 @@ function CompanyBlogViewModel() {
         $.ajax({
             url: apiBaseUrl + '/api/blogs/' + self.selectedPost().id,
             method: 'DELETE',
-            headers: { 'Authorization': 'Bearer ' + (localStorage.getItem('token') || '') }
         }).done(function () {
             toastr.success('Yazi silindi');
             deleteModal.hide();

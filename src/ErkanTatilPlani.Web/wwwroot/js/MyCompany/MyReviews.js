@@ -101,7 +101,6 @@ function MyReviewsViewModel() {
         }
 
         self.isSending(true);
-        var token = localStorage.getItem('authToken');
 
         // Visitor ID'yi al
         var visitorId = null;
@@ -116,7 +115,6 @@ function MyReviewsViewModel() {
         $.ajax({
             url: apiBaseUrl + '/api/reviews/' + self.replyingReviewId() + '/reply',
             method: 'POST',
-            headers: token ? { 'Authorization': 'Bearer ' + token } : {},
             contentType: 'application/json',
             data: JSON.stringify({
                 visitorId: visitorId,

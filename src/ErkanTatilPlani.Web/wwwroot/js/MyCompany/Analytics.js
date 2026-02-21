@@ -15,8 +15,6 @@ function AnalyticsViewModel() {
 
     self.loadAll = function() {
         self.isLoading(true);
-        var token = localStorage.getItem('authToken');
-        var headers = token ? { 'Authorization': 'Bearer ' + token } : {};
         var months = self.selectedMonths();
 
         var loaded = 0;
@@ -29,7 +27,6 @@ function AnalyticsViewModel() {
         // Revenue
         $.ajax({
             url: apiBaseUrl + '/api/companies/analytics/revenue?months=' + months,
-            headers: headers,
             success: function(data) { self.renderRevenueChart(data); checkDone(); },
             error: function() { checkDone(); }
         });
@@ -37,7 +34,6 @@ function AnalyticsViewModel() {
         // Occupancy
         $.ajax({
             url: apiBaseUrl + '/api/companies/analytics/occupancy?months=' + months,
-            headers: headers,
             success: function(data) { self.renderOccupancyChart(data); checkDone(); },
             error: function() { checkDone(); }
         });
@@ -45,7 +41,6 @@ function AnalyticsViewModel() {
         // Cancellations
         $.ajax({
             url: apiBaseUrl + '/api/companies/analytics/cancellations?months=' + months,
-            headers: headers,
             success: function(data) { self.renderCancellationChart(data); checkDone(); },
             error: function() { checkDone(); }
         });
@@ -53,7 +48,6 @@ function AnalyticsViewModel() {
         // Tour Comparison
         $.ajax({
             url: apiBaseUrl + '/api/companies/analytics/tour-comparison',
-            headers: headers,
             success: function(data) { self.renderTourComparisonChart(data); checkDone(); },
             error: function() { checkDone(); }
         });

@@ -46,7 +46,6 @@ function MyReservationsViewModel() {
     // Rezervasyonlari yukle
     self.loadReservations = function(status) {
         self.isLoading(true);
-        var token = localStorage.getItem('authToken');
         var url = apiBaseUrl + '/api/reservations/my';
         if (status && status !== 'all') {
             url += '?status=' + status;
@@ -55,7 +54,6 @@ function MyReservationsViewModel() {
         $.ajax({
             url: url,
             method: 'GET',
-            headers: token ? { 'Authorization': 'Bearer ' + token } : {},
             success: function(data) {
                 self.reservations(data.reservations || []);
                 self.stats(data.stats || { total: 0, pending: 0, confirmed: 0, cancelled: 0, completed: 0 });
@@ -89,12 +87,10 @@ function MyReservationsViewModel() {
 
     // Durum guncelle
     self.updateStatus = function(reservation, newStatus) {
-        var token = localStorage.getItem('authToken');
 
         $.ajax({
             url: apiBaseUrl + '/api/reservations/my/' + reservation.id + '/status',
             method: 'PATCH',
-            headers: token ? { 'Authorization': 'Bearer ' + token } : {},
             contentType: 'application/json',
             data: JSON.stringify({ status: newStatus }),
             success: function() {

@@ -68,9 +68,17 @@
         toastr.options = { "closeButton": true, "progressBar": true, "positionClass": "toast-top-right", "timeOut": "3000" };
         var apiBaseUrl = '@Html.Raw(ViewBag.ApiBaseUrl ?? "https://localhost:7078")';
 
-        // Menu visibility
+        // Auth + Menu visibility
         var currentUserRole = '@(ViewBag.UserRole ?? "Admin")';
         $(document).ready(function() {
+            var token = localStorage.getItem('authToken');
+            if (!token) {
+                window.location.href = '/Account/Login';
+                return;
+            }
+            $.ajaxSetup({
+                headers: { 'Authorization': 'Bearer ' + token }
+            });
             if (currentUserRole === 'Staff') {
                 $('#adminMenu').hide();
             }

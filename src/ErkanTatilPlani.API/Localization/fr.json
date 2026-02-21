@@ -32,6 +32,7 @@
   "Menu.Login": "Connexion",
   "Menu.Logout": "Deconnexion",
   "Menu.Register": "Inscription",
+  "Menu.CompanyPanel": "Panneau entreprise",
   "Menu.AdminPanel": "Panneau d'administration",
   "Menu.MyReservations": "Mes reservations",
 

@@ -32,6 +32,7 @@
   "Menu.Login": "Iniciar sesion",
   "Menu.Logout": "Cerrar sesion",
   "Menu.Register": "Registrarse",
+  "Menu.CompanyPanel": "Panel de empresa",
   "Menu.AdminPanel": "Panel de administracion",
   "Menu.MyReservations": "Mis reservas",
 

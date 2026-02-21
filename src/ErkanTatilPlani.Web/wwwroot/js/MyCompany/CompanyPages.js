@@ -29,7 +29,6 @@ function CompanyPagesViewModel() {
         $.ajax({
             url: apiBaseUrl + '/api/companies/' + companyId + '/pages',
             method: 'GET',
-            headers: { 'Authorization': 'Bearer ' + (localStorage.getItem('token') || '') }
         }).done(function (data) {
             self.pages(data);
             self.isLoading(false);
@@ -59,7 +58,6 @@ function CompanyPagesViewModel() {
         $.ajax({
             url: apiBaseUrl + '/api/companies/' + companyId + '/pages/' + page.id,
             method: 'GET',
-            headers: { 'Authorization': 'Bearer ' + (localStorage.getItem('token') || '') }
         }).done(function (data) {
             self.formData({
                 title: data.title,
@@ -182,7 +180,6 @@ function CompanyPagesViewModel() {
         $.ajax({
             url: apiBaseUrl + '/api/companies/' + companyId + '/pages/' + self.selectedPage().id,
             method: 'DELETE',
-            headers: { 'Authorization': 'Bearer ' + (localStorage.getItem('token') || '') }
         }).done(function () {
             toastr.success('Sayfa silindi');
             deleteModal.hide();

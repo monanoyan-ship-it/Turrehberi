@@ -75,7 +75,6 @@ function PromotionsViewModel() {
         $.ajax({
             url: url,
             method: 'GET',
-            headers: { 'Authorization': 'Bearer ' + localStorage.getItem('authToken') }
         }).done(function (data) {
             self.promotions(data);
         }).fail(function (xhr) {
@@ -155,7 +154,6 @@ function PromotionsViewModel() {
             method: method,
             contentType: 'application/json',
             data: JSON.stringify(data),
-            headers: { 'Authorization': 'Bearer ' + localStorage.getItem('authToken') }
         }).done(function () {
             toastr.success(self.isEditing() ? 'Promosyon guncellendi' : 'Promosyon olusturuldu');
             formModal.hide();
@@ -169,7 +167,6 @@ function PromotionsViewModel() {
         $.ajax({
             url: apiBaseUrl + '/api/promotions/' + promo.id + '/toggle',
             method: 'PUT',
-            headers: { 'Authorization': 'Bearer ' + localStorage.getItem('authToken') }
         }).done(function () {
             toastr.success('Promosyon durumu degistirildi');
             self.loadData();
@@ -183,7 +180,6 @@ function PromotionsViewModel() {
         $.ajax({
             url: apiBaseUrl + '/api/promotions/' + promo.id,
             method: 'DELETE',
-            headers: { 'Authorization': 'Bearer ' + localStorage.getItem('authToken') }
         }).done(function () {
             toastr.success('Promosyon silindi');
             self.loadData();
@@ -196,12 +192,16 @@ function PromotionsViewModel() {
     self.typeFilter.subscribe(function () { self.loadData(); });
     self.statusFilter.subscribe(function () { self.loadData(); });
 
+    // Modals
+    var formModal = null;
+
     // Init
-    self.loadData();
+    $(document).ready(function () {
+        formModal = new bootstrap.Modal(document.getElementById('formModal'));
+        self.loadData();
+    });
 }
 
-var formModal;
 $(document).ready(function () {
-    formModal = new bootstrap.Modal(document.getElementById('formModal'));
     ko.applyBindings(new PromotionsViewModel(), document.getElementById('promotionsApp'));
 });

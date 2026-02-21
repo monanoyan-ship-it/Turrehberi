@@ -32,11 +32,9 @@ function GuidesViewModel() {
     // Load guides
     self.loadData = function() {
         self.isLoading(true);
-        var token = localStorage.getItem('authToken');
         $.ajax({
             url: apiBaseUrl + '/api/guides',
             method: 'GET',
-            headers: token ? { 'Authorization': 'Bearer ' + token } : {},
             success: function(data) {
                 self.guides(data);
                 self.isLoading(false);
@@ -54,32 +52,38 @@ function GuidesViewModel() {
 
     // Load tour dates for assignment dropdown
     self.loadTourDates = function() {
-        var token = localStorage.getItem('authToken');
         $.ajax({
             url: apiBaseUrl + '/api/tours/my',
             method: 'GET',
-            headers: token ? { 'Authorization': 'Bearer ' + token } : {},
             success: function(data) {
-                var dates = [];
-                (data.tours || []).forEach(function(tour) {
-                    // Load dates for each tour
-                    $.ajax({
+                var tours = data.tours || [];
+                if (tours.length === 0) {
+                    self.tourDatesForAssign([]);
+                    return;
+                }
+                var requests = tours.map(function(tour) {
+                    return $.ajax({
                         url: apiBaseUrl + '/api/tours/' + tour.id + '/dates',
-                        method: 'GET',
-                        async: false,
-                        success: function(tourDates) {
-                            tourDates.forEach(function(td) {
-                                if (td.isAvailable && new Date(td.startDate) >= new Date()) {
-                                    dates.push({
-                                        id: td.id,
-                                        label: tour.name + ' - ' + new Date(td.startDate).toLocaleDateString('tr-TR')
-                                    });
-                                }
-                            });
-                        }
+                        method: 'GET'
+                    }).then(function(tourDates) {
+                        return { tour: tour, dates: tourDates };
                     });
                 });
-                self.tourDatesForAssign(dates);
+                $.when.apply($, requests).then(function() {
+                    var results = tours.length === 1 ? [arguments[0]] : Array.prototype.slice.call(arguments);
+                    var dates = [];
+                    results.forEach(function(r) {
+                        (r.dates || []).forEach(function(td) {
+                            if (td.isAvailable && new Date(td.startDate) >= new Date()) {
+                                dates.push({
+                                    id: td.id,
+                                    label: r.tour.name + ' - ' + new Date(td.startDate).toLocaleDateString('tr-TR')
+                                });
+                            }
+                        });
+                    });
+                    self.tourDatesForAssign(dates);
+                });
             }
         });
     };
@@ -114,11 +118,9 @@ function GuidesViewModel() {
 
     // Open detail modal
     self.openDetailModal = function(guide) {
-        var token = localStorage.getItem('authToken');
         $.ajax({
             url: apiBaseUrl + '/api/guides/' + guide.id,
             method: 'GET',
-            headers: token ? { 'Authorization': 'Bearer ' + token } : {},
             success: function(data) {
                 self.detailGuide(data);
                 self.selectedTourDateId(null);
@@ -141,7 +143,6 @@ function GuidesViewModel() {
         }
 
         self.isSaving(true);
-        var token = localStorage.getItem('authToken');
         var isEdit = self.isEditing();
         var url = isEdit ? apiBaseUrl + '/api/guides/' + self.editingGuideId() : apiBaseUrl + '/api/guides';
         var method = isEdit ? 'PUT' : 'POST';
@@ -149,7 +150,6 @@ function GuidesViewModel() {
         $.ajax({
             url: url,
             method: method,
-            headers: token ? { 'Authorization': 'Bearer ' + token } : {},
             contentType: 'application/json',
             data: JSON.stringify({
                 firstName: data.firstName,
@@ -184,12 +184,10 @@ function GuidesViewModel() {
     self.deleteGuide = function() {
         if (!self.deletingGuide()) return;
         self.isDeleting(true);
-        var token = localStorage.getItem('authToken');
 
         $.ajax({
             url: apiBaseUrl + '/api/guides/' + self.deletingGuide().id,
             method: 'DELETE',
-            headers: token ? { 'Authorization': 'Bearer ' + token } : {},
             success: function() {
                 toastr.success(T('Guide.DeleteSuccess') || 'Rehber silindi');
                 deleteGuideModal.hide();
@@ -207,12 +205,10 @@ function GuidesViewModel() {
     // Assign guide to tour date
     self.assignGuide = function() {
         if (!self.selectedTourDateId() || !self.detailGuide()) return;
-        var token = localStorage.getItem('authToken');
 
         $.ajax({
             url: apiBaseUrl + '/api/guides/' + self.detailGuide().id + '/assign',
             method: 'POST',
-            headers: token ? { 'Authorization': 'Bearer ' + token } : {},
             contentType: 'application/json',
             data: JSON.stringify({
                 tourDateId: self.selectedTourDateId(),
@@ -233,11 +229,9 @@ function GuidesViewModel() {
 
     // Remove assignment
     self.removeAssignment = function(assignment) {
-        var token = localStorage.getItem('authToken');
         $.ajax({
             url: apiBaseUrl + '/api/guides/assignments/' + assignment.id,
             method: 'DELETE',
-            headers: token ? { 'Authorization': 'Bearer ' + token } : {},
             success: function() {
                 toastr.success(T('Guide.AssignmentRemoved') || 'Atama kaldirildi');
                 self.openDetailModal(self.detailGuide());

@@ -104,14 +104,12 @@ function TourCalendarViewModel() {
     // Load calendar data
     self.loadCalendar = function() {
         self.isLoading(true);
-        var token = localStorage.getItem('authToken');
         var url = apiBaseUrl + '/api/tour-calendar?year=' + self.currentYear() + '&month=' + self.currentMonth();
         if (self.selectedTourId()) url += '&tourId=' + self.selectedTourId();
 
         $.ajax({
             url: url,
             method: 'GET',
-            headers: token ? { 'Authorization': 'Bearer ' + token } : {},
             success: function(data) {
                 self.calendarData(data);
                 if (data.tours && self.tours().length === 0) {

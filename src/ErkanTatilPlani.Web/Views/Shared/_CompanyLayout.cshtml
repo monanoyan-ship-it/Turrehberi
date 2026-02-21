@@ -77,6 +77,13 @@
         // Auth token
         $(document).ready(function() {
             var token = localStorage.getItem('authToken');
+            if (!token) {
+                window.location.href = '/Account/Login';
+                return;
+            }
+            $.ajaxSetup({
+                headers: { 'Authorization': 'Bearer ' + token }
+            });
             var visitor = localStorage.getItem('visitor');
             if (visitor) {
                 try {
