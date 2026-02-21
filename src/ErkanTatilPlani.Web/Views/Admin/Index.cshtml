@@ -6,7 +6,7 @@
     <!-- Stat Cards -->
     <div class="row g-4 mb-4">
         <div class="col-md-3">
-            <div class="card h-100">
+            <a href="/Admin/Tours" class="card h-100 text-decoration-none text-body">
                 <div class="card-body">
                     <div class="d-flex justify-content-between align-items-center">
                         <div>
@@ -18,10 +18,10 @@
                         </div>
                     </div>
                 </div>
-            </div>
+            </a>
         </div>
         <div class="col-md-3">
-            <div class="card h-100">
+            <a href="/Admin/Companies" class="card h-100 text-decoration-none text-body">
                 <div class="card-body">
                     <div class="d-flex justify-content-between align-items-center">
                         <div>
@@ -33,10 +33,10 @@
                         </div>
                     </div>
                 </div>
-            </div>
+            </a>
         </div>
         <div class="col-md-3">
-            <div class="card h-100">
+            <a href="/Admin/Visitors" class="card h-100 text-decoration-none text-body">
                 <div class="card-body">
                     <div class="d-flex justify-content-between align-items-center">
                         <div>
@@ -48,10 +48,10 @@
                         </div>
                     </div>
                 </div>
-            </div>
+            </a>
         </div>
         <div class="col-md-3">
-            <div class="card h-100">
+            <a href="/Admin/Reservations" class="card h-100 text-decoration-none text-body">
                 <div class="card-body">
                     <div class="d-flex justify-content-between align-items-center">
                         <div>
@@ -63,7 +63,7 @@
                         </div>
                     </div>
                 </div>
-            </div>
+            </a>
         </div>
     </div>
 
@@ -94,7 +94,7 @@
                                     <td data-bind="text: new Date(startDate).toLocaleDateString('tr-TR')"></td>
                                     <td data-bind="text: numberOfPeople"></td>
                                     <td>
-                                        <span class="badge" data-bind="css: getStatusBadge(status), text: getStatusText(status)"></span>
+                                        <span class="badge" data-bind="css: $parent.getStatusBadge(status), text: $parent.getStatusText(status)"></span>
                                     </td>
                                 </tr>
                             </tbody>

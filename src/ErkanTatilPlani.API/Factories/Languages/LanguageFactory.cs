@@ -24,8 +24,7 @@ public class LanguageFactory : ILanguageFactory
             {
                 l.Id, l.Name, l.LanguageCulture, l.UniqueSeoCode,
                 FlagIcon = l.FlagIcon ?? "fi fi-un",
-                l.Rtl, l.IsDefault, l.DisplayOrder, l.IsActive,
-                ResourceCount = l.LocaleStringResources.Count
+                l.Rtl, l.IsDefault, l.DisplayOrder, l.IsActive
             })
             .OrderBy(l => l.DisplayOrder)
             .ToListAsync<object>();

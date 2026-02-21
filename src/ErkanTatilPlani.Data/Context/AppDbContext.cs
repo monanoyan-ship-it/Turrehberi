@@ -15,7 +15,6 @@ public class AppDbContext : DbContext
     public DbSet<Visitor> Visitors => Set<Visitor>();
     public DbSet<Reservation> Reservations => Set<Reservation>();
     public DbSet<Language> Languages => Set<Language>();
-    public DbSet<LocaleStringResource> LocaleStringResources => Set<LocaleStringResource>();
 
     // Review System
     public DbSet<TourReview> TourReviews => Set<TourReview>();
@@ -146,18 +145,6 @@ public class AppDbContext : DbContext
             entity.Property(e => e.UniqueSeoCode).IsRequired().HasMaxLength(5);
             entity.HasIndex(e => e.LanguageCulture).IsUnique();
             entity.HasIndex(e => e.UniqueSeoCode).IsUnique();
-        });
-
-        modelBuilder.Entity<LocaleStringResource>(entity =>
-        {
-            entity.HasKey(e => e.Id);
-            entity.Property(e => e.ResourceName).IsRequired().HasMaxLength(500);
-            entity.Property(e => e.ResourceValue).IsRequired();
-            entity.HasIndex(e => new { e.LanguageId, e.ResourceName }).IsUnique();
-            entity.HasOne(e => e.Language)
-                  .WithMany(l => l.LocaleStringResources)
-                  .HasForeignKey(e => e.LanguageId)
-                  .OnDelete(DeleteBehavior.Cascade);
         });
 
         // ===============================================
@@ -723,14 +710,18 @@ public class AppDbContext : DbContext
         };
         modelBuilder.Entity<Reservation>().HasData(reservations);
 
-        // Diller - Sadece varsayilan diller, ceviriler XML'den yuklenecek
+        // Diller - 9 dil (JSON lokalizasyon dosyalariyla eslesir)
         var languages = new[]
         {
             new Language { Id = 1, Name = "Turkce", LanguageCulture = "tr-TR", UniqueSeoCode = "tr", FlagIcon = "fi fi-tr", IsDefault = true, DisplayOrder = 1, CreatedAt = now, IsActive = true },
             new Language { Id = 2, Name = "English", LanguageCulture = "en-US", UniqueSeoCode = "en", FlagIcon = "fi fi-us", IsDefault = false, DisplayOrder = 2, CreatedAt = now, IsActive = true },
             new Language { Id = 3, Name = "Deutsch", LanguageCulture = "de-DE", UniqueSeoCode = "de", FlagIcon = "fi fi-de", IsDefault = false, DisplayOrder = 3, CreatedAt = now, IsActive = true },
             new Language { Id = 4, Name = "Русский", LanguageCulture = "ru-RU", UniqueSeoCode = "ru", FlagIcon = "fi fi-ru", IsDefault = false, DisplayOrder = 4, CreatedAt = now, IsActive = true },
-            new Language { Id = 5, Name = "Espanol", LanguageCulture = "es-ES", UniqueSeoCode = "es", FlagIcon = "fi fi-es", IsDefault = false, DisplayOrder = 5, CreatedAt = now, IsActive = true }
+            new Language { Id = 5, Name = "Espanol", LanguageCulture = "es-ES", UniqueSeoCode = "es", FlagIcon = "fi fi-es", IsDefault = false, DisplayOrder = 5, CreatedAt = now, IsActive = true },
+            new Language { Id = 6, Name = "Francais", LanguageCulture = "fr-FR", UniqueSeoCode = "fr", FlagIcon = "fi fi-fr", IsDefault = false, DisplayOrder = 6, CreatedAt = now, IsActive = true },
+            new Language { Id = 7, Name = "العربية", LanguageCulture = "ar-SA", UniqueSeoCode = "ar", FlagIcon = "fi fi-sa", Rtl = true, IsDefault = false, DisplayOrder = 7, CreatedAt = now, IsActive = true },
+            new Language { Id = 8, Name = "فارسی", LanguageCulture = "fa-IR", UniqueSeoCode = "fa", FlagIcon = "fi fi-ir", Rtl = true, IsDefault = false, DisplayOrder = 8, CreatedAt = now, IsActive = true },
+            new Language { Id = 9, Name = "Portugues", LanguageCulture = "pt-BR", UniqueSeoCode = "pt", FlagIcon = "fi fi-br", IsDefault = false, DisplayOrder = 9, CreatedAt = now, IsActive = true }
         };
         modelBuilder.Entity<Language>().HasData(languages);
 

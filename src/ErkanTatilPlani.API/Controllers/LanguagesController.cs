@@ -9,12 +9,10 @@ namespace ErkanTatilPlani.API.Controllers;
 public class LanguagesController : ControllerBase
 {
     private readonly ILanguageFactory _languageFactory;
-    private readonly ILanguageResourceFactory _resourceFactory;
 
-    public LanguagesController(ILanguageFactory languageFactory, ILanguageResourceFactory resourceFactory)
+    public LanguagesController(ILanguageFactory languageFactory)
     {
         _languageFactory = languageFactory;
-        _resourceFactory = resourceFactory;
     }
 
     [HttpGet]
@@ -59,50 +57,4 @@ public class LanguagesController : ControllerBase
         if (!success) return StatusCode(statusCode, new { message });
         return NoContent();
     }
-
-    [HttpGet("{id}/export")]
-    public async Task<IActionResult> ExportXml(int id)
-    {
-        var (success, data, fileName, error, statusCode) = await _resourceFactory.ExportXmlAsync(id);
-        if (!success) return StatusCode(statusCode, new { error });
-        return File(data!, "application/xml", fileName);
-    }
-
-    [HttpPost("{id}/import")]
-    public async Task<IActionResult> ImportXml(int id, IFormFile file)
-    {
-        if (file == null || file.Length == 0)
-            return BadRequest(new { error = "Dosya secilmedi" });
-
-        using var stream = file.OpenReadStream();
-        var (success, result, statusCode) = await _resourceFactory.ImportXmlAsync(id, stream);
-        return StatusCode(statusCode, result);
-    }
-
-    [HttpGet("{id}/resources")]
-    public async Task<ActionResult<IEnumerable<LocaleStringResource>>> GetResources(int id)
-        => Ok(await _resourceFactory.GetResourcesAsync(id));
-
-    [HttpPut("{id}/resources/{resourceId}")]
-    public async Task<IActionResult> UpdateResource(int id, int resourceId, [FromBody] LocaleStringResource resource)
-    {
-        var (success, message, statusCode) = await _resourceFactory.UpdateResourceAsync(id, resourceId, resource);
-        if (!success) return StatusCode(statusCode, new { message });
-        return NoContent();
-    }
-
-    [HttpPost("{id}/import-from-folder")]
-    public async Task<IActionResult> ImportFromFolder(int id)
-    {
-        var (success, result, statusCode) = await _resourceFactory.ImportFromFolderAsync(id);
-        return StatusCode(statusCode, result);
-    }
-
-    [HttpPost("import-all")]
-    public async Task<IActionResult> ImportAll()
-        => Ok(await _resourceFactory.ImportAllAsync());
-
-    [HttpGet("available-files")]
-    public IActionResult GetAvailableFiles()
-        => Ok(_resourceFactory.GetAvailableFiles());
 }

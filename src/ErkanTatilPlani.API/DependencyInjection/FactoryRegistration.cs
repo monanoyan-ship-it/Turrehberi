@@ -61,9 +61,8 @@ public static class FactoryRegistration
         // EmailTemplate factories (1)
         services.AddScoped<IEmailTemplateFactory, EmailTemplateFactory>();
 
-        // Language factories (2)
+        // Language factories (1)
         services.AddScoped<ILanguageFactory, LanguageFactory>();
-        services.AddScoped<ILanguageResourceFactory, LanguageResourceFactory>();
 
         // Reservation factories (3)
         services.AddScoped<IReservationCrudFactory, ReservationCrudFactory>();

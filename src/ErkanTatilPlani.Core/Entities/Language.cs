@@ -40,6 +40,4 @@ public class Language : BaseEntity
     /// </summary>
     public int DisplayOrder { get; set; } = 0;
 
-    // Navigation
-    public virtual ICollection<LocaleStringResource> LocaleStringResources { get; set; } = new List<LocaleStringResource>();
 }

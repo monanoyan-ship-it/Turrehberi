@@ -79,7 +79,7 @@ function DashboardViewModel() {
             $.ajax({ url: apiBaseUrl + '/api/visitors', method: 'GET' }),
             $.ajax({ url: apiBaseUrl + '/api/reservations', method: 'GET' })
         ).done(function(toursRes, companiesRes, visitorsRes, reservationsRes) {
-            var tours = toursRes[0];
+            var tours = toursRes[0].tours || toursRes[0];
             var companies = companiesRes[0];
             var visitors = visitorsRes[0];
             var reservations = reservationsRes[0];
