@@ -11,6 +11,7 @@ function TourCalendarViewModel() {
     self.selectedDateDetail = ko.observable(null);
 
     var dateDetailModal = null;
+    var initialized = false;
 
     // Computed
     self.monthYearLabel = ko.computed(function() {
@@ -98,7 +99,7 @@ function TourCalendarViewModel() {
 
     // Tour filter change
     self.selectedTourId.subscribe(function() {
-        self.loadCalendar();
+        if (initialized) self.loadCalendar();
     });
 
     // Load calendar data
@@ -131,6 +132,7 @@ function TourCalendarViewModel() {
     // Init
     $(document).ready(function() {
         dateDetailModal = new bootstrap.Modal(document.getElementById('dateDetailModal'));
+        initialized = true;
         self.loadCalendar();
     });
 }

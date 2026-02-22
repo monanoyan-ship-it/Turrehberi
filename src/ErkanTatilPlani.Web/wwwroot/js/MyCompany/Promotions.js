@@ -9,9 +9,6 @@ function PromotionsViewModel() {
     self.typeFilter = ko.observable('');
     self.statusFilter = ko.observable('');
 
-    // Form
-    self.formData = ko.observable(self.getEmptyForm());
-
     // Helpers
     self.getEmptyForm = function () {
         return {
@@ -37,7 +34,8 @@ function PromotionsViewModel() {
         };
     };
 
-    self.formData(self.getEmptyForm());
+    // Form
+    self.formData = ko.observable(self.getEmptyForm());
 
     self.getTypeBadgeClass = function (typeId) {
         var classes = { 0: 'bg-primary', 1: 'bg-info', 2: 'bg-warning text-dark', 3: 'bg-success', 4: 'bg-danger', 5: 'bg-dark', 6: 'bg-secondary' };

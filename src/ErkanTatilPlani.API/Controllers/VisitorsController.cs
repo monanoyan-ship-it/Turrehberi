@@ -7,7 +7,6 @@ namespace ErkanTatilPlani.API.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
-[Authorize(Roles = "Admin,Staff")]
 public class VisitorsController : ControllerBase
 {
     private readonly IVisitorFactory _visitorFactory;
@@ -32,6 +31,7 @@ public class VisitorsController : ControllerBase
     }
 
     [HttpPost]
+    [Authorize(Roles = "Admin,Staff")]
     public async Task<ActionResult<Visitor>> CreateVisitor(Visitor visitor)
     {
         var created = await _visitorFactory.CreateAsync(visitor);
@@ -39,6 +39,7 @@ public class VisitorsController : ControllerBase
     }
 
     [HttpPut("{id}")]
+    [Authorize(Roles = "Admin,Staff")]
     public async Task<IActionResult> UpdateVisitor(int id, Visitor visitor)
     {
         if (id != visitor.Id) return BadRequest();

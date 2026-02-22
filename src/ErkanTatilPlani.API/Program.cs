@@ -230,8 +230,8 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
-app.UseRateLimiter(); // Rate limiting
 app.UseCors("AllowAll");
+app.UseRateLimiter(); // Rate limiting
 app.UseStaticFiles();
 app.UseResponseCaching();
 app.UseAuthentication();

@@ -51,6 +51,7 @@ public class VisitorReservationFactory : IVisitorReservationFactory
                 r.TotalPrice,
                 Status = r.Status == ReservationStatuses.Ids.Pending ? "Pending" : r.Status == ReservationStatuses.Ids.Confirmed ? "Confirmed" : r.Status == ReservationStatuses.Ids.Cancelled ? "Cancelled" : r.Status == ReservationStatuses.Ids.Completed ? "Completed" : "Unknown",
                 StatusId = r.Status,
+                PaymentStatusId = r.PaymentStatus,
                 r.Notes,
                 r.CreatedAt
             })
@@ -90,8 +91,10 @@ public class VisitorReservationFactory : IVisitorReservationFactory
                 r.CreatedAt,
                 r.UpdatedAt,
                 CanCancel = r.Status == ReservationStatuses.Ids.Pending || r.Status == ReservationStatuses.Ids.Confirmed,
-                // Odeme bilgileri
-                r.DepositAmount,
+                // Odeme bilgileri - DepositAmount 0 ise firma yuzdesinden hesapla
+                DepositAmount = r.DepositAmount > 0
+                    ? r.DepositAmount
+                    : r.TotalPrice * r.Tour.Company.DepositPercentage / 100,
                 r.PaidAmount,
                 r.PaymentId,
                 PaymentStatus = r.PaymentStatus == PaymentStatuses.Ids.Pending ? "Pending" : r.PaymentStatus == PaymentStatuses.Ids.DepositPaid ? "DepositPaid" : r.PaymentStatus == PaymentStatuses.Ids.FullyPaid ? "FullyPaid" : r.PaymentStatus == PaymentStatuses.Ids.Failed ? "Failed" : r.PaymentStatus == PaymentStatuses.Ids.Refunded ? "Refunded" : "Unknown",

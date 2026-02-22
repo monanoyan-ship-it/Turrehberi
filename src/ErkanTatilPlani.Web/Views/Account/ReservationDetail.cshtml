@@ -29,36 +29,36 @@
                 <div class="card shadow-sm border-0 mb-4">
                     <div class="row g-0">
                         <div class="col-md-4">
-                            <img data-bind="attr: { src: tourImageUrl || 'https://picsum.photos/seed/' + tourId + '/400/300' }"
+                            <img data-bind="attr: { src: $data.tourImageUrl || 'https://picsum.photos/seed/' + $data.tourId + '/400/300' }"
                                  class="img-fluid rounded-start h-100" style="object-fit: cover;" alt="Tour">
                         </div>
                         <div class="col-md-8">
                             <div class="card-body">
                                 <div class="d-flex justify-content-between align-items-start mb-2">
-                                    <h4 class="card-title mb-0" data-bind="text: tourName"></h4>
+                                    <h4 class="card-title mb-0" data-bind="text: $data.tourName"></h4>
                                     <span class="badge fs-6"
                                           data-bind="css: {
-                                              'bg-warning': statusId === 0,
-                                              'bg-success': statusId === 1,
-                                              'bg-danger': statusId === 2,
-                                              'bg-info': statusId === 3
-                                          }, text: $parent.getStatusText(status)">
+                                              'bg-warning': $data.statusId === 0,
+                                              'bg-success': $data.statusId === 1,
+                                              'bg-danger': $data.statusId === 2,
+                                              'bg-info': $data.statusId === 3
+                                          }, text: $parent.getStatusText($data.status)">
                                     </span>
                                 </div>
                                 <p class="text-muted mb-3">
                                     <i class="bi bi-geo-alt me-1"></i>
-                                    <span data-bind="text: tourDestination"></span>
+                                    <span data-bind="text: $data.tourDestination"></span>
                                 </p>
-                                <p class="card-text small text-muted" data-bind="text: tourDescription ? (tourDescription.length > 200 ? tourDescription.substring(0, 200) + '...' : tourDescription) : ''"></p>
+                                <p class="card-text small text-muted" data-bind="text: $data.tourDescription ? ($data.tourDescription.length > 200 ? $data.tourDescription.substring(0, 200) + '...' : $data.tourDescription) : ''"></p>
 
                                 <div class="d-flex gap-3 mt-3">
-                                    <a class="btn btn-outline-primary btn-sm" data-bind="attr: { href: '/Tours#tour-' + tourId }">
+                                    <a class="btn btn-outline-primary btn-sm" data-bind="attr: { href: '/Tours#tour-' + $data.tourId }">
                                         <i class="bi bi-info-circle me-1"></i>
                                         <span data-t="ReservationDetail.ViewTour">Turu Gor</span>
                                     </a>
-                                    <a class="btn btn-outline-secondary btn-sm" data-bind="attr: { href: '/' + companySlug }">
+                                    <a class="btn btn-outline-secondary btn-sm" data-bind="attr: { href: '/' + $data.companySlug }">
                                         <i class="bi bi-building me-1"></i>
-                                        <span data-bind="text: companyName"></span>
+                                        <span data-bind="text: $data.companyName"></span>
                                     </a>
                                 </div>
                             </div>
@@ -83,7 +83,7 @@
                                     </div>
                                     <div>
                                         <small class="text-muted d-block" data-t="Reservation.StartDate">Baslangic Tarihi</small>
-                                        <span class="fw-semibold" data-bind="text: new Date(startDate).toLocaleDateString('tr-TR', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })"></span>
+                                        <span class="fw-semibold" data-bind="text: new Date($data.startDate).toLocaleDateString('tr-TR', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })"></span>
                                     </div>
                                 </div>
                             </div>
@@ -94,7 +94,7 @@
                                     </div>
                                     <div>
                                         <small class="text-muted d-block" data-t="Reservation.EndDate">Bitis Tarihi</small>
-                                        <span class="fw-semibold" data-bind="text: new Date(endDate).toLocaleDateString('tr-TR', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })"></span>
+                                        <span class="fw-semibold" data-bind="text: new Date($data.endDate).toLocaleDateString('tr-TR', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })"></span>
                                     </div>
                                 </div>
                             </div>
@@ -105,7 +105,7 @@
                                     </div>
                                     <div>
                                         <small class="text-muted d-block" data-t="Reservation.People">Kisi Sayisi</small>
-                                        <span class="fw-semibold" data-bind="text: numberOfPeople + ' Kisi'"></span>
+                                        <span class="fw-semibold" data-bind="text: $data.numberOfPeople + ' Kisi'"></span>
                                     </div>
                                 </div>
                             </div>
@@ -116,16 +116,16 @@
                                     </div>
                                     <div>
                                         <small class="text-muted d-block" data-t="Tour.Duration">Tur Suresi</small>
-                                        <span class="fw-semibold" data-bind="text: tourDurationDays + ' Gun'"></span>
+                                        <span class="fw-semibold" data-bind="text: $data.tourDurationDays + ' Gun'"></span>
                                     </div>
                                 </div>
                             </div>
                         </div>
 
                         <!-- Notes -->
-                        <div data-bind="visible: notes" class="mt-4 p-3 bg-light rounded">
+                        <div data-bind="visible: $data.notes" class="mt-4 p-3 bg-light rounded">
                             <small class="text-muted d-block mb-1" data-t="Reservation.Notes">Notlar</small>
-                            <span data-bind="text: notes"></span>
+                            <span data-bind="text: $data.notes"></span>
                         </div>
                     </div>
                 </div>
@@ -143,13 +143,13 @@
                             <div class="col-sm-6">
                                 <div class="d-flex align-items-center">
                                     <i class="bi bi-telephone text-muted me-2"></i>
-                                    <a data-bind="attr: { href: 'tel:' + companyPhone }, text: companyPhone" class="text-decoration-none"></a>
+                                    <a data-bind="attr: { href: 'tel:' + $data.companyPhone }, text: $data.companyPhone" class="text-decoration-none"></a>
                                 </div>
                             </div>
                             <div class="col-sm-6">
                                 <div class="d-flex align-items-center">
                                     <i class="bi bi-envelope text-muted me-2"></i>
-                                    <a data-bind="attr: { href: 'mailto:' + companyEmail }, text: companyEmail" class="text-decoration-none"></a>
+                                    <a data-bind="attr: { href: 'mailto:' + $data.companyEmail }, text: $data.companyEmail" class="text-decoration-none"></a>
                                 </div>
                             </div>
                         </div>
@@ -170,16 +170,16 @@
                     <div class="card-body">
                         <div class="d-flex justify-content-between mb-2">
                             <span data-t="ReservationDetail.UnitPrice">Birim Fiyat</span>
-                            <span data-bind="text: tourPrice.toLocaleString('tr-TR', {style: 'currency', currency: 'TRY'})"></span>
+                            <span data-bind="text: $data.tourPrice.toLocaleString('tr-TR', {style: 'currency', currency: 'TRY'})"></span>
                         </div>
                         <div class="d-flex justify-content-between mb-2">
                             <span data-t="Reservation.People">Kisi Sayisi</span>
-                            <span data-bind="text: 'x ' + numberOfPeople"></span>
+                            <span data-bind="text: 'x ' + $data.numberOfPeople"></span>
                         </div>
                         <hr>
                         <div class="d-flex justify-content-between">
                             <span class="fw-bold" data-t="Reservation.TotalPrice">Toplam</span>
-                            <span class="fs-4 fw-bold text-primary" data-bind="text: totalPrice.toLocaleString('tr-TR', {style: 'currency', currency: 'TRY'})"></span>
+                            <span class="fs-4 fw-bold text-primary" data-bind="text: $data.totalPrice.toLocaleString('tr-TR', {style: 'currency', currency: 'TRY'})"></span>
                         </div>
                     </div>
                 </div>
@@ -195,38 +195,38 @@
                     <div class="card-body">
                         <div class="alert mb-3"
                              data-bind="css: {
-                                 'alert-warning': statusId === 0,
-                                 'alert-success': statusId === 1,
-                                 'alert-danger': statusId === 2,
-                                 'alert-info': statusId === 3
+                                 'alert-warning': $data.statusId === 0,
+                                 'alert-success': $data.statusId === 1,
+                                 'alert-danger': $data.statusId === 2,
+                                 'alert-info': $data.statusId === 3
                              }">
                             <i class="bi me-2"
                                data-bind="css: {
-                                   'bi-hourglass-split': statusId === 0,
-                                   'bi-check-circle': statusId === 1,
-                                   'bi-x-circle': statusId === 2,
-                                   'bi-flag': statusId === 3
+                                   'bi-hourglass-split': $data.statusId === 0,
+                                   'bi-check-circle': $data.statusId === 1,
+                                   'bi-x-circle': $data.statusId === 2,
+                                   'bi-flag': $data.statusId === 3
                                }"></i>
-                            <span data-bind="text: $parent.getStatusText(status)"></span>
+                            <span data-bind="text: $parent.getStatusText($data.status)"></span>
                         </div>
 
                         <div class="small text-muted">
                             <div class="mb-1">
                                 <i class="bi bi-calendar-plus me-1"></i>
                                 <span data-t="ReservationDetail.CreatedAt">Olusturulma:</span>
-                                <span data-bind="text: new Date(createdAt).toLocaleString('tr-TR')"></span>
+                                <span data-bind="text: new Date($data.createdAt).toLocaleString('tr-TR')"></span>
                             </div>
-                            <div data-bind="visible: updatedAt">
+                            <div data-bind="visible: $data.updatedAt">
                                 <i class="bi bi-calendar-check me-1"></i>
                                 <span data-t="ReservationDetail.UpdatedAt">Son Guncelleme:</span>
-                                <span data-bind="text: updatedAt ? new Date(updatedAt).toLocaleString('tr-TR') : '-'"></span>
+                                <span data-bind="text: $data.updatedAt ? new Date($data.updatedAt).toLocaleString('tr-TR') : '-'"></span>
                             </div>
                         </div>
                     </div>
                 </div>
 
                 <!-- Payment Card - Odeme Bekliyor -->
-                <div class="card shadow-sm border-0 mb-4" data-bind="visible: paymentStatusId === 0 && statusId !== 2">
+                <div class="card shadow-sm border-0 mb-4" data-bind="visible: $data.paymentStatusId === 0 && $data.statusId !== 2">
                     <div class="card-header bg-warning">
                         <h5 class="mb-0">
                             <i class="bi bi-credit-card me-2"></i>
@@ -240,13 +240,13 @@
                         </div>
                         <div class="d-flex justify-content-between mb-2">
                             <span>On Odeme Tutari</span>
-                            <span class="fw-bold" data-bind="text: depositAmount.toLocaleString('tr-TR', {style: 'currency', currency: 'TRY'})"></span>
+                            <span class="fw-bold" data-bind="text: $data.depositAmount.toLocaleString('tr-TR', {style: 'currency', currency: 'TRY'})"></span>
                         </div>
                         <button class="btn btn-success w-100 btn-lg" data-bind="click: $parent.initiatePayment, disable: $parent.isPaymentLoading">
                             <span data-bind="visible: !$parent.isPaymentLoading()">
                                 <i class="bi bi-credit-card me-1"></i>
                                 On Odeme Yap
-                                <span class="ms-2" data-bind="text: depositAmount.toLocaleString('tr-TR', {style: 'currency', currency: 'TRY'})"></span>
+                                <span class="ms-2" data-bind="text: $data.depositAmount.toLocaleString('tr-TR', {style: 'currency', currency: 'TRY'})"></span>
                             </span>
                             <span data-bind="visible: $parent.isPaymentLoading">
                                 <span class="spinner-border spinner-border-sm me-1"></span>
@@ -261,7 +261,7 @@
                 </div>
 
                 <!-- Payment Card - On Odeme Yapildi, Kalan Odeme Bekleniyor -->
-                <div class="card shadow-sm border-0 mb-4" data-bind="visible: paymentStatusId === 1">
+                <div class="card shadow-sm border-0 mb-4" data-bind="visible: $data.paymentStatusId === 1">
                     <div class="card-header bg-info text-white">
                         <h5 class="mb-0">
                             <i class="bi bi-check-circle me-2"></i>
@@ -275,46 +275,46 @@
                         </div>
                         <div class="d-flex justify-content-between mb-2">
                             <span>Odenen</span>
-                            <span class="text-success fw-bold" data-bind="text: paidAmount.toLocaleString('tr-TR', {style: 'currency', currency: 'TRY'})"></span>
+                            <span class="text-success fw-bold" data-bind="text: $data.paidAmount.toLocaleString('tr-TR', {style: 'currency', currency: 'TRY'})"></span>
                         </div>
                         <div class="d-flex justify-content-between mb-2">
                             <span>Kalan</span>
-                            <span class="text-danger fw-bold" data-bind="text: (totalPrice - paidAmount).toLocaleString('tr-TR', {style: 'currency', currency: 'TRY'})"></span>
+                            <span class="text-danger fw-bold" data-bind="text: ($data.totalPrice - $data.paidAmount).toLocaleString('tr-TR', {style: 'currency', currency: 'TRY'})"></span>
                         </div>
                         <hr>
                         <button class="btn btn-primary w-100" data-bind="click: $parent.initiateRemainingPayment, disable: $parent.isPaymentLoading">
                             <span data-bind="visible: !$parent.isPaymentLoading()">
                                 <i class="bi bi-credit-card me-1"></i>
                                 Kalan Odemeyi Yap
-                                <span class="ms-2" data-bind="text: (totalPrice - paidAmount).toLocaleString('tr-TR', {style: 'currency', currency: 'TRY'})"></span>
+                                <span class="ms-2" data-bind="text: ($data.totalPrice - $data.paidAmount).toLocaleString('tr-TR', {style: 'currency', currency: 'TRY'})"></span>
                             </span>
                             <span data-bind="visible: $parent.isPaymentLoading">
                                 <span class="spinner-border spinner-border-sm me-1"></span>
                                 Isleniyor...
                             </span>
                         </button>
-                        <small class="text-muted d-block mt-2 text-center" data-bind="visible: paidAt">
-                            On odeme tarihi: <span data-bind="text: paidAt ? new Date(paidAt).toLocaleString('tr-TR') : ''"></span>
+                        <small class="text-muted d-block mt-2 text-center" data-bind="visible: $data.paidAt">
+                            On odeme tarihi: <span data-bind="text: $data.paidAt ? new Date($data.paidAt).toLocaleString('tr-TR') : ''"></span>
                         </small>
                     </div>
                 </div>
 
                 <!-- Payment Success Badge - Tam Odeme Yapildi -->
-                <div class="card shadow-sm border-0 mb-4" data-bind="visible: paymentStatusId === 2">
+                <div class="card shadow-sm border-0 mb-4" data-bind="visible: $data.paymentStatusId === 2">
                     <div class="card-body text-center">
                         <i class="bi bi-check-circle-fill text-success" style="font-size: 3rem;"></i>
                         <h5 class="text-success mt-2">Tam Odeme Yapildi</h5>
                         <div class="text-muted">
-                            <span data-bind="text: paidAmount.toLocaleString('tr-TR', {style: 'currency', currency: 'TRY'})"></span>
+                            <span data-bind="text: $data.paidAmount.toLocaleString('tr-TR', {style: 'currency', currency: 'TRY'})"></span>
                         </div>
-                        <small class="text-muted" data-bind="visible: paidAt">
-                            <span data-bind="text: paidAt ? new Date(paidAt).toLocaleString('tr-TR') : ''"></span>
+                        <small class="text-muted" data-bind="visible: $data.paidAt">
+                            <span data-bind="text: $data.paidAt ? new Date($data.paidAt).toLocaleString('tr-TR') : ''"></span>
                         </small>
                     </div>
                 </div>
 
                 <!-- QR Kod Bilet -->
-                <div class="card shadow-sm border-0 mb-4" data-bind="visible: qrToken">
+                <div class="card shadow-sm border-0 mb-4" data-bind="visible: $data.qrToken">
                     <div class="card-header bg-white border-0">
                         <h5 class="mb-0">
                             <i class="bi bi-qr-code me-2 text-primary"></i>
@@ -328,7 +328,7 @@
                 </div>
 
                 <!-- Fotograf Linki -->
-                <div class="card shadow-sm border-0 mb-4" data-bind="visible: photoLink && statusId === 3">
+                <div class="card shadow-sm border-0 mb-4" data-bind="visible: $data.photoLink && $data.statusId === 3">
                     <div class="card-header bg-white border-0">
                         <h5 class="mb-0">
                             <i class="bi bi-camera me-2 text-primary"></i>
@@ -336,14 +336,14 @@
                         </h5>
                     </div>
                     <div class="card-body text-center">
-                        <a data-bind="attr: { href: photoLink }" target="_blank" class="btn btn-outline-primary">
+                        <a data-bind="attr: { href: $data.photoLink }" target="_blank" class="btn btn-outline-primary">
                             <i class="bi bi-images me-1"></i> <span data-t="PhotoLink.View">Fotograflari Gor</span>
                         </a>
                     </div>
                 </div>
 
                 <!-- Tarih Degistir -->
-                <div class="card shadow-sm border-0 mb-4" data-bind="visible: statusId === 1">
+                <div class="card shadow-sm border-0 mb-4" data-bind="visible: $data.statusId === 1">
                     <div class="card-header bg-white border-0">
                         <h5 class="mb-0">
                             <i class="bi bi-calendar-range me-2 text-primary"></i>
@@ -367,7 +367,7 @@
                 </div>
 
                 <!-- Actions Card -->
-                <div class="card shadow-sm border-0" data-bind="visible: canCancel">
+                <div class="card shadow-sm border-0" data-bind="visible: $data.canCancel">
                     <div class="card-header bg-white border-0">
                         <h5 class="mb-0">
                             <i class="bi bi-gear me-2 text-primary"></i>
