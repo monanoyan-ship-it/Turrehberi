@@ -177,6 +177,30 @@ public class ToursController : ControllerBase
         var (success, result, statusCode) = await _photoFactory.ReorderPhotosAsync(id, request.PhotoIds);
         return StatusCode(statusCode, result);
     }
+
+    [HttpPost("{id}/cover-photo")]
+    [Authorize(Roles = "CompanyOwner,Staff,Admin")]
+    public async Task<IActionResult> UploadCoverPhoto(int id, [FromForm] IFormFile file)
+    {
+        var visitorId = GetVisitorId();
+        if (visitorId == null) return Unauthorized();
+
+        using var stream = file?.OpenReadStream() ?? Stream.Null;
+        var (success, result, statusCode) = await _tourFactory.UploadCoverPhotoAsync(
+            visitorId.Value, id, stream, file?.FileName ?? string.Empty);
+        return StatusCode(statusCode, result);
+    }
+
+    [HttpDelete("{id}/cover-photo")]
+    [Authorize(Roles = "CompanyOwner,Staff,Admin")]
+    public async Task<IActionResult> DeleteCoverPhoto(int id)
+    {
+        var visitorId = GetVisitorId();
+        if (visitorId == null) return Unauthorized();
+
+        var (success, result, statusCode) = await _tourFactory.DeleteCoverPhotoAsync(visitorId.Value, id);
+        return StatusCode(statusCode, result);
+    }
 }
 
 public class ReorderPhotosRequest

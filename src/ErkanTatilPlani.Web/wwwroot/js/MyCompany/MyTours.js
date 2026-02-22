@@ -68,6 +68,9 @@ function MyToursViewModel() {
         { value: 0, label: 'Paz' }
     ];
 
+    // Cover photo
+    self.isUploadingCover = ko.observable(false);
+
     // Photo management
     self.photoTourId = ko.observable(null);
     self.photoTourName = ko.observable('');
@@ -231,6 +234,69 @@ function MyToursViewModel() {
                 var response = xhr.responseJSON;
                 toastr.error(response?.message || T('Common.Error') || 'Bir hata olustu');
                 self.isSaving(false);
+            }
+        });
+    };
+
+    // Cover photo upload
+    self.uploadCoverPhoto = function() {
+        var tourId = self.editingTourId();
+        if (!tourId) {
+            toastr.warning(T('MyTours.CoverPhotoAfterSave') || 'Once turu kaydedin');
+            return;
+        }
+
+        var fileInput = document.getElementById('tourCoverPhotoFile');
+        if (!fileInput.files || !fileInput.files[0]) {
+            toastr.warning(T('MyTours.SelectFile') || 'Lutfen bir dosya secin');
+            return;
+        }
+
+        self.isUploadingCover(true);
+        var formData = new FormData();
+        formData.append('file', fileInput.files[0]);
+
+        $.ajax({
+            url: apiBaseUrl + '/api/tours/' + tourId + '/cover-photo',
+            method: 'POST',
+            data: formData,
+            processData: false,
+            contentType: false,
+            success: function(data) {
+                toastr.success(T('MyTours.CoverPhotoUploaded') || 'Kapak fotografi yuklendi');
+                var fd = self.formData();
+                fd.imageUrl = data.imageUrl;
+                self.formData(fd);
+                self.formData.valueHasMutated();
+                fileInput.value = '';
+                self.isUploadingCover(false);
+                self.loadTours();
+            },
+            error: function(xhr) {
+                toastr.error(xhr.responseJSON?.message || T('Common.Error') || 'Hata olustu');
+                self.isUploadingCover(false);
+            }
+        });
+    };
+
+    // Cover photo delete
+    self.deleteCoverPhoto = function() {
+        var tourId = self.editingTourId();
+        if (!tourId) return;
+
+        $.ajax({
+            url: apiBaseUrl + '/api/tours/' + tourId + '/cover-photo',
+            method: 'DELETE',
+            success: function() {
+                toastr.success(T('MyTours.CoverPhotoDeleted') || 'Kapak fotografi silindi');
+                var fd = self.formData();
+                fd.imageUrl = '';
+                self.formData(fd);
+                self.formData.valueHasMutated();
+                self.loadTours();
+            },
+            error: function(xhr) {
+                toastr.error(xhr.responseJSON?.message || T('Common.Error') || 'Hata olustu');
             }
         });
     };

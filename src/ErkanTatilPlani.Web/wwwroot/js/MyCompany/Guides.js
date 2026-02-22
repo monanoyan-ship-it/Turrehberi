@@ -12,7 +12,7 @@ function GuidesViewModel() {
     self.editingGuideId = ko.observable(null);
     self.formData = ko.observable({
         firstName: '', lastName: '', phone: '', email: '',
-        photoUrl: '', languages: '', bio: '', experienceYears: ''
+        languages: '', bio: '', experienceYears: ''
     });
 
     // Detail
@@ -21,8 +21,16 @@ function GuidesViewModel() {
     self.selectedTourDateId = ko.observable(null);
     self.assignNotes = ko.observable('');
 
-    // Photo upload
+    // Photo modal
     self.isUploadingPhoto = ko.observable(false);
+    self.photoGuideId = ko.observable(null);
+    self.photoGuideName = ko.observable('');
+    self.photoGuideUrl = ko.observable('');
+
+    // Assign modal
+    self.assignGuideId = ko.observable(null);
+    self.assignGuideName = ko.observable('');
+    self.assignGuideAssignments = ko.observableArray([]);
 
     // Delete
     self.deletingGuide = ko.observable(null);
@@ -31,6 +39,8 @@ function GuidesViewModel() {
     var guideModal = null;
     var detailModal = null;
     var deleteGuideModal = null;
+    var photoModal = null;
+    var assignModal = null;
 
     // Load guides
     self.loadData = function() {
@@ -78,9 +88,12 @@ function GuidesViewModel() {
                     results.forEach(function(r) {
                         (r.dates || []).forEach(function(td) {
                             if (td.isAvailable && new Date(td.startDate) >= new Date()) {
+                                var startDt = new Date(td.startDate);
+                                var dateStr = startDt.toLocaleDateString('tr-TR');
+                                var timeStr = startDt.toLocaleTimeString('tr-TR', {hour:'2-digit', minute:'2-digit'});
                                 dates.push({
                                     id: td.id,
-                                    label: r.tour.name + ' - ' + new Date(td.startDate).toLocaleDateString('tr-TR')
+                                    label: r.tour.name + ' - ' + dateStr + ' ' + timeStr
                                 });
                             }
                         });
@@ -97,7 +110,7 @@ function GuidesViewModel() {
         self.editingGuideId(null);
         self.formData({
             firstName: '', lastName: '', phone: '', email: '',
-            photoUrl: '', languages: '', bio: '', experienceYears: ''
+            languages: '', bio: '', experienceYears: ''
         });
         guideModal.show();
     };
@@ -111,7 +124,6 @@ function GuidesViewModel() {
             lastName: guide.lastName,
             phone: guide.phone || '',
             email: guide.email || '',
-            photoUrl: guide.photoUrl || '',
             languages: guide.languages || '',
             bio: guide.bio || '',
             experienceYears: guide.experienceYears || ''
@@ -159,7 +171,6 @@ function GuidesViewModel() {
                 lastName: data.lastName,
                 phone: data.phone || null,
                 email: data.email || null,
-                photoUrl: data.photoUrl || null,
                 languages: data.languages || '',
                 bio: data.bio || null,
                 experienceYears: data.experienceYears ? parseInt(data.experienceYears) : null
@@ -205,13 +216,87 @@ function GuidesViewModel() {
         });
     };
 
+    // Open assign modal
+    self.openAssignModal = function(guide) {
+        self.assignGuideId(guide.id);
+        self.assignGuideName(guide.firstName + ' ' + guide.lastName);
+        self.selectedTourDateId(null);
+        self.assignNotes('');
+        self.assignGuideAssignments([]);
+        self.loadTourDates();
+
+        // Rehberin mevcut atamalarini yukle
+        $.ajax({
+            url: apiBaseUrl + '/api/guides/' + guide.id,
+            method: 'GET',
+            success: function(data) {
+                self.assignGuideAssignments(data.assignments || []);
+            }
+        });
+
+        assignModal.show();
+    };
+
+    // Assign guide from assign modal
+    self.assignGuideFromModal = function() {
+        if (!self.selectedTourDateId() || !self.assignGuideId()) return;
+
+        $.ajax({
+            url: apiBaseUrl + '/api/guides/' + self.assignGuideId() + '/assign',
+            method: 'POST',
+            contentType: 'application/json',
+            data: JSON.stringify({
+                tourDateId: self.selectedTourDateId(),
+                notes: self.assignNotes() || null
+            }),
+            success: function() {
+                toastr.success(T('Guide.AssignSuccess') || 'Rehber atandi');
+                self.selectedTourDateId(null);
+                self.assignNotes('');
+                // Atama listesini yenile
+                $.ajax({
+                    url: apiBaseUrl + '/api/guides/' + self.assignGuideId(),
+                    method: 'GET',
+                    success: function(data) {
+                        self.assignGuideAssignments(data.assignments || []);
+                    }
+                });
+                self.loadData();
+            },
+            error: function(xhr) {
+                toastr.error(xhr.responseJSON?.message || T('Common.Error') || 'Hata olustu');
+            }
+        });
+    };
+
+    // Remove assignment from assign modal
+    self.removeAssignmentFromModal = function(assignment) {
+        $.ajax({
+            url: apiBaseUrl + '/api/guides/assignments/' + assignment.id,
+            method: 'DELETE',
+            success: function() {
+                toastr.success(T('Guide.AssignmentRemoved') || 'Atama kaldirildi');
+                self.assignGuideAssignments.remove(assignment);
+                self.loadData();
+            },
+            error: function(xhr) {
+                toastr.error(xhr.responseJSON?.message || T('Common.Error') || 'Hata olustu');
+            }
+        });
+    };
+
+    // Open photo modal
+    self.openPhotoModal = function(guide) {
+        self.photoGuideId(guide.id);
+        self.photoGuideName(guide.firstName + ' ' + guide.lastName);
+        self.photoGuideUrl(guide.photoUrl || '');
+        photoModal.show();
+    };
+
     // Upload guide photo
     self.uploadGuidePhoto = function() {
-        var guideId = self.editingGuideId();
-        if (!guideId) {
-            toastr.warning(T('Guide.SaveFirst') || 'Once rehberi kaydedin, sonra fotograf yukleyin');
-            return;
-        }
+        var guideId = self.photoGuideId();
+        if (!guideId) return;
 
         var fileInput = document.getElementById('guidePhotoFile');
         if (!fileInput.files || !fileInput.files[0]) {
@@ -231,9 +316,7 @@ function GuidesViewModel() {
             contentType: false,
             success: function(data) {
                 toastr.success(T('Guide.PhotoUploadSuccess') || 'Fotograf yuklendi');
-                var fd = self.formData();
-                fd.photoUrl = data.photoUrl;
-                self.formData(fd);
+                self.photoGuideUrl(data.photoUrl);
                 fileInput.value = '';
                 self.isUploadingPhoto(false);
                 self.loadData();
@@ -247,7 +330,7 @@ function GuidesViewModel() {
 
     // Delete guide photo
     self.deleteGuidePhoto = function() {
-        var guideId = self.editingGuideId();
+        var guideId = self.photoGuideId();
         if (!guideId) return;
 
         $.ajax({
@@ -255,9 +338,7 @@ function GuidesViewModel() {
             method: 'DELETE',
             success: function() {
                 toastr.success(T('Guide.PhotoDeleteSuccess') || 'Fotograf silindi');
-                var fd = self.formData();
-                fd.photoUrl = '';
-                self.formData(fd);
+                self.photoGuideUrl('');
                 self.loadData();
             },
             error: function(xhr) {
@@ -311,6 +392,8 @@ function GuidesViewModel() {
         guideModal = new bootstrap.Modal(document.getElementById('guideModal'));
         detailModal = new bootstrap.Modal(document.getElementById('detailModal'));
         deleteGuideModal = new bootstrap.Modal(document.getElementById('deleteGuideModal'));
+        photoModal = new bootstrap.Modal(document.getElementById('photoModal'));
+        assignModal = new bootstrap.Modal(document.getElementById('assignModal'));
         self.loadData();
     });
 }

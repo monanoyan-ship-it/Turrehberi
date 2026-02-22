@@ -13,4 +13,6 @@ public interface ITourFactory
     Task<(Tour? tour, string? errorMessage, string? errorCode, int? statusCode)> CreateTourAsync(int visitorId, Tour tour);
     Task<(bool success, string? errorMessage, string? errorCode, int? statusCode)> UpdateTourAsync(int visitorId, int id, Tour tour);
     Task<(bool success, bool notFound, string? errorMessage, string? errorCode, int? statusCode)> DeleteTourAsync(int visitorId, int id);
+    Task<(bool success, object? result, int statusCode)> UploadCoverPhotoAsync(int visitorId, int tourId, Stream fileStream, string fileName);
+    Task<(bool success, object? result, int statusCode)> DeleteCoverPhotoAsync(int visitorId, int tourId);
 }

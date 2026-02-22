@@ -159,11 +159,35 @@
                                 <input type="number" class="form-control" data-bind="value: formData().maxCapacity" min="1" required>
                             </div>
 
-                            <!-- Resim URL -->
-                            <div class="col-12">
-                                <label class="form-label" data-t="MyTours.ImageUrl">Resim URL</label>
-                                <input type="url" class="form-control" data-bind="value: formData().imageUrl" placeholder="https://...">
-                                <small class="text-muted" data-t="MyTours.ImageUrlHint">Bos birakirsaniz varsayilan resim kullanilir</small>
+                            <!-- Kapak Fotografi -->
+                            <div class="col-12" data-bind="visible: isEditing()">
+                                <label class="form-label" data-t="MyTours.CoverPhoto">Kapak Fotografi</label>
+                                <div class="d-flex align-items-center gap-3">
+                                    <div data-bind="visible: formData().imageUrl">
+                                        <img data-bind="attr: { src: formData().imageUrl }" class="rounded" style="width: 80px; height: 55px; object-fit: cover;">
+                                    </div>
+                                    <div class="flex-grow-1">
+                                        <div class="input-group">
+                                            <input type="file" class="form-control" id="tourCoverPhotoFile" accept="image/*">
+                                            <button class="btn btn-outline-primary" type="button" data-bind="click: uploadCoverPhoto, enable: !isUploadingCover()">
+                                                <span data-bind="visible: isUploadingCover()" class="spinner-border spinner-border-sm me-1"></span>
+                                                <i class="bi bi-upload me-1"></i><span data-t="Common.Upload">Yukle</span>
+                                            </button>
+                                        </div>
+                                        <div data-bind="visible: formData().imageUrl && formData().imageUrl.indexOf('/uploads/') === 0" class="mt-1">
+                                            <button class="btn btn-outline-danger btn-sm" type="button" data-bind="click: deleteCoverPhoto">
+                                                <i class="bi bi-trash me-1"></i><span data-t="MyTours.DeleteCoverPhoto">Kapak Fotografini Sil</span>
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                                <small class="text-muted" data-t="MyTours.CoverPhotoHint">Once turu kaydedin, sonra kapak fotografi yukleyin</small>
+                            </div>
+                            <div class="col-12" data-bind="visible: !isEditing()">
+                                <div class="alert alert-info py-2 mb-0">
+                                    <i class="bi bi-info-circle me-1"></i>
+                                    <span data-t="MyTours.CoverPhotoAfterSave">Kapak fotografini tur kaydedildikten sonra yukleyebilirsiniz.</span>
+                                </div>
                             </div>
 
                             <!-- Zorluk ve Kategori -->

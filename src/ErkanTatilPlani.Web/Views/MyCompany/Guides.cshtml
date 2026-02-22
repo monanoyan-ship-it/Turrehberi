@@ -64,6 +64,12 @@
                                 </span>
                             </div>
                             <div class="btn-group btn-group-sm">
+                                <button class="btn btn-outline-success" data-bind="click: $parent.openAssignModal" title="Tur Ata">
+                                    <i class="bi bi-calendar-plus"></i>
+                                </button>
+                                <button class="btn btn-outline-secondary" data-bind="click: $parent.openPhotoModal" title="Fotograf">
+                                    <i class="bi bi-camera"></i>
+                                </button>
                                 <button class="btn btn-outline-info" data-bind="click: $parent.openDetailModal" title="Detay">
                                     <i class="bi bi-eye"></i>
                                 </button>
@@ -118,29 +124,6 @@
                         <div class="col-md-6">
                             <label class="form-label" data-t="Guide.ExperienceYears">Deneyim (Yil)</label>
                             <input type="number" class="form-control" data-bind="value: formData().experienceYears" min="0">
-                        </div>
-                        <div class="col-12">
-                            <label class="form-label" data-t="Guide.Photo">Fotograf</label>
-                            <div class="d-flex align-items-center gap-3">
-                                <!-- Mevcut fotograf onizleme -->
-                                <div data-bind="visible: formData().photoUrl">
-                                    <img data-bind="attr: { src: formData().photoUrl }" class="rounded-circle" style="width: 60px; height: 60px; object-fit: cover;">
-                                </div>
-                                <div class="flex-grow-1">
-                                    <div class="input-group">
-                                        <input type="file" class="form-control" id="guidePhotoFile" accept="image/*">
-                                        <button class="btn btn-outline-primary" type="button" data-bind="click: uploadGuidePhoto, enable: !isUploadingPhoto()">
-                                            <span data-bind="visible: isUploadingPhoto()" class="spinner-border spinner-border-sm me-1"></span>
-                                            <i class="bi bi-upload"></i> <span data-t="Common.Upload">Yukle</span>
-                                        </button>
-                                    </div>
-                                    <div data-bind="visible: formData().photoUrl" class="mt-1">
-                                        <button class="btn btn-outline-danger btn-sm" type="button" data-bind="click: deleteGuidePhoto">
-                                            <i class="bi bi-trash me-1"></i><span data-t="Guide.DeletePhoto">Fotografı Sil</span>
-                                        </button>
-                                    </div>
-                                </div>
-                            </div>
                         </div>
                         <div class="col-12">
                             <label class="form-label" data-t="Guide.Bio">Biyografi</label>
@@ -249,6 +232,131 @@
                                     <td><span class="badge" data-bind="css: statusCss || 'bg-secondary', text: statusName || 'Bilinmiyor'"></span></td>
                                     <td>
                                         <button class="btn btn-outline-danger btn-sm" data-bind="click: $parent.removeAssignment" title="Kaldir">
+                                            <i class="bi bi-x"></i>
+                                        </button>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" data-t="Common.Close">Kapat</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Fotograf Modal -->
+    <div class="modal fade" id="photoModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">
+                        <i class="bi bi-camera me-2"></i>
+                        <span data-bind="text: photoGuideName()"></span> - <span data-t="Guide.Photo">Fotograf</span>
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body text-center">
+                    <!-- Mevcut fotograf -->
+                    <div class="mb-3">
+                        <img data-bind="attr: { src: photoGuideUrl() || 'https://picsum.photos/seed/guide-' + photoGuideId() + '/200/200' }"
+                             class="rounded-circle" style="width: 120px; height: 120px; object-fit: cover;">
+                    </div>
+                    <!-- Upload -->
+                    <div class="input-group mb-2">
+                        <input type="file" class="form-control" id="guidePhotoFile" accept="image/*">
+                        <button class="btn btn-primary" type="button" data-bind="click: uploadGuidePhoto, enable: !isUploadingPhoto()">
+                            <span data-bind="visible: isUploadingPhoto()" class="spinner-border spinner-border-sm me-1"></span>
+                            <i class="bi bi-upload me-1"></i><span data-t="Common.Upload">Yukle</span>
+                        </button>
+                    </div>
+                    <!-- Sil butonu -->
+                    <div data-bind="visible: photoGuideUrl()">
+                        <button class="btn btn-outline-danger btn-sm" type="button" data-bind="click: deleteGuidePhoto">
+                            <i class="bi bi-trash me-1"></i><span data-t="Guide.DeletePhoto">Fotografı Sil</span>
+                        </button>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" data-t="Common.Close">Kapat</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Rehber Tur Atama Modal -->
+    <div class="modal fade" id="assignModal" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">
+                        <i class="bi bi-calendar-plus me-2"></i>
+                        <span data-bind="text: assignGuideName()"></span> - <span data-t="Guide.AssignToDate">Tur Atama</span>
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <!-- Yeni Atama -->
+                    <div class="card mb-3">
+                        <div class="card-header">
+                            <h6 class="mb-0"><i class="bi bi-plus-circle me-1"></i> <span data-t="Guide.NewAssignment">Yeni Atama</span></h6>
+                        </div>
+                        <div class="card-body">
+                            <div class="row g-2 align-items-end">
+                                <div class="col-md-6">
+                                    <label class="form-label small" data-t="Guide.SelectTourDate">Tur Tarihi Secin</label>
+                                    <select class="form-select form-select-sm" data-bind="options: tourDatesForAssign, optionsText: 'label', optionsValue: 'id', optionsCaption: 'Tur tarihi secin...', value: selectedTourDateId"></select>
+                                </div>
+                                <div class="col-md-4">
+                                    <label class="form-label small">Not (opsiyonel)</label>
+                                    <input type="text" class="form-control form-control-sm" data-bind="value: assignNotes" placeholder="Not ekleyin...">
+                                </div>
+                                <div class="col-md-2">
+                                    <button class="btn btn-success btn-sm w-100" data-bind="click: assignGuideFromModal, enable: selectedTourDateId()">
+                                        <i class="bi bi-plus me-1"></i><span data-t="Guide.Assign">Ata</span>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Mevcut Atamalar -->
+                    <h6><i class="bi bi-list-check me-1"></i> <span data-t="Guide.CurrentAssignments">Mevcut Atamalar</span></h6>
+                    <div data-bind="visible: assignGuideAssignments().length === 0" class="text-center text-muted py-3">
+                        <i class="bi bi-calendar-x fs-3"></i>
+                        <p class="mt-2" data-t="Guide.NoAssignments">Henuz atama yok</p>
+                    </div>
+                    <div class="table-responsive" data-bind="visible: assignGuideAssignments().length > 0">
+                        <table class="table table-sm table-hover mb-0">
+                            <thead class="table-light">
+                                <tr>
+                                    <th data-t="Tour.Name">Tur</th>
+                                    <th data-t="TourDate.StartDate">Baslangic</th>
+                                    <th data-t="TourDate.EndDate">Bitis</th>
+                                    <th data-t="Common.Status">Durum</th>
+                                    <th></th>
+                                </tr>
+                            </thead>
+                            <tbody data-bind="foreach: assignGuideAssignments">
+                                <tr>
+                                    <td>
+                                        <strong data-bind="text: tourName"></strong>
+                                    </td>
+                                    <td>
+                                        <span data-bind="text: new Date(startDate).toLocaleDateString('tr-TR')"></span>
+                                        <small class="text-muted" data-bind="text: new Date(startDate).toLocaleTimeString('tr-TR', {hour:'2-digit', minute:'2-digit'})"></small>
+                                    </td>
+                                    <td>
+                                        <span data-bind="text: new Date(endDate).toLocaleDateString('tr-TR')"></span>
+                                        <small class="text-muted" data-bind="text: new Date(endDate).toLocaleTimeString('tr-TR', {hour:'2-digit', minute:'2-digit'})"></small>
+                                    </td>
+                                    <td>
+                                        <span class="badge" data-bind="css: statusCss || 'bg-secondary', text: statusName || 'Bilinmiyor'"></span>
+                                    </td>
+                                    <td>
+                                        <button class="btn btn-outline-danger btn-sm" data-bind="click: $parent.removeAssignmentFromModal" title="Kaldir">
                                             <i class="bi bi-x"></i>
                                         </button>
                                     </td>

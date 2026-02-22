@@ -15,19 +15,22 @@ public class TourFactory : ITourFactory
     private readonly ICompanyEntityService _companyService;
     private readonly ICacheService _cache;
     private readonly IUnitOfWork _unitOfWork;
+    private readonly IFileUploadService _fileUploadService;
 
     public TourFactory(
         ITourEntityService tourService,
         IVisitorEntityService visitorService,
         ICompanyEntityService companyService,
         ICacheService cache,
-        IUnitOfWork unitOfWork)
+        IUnitOfWork unitOfWork,
+        IFileUploadService fileUploadService)
     {
         _tourService = tourService;
         _visitorService = visitorService;
         _companyService = companyService;
         _cache = cache;
         _unitOfWork = unitOfWork;
+        _fileUploadService = fileUploadService;
     }
 
     public async Task<object> GetToursAsync(string? search, string? destination, decimal? minPrice, decimal? maxPrice, int? minDays, int? maxDays, int? companyId, bool? featured, string? sort, int? difficulty, int? category, string? guideLanguage)
@@ -230,6 +233,55 @@ public class TourFactory : ITourFactory
         tour.IsActive = false;
         await _unitOfWork.SaveChangesAsync();
         return (true, false, null, null, null);
+    }
+
+    public async Task<(bool success, object? result, int statusCode)> UploadCoverPhotoAsync(int visitorId, int tourId, Stream fileStream, string fileName)
+    {
+        var visitor = await _visitorService.GetByIdWithCompanyAsync(visitorId);
+        if (visitor == null) return (false, new { message = "Kullanici bulunamadi" }, 401);
+        if (visitor.Company == null) return (false, new { message = "Firma sahibi degilsiniz" }, 403);
+
+        var tour = await _tourService.GetByIdAsync(tourId);
+        if (tour == null || !tour.IsActive) return (false, new { message = "Tur bulunamadi" }, 404);
+        if (tour.CompanyId != visitor.Company.Id) return (false, new { message = "Bu tur firmaniza ait degil" }, 403);
+
+        // Eski fotoğrafı sil
+        if (!string.IsNullOrEmpty(tour.ImageUrl) && tour.ImageUrl.StartsWith("/uploads/"))
+        {
+            await _fileUploadService.DeleteFileAsync(tour.ImageUrl);
+        }
+
+        var uploadResult = await _fileUploadService.UploadImageAsync(fileStream, fileName, "tours", 1200);
+        if (!uploadResult.Success)
+            return (false, new { message = uploadResult.ErrorMessage }, 400);
+
+        tour.ImageUrl = uploadResult.Url ?? string.Empty;
+        tour.UpdatedAt = DateTime.UtcNow;
+        await _unitOfWork.SaveChangesAsync();
+
+        return (true, new { imageUrl = uploadResult.Url }, 200);
+    }
+
+    public async Task<(bool success, object? result, int statusCode)> DeleteCoverPhotoAsync(int visitorId, int tourId)
+    {
+        var visitor = await _visitorService.GetByIdWithCompanyAsync(visitorId);
+        if (visitor == null) return (false, new { message = "Kullanici bulunamadi" }, 401);
+        if (visitor.Company == null) return (false, new { message = "Firma sahibi degilsiniz" }, 403);
+
+        var tour = await _tourService.GetByIdAsync(tourId);
+        if (tour == null || !tour.IsActive) return (false, new { message = "Tur bulunamadi" }, 404);
+        if (tour.CompanyId != visitor.Company.Id) return (false, new { message = "Bu tur firmaniza ait degil" }, 403);
+
+        if (!string.IsNullOrEmpty(tour.ImageUrl) && tour.ImageUrl.StartsWith("/uploads/"))
+        {
+            await _fileUploadService.DeleteFileAsync(tour.ImageUrl);
+        }
+
+        tour.ImageUrl = string.Empty;
+        tour.UpdatedAt = DateTime.UtcNow;
+        await _unitOfWork.SaveChangesAsync();
+
+        return (true, new { message = "Kapak fotografi silindi" }, 200);
     }
 
     private async Task<(string? errorMessage, string? errorCode, int? statusCode)> CheckCompanyStatus(int visitorId)
