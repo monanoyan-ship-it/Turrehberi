@@ -70,6 +70,7 @@
 
         // Auth + Menu visibility
         var currentUserRole = '@(ViewBag.UserRole ?? "Admin")';
+        window.currentUser = null;
         $(document).ready(function() {
             var token = localStorage.getItem('token');
             if (!token) {
@@ -79,6 +80,13 @@
             $.ajaxSetup({
                 headers: { 'Authorization': 'Bearer ' + token }
             });
+            var userStr = localStorage.getItem('user');
+            if (userStr) {
+                try {
+                    window.currentUser = JSON.parse(userStr);
+                    $('#currentUserName').text(window.currentUser.firstName + ' ' + window.currentUser.lastName);
+                } catch(e) {}
+            }
             if (currentUserRole === 'Staff') {
                 $('#adminMenu').hide();
             }

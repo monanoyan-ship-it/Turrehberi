@@ -135,7 +135,9 @@ function MyReviewsViewModel() {
     };
 
     // Init
-    self.loadReviews(null);
+    $(document).ready(function() {
+        self.loadReviews(null);
+    });
 }
 
 // Localization helper

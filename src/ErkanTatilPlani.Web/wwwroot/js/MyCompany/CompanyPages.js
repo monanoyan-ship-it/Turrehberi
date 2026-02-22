@@ -218,7 +218,6 @@ function CompanyPagesViewModel() {
             url: apiBaseUrl + '/api/companies/' + companyId + '/pages/reorder',
             method: 'PUT',
             contentType: 'application/json',
-            headers: { 'Authorization': 'Bearer ' + (localStorage.getItem('token') || '') },
             data: JSON.stringify(ids)
         }).done(function () {
             toastr.success('Siralama guncellendi');
