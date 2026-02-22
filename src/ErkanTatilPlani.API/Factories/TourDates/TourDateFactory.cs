@@ -161,6 +161,78 @@ public class TourDateFactory : ITourDateFactory
         }, 200);
     }
 
+    public async Task<(bool success, object? result, int statusCode)> CreateBatchTourDatesAsync(int visitorId, int tourId, BatchTourDateRequest request)
+    {
+        var check = await CheckTourOwnership(visitorId, tourId);
+        if (check.errorMessage != null)
+            return (false, new { message = check.errorMessage }, check.statusCode ?? 400);
+
+        // Validasyon
+        if (request.StartDate >= request.EndDate)
+            return (false, new { message = "Bitis tarihi baslangictan sonra olmali" }, 400);
+
+        if (request.DurationDays < 1)
+            return (false, new { message = "Sure en az 1 gun olmali" }, 400);
+
+        var dates = new List<TourDate>();
+        var currentDate = DateTime.SpecifyKind(request.StartDate.Date, DateTimeKind.Utc);
+        var endDate = DateTime.SpecifyKind(request.EndDate.Date, DateTimeKind.Utc);
+
+        if (request.DaysOfWeek != null && request.DaysOfWeek.Any())
+        {
+            // Belirli haftanin gunleri modunda calis
+            while (currentDate <= endDate)
+            {
+                if (request.DaysOfWeek.Contains((int)currentDate.DayOfWeek))
+                {
+                    dates.Add(new TourDate
+                    {
+                        TourId = tourId,
+                        StartDate = currentDate,
+                        EndDate = currentDate.AddDays(request.DurationDays - 1),
+                        Price = request.Price,
+                        MaxCapacity = request.MaxCapacity,
+                        IsAvailable = true
+                    });
+                }
+                currentDate = currentDate.AddDays(1);
+            }
+        }
+        else
+        {
+            // Her N gunde bir modunda calis
+            var interval = Math.Max(1, request.RepeatEveryDays);
+            while (currentDate <= endDate)
+            {
+                dates.Add(new TourDate
+                {
+                    TourId = tourId,
+                    StartDate = currentDate,
+                    EndDate = currentDate.AddDays(request.DurationDays - 1),
+                    Price = request.Price,
+                    MaxCapacity = request.MaxCapacity,
+                    IsAvailable = true
+                });
+                currentDate = currentDate.AddDays(interval);
+            }
+        }
+
+        if (!dates.Any())
+            return (false, new { message = "Belirtilen kriterlere uygun tarih bulunamadi" }, 400);
+
+        // Maksimum 100 tarih
+        if (dates.Count > 100)
+            return (false, new { message = "Tek seferde en fazla 100 tarih olusturulabilir" }, 400);
+
+        foreach (var date in dates)
+        {
+            _tourDateService.Add(date);
+        }
+        await _unitOfWork.SaveChangesAsync();
+
+        return (true, new { message = $"{dates.Count} tarih olusturuldu", count = dates.Count }, 200);
+    }
+
     private async Task<(string? errorMessage, string? errorCode, int? statusCode)> CheckTourOwnership(int visitorId, int tourId)
     {
         var visitor = await _visitorService.GetByIdWithCompanyAsync(visitorId);

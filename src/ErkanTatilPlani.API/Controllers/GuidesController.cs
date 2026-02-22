@@ -106,6 +106,28 @@ public class GuidesController : ControllerBase
         return StatusCode(statusCode, result);
     }
 
+    [HttpPost("{id}/photo")]
+    public async Task<IActionResult> UploadGuidePhoto(int id, [FromForm] IFormFile file)
+    {
+        var visitorId = GetVisitorId();
+        if (visitorId == null) return Unauthorized();
+
+        using var stream = file?.OpenReadStream() ?? Stream.Null;
+        var (success, result, statusCode) = await _guideFactory.UploadGuidePhotoAsync(
+            visitorId.Value, id, stream, file?.FileName ?? string.Empty);
+        return StatusCode(statusCode, result);
+    }
+
+    [HttpDelete("{id}/photo")]
+    public async Task<IActionResult> DeleteGuidePhoto(int id)
+    {
+        var visitorId = GetVisitorId();
+        if (visitorId == null) return Unauthorized();
+
+        var (success, result, statusCode) = await _guideFactory.DeleteGuidePhotoAsync(visitorId.Value, id);
+        return StatusCode(statusCode, result);
+    }
+
     [HttpGet("{id}/performance")]
     public async Task<IActionResult> GetPerformance(int id)
     {

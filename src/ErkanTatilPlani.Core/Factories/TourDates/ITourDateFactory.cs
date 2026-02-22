@@ -11,4 +11,16 @@ public interface ITourDateFactory
     Task<(bool success, bool notFound, string? errorMessage, string? errorCode, int? statusCode)> DeleteTourDateAsync(int visitorId, int id);
     Task<IEnumerable<object>> GetCheapestDatesAsync(int tourId, string month);
     Task<(bool success, object result, int statusCode)> GetCapacitySummaryAsync(int visitorId, int tourId);
+    Task<(bool success, object? result, int statusCode)> CreateBatchTourDatesAsync(int visitorId, int tourId, BatchTourDateRequest request);
+}
+
+public class BatchTourDateRequest
+{
+    public DateTime StartDate { get; set; }
+    public DateTime EndDate { get; set; }
+    public int RepeatEveryDays { get; set; } = 7;
+    public List<int>? DaysOfWeek { get; set; }
+    public int DurationDays { get; set; } = 1;
+    public decimal? Price { get; set; }
+    public int? MaxCapacity { get; set; }
 }

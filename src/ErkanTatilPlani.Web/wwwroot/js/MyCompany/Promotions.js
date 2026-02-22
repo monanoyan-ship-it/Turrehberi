@@ -156,6 +156,7 @@ function PromotionsViewModel() {
             toastr.success(self.isEditing() ? 'Promosyon guncellendi' : 'Promosyon olusturuldu');
             formModal.hide();
             self.loadData();
+            self.loadDynamicRules();
         }).fail(function (xhr) {
             toastr.error(xhr.responseJSON?.message || 'Islem basarisiz');
         });
@@ -168,6 +169,7 @@ function PromotionsViewModel() {
         }).done(function () {
             toastr.success('Promosyon durumu degistirildi');
             self.loadData();
+            self.loadDynamicRules();
         }).fail(function (xhr) {
             toastr.error(xhr.responseJSON?.message || 'Islem basarisiz');
         });
@@ -181,9 +183,34 @@ function PromotionsViewModel() {
         }).done(function () {
             toastr.success('Promosyon silindi');
             self.loadData();
+            self.loadDynamicRules();
         }).fail(function (xhr) {
             toastr.error(xhr.responseJSON?.message || 'Islem basarisiz');
         });
+    };
+
+    // Dynamic pricing rules (promotionTypeId === 6)
+    self.dynamicRules = ko.observableArray([]);
+
+    self.loadDynamicRules = function () {
+        $.ajax({
+            url: apiBaseUrl + '/api/promotions?type=6',
+            method: 'GET',
+        }).done(function (data) {
+            self.dynamicRules(data);
+        }).fail(function (xhr) {
+            toastr.error(xhr.responseJSON?.message || T('Common.Error') || 'Dinamik kurallar yuklenemedi');
+        });
+    };
+
+    self.openDynamicRuleModal = function () {
+        self.isEditing(false);
+        self.editingId(null);
+        var form = self.getEmptyForm();
+        form.promotionTypeId('6');
+        form.discountTypeId('0');
+        self.formData(form);
+        formModal.show();
     };
 
     // Filter subscriptions
@@ -197,6 +224,7 @@ function PromotionsViewModel() {
     $(document).ready(function () {
         formModal = new bootstrap.Modal(document.getElementById('formModal'));
         self.loadData();
+        self.loadDynamicRules();
     });
 }
 

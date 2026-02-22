@@ -47,10 +47,41 @@ function MyToursViewModel() {
         maxCapacity: ''
     });
 
+    // Batch date
+    self.isSavingBatch = ko.observable(false);
+    self.batchFormData = ko.observable({
+        startDate: '',
+        endDate: '',
+        price: '',
+        maxCapacity: '',
+        durationDays: 1
+    });
+    self.batchSelectedDays = ko.observableArray([]);
+    self.batchPreview = ko.observableArray([]);
+    self.weekDays = [
+        { value: 1, label: 'Pzt' },
+        { value: 2, label: 'Sal' },
+        { value: 3, label: 'Car' },
+        { value: 4, label: 'Per' },
+        { value: 5, label: 'Cum' },
+        { value: 6, label: 'Cmt' },
+        { value: 0, label: 'Paz' }
+    ];
+
+    // Photo management
+    self.photoTourId = ko.observable(null);
+    self.photoTourName = ko.observable('');
+    self.tourPhotos = ko.observableArray([]);
+    self.isLoadingPhotos = ko.observable(false);
+    self.isUploadingPhoto = ko.observable(false);
+    self.photoTitle = ko.observable('');
+    self.photoIsCover = ko.observable(false);
+
     // Modals
     var tourModal = null;
     var deleteModal = null;
     var dateManageModal = null;
+    var photoModal = null;
 
     // Helper functions
     self.formatCurrency = function(value) {
@@ -308,11 +339,193 @@ function MyToursViewModel() {
         });
     };
 
+    // ===============================================
+    // TOPLU TARIH OLUSTURMA
+    // ===============================================
+
+    self.previewBatchDates = function() {
+        var data = self.batchFormData();
+        if (!data.startDate || !data.endDate) {
+            toastr.warning(T('Common.Required') || 'Baslangic ve bitis tarihi zorunlu');
+            return;
+        }
+
+        var start = new Date(data.startDate);
+        var end = new Date(data.endDate);
+        if (start >= end) {
+            toastr.warning(T('TourDate.EndAfterStart') || 'Bitis tarihi baslangictan sonra olmali');
+            return;
+        }
+
+        var selectedDays = self.batchSelectedDays();
+        var dates = [];
+        var current = new Date(start);
+
+        if (selectedDays.length > 0) {
+            while (current <= end) {
+                if (selectedDays.indexOf(current.getDay()) !== -1) {
+                    dates.push(current.toLocaleDateString('tr-TR'));
+                }
+                current.setDate(current.getDate() + 1);
+            }
+        } else {
+            var interval = 7;
+            while (current <= end) {
+                dates.push(current.toLocaleDateString('tr-TR'));
+                current.setDate(current.getDate() + interval);
+            }
+        }
+
+        self.batchPreview(dates.slice(0, 50));
+        if (dates.length > 50) {
+            toastr.info('Toplam ' + dates.length + ' tarih, ilk 50 gosteriliyor');
+        }
+    };
+
+    self.createBatchDates = function() {
+        var data = self.batchFormData();
+        if (!data.startDate || !data.endDate) {
+            toastr.warning(T('Common.Required') || 'Baslangic ve bitis tarihi zorunlu');
+            return;
+        }
+
+        self.isSavingBatch(true);
+
+        var requestData = {
+            startDate: data.startDate,
+            endDate: data.endDate,
+            durationDays: parseInt(data.durationDays) || 1,
+            price: data.price ? parseFloat(data.price) : null,
+            maxCapacity: data.maxCapacity ? parseInt(data.maxCapacity) : null
+        };
+
+        var selectedDays = self.batchSelectedDays();
+        if (selectedDays.length > 0) {
+            requestData.daysOfWeek = selectedDays.map(function(d) { return parseInt(d); });
+        } else {
+            requestData.repeatEveryDays = 7;
+        }
+
+        $.ajax({
+            url: apiBaseUrl + '/api/tours/' + self.managingTourId() + '/dates/batch',
+            method: 'POST',
+            contentType: 'application/json',
+            data: JSON.stringify(requestData),
+            success: function(response) {
+                toastr.success(response.message || T('TourDate.BatchSuccess') || 'Tarihler olusturuldu');
+                self.batchFormData({ startDate: '', endDate: '', price: '', maxCapacity: '', durationDays: 1 });
+                self.batchSelectedDays([]);
+                self.batchPreview([]);
+                self.loadManagedDates(self.managingTourId());
+                self.isSavingBatch(false);
+            },
+            error: function(xhr) {
+                toastr.error(xhr.responseJSON?.message || T('Common.Error') || 'Hata olustu');
+                self.isSavingBatch(false);
+            }
+        });
+    };
+
+    // ===============================================
+    // FOTOGRAF YONETIMI
+    // ===============================================
+
+    self.openPhotoModal = function(tour) {
+        self.photoTourId(tour.id);
+        self.photoTourName(tour.name);
+        self.photoTitle('');
+        self.photoIsCover(false);
+        self.loadTourPhotos(tour.id);
+        photoModal.show();
+    };
+
+    self.loadTourPhotos = function(tourId) {
+        self.isLoadingPhotos(true);
+        $.ajax({
+            url: apiBaseUrl + '/api/tours/' + tourId + '/photos',
+            method: 'GET',
+            success: function(data) {
+                self.tourPhotos(data || []);
+                self.isLoadingPhotos(false);
+            },
+            error: function() {
+                self.tourPhotos([]);
+                self.isLoadingPhotos(false);
+            }
+        });
+    };
+
+    self.uploadPhoto = function() {
+        var fileInput = document.getElementById('photoFile');
+        if (!fileInput.files || !fileInput.files[0]) {
+            toastr.warning(T('MyTours.SelectFile') || 'Lutfen bir dosya secin');
+            return;
+        }
+
+        self.isUploadingPhoto(true);
+
+        var formData = new FormData();
+        formData.append('file', fileInput.files[0]);
+        formData.append('title', self.photoTitle() || '');
+        formData.append('isCover', self.photoIsCover());
+
+        $.ajax({
+            url: apiBaseUrl + '/api/tours/' + self.photoTourId() + '/photos',
+            method: 'POST',
+            data: formData,
+            processData: false,
+            contentType: false,
+            success: function(data) {
+                toastr.success(T('MyTours.PhotoUploadSuccess') || 'Fotograf yuklendi');
+                fileInput.value = '';
+                self.photoTitle('');
+                self.photoIsCover(false);
+                self.loadTourPhotos(self.photoTourId());
+                self.isUploadingPhoto(false);
+            },
+            error: function(xhr) {
+                toastr.error(xhr.responseJSON?.message || T('Common.Error') || 'Hata olustu');
+                self.isUploadingPhoto(false);
+            }
+        });
+    };
+
+    self.deletePhoto = function(photo) {
+        if (!confirm(T('MyTours.PhotoDeleteConfirm') || 'Bu fotografi silmek istediginizden emin misiniz?')) return;
+
+        $.ajax({
+            url: apiBaseUrl + '/api/tours/' + self.photoTourId() + '/photos/' + photo.id,
+            method: 'DELETE',
+            success: function() {
+                toastr.success(T('MyTours.PhotoDeleteSuccess') || 'Fotograf silindi');
+                self.loadTourPhotos(self.photoTourId());
+            },
+            error: function(xhr) {
+                toastr.error(xhr.responseJSON?.message || T('Common.Error') || 'Hata olustu');
+            }
+        });
+    };
+
+    self.setCoverPhoto = function(photo) {
+        $.ajax({
+            url: apiBaseUrl + '/api/tours/' + self.photoTourId() + '/photos/' + photo.id + '/cover',
+            method: 'PUT',
+            success: function() {
+                toastr.success(T('MyTours.CoverPhotoUpdated') || 'Kapak fotografı guncellendi');
+                self.loadTourPhotos(self.photoTourId());
+            },
+            error: function(xhr) {
+                toastr.error(xhr.responseJSON?.message || T('Common.Error') || 'Hata olustu');
+            }
+        });
+    };
+
     // Init
     $(document).ready(function() {
         tourModal = new bootstrap.Modal(document.getElementById('tourModal'));
         deleteModal = new bootstrap.Modal(document.getElementById('deleteModal'));
         dateManageModal = new bootstrap.Modal(document.getElementById('dateManageModal'));
+        photoModal = new bootstrap.Modal(document.getElementById('photoModal'));
         self.loadTours();
     });
 }

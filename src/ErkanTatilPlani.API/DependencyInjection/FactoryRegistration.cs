@@ -45,8 +45,9 @@ public static class FactoryRegistration
         // Favorite factories (1)
         services.AddScoped<IFavoriteFactory, FavoriteFactory>();
 
-        // Tour factories (1)
+        // Tour factories (2)
         services.AddScoped<ITourFactory, TourFactory>();
+        services.AddScoped<ITourPhotoFactory, TourPhotoFactory>();
 
         // TourDate factories (2)
         services.AddScoped<ITourDateFactory, TourDateFactory>();

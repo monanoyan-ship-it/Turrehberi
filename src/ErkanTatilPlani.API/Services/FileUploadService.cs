@@ -30,7 +30,7 @@ public class FileUploadService : IFileUploadService
 
     private void EnsureDirectoriesExist()
     {
-        var folders = new[] { "reviews", "galleries", "avatars", "contracts" };
+        var folders = new[] { "reviews", "galleries", "avatars", "contracts", "tours", "guides" };
         foreach (var folder in folders)
         {
             var path = Path.Combine(_uploadsPath, folder);

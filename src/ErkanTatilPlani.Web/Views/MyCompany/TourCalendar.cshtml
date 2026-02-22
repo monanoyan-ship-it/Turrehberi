@@ -42,28 +42,37 @@
         <!-- Takvim Grid -->
         <div class="card">
             <div class="card-body p-0">
-                <table class="table table-bordered mb-0">
+                <!-- Desktop Takvim -->
+                <table class="table table-bordered mb-0 d-none d-md-table" style="table-layout: fixed;">
                     <thead class="table-light">
                         <tr>
-                            <th class="text-center py-2" data-t="Calendar.Sun">Paz</th>
-                            <th class="text-center py-2" data-t="Calendar.Mon">Pzt</th>
-                            <th class="text-center py-2" data-t="Calendar.Tue">Sal</th>
-                            <th class="text-center py-2" data-t="Calendar.Wed">Car</th>
-                            <th class="text-center py-2" data-t="Calendar.Thu">Per</th>
-                            <th class="text-center py-2" data-t="Calendar.Fri">Cum</th>
-                            <th class="text-center py-2" data-t="Calendar.Sat">Cmt</th>
+                            <th class="text-center py-2" style="width: 14.28%;" data-t="Calendar.Sun">Paz</th>
+                            <th class="text-center py-2" style="width: 14.28%;" data-t="Calendar.Mon">Pzt</th>
+                            <th class="text-center py-2" style="width: 14.28%;" data-t="Calendar.Tue">Sal</th>
+                            <th class="text-center py-2" style="width: 14.28%;" data-t="Calendar.Wed">Car</th>
+                            <th class="text-center py-2" style="width: 14.28%;" data-t="Calendar.Thu">Per</th>
+                            <th class="text-center py-2" style="width: 14.28%;" data-t="Calendar.Fri">Cum</th>
+                            <th class="text-center py-2" style="width: 14.28%;" data-t="Calendar.Sat">Cmt</th>
                         </tr>
                     </thead>
                     <tbody data-bind="foreach: calendarWeeks">
                         <tr>
                             <!-- ko foreach: $data -->
-                            <td class="p-1" style="min-height: 80px; vertical-align: top;" data-bind="css: { 'bg-light': !day }">
+                            <td class="p-1" style="min-height: 100px; height: 100px; vertical-align: top; overflow: hidden;" data-bind="css: { 'bg-light': !day }">
                                 <!-- ko if: day -->
                                 <div class="small fw-bold mb-1" data-bind="text: day, css: { 'text-muted': isPast }"></div>
-                                <!-- ko foreach: tours -->
+                                <!-- ko foreach: tours.slice(0, 3) -->
                                 <div class="mb-1" data-bind="click: $parents[1].showTourDatePopover" style="cursor: pointer;">
-                                    <span class="badge w-100 text-truncate" style="font-size: 0.7em; max-width: 100%;"
-                                          data-bind="text: tourName, css: $parents[1].getBadgeClass($data), attr: { title: tourName + ' (' + bookedCount + '/' + (maxCapacity || '∞') + ')' }"></span>
+                                    <span class="badge w-100 text-start" style="font-size: 0.7em; max-width: 100%; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;"
+                                          data-bind="css: $parents[1].getBadgeClass($data), attr: { title: tourName + ' (' + bookedCount + '/' + (maxCapacity || '∞') + ')' }">
+                                        <span data-bind="text: tourName"></span>
+                                        <span class="float-end" data-bind="text: bookedCount + '/' + (maxCapacity || '∞')"></span>
+                                    </span>
+                                </div>
+                                <!-- /ko -->
+                                <!-- ko if: tours.length > 3 -->
+                                <div class="text-center">
+                                    <small class="text-muted" data-bind="text: '+' + (tours.length - 3) + ' ' + (T('Calendar.More') || 'daha')"></small>
                                 </div>
                                 <!-- /ko -->
                                 <!-- /ko -->
@@ -72,6 +81,28 @@
                         </tr>
                     </tbody>
                 </table>
+
+                <!-- Mobil Liste Gorunumu -->
+                <div class="d-md-none" data-bind="foreach: calendarWeeks">
+                    <!-- ko foreach: $data -->
+                    <!-- ko if: day && tours.length > 0 -->
+                    <div class="border-bottom p-2">
+                        <div class="fw-bold mb-1">
+                            <span data-bind="text: day"></span>
+                            <span data-bind="text: $parents[1].monthYearLabel()"></span>
+                            <span class="badge bg-light text-dark float-end" data-bind="text: tours.length + ' ' + (T('Calendar.Tour') || 'tur')"></span>
+                        </div>
+                        <!-- ko foreach: tours -->
+                        <div class="d-flex justify-content-between align-items-center mb-1" data-bind="click: $parents[2].showTourDatePopover" style="cursor: pointer;">
+                            <span class="badge" style="font-size: 0.8em;"
+                                  data-bind="css: $parents[2].getBadgeClass($data), text: tourName"></span>
+                            <small class="text-muted" data-bind="text: bookedCount + '/' + (maxCapacity || '∞')"></small>
+                        </div>
+                        <!-- /ko -->
+                    </div>
+                    <!-- /ko -->
+                    <!-- /ko -->
+                </div>
             </div>
         </div>
     </div>

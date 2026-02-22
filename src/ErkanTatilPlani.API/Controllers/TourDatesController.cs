@@ -119,6 +119,17 @@ public class TourDatesController : ControllerBase
         return StatusCode(statusCode, result);
     }
 
+    [HttpPost("tours/{tourId}/dates/batch")]
+    [Authorize(Roles = "CompanyOwner,Staff,Admin")]
+    public async Task<IActionResult> CreateBatchTourDates(int tourId, [FromBody] BatchTourDateRequest request)
+    {
+        var visitorId = GetVisitorId();
+        if (visitorId == null) return Unauthorized(new { message = "Giris yapmaniz gerekiyor" });
+
+        var (success, result, statusCode) = await _tourDateFactory.CreateBatchTourDatesAsync(visitorId.Value, tourId, request);
+        return StatusCode(statusCode, result);
+    }
+
     [HttpGet("tours/{tourId}/dates/cheapest")]
     public async Task<ActionResult<IEnumerable<object>>> GetCheapestDates(int tourId, [FromQuery] string month)
     {

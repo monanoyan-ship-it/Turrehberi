@@ -59,6 +59,9 @@ public class AppDbContext : DbContext
     public DbSet<Guide> Guides => Set<Guide>();
     public DbSet<TourGuideAssignment> TourGuideAssignments => Set<TourGuideAssignment>();
 
+    // Tour Photos
+    public DbSet<TourPhoto> TourPhotos => Set<TourPhoto>();
+
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         base.OnModelCreating(modelBuilder);
@@ -616,6 +619,24 @@ public class AppDbContext : DbContext
             entity.Property(e => e.QrCode).HasMaxLength(500);
             entity.Property(e => e.QrToken).HasMaxLength(100);
             entity.Property(e => e.PhotoLink).HasMaxLength(500);
+        });
+
+        // ===============================================
+        // TUR FOTOGRAFLARI
+        // ===============================================
+
+        modelBuilder.Entity<TourPhoto>(entity =>
+        {
+            entity.HasKey(e => e.Id);
+            entity.Property(e => e.ImageUrl).IsRequired().HasMaxLength(500);
+            entity.Property(e => e.ThumbnailUrl).HasMaxLength(500);
+            entity.Property(e => e.Title).HasMaxLength(200);
+            entity.Property(e => e.MimeType).HasMaxLength(50);
+
+            entity.HasOne(e => e.Tour)
+                  .WithMany(t => t.Photos)
+                  .HasForeignKey(e => e.TourId)
+                  .OnDelete(DeleteBehavior.Cascade);
         });
 
         // Tour - bulusma noktasi

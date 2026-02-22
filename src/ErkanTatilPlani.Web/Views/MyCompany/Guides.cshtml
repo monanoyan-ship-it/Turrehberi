@@ -120,8 +120,27 @@
                             <input type="number" class="form-control" data-bind="value: formData().experienceYears" min="0">
                         </div>
                         <div class="col-12">
-                            <label class="form-label" data-t="Guide.PhotoUrl">Fotograf URL</label>
-                            <input type="url" class="form-control" data-bind="value: formData().photoUrl" placeholder="https://...">
+                            <label class="form-label" data-t="Guide.Photo">Fotograf</label>
+                            <div class="d-flex align-items-center gap-3">
+                                <!-- Mevcut fotograf onizleme -->
+                                <div data-bind="visible: formData().photoUrl">
+                                    <img data-bind="attr: { src: formData().photoUrl }" class="rounded-circle" style="width: 60px; height: 60px; object-fit: cover;">
+                                </div>
+                                <div class="flex-grow-1">
+                                    <div class="input-group">
+                                        <input type="file" class="form-control" id="guidePhotoFile" accept="image/*">
+                                        <button class="btn btn-outline-primary" type="button" data-bind="click: uploadGuidePhoto, enable: !isUploadingPhoto()">
+                                            <span data-bind="visible: isUploadingPhoto()" class="spinner-border spinner-border-sm me-1"></span>
+                                            <i class="bi bi-upload"></i> <span data-t="Common.Upload">Yukle</span>
+                                        </button>
+                                    </div>
+                                    <div data-bind="visible: formData().photoUrl" class="mt-1">
+                                        <button class="btn btn-outline-danger btn-sm" type="button" data-bind="click: deleteGuidePhoto">
+                                            <i class="bi bi-trash me-1"></i><span data-t="Guide.DeletePhoto">Fotografı Sil</span>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                         <div class="col-12">
                             <label class="form-label" data-t="Guide.Bio">Biyografi</label>

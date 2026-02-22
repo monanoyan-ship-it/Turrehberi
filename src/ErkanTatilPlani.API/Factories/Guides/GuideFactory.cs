@@ -3,6 +3,7 @@ using ErkanTatilPlani.Core.EntityServices;
 using ErkanTatilPlani.Core.Enums;
 using ErkanTatilPlani.Core.Factories.Guides;
 using ErkanTatilPlani.Core.Infrastructure;
+using ErkanTatilPlani.Core.Services;
 using Microsoft.EntityFrameworkCore;
 
 namespace ErkanTatilPlani.API.Factories.Guides;
@@ -12,17 +13,20 @@ public class GuideFactory : IGuideFactory
     private readonly IGuideEntityService _guideService;
     private readonly IVisitorEntityService _visitorService;
     private readonly ITourDateEntityService _tourDateService;
+    private readonly IFileUploadService _fileUploadService;
     private readonly IUnitOfWork _unitOfWork;
 
     public GuideFactory(
         IGuideEntityService guideService,
         IVisitorEntityService visitorService,
         ITourDateEntityService tourDateService,
+        IFileUploadService fileUploadService,
         IUnitOfWork unitOfWork)
     {
         _guideService = guideService;
         _visitorService = visitorService;
         _tourDateService = tourDateService;
+        _fileUploadService = fileUploadService;
         _unitOfWork = unitOfWork;
     }
 
@@ -221,6 +225,56 @@ public class GuideFactory : IGuideFactory
             completedAssignments,
             upcomingAssignments
         }, 200);
+    }
+
+    public async Task<(bool success, object result, int statusCode)> UploadGuidePhotoAsync(int visitorId, int guideId, Stream fileStream, string fileName)
+    {
+        var check = await CheckCompanyOwnership(visitorId);
+        if (check.errorMessage != null) return (false, new { message = check.errorMessage }, check.statusCode);
+
+        var guide = await _guideService.GetByIdAsync(guideId);
+        if (guide == null || !guide.IsActive) return (false, new { message = "Rehber bulunamadi" }, 404);
+        if (guide.CompanyId != check.companyId) return (false, new { message = "Bu rehber firmaniza ait degil" }, 403);
+
+        if (fileStream == null || fileStream.Length == 0)
+            return (false, new { message = "Dosya secilmedi" }, 400);
+
+        // Eski fotoyu sil
+        if (!string.IsNullOrEmpty(guide.PhotoUrl) && guide.PhotoUrl.StartsWith("/uploads/"))
+        {
+            await _fileUploadService.DeleteFileAsync(guide.PhotoUrl);
+        }
+
+        var result = await _fileUploadService.UploadImageAsync(fileStream, fileName, "guides", 400);
+        if (!result.Success)
+            return (false, new { message = result.ErrorMessage }, 400);
+
+        guide.PhotoUrl = result.Url;
+        guide.UpdatedAt = DateTime.UtcNow;
+        await _unitOfWork.SaveChangesAsync();
+
+        return (true, new { message = "Fotograf yuklendi", photoUrl = result.Url }, 200);
+    }
+
+    public async Task<(bool success, object result, int statusCode)> DeleteGuidePhotoAsync(int visitorId, int guideId)
+    {
+        var check = await CheckCompanyOwnership(visitorId);
+        if (check.errorMessage != null) return (false, new { message = check.errorMessage }, check.statusCode);
+
+        var guide = await _guideService.GetByIdAsync(guideId);
+        if (guide == null || !guide.IsActive) return (false, new { message = "Rehber bulunamadi" }, 404);
+        if (guide.CompanyId != check.companyId) return (false, new { message = "Bu rehber firmaniza ait degil" }, 403);
+
+        if (!string.IsNullOrEmpty(guide.PhotoUrl) && guide.PhotoUrl.StartsWith("/uploads/"))
+        {
+            await _fileUploadService.DeleteFileAsync(guide.PhotoUrl);
+        }
+
+        guide.PhotoUrl = null;
+        guide.UpdatedAt = DateTime.UtcNow;
+        await _unitOfWork.SaveChangesAsync();
+
+        return (true, new { message = "Fotograf silindi" }, 200);
     }
 
     private async Task<(string? errorMessage, int statusCode, int? companyId)> CheckCompanyOwnership(int visitorId)

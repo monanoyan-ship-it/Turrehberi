@@ -181,8 +181,37 @@ public class TourFactory : ITourFactory
         if (visitor.Company.StatusId != CompanyStatuses.Ids.Approved)
             return (false, "Firma durumu uygun degil", "COMPANY_NOT_APPROVED", 403);
 
-        tour.UpdatedAt = DateTime.UtcNow;
-        _tourService.Update(tour);
+        var existing = await _tourService.GetByIdAsync(id);
+        if (existing == null) return (false, "Tur bulunamadi", null, 404);
+        if (existing.CompanyId != visitor.Company.Id)
+            return (false, "Bu tur firmaniza ait degil", "NOT_TOUR_OWNER", 403);
+
+        // CompanyOwner IsFeatured degistiremez - sadece Admin degistirebilir
+        if (visitor.UserTypeId != UserTypes.Ids.Admin)
+        {
+            tour.IsFeatured = existing.IsFeatured;
+        }
+
+        existing.Name = tour.Name;
+        existing.Description = tour.Description;
+        existing.Destination = tour.Destination;
+        existing.Price = tour.Price;
+        existing.DurationDays = tour.DurationDays;
+        existing.MaxCapacity = tour.MaxCapacity;
+        existing.ImageUrl = tour.ImageUrl;
+        existing.IsFeatured = tour.IsFeatured;
+        existing.DifficultyId = tour.DifficultyId;
+        existing.CategoryId = tour.CategoryId;
+        existing.GuideLanguages = tour.GuideLanguages;
+        existing.Inclusions = tour.Inclusions;
+        existing.Exclusions = tour.Exclusions;
+        existing.Latitude = tour.Latitude;
+        existing.Longitude = tour.Longitude;
+        existing.MeetingPointLat = tour.MeetingPointLat;
+        existing.MeetingPointLng = tour.MeetingPointLng;
+        existing.MeetingPointAddress = tour.MeetingPointAddress;
+        existing.UpdatedAt = DateTime.UtcNow;
+
         await _unitOfWork.SaveChangesAsync();
         return (true, null, null, null);
     }

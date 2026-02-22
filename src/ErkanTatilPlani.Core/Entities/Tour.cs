@@ -88,4 +88,5 @@ public class Tour : BaseEntity
     public virtual ICollection<FavoriteTour> FavoritedBy { get; set; } = new List<FavoriteTour>();
     public virtual ICollection<TourDate> TourDates { get; set; } = new List<TourDate>();
     public virtual ICollection<TourWatch> TourWatches { get; set; } = new List<TourWatch>();
+    public virtual ICollection<TourPhoto> Photos { get; set; } = new List<TourPhoto>();
 }

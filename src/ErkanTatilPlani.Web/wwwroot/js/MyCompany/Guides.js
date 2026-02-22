@@ -21,6 +21,9 @@ function GuidesViewModel() {
     self.selectedTourDateId = ko.observable(null);
     self.assignNotes = ko.observable('');
 
+    // Photo upload
+    self.isUploadingPhoto = ko.observable(false);
+
     // Delete
     self.deletingGuide = ko.observable(null);
 
@@ -198,6 +201,67 @@ function GuidesViewModel() {
             error: function(xhr) {
                 toastr.error(xhr.responseJSON?.message || T('Common.Error') || 'Hata olustu');
                 self.isDeleting(false);
+            }
+        });
+    };
+
+    // Upload guide photo
+    self.uploadGuidePhoto = function() {
+        var guideId = self.editingGuideId();
+        if (!guideId) {
+            toastr.warning(T('Guide.SaveFirst') || 'Once rehberi kaydedin, sonra fotograf yukleyin');
+            return;
+        }
+
+        var fileInput = document.getElementById('guidePhotoFile');
+        if (!fileInput.files || !fileInput.files[0]) {
+            toastr.warning(T('MyTours.SelectFile') || 'Lutfen bir dosya secin');
+            return;
+        }
+
+        self.isUploadingPhoto(true);
+        var formData = new FormData();
+        formData.append('file', fileInput.files[0]);
+
+        $.ajax({
+            url: apiBaseUrl + '/api/guides/' + guideId + '/photo',
+            method: 'POST',
+            data: formData,
+            processData: false,
+            contentType: false,
+            success: function(data) {
+                toastr.success(T('Guide.PhotoUploadSuccess') || 'Fotograf yuklendi');
+                var fd = self.formData();
+                fd.photoUrl = data.photoUrl;
+                self.formData(fd);
+                fileInput.value = '';
+                self.isUploadingPhoto(false);
+                self.loadData();
+            },
+            error: function(xhr) {
+                toastr.error(xhr.responseJSON?.message || T('Common.Error') || 'Hata olustu');
+                self.isUploadingPhoto(false);
+            }
+        });
+    };
+
+    // Delete guide photo
+    self.deleteGuidePhoto = function() {
+        var guideId = self.editingGuideId();
+        if (!guideId) return;
+
+        $.ajax({
+            url: apiBaseUrl + '/api/guides/' + guideId + '/photo',
+            method: 'DELETE',
+            success: function() {
+                toastr.success(T('Guide.PhotoDeleteSuccess') || 'Fotograf silindi');
+                var fd = self.formData();
+                fd.photoUrl = '';
+                self.formData(fd);
+                self.loadData();
+            },
+            error: function(xhr) {
+                toastr.error(xhr.responseJSON?.message || T('Common.Error') || 'Hata olustu');
             }
         });
     };

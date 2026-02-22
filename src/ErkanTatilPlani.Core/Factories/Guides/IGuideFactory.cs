@@ -13,4 +13,6 @@ public interface IGuideFactory
     Task<(bool success, object result, int statusCode)> RemoveAssignmentAsync(int visitorId, int assignmentId);
     Task<(bool success, object result, int statusCode)> GetGuideAvailabilityAsync(int visitorId, int guideId, int year, int month);
     Task<(bool success, object result, int statusCode)> GetGuidePerformanceAsync(int visitorId, int guideId);
+    Task<(bool success, object result, int statusCode)> UploadGuidePhotoAsync(int visitorId, int guideId, Stream fileStream, string fileName);
+    Task<(bool success, object result, int statusCode)> DeleteGuidePhotoAsync(int visitorId, int guideId);
 }

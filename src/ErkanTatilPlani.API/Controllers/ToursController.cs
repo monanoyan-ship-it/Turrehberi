@@ -11,10 +11,12 @@ namespace ErkanTatilPlani.API.Controllers;
 public class ToursController : ControllerBase
 {
     private readonly ITourFactory _tourFactory;
+    private readonly ITourPhotoFactory _photoFactory;
 
-    public ToursController(ITourFactory tourFactory)
+    public ToursController(ITourFactory tourFactory, ITourPhotoFactory photoFactory)
     {
         _tourFactory = tourFactory;
+        _photoFactory = photoFactory;
     }
 
     private int? GetVisitorId()
@@ -128,4 +130,56 @@ public class ToursController : ControllerBase
         }
         return NoContent();
     }
+
+    // ===============================================
+    // TUR FOTOGRAFLARI
+    // ===============================================
+
+    [HttpGet("{id}/photos")]
+    public async Task<ActionResult<object>> GetTourPhotos(int id)
+    {
+        var (found, result) = await _photoFactory.GetPhotosAsync(id);
+        if (!found)
+            return NotFound(new { message = "Tur bulunamadi" });
+        return Ok(result);
+    }
+
+    [HttpPost("{id}/photos")]
+    [Authorize(Roles = "CompanyOwner,Staff,Admin")]
+    public async Task<ActionResult<object>> UploadTourPhoto(int id, [FromForm] IFormFile file, [FromForm] string? title = null, [FromForm] bool isCover = false)
+    {
+        using var stream = file?.OpenReadStream() ?? Stream.Null;
+        var (success, result, statusCode) = await _photoFactory.UploadPhotoAsync(
+            id, stream, file?.FileName ?? string.Empty, title, isCover);
+        return StatusCode(statusCode, result);
+    }
+
+    [HttpDelete("{tourId}/photos/{photoId}")]
+    [Authorize(Roles = "CompanyOwner,Staff,Admin")]
+    public async Task<IActionResult> DeleteTourPhoto(int tourId, int photoId)
+    {
+        var (success, result, statusCode) = await _photoFactory.DeletePhotoAsync(tourId, photoId);
+        return StatusCode(statusCode, result);
+    }
+
+    [HttpPut("{tourId}/photos/{photoId}/cover")]
+    [Authorize(Roles = "CompanyOwner,Staff,Admin")]
+    public async Task<IActionResult> SetCoverPhoto(int tourId, int photoId)
+    {
+        var (success, result, statusCode) = await _photoFactory.SetCoverPhotoAsync(tourId, photoId);
+        return StatusCode(statusCode, result);
+    }
+
+    [HttpPut("{id}/photos/reorder")]
+    [Authorize(Roles = "CompanyOwner,Staff,Admin")]
+    public async Task<IActionResult> ReorderTourPhotos(int id, [FromBody] ReorderPhotosRequest request)
+    {
+        var (success, result, statusCode) = await _photoFactory.ReorderPhotosAsync(id, request.PhotoIds);
+        return StatusCode(statusCode, result);
+    }
+}
+
+public class ReorderPhotosRequest
+{
+    public List<int> PhotoIds { get; set; } = new();
 }
