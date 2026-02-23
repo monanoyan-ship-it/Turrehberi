@@ -323,38 +323,56 @@
                                 <div class="row g-2">
                                     <div class="col-md-3">
                                         <label class="form-label small" data-t="TourDate.BatchStartDate">Baslangic</label>
-                                        <input type="date" class="form-control form-control-sm" data-bind="value: batchFormData().startDate">
+                                        <input type="date" class="form-control form-control-sm" data-bind="value: batchPeriodStart">
                                     </div>
                                     <div class="col-md-3">
                                         <label class="form-label small" data-t="TourDate.BatchEndDate">Bitis</label>
-                                        <input type="date" class="form-control form-control-sm" data-bind="value: batchFormData().endDate">
+                                        <input type="date" class="form-control form-control-sm" data-bind="value: batchPeriodEnd">
                                     </div>
                                     <div class="col-md-3">
                                         <label class="form-label small" data-t="TourDate.BatchPrice">Fiyat</label>
-                                        <input type="number" class="form-control form-control-sm" data-bind="value: batchFormData().price" min="0" step="0.01">
+                                        <input type="number" class="form-control form-control-sm" data-bind="value: batchPrice" min="0" step="0.01">
                                     </div>
                                     <div class="col-md-3">
                                         <label class="form-label small" data-t="TourDate.BatchCapacity">Kapasite</label>
-                                        <input type="number" class="form-control form-control-sm" data-bind="value: batchFormData().maxCapacity" min="1">
+                                        <input type="number" class="form-control form-control-sm" data-bind="value: batchMaxCapacity" min="1">
                                     </div>
-                                    <div class="col-md-2">
-                                        <label class="form-label small" data-t="TourDate.DurationValue">Sure</label>
-                                        <input type="number" class="form-control form-control-sm" data-bind="value: batchFormData().durationValue" min="1">
-                                    </div>
-                                    <div class="col-md-2">
-                                        <label class="form-label small" data-t="TourDate.DurationUnit">Birim</label>
-                                        <select class="form-select form-select-sm" data-bind="options: durationUnits, optionsText: 'label', optionsValue: 'value', value: batchFormData().durationUnit"></select>
-                                    </div>
-                                    <div class="col-md-8">
+                                    <div class="col-12">
                                         <label class="form-label small" data-t="TourDate.DaysOfWeek">Haftanin Gunleri</label>
                                         <div class="d-flex flex-wrap gap-1">
                                             <!-- ko foreach: weekDays -->
-                                            <label class="btn btn-sm btn-outline-primary">
-                                                <input type="checkbox" class="btn-check" data-bind="checked: $parent.batchSelectedDays, checkedValue: value">
-                                                <span data-bind="text: label"></span>
-                                            </label>
+                                            <input type="checkbox" class="btn-check" autocomplete="off" data-bind="attr: { id: 'dayBtn' + value }, checked: $parent.batchSelectedDays, checkedValue: value">
+                                            <label class="btn btn-sm btn-outline-primary" data-bind="attr: { 'for': 'dayBtn' + value }, text: label"></label>
                                             <!-- /ko -->
                                         </div>
+                                    </div>
+                                    <!-- Seanslar -->
+                                    <div class="col-12">
+                                        <label class="form-label small" data-t="TourDate.Sessions">Seanslar</label>
+                                        <!-- ko foreach: batchTimeSlots -->
+                                        <div class="row g-1 mb-1 align-items-center">
+                                            <div class="col-md-3">
+                                                <input type="time" class="form-control form-control-sm" data-bind="value: startTime" title="Saat">
+                                            </div>
+                                            <div class="col-md-3">
+                                                <div class="input-group input-group-sm">
+                                                    <span class="input-group-text" data-t="TourDate.DurationValue">Sure</span>
+                                                    <input type="number" class="form-control" data-bind="value: durationValue" min="1">
+                                                </div>
+                                            </div>
+                                            <div class="col-md-3">
+                                                <select class="form-select form-select-sm" data-bind="options: $parent.durationUnits, optionsText: 'label', optionsValue: 'value', value: durationUnit"></select>
+                                            </div>
+                                            <div class="col-md-3">
+                                                <button class="btn btn-outline-danger btn-sm" data-bind="click: $parent.removeTimeSlot" title="Seansi Sil">
+                                                    <i class="bi bi-trash"></i> <span data-t="TourDate.RemoveSession">Sil</span>
+                                                </button>
+                                            </div>
+                                        </div>
+                                        <!-- /ko -->
+                                        <button class="btn btn-outline-secondary btn-sm mt-1" data-bind="click: addTimeSlot">
+                                            <i class="bi bi-plus me-1"></i><span data-t="TourDate.AddSession">Seans Ekle</span>
+                                        </button>
                                     </div>
                                     <div class="col-12 text-end">
                                         <button class="btn btn-info btn-sm" data-bind="click: previewBatchDates">
@@ -367,13 +385,38 @@
                                     </div>
                                     <!-- Onizleme -->
                                     <div class="col-12" data-bind="visible: batchPreview().length > 0">
-                                        <div class="alert alert-info p-2 mb-0">
-                                            <small><strong data-bind="text: batchPreview().length"></strong> <span data-t="TourDate.DatesWillBeCreated">tarih olusturulacak</span>:</small>
-                                            <div class="d-flex flex-wrap gap-1 mt-1">
-                                                <!-- ko foreach: batchPreview -->
-                                                <span class="badge bg-light text-dark" data-bind="text: $data"></span>
-                                                <!-- /ko -->
+                                        <div class="card border-info">
+                                            <div class="card-header bg-info bg-opacity-10 py-2 d-flex justify-content-between align-items-center">
+                                                <span>
+                                                    <i class="bi bi-calendar-check me-1"></i>
+                                                    <strong data-bind="text: batchPreviewDayCount"></strong> <span data-t="TourDate.DaysOfWeek">gun</span>,
+                                                    <strong data-bind="text: batchPreviewTotal"></strong> <span data-t="TourDate.DatesWillBeCreated">tarih olusturulacak</span>
+                                                </span>
+                                                <span class="badge bg-info" data-bind="text: batchTimeSlots().length + ' seans/gun'"></span>
                                             </div>
+                                            <div class="card-body p-0" style="max-height: 200px; overflow-y: auto;">
+                                                <table class="table table-sm table-hover mb-0">
+                                                    <tbody data-bind="foreach: batchPreview">
+                                                        <tr>
+                                                            <td class="ps-3" style="width: 140px;">
+                                                                <strong data-bind="text: dayLabel"></strong>
+                                                            </td>
+                                                            <td>
+                                                                <!-- ko foreach: slots -->
+                                                                <span class="badge bg-primary bg-opacity-75 me-1">
+                                                                    <i class="bi bi-clock me-1"></i><span data-bind="text: start + ' - ' + end"></span>
+                                                                </span>
+                                                                <!-- /ko -->
+                                                            </td>
+                                                        </tr>
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                            <!-- ko if: batchPreviewMore() > 0 -->
+                                            <div class="card-footer bg-info bg-opacity-10 py-1 text-center">
+                                                <small class="text-muted">... +<strong data-bind="text: batchPreviewMore"></strong> gun daha</small>
+                                            </div>
+                                            <!-- /ko -->
                                         </div>
                                     </div>
                                 </div>

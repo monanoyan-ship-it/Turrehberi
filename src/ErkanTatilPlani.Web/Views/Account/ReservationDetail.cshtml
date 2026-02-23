@@ -83,7 +83,7 @@
                                     </div>
                                     <div>
                                         <small class="text-muted d-block" data-t="Reservation.StartDate">Baslangic Tarihi</small>
-                                        <span class="fw-semibold" data-bind="text: new Date($data.startDate).toLocaleDateString('tr-TR', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })"></span>
+                                        <span class="fw-semibold" data-bind="text: (function(){ var d = new Date($data.startDate); var t = d.toLocaleDateString('tr-TR', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' }); var h = d.getUTCHours(); var m = d.getUTCMinutes(); return (h || m) ? t + ' ' + String(h).padStart(2,'0') + ':' + String(m).padStart(2,'0') : t; })()"></span>
                                     </div>
                                 </div>
                             </div>
@@ -94,7 +94,7 @@
                                     </div>
                                     <div>
                                         <small class="text-muted d-block" data-t="Reservation.EndDate">Bitis Tarihi</small>
-                                        <span class="fw-semibold" data-bind="text: new Date($data.endDate).toLocaleDateString('tr-TR', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })"></span>
+                                        <span class="fw-semibold" data-bind="text: (function(){ var d = new Date($data.endDate); var t = d.toLocaleDateString('tr-TR', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' }); var h = d.getUTCHours(); var m = d.getUTCMinutes(); return (h || m) ? t + ' ' + String(h).padStart(2,'0') + ':' + String(m).padStart(2,'0') : t; })()"></span>
                                     </div>
                                 </div>
                             </div>

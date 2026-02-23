@@ -240,7 +240,7 @@
                 <div class="d-flex justify-content-between mb-2">
                     <div>
                         <small class="text-muted" data-t="Reservation.StartDate">Baslangic:</small>
-                        <div class="fw-semibold" data-bind="text: new Date(startDate).toLocaleDateString('tr-TR')"></div>
+                        <div class="fw-semibold" data-bind="text: (function(){ var d = new Date(startDate); var t = d.toLocaleDateString('tr-TR'); var h = d.getUTCHours(); var m = d.getUTCMinutes(); return (h || m) ? t + ' ' + String(h).padStart(2,'0') + ':' + String(m).padStart(2,'0') : t; })()"></div>
                     </div>
                     <div class="text-end">
                         <small class="text-muted" data-t="Reservation.People">Kisi:</small>

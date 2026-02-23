@@ -24,10 +24,10 @@ public class TourCalendarFactory : ITourCalendarFactory
     public async Task<(bool success, object result, int statusCode)> GetCalendarDataAsync(int visitorId, int year, int month, int? tourId)
     {
         var visitor = await _visitorService.GetByIdWithCompanyAsync(visitorId);
-        if (visitor == null) return (false, new { message = "Kullanici bulunamadi" }, 401);
-        if (visitor.Company == null) return (false, new { message = "Firma sahibi degilsiniz" }, 403);
+        if (visitor == null) return (false, new { message = "Error.UserNotFound" }, 401);
+        if (visitor.Company == null) return (false, new { message = "Error.NotCompanyOwner" }, 403);
         if (visitor.Company.StatusId != CompanyStatuses.Ids.Approved)
-            return (false, new { message = "Firma durumu uygun degil" }, 403);
+            return (false, new { message = "Error.CompanyStatusInvalid" }, 403);
 
         var companyId = visitor.Company.Id;
         var monthStart = new DateTime(year, month, 1, 0, 0, 0, DateTimeKind.Utc);

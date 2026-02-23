@@ -45,7 +45,7 @@ public class ReservationsController : ControllerBase
     public async Task<ActionResult<object>> GetMyReservations([FromQuery] string? status = null)
     {
         var visitorId = GetVisitorId();
-        if (visitorId == null) return Unauthorized(new { message = "Giris yapmaniz gerekiyor" });
+        if (visitorId == null) return Unauthorized(new { message = "Error.LoginRequired" });
 
         var (result, errorMessage, errorCode, statusCode) = await _visitor.GetMyReservationsAsync(visitorId.Value, status);
         if (errorMessage != null)
@@ -64,7 +64,7 @@ public class ReservationsController : ControllerBase
     public async Task<IActionResult> UpdateMyReservationStatus(int id, [FromBody] UpdateStatusRequest request)
     {
         var visitorId = GetVisitorId();
-        if (visitorId == null) return Unauthorized(new { message = "Giris yapmaniz gerekiyor" });
+        if (visitorId == null) return Unauthorized(new { message = "Error.LoginRequired" });
 
         var (success, result, statusCode) = await _visitor.UpdateMyReservationStatusAsync(visitorId.Value, id, request.Status, request.RejectionReason);
         return StatusCode(statusCode, result);
@@ -78,7 +78,7 @@ public class ReservationsController : ControllerBase
     public async Task<ActionResult<object>> GetVisitorReservations()
     {
         var visitorId = GetVisitorId();
-        if (visitorId == null) return Unauthorized(new { message = "Giris yapmaniz gerekiyor" });
+        if (visitorId == null) return Unauthorized(new { message = "Error.LoginRequired" });
 
         return Ok(await _visitor.GetVisitorReservationsAsync(visitorId.Value));
     }
@@ -91,11 +91,11 @@ public class ReservationsController : ControllerBase
     public async Task<ActionResult<object>> GetVisitorReservationDetail(int id)
     {
         var visitorId = GetVisitorId();
-        if (visitorId == null) return Unauthorized(new { message = "Giris yapmaniz gerekiyor" });
+        if (visitorId == null) return Unauthorized(new { message = "Error.LoginRequired" });
 
         var result = await _visitor.GetVisitorReservationDetailAsync(visitorId.Value, id);
         if (result == null)
-            return NotFound(new { message = "Rezervasyon bulunamadi" });
+            return NotFound(new { message = "Error.ReservationNotFound" });
 
         return Ok(result);
     }
@@ -108,7 +108,7 @@ public class ReservationsController : ControllerBase
     public async Task<IActionResult> CancelVisitorReservation(int id)
     {
         var visitorId = GetVisitorId();
-        if (visitorId == null) return Unauthorized(new { message = "Giris yapmaniz gerekiyor" });
+        if (visitorId == null) return Unauthorized(new { message = "Error.LoginRequired" });
 
         var (success, result, statusCode) = await _visitor.CancelVisitorReservationAsync(visitorId.Value, id);
         return StatusCode(statusCode, result);
@@ -119,7 +119,7 @@ public class ReservationsController : ControllerBase
     public async Task<IActionResult> ChangeDateVisitorReservation(int id, [FromBody] ChangeDateRequest request)
     {
         var visitorId = GetVisitorId();
-        if (visitorId == null) return Unauthorized(new { message = "Giris yapmaniz gerekiyor" });
+        if (visitorId == null) return Unauthorized(new { message = "Error.LoginRequired" });
 
         var (success, message) = await _visitor.ChangeDateAsync(visitorId.Value, id, request.NewStartDate);
         if (!success) return BadRequest(new { message });
@@ -174,6 +174,7 @@ public class ReservationsController : ControllerBase
             request.NumberOfPeople,
             request.Notes,
             request.Address,
+            request.TourDateId,
             request.StartDate,
             customerIp,
             request.CouponCode);
@@ -188,7 +189,7 @@ public class ReservationsController : ControllerBase
     public async Task<ActionResult<object>> PaymentCallback([FromForm] string token, [FromForm] int? reservationId = null)
     {
         if (string.IsNullOrEmpty(token))
-            return BadRequest(new { message = "Token gerekli" });
+            return BadRequest(new { message = "Error.TokenRequired" });
 
         var (success, result, statusCode) = await _payment.ProcessPaymentCallbackAsync(token, reservationId);
         return StatusCode(statusCode, result);
@@ -202,7 +203,7 @@ public class ReservationsController : ControllerBase
     {
         var result = await _payment.GetPaymentStatusAsync(reservationId);
         if (result == null)
-            return NotFound(new { message = "Rezervasyon bulunamadi" });
+            return NotFound(new { message = "Error.ReservationNotFound" });
 
         return Ok(result);
     }
@@ -241,6 +242,7 @@ public class CreateReservationRequest
     public int NumberOfPeople { get; set; } = 1;
     public string? Notes { get; set; }
     public string? Address { get; set; }
+    public int? TourDateId { get; set; }
     public DateTime? StartDate { get; set; }
     public string? CouponCode { get; set; }
     public string? ParticipantInfo { get; set; }

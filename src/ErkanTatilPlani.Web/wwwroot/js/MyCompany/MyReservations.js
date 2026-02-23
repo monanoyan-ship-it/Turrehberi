@@ -20,7 +20,11 @@ function MyReservationsViewModel() {
     self.formatDate = function(dateString) {
         if (!dateString) return '';
         var date = new Date(dateString);
-        return date.toLocaleDateString('tr-TR');
+        var text = date.toLocaleDateString('tr-TR');
+        var h = date.getUTCHours();
+        var m = date.getUTCMinutes();
+        if (h || m) text += ' ' + String(h).padStart(2,'0') + ':' + String(m).padStart(2,'0');
+        return text;
     };
 
     self.getStatusBadgeClass = function(status) {

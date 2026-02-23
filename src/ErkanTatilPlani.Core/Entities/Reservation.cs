@@ -6,6 +6,7 @@ public class Reservation : BaseEntity
 {
     public int TourId { get; set; }
     public int VisitorId { get; set; }
+    public int? TourDateId { get; set; }
     public DateTime StartDate { get; set; }
     public DateTime EndDate { get; set; }
     public int NumberOfPeople { get; set; }
@@ -35,5 +36,6 @@ public class Reservation : BaseEntity
 
     public virtual Tour Tour { get; set; } = null!;
     public virtual Visitor Visitor { get; set; } = null!;
+    public virtual TourDate? TourDate { get; set; }
     public virtual Promotion? Promotion { get; set; }
 }

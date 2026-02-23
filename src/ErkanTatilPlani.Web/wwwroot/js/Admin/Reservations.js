@@ -37,8 +37,8 @@ function AdminReservationsViewModel() {
         var data = Object.assign({}, reservation);
         data.status = newStatus;
         $.ajax({ url: apiBaseUrl + '/api/reservations/' + reservation.id, method: 'PUT', contentType: 'application/json', data: JSON.stringify(data) })
-            .done(function() { self.loadData(); toastr.success(newStatus === 1 ? 'Onaylandi' : 'Iptal edildi'); })
-            .fail(function() { toastr.error('Hata olustu'); });
+            .done(function() { self.loadData(); toastr.success(newStatus === 1 ? T('Success.Confirmed') : T('Success.Cancelled')); })
+            .fail(function() { toastr.error(T('Common.Error')); });
     };
 
     $(document).ready(function() { detailsModal = new bootstrap.Modal(document.getElementById('detailsModal')); self.loadData(); });

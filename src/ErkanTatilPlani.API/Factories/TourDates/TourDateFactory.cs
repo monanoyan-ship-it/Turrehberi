@@ -72,7 +72,7 @@ public class TourDateFactory : ITourDateFactory
     public async Task<(bool success, string? errorMessage, string? errorCode, int? statusCode)> UpdateTourDateAsync(int visitorId, int id, TourDate tourDate)
     {
         var existing = await _tourDateService.GetByIdAsync(id);
-        if (existing == null) return (false, "Tarih bulunamadi", null, 404);
+        if (existing == null) return (false, "Error.DateNotFound", null, 404);
 
         var check = await CheckTourOwnership(visitorId, existing.TourId);
         if (check.errorMessage != null) return (false, check.errorMessage, check.errorCode, check.statusCode);
@@ -171,45 +171,61 @@ public class TourDateFactory : ITourDateFactory
             return (false, new { message = check.errorMessage }, check.statusCode ?? 400);
 
         // Validasyon
-        if (request.StartDate >= request.EndDate)
-            return (false, new { message = "Bitis tarihi baslangictan sonra olmali" }, 400);
+        if (request.PeriodStartDate >= request.PeriodEndDate)
+            return (false, new { message = "Validation.EndDateMustBeAfterStart" }, 400);
 
-        if (request.DurationValue < 1)
-            return (false, new { message = "Sure en az 1 olmali" }, 400);
+        // TimeSlots yoksa legacy alanlardan tek slot olustur (geriye uyumluluk)
+        var timeSlots = request.TimeSlots != null && request.TimeSlots.Any()
+            ? request.TimeSlots
+            : new List<TimeSlotRequest> { new() { StartTime = "00:00", DurationValue = request.DurationValue, DurationUnit = request.DurationUnit ?? "Day" } };
 
-        var dates = new List<TourDate>();
-        var currentDate = DateTime.SpecifyKind(request.StartDate.Date, DateTimeKind.Utc);
-        var endDate = DateTime.SpecifyKind(request.EndDate.Date, DateTimeKind.Utc);
-
-        // Sure birimine gore bitis tarihini hesapla
-        var durationUnit = DurationUnits.GetBySystemName(request.DurationUnit ?? "Day");
-        DateTime CalculateEndDate(DateTime start)
+        // Her slot icin validasyon
+        foreach (var slot in timeSlots)
         {
-            return durationUnit?.Id switch
+            if (slot.DurationValue < 1)
+                return (false, new { message = "Validation.MinDurationRequired" }, 400);
+            if (!TimeSpan.TryParse(slot.StartTime, out _))
+                return (false, new { message = "Validation.InvalidTimeFormat" }, 400);
+        }
+
+        // EndDate hesaplama helper
+        DateTime CalculateEndDate(DateTime start, int durationValue, string durationUnitName)
+        {
+            var unit = DurationUnits.GetBySystemName(durationUnitName ?? "Day");
+            return unit?.Id switch
             {
-                DurationUnits.Ids.Hour => start.AddHours(request.DurationValue),
-                DurationUnits.Ids.Week => start.AddDays(request.DurationValue * 7),
-                DurationUnits.Ids.Month => start.AddMonths(request.DurationValue),
-                _ => start.AddDays(request.DurationValue) // Day (default)
+                DurationUnits.Ids.Hour => start.AddHours(durationValue),
+                DurationUnits.Ids.Week => start.AddDays(durationValue * 7),
+                DurationUnits.Ids.Month => start.AddMonths(durationValue),
+                _ => start.AddDays(durationValue) // Day (default)
             };
         }
+
+        var dates = new List<TourDate>();
+        var currentDate = DateTime.SpecifyKind(request.PeriodStartDate.Date, DateTimeKind.Utc);
+        var periodEnd = DateTime.SpecifyKind(request.PeriodEndDate.Date, DateTimeKind.Utc);
 
         if (request.DaysOfWeek != null && request.DaysOfWeek.Any())
         {
             // Belirli haftanin gunleri modunda calis
-            while (currentDate <= endDate)
+            while (currentDate <= periodEnd)
             {
                 if (request.DaysOfWeek.Contains((int)currentDate.DayOfWeek))
                 {
-                    dates.Add(new TourDate
+                    foreach (var slot in timeSlots)
                     {
-                        TourId = tourId,
-                        StartDate = currentDate,
-                        EndDate = CalculateEndDate(currentDate),
-                        Price = request.Price,
-                        MaxCapacity = request.MaxCapacity,
-                        IsAvailable = true
-                    });
+                        var slotTime = TimeSpan.Parse(slot.StartTime);
+                        var startDate = currentDate.Add(slotTime);
+                        dates.Add(new TourDate
+                        {
+                            TourId = tourId,
+                            StartDate = startDate,
+                            EndDate = CalculateEndDate(startDate, slot.DurationValue, slot.DurationUnit),
+                            Price = request.Price,
+                            MaxCapacity = request.MaxCapacity,
+                            IsAvailable = true
+                        });
+                    }
                 }
                 currentDate = currentDate.AddDays(1);
             }
@@ -218,27 +234,32 @@ public class TourDateFactory : ITourDateFactory
         {
             // Her N gunde bir modunda calis
             var interval = Math.Max(1, request.RepeatEveryDays);
-            while (currentDate <= endDate)
+            while (currentDate <= periodEnd)
             {
-                dates.Add(new TourDate
+                foreach (var slot in timeSlots)
                 {
-                    TourId = tourId,
-                    StartDate = currentDate,
-                    EndDate = CalculateEndDate(currentDate),
-                    Price = request.Price,
-                    MaxCapacity = request.MaxCapacity,
-                    IsAvailable = true
-                });
+                    var slotTime = TimeSpan.Parse(slot.StartTime);
+                    var startDate = currentDate.Add(slotTime);
+                    dates.Add(new TourDate
+                    {
+                        TourId = tourId,
+                        StartDate = startDate,
+                        EndDate = CalculateEndDate(startDate, slot.DurationValue, slot.DurationUnit),
+                        Price = request.Price,
+                        MaxCapacity = request.MaxCapacity,
+                        IsAvailable = true
+                    });
+                }
                 currentDate = currentDate.AddDays(interval);
             }
         }
 
         if (!dates.Any())
-            return (false, new { message = "Belirtilen kriterlere uygun tarih bulunamadi" }, 400);
+            return (false, new { message = "Error.NoDatesMatchCriteria" }, 400);
 
-        // Maksimum 100 tarih
-        if (dates.Count > 100)
-            return (false, new { message = "Tek seferde en fazla 100 tarih olusturulabilir" }, 400);
+        // Maksimum 200 tarih (coklu seans carpan etkisi)
+        if (dates.Count > 200)
+            return (false, new { message = "Error.MaxBatchDates200" }, 400);
 
         foreach (var date in dates)
         {
@@ -246,20 +267,20 @@ public class TourDateFactory : ITourDateFactory
         }
         await _unitOfWork.SaveChangesAsync();
 
-        return (true, new { message = $"{dates.Count} tarih olusturuldu", count = dates.Count }, 200);
+        return (true, new { message = "Success.BatchDatesCreated", count = dates.Count }, 200);
     }
 
     private async Task<(string? errorMessage, string? errorCode, int? statusCode)> CheckTourOwnership(int visitorId, int tourId)
     {
         var visitor = await _visitorService.GetByIdWithCompanyAsync(visitorId);
-        if (visitor == null) return ("Kullanici bulunamadi", null, 401);
-        if (visitor.Company == null) return ("Firma sahibi degilsiniz", "NOT_COMPANY_OWNER", 403);
+        if (visitor == null) return ("Error.UserNotFound", null, 401);
+        if (visitor.Company == null) return ("Error.NotCompanyOwner", "NOT_COMPANY_OWNER", 403);
         if (visitor.Company.StatusId != CompanyStatuses.Ids.Approved)
-            return ("Firma durumu uygun degil", "COMPANY_NOT_APPROVED", 403);
+            return ("Error.CompanyStatusInvalid", "COMPANY_NOT_APPROVED", 403);
 
         var tour = await _tourService.GetByIdAsync(tourId);
-        if (tour == null) return ("Tur bulunamadi", null, 404);
-        if (tour.CompanyId != visitor.Company.Id) return ("Bu tur firmaniza ait degil", "NOT_TOUR_OWNER", 403);
+        if (tour == null) return ("Error.TourNotFound", null, 404);
+        if (tour.CompanyId != visitor.Company.Id) return ("Error.TourNotOwnedByCompany", "NOT_TOUR_OWNER", 403);
 
         return (null, null, null);
     }

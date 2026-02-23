@@ -49,32 +49,50 @@ function MyToursViewModel() {
 
     // Batch date
     self.isSavingBatch = ko.observable(false);
-    self.batchFormData = ko.observable({
-        startDate: '',
-        endDate: '',
-        price: '',
-        maxCapacity: '',
-        durationValue: 1,
-        durationUnit: 'Day'
-    });
+    self.batchPeriodStart = ko.observable('');
+    self.batchPeriodEnd = ko.observable('');
+    self.batchPrice = ko.observable('');
+    self.batchMaxCapacity = ko.observable('');
     self.batchSelectedDays = ko.observableArray([]);
     // DurationUnits TypeDefinition (SystemName degerlerini kullanir)
     self.durationUnits = [
-        { value: 'Hour', label: T('TourDate.DurationHour') || 'Saat' },
-        { value: 'Day', label: T('TourDate.DurationDay') || 'Gun' },
-        { value: 'Week', label: T('TourDate.DurationWeek') || 'Hafta' },
-        { value: 'Month', label: T('TourDate.DurationMonth') || 'Ay' }
+        { value: 'Hour', label: T('TourDate.DurationHour') },
+        { value: 'Day', label: T('TourDate.DurationDay') },
+        { value: 'Week', label: T('TourDate.DurationWeek') },
+        { value: 'Month', label: T('TourDate.DurationMonth') }
     ];
+    self.batchTimeSlots = ko.observableArray([
+        { startTime: ko.observable('09:00'), durationValue: ko.observable(1), durationUnit: ko.observable('Day') }
+    ]);
     self.batchPreview = ko.observableArray([]);
+    self.batchPreviewTotal = ko.observable(0);
+    self.batchPreviewDayCount = ko.observable(0);
+    self.batchPreviewMore = ko.observable(0);
     self.weekDays = [
-        { value: 1, label: 'Pzt' },
-        { value: 2, label: 'Sal' },
-        { value: 3, label: 'Car' },
-        { value: 4, label: 'Per' },
-        { value: 5, label: 'Cum' },
-        { value: 6, label: 'Cmt' },
-        { value: 0, label: 'Paz' }
+        { value: 1, label: T('WeekDay.Mon') },
+        { value: 2, label: T('WeekDay.Tue') },
+        { value: 3, label: T('WeekDay.Wed') },
+        { value: 4, label: T('WeekDay.Thu') },
+        { value: 5, label: T('WeekDay.Fri') },
+        { value: 6, label: T('WeekDay.Sat') },
+        { value: 0, label: T('WeekDay.Sun') }
     ];
+
+    self.addTimeSlot = function() {
+        self.batchTimeSlots.push({
+            startTime: ko.observable('09:00'),
+            durationValue: ko.observable(1),
+            durationUnit: ko.observable('Day')
+        });
+    };
+
+    self.removeTimeSlot = function(slot) {
+        if (self.batchTimeSlots().length <= 1) {
+            toastr.warning(T('TourDate.MinOneSlot'));
+            return;
+        }
+        self.batchTimeSlots.remove(slot);
+    };
 
     // Cover photo
     self.isUploadingCover = ko.observable(false);
@@ -127,14 +145,13 @@ function MyToursViewModel() {
                 self.isLoading(false);
             },
             error: function(xhr) {
-                console.error('Turlar yuklenemedi:', xhr);
+                console.error('Tours load failed:', xhr);
                 if (xhr.status === 401) {
-                    toastr.error(T('Login.Error.Required') || 'Giris yapmaniz gerekiyor');
+                    toastr.error(T('Login.Error.Required'));
                 } else if (xhr.status === 403) {
-                    var response = xhr.responseJSON;
-                    toastr.warning(response?.message || 'Firma sahibi degilsiniz');
+                    toastr.warning(T(xhr.responseJSON?.message) || T('Error.NotCompanyOwner'));
                 } else {
-                    toastr.error(T('Common.Error') || 'Bir hata olustu');
+                    toastr.error(T('Common.Error'));
                 }
                 self.isLoading(false);
             }
@@ -194,7 +211,7 @@ function MyToursViewModel() {
 
         // Validasyon
         if (!data.name || !data.destination || !data.price || !data.durationDays || !data.maxCapacity) {
-            toastr.warning(T('Common.Required') || 'Zorunlu alanlari doldurun');
+            toastr.warning(T('Common.Required'));
             return;
         }
 
@@ -232,15 +249,14 @@ function MyToursViewModel() {
             contentType: 'application/json',
             data: JSON.stringify(data),
             success: function() {
-                toastr.success(isEdit ? (T('MyTours.UpdateSuccess') || 'Tur guncellendi') : (T('MyTours.AddSuccess') || 'Tur eklendi'));
+                toastr.success(isEdit ? T('MyTours.UpdateSuccess') : T('MyTours.AddSuccess'));
                 tourModal.hide();
                 self.loadTours();
                 self.isSaving(false);
             },
             error: function(xhr) {
-                console.error('Tur kaydedilemedi:', xhr);
-                var response = xhr.responseJSON;
-                toastr.error(response?.message || T('Common.Error') || 'Bir hata olustu');
+                console.error('Tour save failed:', xhr);
+                toastr.error(T(xhr.responseJSON?.message) || T('Common.Error'));
                 self.isSaving(false);
             }
         });
@@ -250,13 +266,13 @@ function MyToursViewModel() {
     self.uploadCoverPhoto = function() {
         var tourId = self.editingTourId();
         if (!tourId) {
-            toastr.warning(T('MyTours.CoverPhotoAfterSave') || 'Once turu kaydedin');
+            toastr.warning(T('MyTours.CoverPhotoAfterSave'));
             return;
         }
 
         var fileInput = document.getElementById('tourCoverPhotoFile');
         if (!fileInput.files || !fileInput.files[0]) {
-            toastr.warning(T('MyTours.SelectFile') || 'Lutfen bir dosya secin');
+            toastr.warning(T('MyTours.SelectFile'));
             return;
         }
 
@@ -271,7 +287,7 @@ function MyToursViewModel() {
             processData: false,
             contentType: false,
             success: function(data) {
-                toastr.success(T('MyTours.CoverPhotoUploaded') || 'Kapak fotografi yuklendi');
+                toastr.success(T('MyTours.CoverPhotoUploaded'));
                 var fd = self.formData();
                 fd.imageUrl = data.imageUrl;
                 self.formData(fd);
@@ -281,7 +297,7 @@ function MyToursViewModel() {
                 self.loadTours();
             },
             error: function(xhr) {
-                toastr.error(xhr.responseJSON?.message || T('Common.Error') || 'Hata olustu');
+                toastr.error(T(xhr.responseJSON?.message) || T('Common.Error'));
                 self.isUploadingCover(false);
             }
         });
@@ -296,7 +312,7 @@ function MyToursViewModel() {
             url: apiBaseUrl + '/api/tours/' + tourId + '/cover-photo',
             method: 'DELETE',
             success: function() {
-                toastr.success(T('MyTours.CoverPhotoDeleted') || 'Kapak fotografi silindi');
+                toastr.success(T('MyTours.CoverPhotoDeleted'));
                 var fd = self.formData();
                 fd.imageUrl = '';
                 self.formData(fd);
@@ -304,7 +320,7 @@ function MyToursViewModel() {
                 self.loadTours();
             },
             error: function(xhr) {
-                toastr.error(xhr.responseJSON?.message || T('Common.Error') || 'Hata olustu');
+                toastr.error(T(xhr.responseJSON?.message) || T('Common.Error'));
             }
         });
     };
@@ -325,16 +341,15 @@ function MyToursViewModel() {
             url: apiBaseUrl + '/api/tours/' + self.deletingTour().id,
             method: 'DELETE',
             success: function() {
-                toastr.success(T('MyTours.DeleteSuccess') || 'Tur silindi');
+                toastr.success(T('MyTours.DeleteSuccess'));
                 deleteModal.hide();
                 self.loadTours();
                 self.isDeleting(false);
                 self.deletingTour(null);
             },
             error: function(xhr) {
-                console.error('Tur silinemedi:', xhr);
-                var response = xhr.responseJSON;
-                toastr.error(response?.message || T('Common.Error') || 'Bir hata olustu');
+                console.error('Tour delete failed:', xhr);
+                toastr.error(T(xhr.responseJSON?.message) || T('Common.Error'));
                 self.isDeleting(false);
             }
         });
@@ -370,7 +385,7 @@ function MyToursViewModel() {
     self.saveTourDate = function() {
         var data = self.dateFormData();
         if (!data.startDate || !data.endDate) {
-            toastr.warning(T('Common.Required') || 'Baslangic ve bitis tarihi zorunlu');
+            toastr.warning(T('Common.Required'));
             return;
         }
         self.isSavingDate(true);
@@ -386,13 +401,13 @@ function MyToursViewModel() {
                 isAvailable: true
             }),
             success: function() {
-                toastr.success(T('TourDate.AddDate') || 'Tarih eklendi');
+                toastr.success(T('TourDate.AddDate'));
                 self.dateFormData({ startDate: '', endDate: '', price: '', maxCapacity: '' });
                 self.loadManagedDates(self.managingTourId());
                 self.isSavingDate(false);
             },
             error: function(xhr) {
-                toastr.error(xhr.responseJSON?.message || T('Common.Error') || 'Hata olustu');
+                toastr.error(T(xhr.responseJSON?.message) || T('Common.Error'));
                 self.isSavingDate(false);
             }
         });
@@ -404,11 +419,11 @@ function MyToursViewModel() {
             url: apiBaseUrl + '/api/tour-dates/' + dateItem.id,
             method: 'DELETE',
             success: function() {
-                toastr.success(T('Common.Delete') || 'Tarih silindi');
+                toastr.success(T('Common.Delete'));
                 self.loadManagedDates(self.managingTourId());
             },
             error: function(xhr) {
-                toastr.error(xhr.responseJSON?.message || T('Common.Error') || 'Hata olustu');
+                toastr.error(T(xhr.responseJSON?.message) || T('Common.Error'));
             }
         });
     };
@@ -418,62 +433,104 @@ function MyToursViewModel() {
     // ===============================================
 
     self.previewBatchDates = function() {
-        var data = self.batchFormData();
-        if (!data.startDate || !data.endDate) {
-            toastr.warning(T('Common.Required') || 'Baslangic ve bitis tarihi zorunlu');
+        var periodStart = self.batchPeriodStart();
+        var periodEnd = self.batchPeriodEnd();
+        if (!periodStart || !periodEnd) {
+            toastr.warning(T('Common.Required'));
             return;
         }
 
-        var start = new Date(data.startDate);
-        var end = new Date(data.endDate);
+        var start = new Date(periodStart);
+        var end = new Date(periodEnd);
         if (start >= end) {
-            toastr.warning(T('TourDate.EndAfterStart') || 'Bitis tarihi baslangictan sonra olmali');
+            toastr.warning(T('TourDate.EndAfterStart'));
             return;
         }
 
         var selectedDays = self.batchSelectedDays().map(function(d) { return parseInt(d); });
-        var dates = [];
+        var slots = self.batchTimeSlots();
+        var dayNames = [T('WeekDay.Sun'), T('WeekDay.Mon'), T('WeekDay.Tue'), T('WeekDay.Wed'), T('WeekDay.Thu'), T('WeekDay.Fri'), T('WeekDay.Sat')];
+        var grouped = {};
+        var totalCount = 0;
         var current = new Date(start);
 
-        if (selectedDays.length > 0) {
-            // Secilen haftanin gunlerinde tarih olustur
-            while (current <= end) {
-                if (selectedDays.indexOf(current.getDay()) !== -1) {
-                    dates.push(current.toLocaleDateString('tr-TR'));
-                }
-                current.setDate(current.getDate() + 1);
+        function calculateEndTime(startTime, durationValue, durationUnit) {
+            var parts = startTime.split(':');
+            var h = parseInt(parts[0]); var m = parseInt(parts[1] || '0');
+            var totalMinutes = h * 60 + m;
+            switch (durationUnit) {
+                case 'Hour': totalMinutes += durationValue * 60; break;
+                case 'Day': totalMinutes += durationValue * 24 * 60; break;
+                case 'Week': totalMinutes += durationValue * 7 * 24 * 60; break;
+                case 'Month': totalMinutes += durationValue * 30 * 24 * 60; break;
+                default: totalMinutes += durationValue * 24 * 60;
             }
-        } else {
-            // Her N gunde bir
-            var interval = 7;
-            while (current <= end) {
-                dates.push(current.toLocaleDateString('tr-TR'));
-                current.setDate(current.getDate() + interval);
+            var endH = Math.floor(totalMinutes / 60) % 24;
+            var endM = totalMinutes % 60;
+            return (endH < 10 ? '0' : '') + endH + ':' + (endM < 10 ? '0' : '') + endM;
+        }
+
+        while (current <= end) {
+            var dayMatch = selectedDays.length === 0 || selectedDays.indexOf(current.getDay()) !== -1;
+            if (dayMatch) {
+                var dayKey = current.toLocaleDateString('tr-TR');
+                var dayLabel = current.getDate() + ' ' + current.toLocaleDateString('tr-TR', { month: 'short' }) + ' ' + dayNames[current.getDay()];
+                var slotList = [];
+                for (var i = 0; i < slots.length; i++) {
+                    var st = slots[i].startTime();
+                    var dv = parseInt(slots[i].durationValue()) || 1;
+                    var du = slots[i].durationUnit();
+                    var et = calculateEndTime(st, dv, du);
+                    slotList.push({ start: st, end: et });
+                    totalCount++;
+                }
+                grouped[dayKey] = { label: dayLabel, slotList: slotList, dayOfWeek: current.getDay() };
+            }
+            if (selectedDays.length === 0) {
+                current.setDate(current.getDate() + 7);
+            } else {
+                current.setDate(current.getDate() + 1);
             }
         }
 
-        self.batchPreview(dates.slice(0, 50));
-        if (dates.length > 50) {
-            toastr.info('Toplam ' + dates.length + ' tarih, ilk 50 gosteriliyor');
+        var previewItems = [];
+        var keys = Object.keys(grouped);
+        var displayKeys = keys.slice(0, 30);
+        for (var k = 0; k < displayKeys.length; k++) {
+            var g = grouped[displayKeys[k]];
+            previewItems.push({ dayLabel: g.label, slots: g.slotList, dayOfWeek: g.dayOfWeek });
         }
+
+        self.batchPreviewTotal(totalCount);
+        self.batchPreviewDayCount(keys.length);
+        self.batchPreviewMore(keys.length > 30 ? keys.length - 30 : 0);
+        self.batchPreview(previewItems);
     };
 
     self.createBatchDates = function() {
-        var data = self.batchFormData();
-        if (!data.startDate || !data.endDate) {
-            toastr.warning(T('Common.Required') || 'Baslangic ve bitis tarihi zorunlu');
+        var periodStart = self.batchPeriodStart();
+        var periodEnd = self.batchPeriodEnd();
+        if (!periodStart || !periodEnd) {
+            toastr.warning(T('Common.Required'));
             return;
         }
 
         self.isSavingBatch(true);
 
+        var timeSlotsData = self.batchTimeSlots().map(function(slot) {
+            return {
+                startTime: slot.startTime(),
+                durationValue: parseInt(slot.durationValue()) || 1,
+                durationUnit: slot.durationUnit()
+            };
+        });
+
         var requestData = {
-            startDate: data.startDate,
-            endDate: data.endDate,
-            durationValue: parseInt(data.durationValue) || 1,
-            durationUnit: data.durationUnit || 'day',
-            price: data.price ? parseFloat(data.price) : null,
-            maxCapacity: data.maxCapacity ? parseInt(data.maxCapacity) : null
+            periodStartDate: periodStart,
+            periodEndDate: periodEnd,
+            timeSlots: timeSlotsData,
+            price: self.batchPrice() ? parseFloat(self.batchPrice()) : null,
+            maxCapacity: self.batchMaxCapacity() ? parseInt(self.batchMaxCapacity()) : null
         };
 
         var selectedDays = self.batchSelectedDays().map(function(d) { return parseInt(d); });
@@ -489,15 +546,22 @@ function MyToursViewModel() {
             contentType: 'application/json',
             data: JSON.stringify(requestData),
             success: function(response) {
-                toastr.success(response.message || T('TourDate.BatchSuccess') || 'Tarihler olusturuldu');
-                self.batchFormData({ startDate: '', endDate: '', price: '', maxCapacity: '', durationValue: 1, durationUnit: 'Day' });
+                toastr.success(T(response.message) || T('TourDate.BatchSuccess'));
+                self.batchPeriodStart('');
+                self.batchPeriodEnd('');
+                self.batchPrice('');
+                self.batchMaxCapacity('');
                 self.batchSelectedDays([]);
+                self.batchTimeSlots([{ startTime: ko.observable('09:00'), durationValue: ko.observable(1), durationUnit: ko.observable('Day') }]);
                 self.batchPreview([]);
+                self.batchPreviewTotal(0);
+                self.batchPreviewDayCount(0);
+                self.batchPreviewMore(0);
                 self.loadManagedDates(self.managingTourId());
                 self.isSavingBatch(false);
             },
             error: function(xhr) {
-                toastr.error(xhr.responseJSON?.message || T('Common.Error') || 'Hata olustu');
+                toastr.error(T(xhr.responseJSON?.message) || T('Common.Error'));
                 self.isSavingBatch(false);
             }
         });
@@ -535,7 +599,7 @@ function MyToursViewModel() {
     self.uploadPhoto = function() {
         var fileInput = document.getElementById('photoFile');
         if (!fileInput.files || !fileInput.files[0]) {
-            toastr.warning(T('MyTours.SelectFile') || 'Lutfen bir dosya secin');
+            toastr.warning(T('MyTours.SelectFile'));
             return;
         }
 
@@ -553,7 +617,7 @@ function MyToursViewModel() {
             processData: false,
             contentType: false,
             success: function(data) {
-                toastr.success(T('MyTours.PhotoUploadSuccess') || 'Fotograf yuklendi');
+                toastr.success(T('MyTours.PhotoUploadSuccess'));
                 fileInput.value = '';
                 self.photoTitle('');
                 self.photoIsCover(false);
@@ -561,24 +625,24 @@ function MyToursViewModel() {
                 self.isUploadingPhoto(false);
             },
             error: function(xhr) {
-                toastr.error(xhr.responseJSON?.message || T('Common.Error') || 'Hata olustu');
+                toastr.error(T(xhr.responseJSON?.message) || T('Common.Error'));
                 self.isUploadingPhoto(false);
             }
         });
     };
 
     self.deletePhoto = function(photo) {
-        if (!confirm(T('MyTours.PhotoDeleteConfirm') || 'Bu fotografi silmek istediginizden emin misiniz?')) return;
+        if (!confirm(T('Confirm.DeletePhoto'))) return;
 
         $.ajax({
             url: apiBaseUrl + '/api/tours/' + self.photoTourId() + '/photos/' + photo.id,
             method: 'DELETE',
             success: function() {
-                toastr.success(T('MyTours.PhotoDeleteSuccess') || 'Fotograf silindi');
+                toastr.success(T('MyTours.PhotoDeleteSuccess'));
                 self.loadTourPhotos(self.photoTourId());
             },
             error: function(xhr) {
-                toastr.error(xhr.responseJSON?.message || T('Common.Error') || 'Hata olustu');
+                toastr.error(T(xhr.responseJSON?.message) || T('Common.Error'));
             }
         });
     };
@@ -588,11 +652,11 @@ function MyToursViewModel() {
             url: apiBaseUrl + '/api/tours/' + self.photoTourId() + '/photos/' + photo.id + '/cover',
             method: 'PUT',
             success: function() {
-                toastr.success(T('MyTours.CoverPhotoUpdated') || 'Kapak fotografı guncellendi');
+                toastr.success(T('MyTours.CoverPhotoUpdated'));
                 self.loadTourPhotos(self.photoTourId());
             },
             error: function(xhr) {
-                toastr.error(xhr.responseJSON?.message || T('Common.Error') || 'Hata olustu');
+                toastr.error(T(xhr.responseJSON?.message) || T('Common.Error'));
             }
         });
     };
@@ -605,13 +669,6 @@ function MyToursViewModel() {
         photoModal = new bootstrap.Modal(document.getElementById('photoModal'));
         self.loadTours();
     });
-}
-
-// Localization helper
-if (typeof T === 'undefined') {
-    window.T = function(key) {
-        return null;
-    };
 }
 
 ko.applyBindings(new MyToursViewModel(), document.getElementById('myToursApp'));

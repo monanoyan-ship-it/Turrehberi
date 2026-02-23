@@ -15,6 +15,7 @@ namespace ErkanTatilPlani.API.Factories.Reservations;
 public class ReservationPaymentFactory : IReservationPaymentFactory
 {
     private readonly ITourEntityService _tourService;
+    private readonly ITourDateEntityService _tourDateService;
     private readonly IVisitorEntityService _visitorService;
     private readonly IReservationEntityService _reservationService;
     private readonly IUnitOfWork _unitOfWork;
@@ -27,6 +28,7 @@ public class ReservationPaymentFactory : IReservationPaymentFactory
 
     public ReservationPaymentFactory(
         ITourEntityService tourService,
+        ITourDateEntityService tourDateService,
         IVisitorEntityService visitorService,
         IReservationEntityService reservationService,
         IUnitOfWork unitOfWork,
@@ -38,6 +40,7 @@ public class ReservationPaymentFactory : IReservationPaymentFactory
         INotificationFactory notificationFactory)
     {
         _tourService = tourService;
+        _tourDateService = tourDateService;
         _visitorService = visitorService;
         _reservationService = reservationService;
         _unitOfWork = unitOfWork;
@@ -58,6 +61,7 @@ public class ReservationPaymentFactory : IReservationPaymentFactory
         int numberOfPeople,
         string? notes,
         string? address,
+        int? tourDateId,
         DateTime? startDate,
         string customerIp,
         string? couponCode = null)
@@ -65,20 +69,20 @@ public class ReservationPaymentFactory : IReservationPaymentFactory
         // Tur kontrolu
         var tour = await _tourService.GetByIdWithCompanyAsync(tourId);
         if (tour == null)
-            return (false, new { message = "Tur bulunamadi" }, 404);
+            return (false, new { message = "Error.TourNotFound" }, 404);
 
         if (tour.Company == null || tour.Company.StatusId != CompanyStatuses.Ids.Approved)
-            return (false, new { message = "Bu tur su anda rezervasyona kapali" }, 400);
+            return (false, new { message = "Error.TourNotAvailableForReservation" }, 400);
 
         // Validasyon
         if (string.IsNullOrWhiteSpace(fullName))
-            return (false, new { message = "Ad soyad zorunludur" }, 400);
+            return (false, new { message = "Validation.FullNameRequired" }, 400);
         if (string.IsNullOrWhiteSpace(email))
-            return (false, new { message = "E-posta zorunludur" }, 400);
+            return (false, new { message = "Validation.EmailRequired" }, 400);
         if (string.IsNullOrWhiteSpace(phone))
-            return (false, new { message = "Telefon zorunludur" }, 400);
+            return (false, new { message = "Validation.PhoneRequired" }, 400);
         if (numberOfPeople < 1)
-            return (false, new { message = "Kisi sayisi en az 1 olmalidir" }, 400);
+            return (false, new { message = "Validation.MinOnePersonRequired" }, 400);
 
         // Giris yapmamis kullanici icin visitor olustur/bul
         if (visitorId == null)
@@ -106,9 +110,33 @@ public class ReservationPaymentFactory : IReservationPaymentFactory
             }
         }
 
-        // Baslangic ve bitis tarihi
-        var resolvedStartDate = startDate ?? DateTime.UtcNow.AddDays(7);
-        var endDate = resolvedStartDate.AddDays(tour.DurationDays);
+        // TourDate bazli tarih cozumleme
+        DateTime resolvedStartDate;
+        DateTime endDate;
+        TourDate? selectedTourDate = null;
+
+        if (tourDateId.HasValue)
+        {
+            selectedTourDate = await _tourDateService.GetByIdAsync(tourDateId.Value);
+            if (selectedTourDate == null)
+                return (false, new { message = "Error.SelectedSessionNotFound" }, 404);
+            if (selectedTourDate.TourId != tourId)
+                return (false, new { message = "Error.SessionNotBelongToTour" }, 400);
+            if (!selectedTourDate.IsAvailable)
+                return (false, new { message = "Error.SessionFull" }, 400);
+            if (selectedTourDate.MaxCapacity.HasValue &&
+                selectedTourDate.BookedCount + numberOfPeople > selectedTourDate.MaxCapacity.Value)
+                return (false, new { message = "Error.InsufficientCapacity" }, 400);
+
+            resolvedStartDate = selectedTourDate.StartDate;
+            endDate = selectedTourDate.EndDate;
+        }
+        else
+        {
+            // Legacy fallback
+            resolvedStartDate = startDate ?? DateTime.UtcNow.AddDays(7);
+            endDate = resolvedStartDate.AddDays(tour.DurationDays);
+        }
 
         // Promosyon destekli fiyat hesaplama
         var priceResult = await _promotionCalculation.CalculatePriceAsync(
@@ -123,6 +151,7 @@ public class ReservationPaymentFactory : IReservationPaymentFactory
         {
             TourId = tourId,
             VisitorId = visitorId!.Value,
+            TourDateId = tourDateId,
             StartDate = resolvedStartDate,
             EndDate = endDate,
             NumberOfPeople = numberOfPeople,
@@ -141,6 +170,18 @@ public class ReservationPaymentFactory : IReservationPaymentFactory
             PaymentStatus = PaymentStatuses.Ids.Pending,
             Notes = notes ?? ""
         };
+
+        // TourDate BookedCount guncelle
+        if (selectedTourDate != null)
+        {
+            selectedTourDate.BookedCount += numberOfPeople;
+            if (selectedTourDate.MaxCapacity.HasValue &&
+                selectedTourDate.BookedCount >= selectedTourDate.MaxCapacity.Value)
+            {
+                selectedTourDate.IsAvailable = false;
+            }
+            selectedTourDate.UpdatedAt = DateTime.UtcNow;
+        }
 
         _reservationService.Add(reservation);
         await _unitOfWork.SaveChangesAsync();
@@ -201,9 +242,9 @@ public class ReservationPaymentFactory : IReservationPaymentFactory
             CustomerSurname = nameParts2.Length > 1 ? nameParts2[1] : "",
             CustomerPhone = phone,
             CustomerIp = customerIp,
-            CustomerAddress = address ?? "Belirtilmedi",
-            ProductName = $"{tour.Name} - {tour.Destination} ({numberOfPeople} kisi)",
-            ProductCategory = "Tur Rezervasyonu",
+            CustomerAddress = address ?? "",
+            ProductName = $"{tour.Name} - {tour.Destination} ({numberOfPeople} pax)",
+            ProductCategory = "Tour Reservation",
             CallbackUrl = callbackUrl
         };
 
@@ -216,7 +257,7 @@ public class ReservationPaymentFactory : IReservationPaymentFactory
 
             return (false, new
             {
-                message = "Odeme baslatilirken bir hata olustu",
+                message = "Error.PaymentInitFailed",
                 error = paymentResult.ErrorMessage
             }, 400);
         }
@@ -264,7 +305,7 @@ public class ReservationPaymentFactory : IReservationPaymentFactory
         }
 
         if (reservation == null)
-            return (false, new { message = "Rezervasyon bulunamadi", token = token.Substring(0, Math.Min(20, token.Length)) }, 404);
+            return (false, new { message = "Error.ReservationNotFound", token = token.Substring(0, Math.Min(20, token.Length)) }, 404);
 
         if (paymentResult.Success)
         {
@@ -346,7 +387,7 @@ public class ReservationPaymentFactory : IReservationPaymentFactory
             return (true, new
             {
                 success = true,
-                message = "Odeme basarili",
+                message = "Success.PaymentCompleted",
                 reservationId = reservation.Id,
                 paymentId = paymentResult.PaymentId,
                 qrToken = reservation.QrToken
@@ -361,7 +402,7 @@ public class ReservationPaymentFactory : IReservationPaymentFactory
             return (true, new
             {
                 success = false,
-                message = paymentResult.ErrorMessage ?? "Odeme basarisiz",
+                message = paymentResult.ErrorMessage ?? "Error.PaymentFailed",
                 reservationId = reservation.Id
             }, 200);
         }

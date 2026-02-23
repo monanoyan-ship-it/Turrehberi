@@ -14,20 +14,28 @@ public interface ITourDateFactory
     Task<(bool success, object? result, int statusCode)> CreateBatchTourDatesAsync(int visitorId, int tourId, BatchTourDateRequest request);
 }
 
+public class TimeSlotRequest
+{
+    public string StartTime { get; set; } = "09:00";
+    public int DurationValue { get; set; } = 1;
+    public string DurationUnit { get; set; } = "Day";
+}
+
 public class BatchTourDateRequest
 {
-    public DateTime StartDate { get; set; }
-    public DateTime EndDate { get; set; }
+    public DateTime PeriodStartDate { get; set; }
+    public DateTime PeriodEndDate { get; set; }
     public int RepeatEveryDays { get; set; } = 7;
     public List<int>? DaysOfWeek { get; set; }
     /// <summary>
-    /// Tur suresi degeri (DurationUnit ile birlikte kullanilir)
+    /// Tur suresi degeri (TimeSlots bossa fallback olarak kullanilir)
     /// </summary>
     public int DurationValue { get; set; } = 1;
     /// <summary>
-    /// Tur suresi birimi: hour, day, week, month
+    /// Tur suresi birimi: Hour, Day, Week, Month (TimeSlots bossa fallback)
     /// </summary>
-    public string DurationUnit { get; set; } = "day";
+    public string DurationUnit { get; set; } = "Day";
+    public List<TimeSlotRequest>? TimeSlots { get; set; }
     public decimal? Price { get; set; }
     public int? MaxCapacity { get; set; }
 }

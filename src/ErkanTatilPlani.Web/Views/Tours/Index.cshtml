@@ -318,7 +318,7 @@
                     </button>
                     <!-- Paylas Dropdown -->
                     <div class="dropdown">
-                        <button class="btn btn-outline-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown" title="Paylas">
+                        <button class="btn btn-outline-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown" data-t-title="Common.Share" title="Paylas">
                             <i class="bi bi-share"></i>
                         </button>
                         <ul class="dropdown-menu dropdown-menu-end">
@@ -478,11 +478,16 @@
                     </div>
                     <div class="row g-2" data-bind="visible: !$parent.isLoadingDates(), foreach: $parent.tourDates">
                         <div class="col-md-4 col-sm-6">
-                            <div class="card h-100" data-bind="css: { 'border-success': isAvailable, 'border-secondary opacity-50': !isAvailable }">
+                            <div class="card h-100" style="cursor: pointer;" data-bind="click: function() { if (isAvailable) $parent.selectTourDate($data); }, css: { 'border-success': isAvailable && $parent.selectedTourDateId() !== id, 'border-primary border-2': $parent.selectedTourDateId() === id, 'border-secondary opacity-50': !isAvailable }">
                                 <div class="card-body p-2">
                                     <div class="d-flex justify-content-between align-items-center mb-1">
-                                        <small class="fw-semibold" data-bind="text: new Date(startDate).toLocaleDateString('tr-TR', {day:'numeric', month:'short'}) + ' - ' + new Date(endDate).toLocaleDateString('tr-TR', {day:'numeric', month:'short'})"></small>
+                                        <small class="fw-semibold" data-bind="text: $parent.formatDateWithTime(startDate) + ' - ' + $parent.formatDateWithTime(endDate)"></small>
+                                        <!-- ko if: $parent.selectedTourDateId() === id -->
+                                        <span class="badge bg-primary"><i class="bi bi-check-circle-fill me-1"></i>Secili</span>
+                                        <!-- /ko -->
+                                        <!-- ko ifnot: $parent.selectedTourDateId() === id -->
                                         <span class="badge" data-bind="css: isAvailable ? 'bg-success' : 'bg-secondary', text: isAvailable ? (T('TourDate.Available') || 'Musait') : (T('TourDate.NotAvailable') || 'Dolu')"></span>
+                                        <!-- /ko -->
                                     </div>
                                     <div class="d-flex justify-content-between align-items-center">
                                         <span class="fw-bold text-primary" data-bind="text: price ? price.toLocaleString('tr-TR', {style:'currency', currency:'TRY'}) : ''"></span>
@@ -882,6 +887,23 @@
                                     <p class="mb-0"><strong data-bind="text: price.toLocaleString('tr-TR', {style: 'currency', currency: 'TRY'})"></strong> / kisi</p>
                                 </div>
                             </div>
+                            <!-- Secili Seans Bilgisi -->
+                            <!-- ko if: selectedTourDateObj() -->
+                            <div class="alert alert-primary py-2 mb-3">
+                                <i class="bi bi-calendar-check me-1"></i>
+                                <strong data-bind="text: T('TourDate.SelectedSession') || 'Secili Seans'"></strong>:
+                                <span data-bind="text: formatDateWithTime(selectedTourDateObj().startDate) + ' - ' + formatDateWithTime(selectedTourDateObj().endDate)"></span>
+                                <!-- ko if: selectedTourDateObj().price -->
+                                | <strong data-bind="text: selectedTourDateObj().price.toLocaleString('tr-TR', {style:'currency', currency:'TRY'})"></strong>/kisi
+                                <!-- /ko -->
+                            </div>
+                            <!-- /ko -->
+                            <!-- ko ifnot: selectedTourDateObj() -->
+                            <div class="alert alert-warning py-2 mb-3">
+                                <i class="bi bi-exclamation-triangle me-1"></i>
+                                <span data-bind="text: T('TourDate.NoSessionSelected') || 'Lutfen takvimden bir seans secin'"></span>
+                            </div>
+                            <!-- /ko -->
                             <form id="reservationForm">
                                 <div class="mb-3">
                                     <label class="form-label">Adiniz Soyadiniz *</label>
@@ -929,10 +951,10 @@
                                                                     <input type="text" class="form-control form-control-sm" data-bind="value: name" placeholder="Ad Soyad" />
                                                                 </div>
                                                                 <div class="col-2">
-                                                                    <input type="number" class="form-control form-control-sm" data-bind="value: age" placeholder="Yas" min="0" max="120" />
+                                                                    <input type="number" class="form-control form-control-sm" data-bind="value: age" data-t-placeholder="Reservation.AgePlaceholder" placeholder="Yas" min="0" max="120" />
                                                                 </div>
                                                                 <div class="col-4">
-                                                                    <input type="text" class="form-control form-control-sm" data-bind="value: diet" placeholder="Diyet" />
+                                                                    <input type="text" class="form-control form-control-sm" data-bind="value: diet" data-t-placeholder="Reservation.DietPlaceholder" placeholder="Diyet" />
                                                                 </div>
                                                             </div>
                                                             <input type="text" class="form-control form-control-sm mt-1" data-bind="value: health" placeholder="Saglik notu (opsiyonel)" />
@@ -967,7 +989,7 @@
                                     <div class="mb-2">
                                         <label class="form-label small mb-1"><i class="bi bi-ticket-perforated me-1"></i>Kupon Kodu</label>
                                         <div class="input-group input-group-sm">
-                                            <input type="text" class="form-control" placeholder="INDIRIM20" data-bind="value: couponCode" />
+                                            <input type="text" class="form-control" data-t-placeholder="Promotion.CodePlaceholder" placeholder="INDIRIM20" data-bind="value: couponCode" />
                                             <button class="btn btn-outline-primary" type="button" data-bind="click: applyCoupon">Uygula</button>
                                         </div>
                                         <small class="text-success" data-bind="visible: couponDiscount() > 0, text: 'Kupon indirimi: -' + couponDiscount().toLocaleString('tr-TR', {style: 'currency', currency: 'TRY'})"></small>
@@ -1383,6 +1405,27 @@ function ToursViewModel() {
     // Tur tarihleri (musaitlik takvimi)
     self.tourDates = ko.observableArray([]);
     self.isLoadingDates = ko.observable(false);
+    self.selectedTourDateId = ko.observable(null);
+    self.selectedTourDateObj = ko.observable(null);
+
+    self.selectTourDate = function(tourDate) {
+        if (self.selectedTourDateId() === tourDate.id) {
+            self.selectedTourDateId(null);
+            self.selectedTourDateObj(null);
+        } else {
+            self.selectedTourDateId(tourDate.id);
+            self.selectedTourDateObj(tourDate);
+        }
+    };
+
+    self.formatDateWithTime = function(dateStr) {
+        var d = new Date(dateStr);
+        var dateText = d.toLocaleDateString('tr-TR', {day:'numeric', month:'short'});
+        var hours = d.getUTCHours();
+        var minutes = d.getUTCMinutes();
+        if (hours === 0 && minutes === 0) return dateText;
+        return dateText + ' ' + String(hours).padStart(2,'0') + ':' + String(minutes).padStart(2,'0');
+    };
     self.calendarMonth = ko.observable(new Date().toISOString().substring(0, 7)); // "2026-02"
     self.calendarMonthLabel = ko.computed(function() {
         var parts = self.calendarMonth().split('-');
@@ -2184,6 +2227,7 @@ function ToursViewModel() {
 
         var requestData = {
             tourId: tour.id,
+            tourDateId: self.selectedTourDateId() || null,
             fullName: data.fullName,
             email: data.email,
             phone: data.phone,
