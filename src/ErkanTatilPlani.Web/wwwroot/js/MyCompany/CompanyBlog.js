@@ -35,20 +35,20 @@ function CompanyBlogViewModel() {
     });
 
     // Helpers
-    var categoryNames = {
-        0: T('Blog.Category.TravelTips'), 1: T('Blog.Category.Destinations'), 2: T('Blog.Category.News'),
-        3: T('Blog.Category.Culture'), 4: T('Blog.Category.FoodAndDrink'), 5: T('Blog.Category.Adventure')
+    var categoryKeys = {
+        0: 'Blog.Category.TravelTips', 1: 'Blog.Category.Destinations', 2: 'Blog.Category.News',
+        3: 'Blog.Category.Culture', 4: 'Blog.Category.FoodAndDrink', 5: 'Blog.Category.Adventure'
     };
     var categoryBadgeClasses = {
         0: 'bg-info', 1: 'bg-success', 2: 'bg-primary',
         3: 'bg-warning text-dark', 4: 'bg-danger', 5: 'bg-dark'
     };
-    var statusNames = { 0: T('Blog.Status.Draft'), 1: T('Blog.Status.Published'), 2: T('Blog.Status.Archived') };
+    var statusKeys = { 0: 'Blog.Status.Draft', 1: 'Blog.Status.Published', 2: 'Blog.Status.Archived' };
     var statusBadgeClasses = { 0: 'bg-secondary', 1: 'bg-success', 2: 'bg-warning text-dark' };
 
-    self.getCategoryName = function (id) { return categoryNames[id] || T('Blog.Category.Other'); };
+    self.getCategoryName = function (id) { return categoryKeys[id] ? T(categoryKeys[id]) : T('Blog.Category.Other'); };
     self.getCategoryBadgeClass = function (id) { return categoryBadgeClasses[id] || 'bg-secondary'; };
-    self.getStatusName = function (id) { return statusNames[id] || T('Common.Unknown'); };
+    self.getStatusName = function (id) { return statusKeys[id] ? T(statusKeys[id]) : T('Common.Unknown'); };
     self.getStatusBadgeClass = function (id) { return statusBadgeClasses[id] || 'bg-secondary'; };
 
     self.formatDate = function (dateStr) {
@@ -249,4 +249,6 @@ function CompanyBlogViewModel() {
     });
 }
 
-ko.applyBindings(new CompanyBlogViewModel(), document.getElementById('companyBlogApp'));
+$(document).ready(function() {
+    ko.applyBindings(new CompanyBlogViewModel(), document.getElementById('companyBlogApp'));
+});

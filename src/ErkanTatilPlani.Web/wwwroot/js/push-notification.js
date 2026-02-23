@@ -1,6 +1,6 @@
 // Push Notification Management
 var PushNotificationManager = (function () {
-    var apiBaseUrl = window.apiBaseUrl || '';
+    // apiBaseUrl _Layout.cshtml <head>'de tanimlandi
     var isSubscribed = false;
     var swRegistration = null;
 
@@ -35,13 +35,15 @@ var PushNotificationManager = (function () {
         if (!btn) return;
 
         if (isSubscribed) {
-            btn.innerHTML = '<i class="bi bi-bell-fill"></i> ' + T('Push.Subscribed');
-            btn.classList.remove('btn-outline-primary');
-            btn.classList.add('btn-primary');
+            btn.innerHTML = '<i class="bi bi-broadcast-pin"></i>';
+            btn.setAttribute('title', T('Push.Subscribed'));
+            btn.classList.remove('btn-outline-secondary');
+            btn.classList.add('btn-secondary');
         } else {
-            btn.innerHTML = '<i class="bi bi-bell"></i> ' + T('Push.Subscribe');
-            btn.classList.remove('btn-primary');
-            btn.classList.add('btn-outline-primary');
+            btn.innerHTML = '<i class="bi bi-broadcast"></i>';
+            btn.setAttribute('title', T('Push.Subscribe'));
+            btn.classList.remove('btn-secondary');
+            btn.classList.add('btn-outline-secondary');
         }
     }
 
@@ -54,16 +56,8 @@ var PushNotificationManager = (function () {
         // VAPID public key placeholder - gercek implementasyonda server'dan alinacak
         var applicationServerKey = null;
 
-        Notification.requestPermission().then(function (permission) {
-            if (permission !== 'granted') {
-                toastr.warning(T('Push.PermissionDenied'));
-                return;
-            }
-
-            var options = {
-                userVisibleOnly: true
-            };
-
+        function doPushSubscribe() {
+            var options = { userVisibleOnly: true };
             if (applicationServerKey) {
                 options.applicationServerKey = urlBase64ToUint8Array(applicationServerKey);
             }
@@ -97,7 +91,22 @@ var PushNotificationManager = (function () {
                     console.error('Push subscription failed:', err);
                     toastr.error(T('Push.SubscribeFailed'));
                 });
-        });
+        }
+
+        // Izin zaten verilmisse tekrar sorma
+        if (Notification.permission === 'granted') {
+            doPushSubscribe();
+        } else if (Notification.permission === 'denied') {
+            toastr.warning(T('Push.PermissionDenied'));
+        } else {
+            Notification.requestPermission().then(function (permission) {
+                if (permission === 'granted') {
+                    doPushSubscribe();
+                } else {
+                    toastr.warning(T('Push.PermissionDenied'));
+                }
+            });
+        }
     }
 
     function unsubscribe() {
@@ -151,6 +160,7 @@ var PushNotificationManager = (function () {
         subscribe: subscribe,
         unsubscribe: unsubscribe,
         toggle: toggle,
+        updateUI: updateUI,
         isSubscribed: function () { return isSubscribed; }
     };
 })();

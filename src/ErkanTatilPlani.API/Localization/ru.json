@@ -1259,5 +1259,6 @@
   "WeekDay.Fri": "Пятница",
   "WeekDay.Sat": "Суббота",
   "WeekDay.Sun": "Воскресенье",
-  "Contact.SuccessMessage": "Ваше сообщение успешно отправлено"
+  "Contact.SuccessMessage": "Ваше сообщение успешно отправлено",
+  "Error.CompanyCannotReserve": "Аккаунты компаний не могут бронировать"
 }

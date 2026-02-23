@@ -38,13 +38,13 @@ function MyReservationsViewModel() {
     };
 
     self.getStatusText = function(status) {
-        var texts = {
-            'Pending': T('Status.Pending') || 'Beklemede',
-            'Confirmed': T('Status.Confirmed') || 'Onaylandi',
-            'Cancelled': T('Status.Cancelled') || 'Iptal Edildi',
-            'Completed': T('Status.Completed') || 'Tamamlandi'
+        var keys = {
+            'Pending': 'Status.Pending',
+            'Confirmed': 'Status.Confirmed',
+            'Cancelled': 'Status.Cancelled',
+            'Completed': 'Status.Completed'
         };
-        return texts[status] || status;
+        return keys[status] ? T(keys[status]) : status;
     };
 
     // Rezervasyonlari yukle
@@ -118,11 +118,6 @@ function MyReservationsViewModel() {
         detailModal = new bootstrap.Modal(document.getElementById('detailModal'));
         self.loadReservations();
     });
-}
-
-// Localization helper
-if (typeof T === 'undefined') {
-    window.T = function(key) { return null; };
 }
 
 ko.applyBindings(new MyReservationsViewModel(), document.getElementById('myReservationsApp'));

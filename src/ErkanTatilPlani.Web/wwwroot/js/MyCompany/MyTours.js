@@ -55,12 +55,15 @@ function MyToursViewModel() {
     self.batchMaxCapacity = ko.observable('');
     self.batchSelectedDays = ko.observableArray([]);
     // DurationUnits TypeDefinition (SystemName degerlerini kullanir)
-    self.durationUnits = [
-        { value: 'Hour', label: T('TourDate.DurationHour') },
-        { value: 'Day', label: T('TourDate.DurationDay') },
-        { value: 'Week', label: T('TourDate.DurationWeek') },
-        { value: 'Month', label: T('TourDate.DurationMonth') }
-    ];
+    self.getDurationUnits = function() {
+        return [
+            { value: 'Hour', label: T('TourDate.DurationHour') },
+            { value: 'Day', label: T('TourDate.DurationDay') },
+            { value: 'Week', label: T('TourDate.DurationWeek') },
+            { value: 'Month', label: T('TourDate.DurationMonth') }
+        ];
+    };
+    self.durationUnits = ko.observableArray(self.getDurationUnits());
     self.batchTimeSlots = ko.observableArray([
         { startTime: ko.observable('09:00'), durationValue: ko.observable(1), durationUnit: ko.observable('Day') }
     ]);
@@ -68,15 +71,18 @@ function MyToursViewModel() {
     self.batchPreviewTotal = ko.observable(0);
     self.batchPreviewDayCount = ko.observable(0);
     self.batchPreviewMore = ko.observable(0);
-    self.weekDays = [
-        { value: 1, label: T('WeekDay.Mon') },
-        { value: 2, label: T('WeekDay.Tue') },
-        { value: 3, label: T('WeekDay.Wed') },
-        { value: 4, label: T('WeekDay.Thu') },
-        { value: 5, label: T('WeekDay.Fri') },
-        { value: 6, label: T('WeekDay.Sat') },
-        { value: 0, label: T('WeekDay.Sun') }
-    ];
+    self.getWeekDays = function() {
+        return [
+            { value: 1, label: T('WeekDay.Mon') },
+            { value: 2, label: T('WeekDay.Tue') },
+            { value: 3, label: T('WeekDay.Wed') },
+            { value: 4, label: T('WeekDay.Thu') },
+            { value: 5, label: T('WeekDay.Fri') },
+            { value: 6, label: T('WeekDay.Sat') },
+            { value: 0, label: T('WeekDay.Sun') }
+        ];
+    };
+    self.weekDays = ko.observableArray(self.getWeekDays());
 
     self.addTimeSlot = function() {
         self.batchTimeSlots.push({
@@ -661,6 +667,12 @@ function MyToursViewModel() {
         });
     };
 
+    // Locale yuklendikten sonra label'lari guncelle
+    onLocaleReady.push(function() {
+        self.durationUnits(self.getDurationUnits());
+        self.weekDays(self.getWeekDays());
+    });
+
     // Init
     $(document).ready(function() {
         tourModal = new bootstrap.Modal(document.getElementById('tourModal'));
@@ -671,4 +683,6 @@ function MyToursViewModel() {
     });
 }
 
-ko.applyBindings(new MyToursViewModel(), document.getElementById('myToursApp'));
+$(document).ready(function() {
+    ko.applyBindings(new MyToursViewModel(), document.getElementById('myToursApp'));
+});

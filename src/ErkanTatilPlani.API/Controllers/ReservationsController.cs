@@ -163,6 +163,12 @@ public class ReservationsController : ControllerBase
     public async Task<ActionResult<object>> CreatePublicReservation([FromBody] CreateReservationRequest request)
     {
         var visitorId = GetVisitorId();
+
+        // Firma hesaplari (CompanyOwner, Staff, Admin) rezervasyon yapamaz
+        var userTypeStr = User.FindFirst("UserTypeId")?.Value;
+        if (int.TryParse(userTypeStr, out var userTypeId) && userTypeId >= 1)
+            return BadRequest(new { message = "Error.CompanyCannotReserve" });
+
         var customerIp = HttpContext.Connection.RemoteIpAddress?.ToString() ?? "127.0.0.1";
 
         var (success, result, statusCode) = await _payment.CreatePublicReservationAsync(

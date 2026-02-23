@@ -63,13 +63,13 @@ function CompanyDashboardViewModel() {
     };
 
     self.getStatusText = function(status) {
-        var texts = {
-            'Pending': T('Status.Pending'),
-            'Confirmed': T('Status.Confirmed'),
-            'Cancelled': T('Status.Cancelled'),
-            'Completed': T('Status.Completed')
+        var keys = {
+            'Pending': 'Status.Pending',
+            'Confirmed': 'Status.Confirmed',
+            'Cancelled': 'Status.Cancelled',
+            'Completed': 'Status.Completed'
         };
-        return texts[status] || status;
+        return keys[status] ? T(keys[status]) : status;
     };
 
     // Dashboard verilerini yukle

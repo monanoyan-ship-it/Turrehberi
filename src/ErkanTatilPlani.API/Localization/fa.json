@@ -1259,5 +1259,6 @@
   "WeekDay.Fri": "جمعه",
   "WeekDay.Sat": "شنبه",
   "WeekDay.Sun": "یکشنبه",
-  "Contact.SuccessMessage": "پیام شما با موفقیت ارسال شد"
+  "Contact.SuccessMessage": "پیام شما با موفقیت ارسال شد",
+  "Error.CompanyCannotReserve": "حساب‌های شرکتی نمی‌توانند رزرو کنند"
 }

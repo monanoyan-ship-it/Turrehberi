@@ -1259,5 +1259,6 @@
   "WeekDay.Fri": "Cuma",
   "WeekDay.Sat": "Cumartesi",
   "WeekDay.Sun": "Pazar",
-  "Contact.SuccessMessage": "Mesajınız başarıyla gönderildi"
+  "Contact.SuccessMessage": "Mesajınız başarıyla gönderildi",
+  "Error.CompanyCannotReserve": "Firma hesaplari rezervasyon yapamaz"
 }

@@ -14,9 +14,9 @@ function BlogDetailViewModel() {
     self.isLoggedIn = ko.observable(!!getToken());
 
     // Category helpers
-    var categoryNames = {
-        0: T('Blog.Category.TravelTips'), 1: T('Blog.Category.Destinations'), 2: T('Blog.Category.News'),
-        3: T('Blog.Category.Culture'), 4: T('Blog.Category.FoodAndDrink'), 5: T('Blog.Category.Adventure')
+    var categoryKeys = {
+        0: 'Blog.Category.TravelTips', 1: 'Blog.Category.Destinations', 2: 'Blog.Category.News',
+        3: 'Blog.Category.Culture', 4: 'Blog.Category.FoodAndDrink', 5: 'Blog.Category.Adventure'
     };
     var categoryBadgeClasses = {
         0: 'bg-info', 1: 'bg-success', 2: 'bg-primary',
@@ -24,7 +24,7 @@ function BlogDetailViewModel() {
     };
 
     self.getCategoryName = function (id) {
-        return categoryNames[id] || T('Blog.Category.Other');
+        return categoryKeys[id] ? T(categoryKeys[id]) : T('Blog.Category.Other');
     };
 
     self.getCategoryBadgeClass = function (id) {

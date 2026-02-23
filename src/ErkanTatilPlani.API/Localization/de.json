@@ -1259,5 +1259,6 @@
   "WeekDay.Fri": "Freitag",
   "WeekDay.Sat": "Samstag",
   "WeekDay.Sun": "Sonntag",
-  "Contact.SuccessMessage": "Ihre Nachricht wurde erfolgreich gesendet"
+  "Contact.SuccessMessage": "Ihre Nachricht wurde erfolgreich gesendet",
+  "Error.CompanyCannotReserve": "Firmenkonten können keine Reservierungen vornehmen"
 }

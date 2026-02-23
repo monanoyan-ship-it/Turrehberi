@@ -137,8 +137,4 @@ function TourCalendarViewModel() {
     });
 }
 
-if (typeof T === 'undefined') {
-    window.T = function(key) { return null; };
-}
-
 ko.applyBindings(new TourCalendarViewModel(), document.getElementById('tourCalendarApp'));

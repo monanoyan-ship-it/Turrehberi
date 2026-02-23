@@ -1259,5 +1259,6 @@
   "WeekDay.Fri": "Friday",
   "WeekDay.Sat": "Saturday",
   "WeekDay.Sun": "Sunday",
-  "Contact.SuccessMessage": "Your message has been sent successfully"
+  "Contact.SuccessMessage": "Your message has been sent successfully",
+  "Error.CompanyCannotReserve": "Company accounts cannot make reservations"
 }

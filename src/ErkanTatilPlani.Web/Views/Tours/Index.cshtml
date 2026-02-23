@@ -2082,12 +2082,18 @@ function ToursViewModel() {
 
     // Rezervasyon modali
     self.openReservationModal = function(tour) {
+        // Firma hesaplari rezervasyon yapamaz
+        var user = getUser();
+        if (user && user.userTypeId >= 1) {
+            toastr.warning(T('Error.CompanyCannotReserve'));
+            return;
+        }
+
         self.selectedTour(tour);
         self.numberOfPeople(1); // Kisi sayisini sifirla
         self.showPaymentStep(false); // Odeme adimini sifirla
 
         // Giris yapilmissa kullanici bilgilerini doldur
-        var user = getUser();
         if (user) {
             self.reservationData({
                 fullName: (user.firstName || '') + ' ' + (user.lastName || ''),

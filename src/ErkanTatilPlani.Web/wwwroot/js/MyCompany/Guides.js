@@ -460,8 +460,4 @@ function GuidesViewModel() {
     });
 }
 
-if (typeof T === 'undefined') {
-    window.T = function(key) { return null; };
-}
-
 ko.applyBindings(new GuidesViewModel(), document.getElementById('guidesApp'));

@@ -153,8 +153,4 @@ function AnalyticsViewModel() {
     });
 }
 
-if (typeof T === 'undefined') {
-    window.T = function(key) { return null; };
-}
-
 ko.applyBindings(new AnalyticsViewModel(), document.getElementById('analyticsApp'));

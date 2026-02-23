@@ -1259,5 +1259,6 @@
   "WeekDay.Fri": "الجمعة",
   "WeekDay.Sat": "السبت",
   "WeekDay.Sun": "الأحد",
-  "Contact.SuccessMessage": "تم إرسال رسالتك بنجاح"
+  "Contact.SuccessMessage": "تم إرسال رسالتك بنجاح",
+  "Error.CompanyCannotReserve": "حسابات الشركات لا يمكنها إجراء حجوزات"
 }

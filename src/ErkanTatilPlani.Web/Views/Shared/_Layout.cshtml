@@ -34,6 +34,20 @@
     <link rel="icon" type="image/x-icon" href="/favicon.ico" />
     <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
 
+    <script>
+        // Global T() ve apiBaseUrl - tum script'lerden once tanimlanmali
+        var locale = {};
+        var apiBaseUrl = '@Html.Raw(ViewBag.ApiBaseUrl ?? "https://localhost:7078")';
+        var onLocaleReady = []; // Locale yuklendikten sonra cagrilacak callback'ler
+        function T(key) {
+            var args = Array.prototype.slice.call(arguments, 1);
+            var value = locale[key] || key;
+            for (var i = 0; i < args.length; i++) {
+                value = value.replace('{' + i + '}', args[i]);
+            }
+            return value;
+        }
+    </script>
     @await RenderSectionAsync("Head", required: false)
 
     <link rel="stylesheet" href="~/lib/bootstrap/css/bootstrap.min.css" />
@@ -142,18 +156,18 @@
                         </ul>
                     </div>
                     <!-- Push Bildirim Butonu (Sadece giris yapmis kullanicilar) -->
-                    <button id="pushNotificationBtn" class="btn btn-outline-primary btn-sm me-2" style="display: none;" onclick="PushNotificationManager.toggle()" title="Push Bildirimleri">
-                        <i class="bi bi-bell"></i>
+                    <button id="pushNotificationBtn" class="btn btn-outline-secondary btn-sm me-1" style="display: none;" onclick="PushNotificationManager.toggle()" title="Push Bildirimleri">
+                        <i class="bi bi-broadcast"></i>
                     </button>
                     <!-- Mesaj Ikonu (Sadece giris yapmis kullanicilar) -->
-                    <div id="messageBell" class="me-2" style="display: none;">
+                    <div id="messageBell" class="me-1" style="display: none;">
                         <a href="/Account/Messages" class="btn btn-outline-secondary btn-sm position-relative">
                             <i class="bi bi-chat-dots"></i>
                             <span id="messageBadge" class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-success" style="display: none; font-size: 0.6rem;">0</span>
                         </a>
                     </div>
                     <!-- Bildirim Zili (Sadece giris yapmis kullanicilar) -->
-                    <div id="notificationBell" class="dropdown me-2" style="display: none;">
+                    <div id="notificationBell" class="dropdown me-1" style="display: none;">
                         <button class="btn btn-outline-secondary btn-sm position-relative" type="button" data-bs-toggle="dropdown" aria-expanded="false" id="notificationBellBtn">
                             <i class="bi bi-bell"></i>
                             <span id="notificationBadge" class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger" style="display: none; font-size: 0.6rem;">
@@ -195,7 +209,7 @@
                                     <li><span class="dropdown-item-text small text-muted" id="userEmail"></span></li>
                                     <li><hr class="dropdown-divider"></li>
                                     <li><a class="dropdown-item" href="/Account/Profile"><i class="bi bi-person me-2"></i><span data-t="Menu.Profile">Profilim</span></a></li>
-                                    <li><a class="dropdown-item" href="/Account/Reservations"><i class="bi bi-calendar-check me-2"></i><span data-t="Menu.MyReservations">Rezervasyonlarim</span></a></li>
+                                    <li id="reservationMenuItem"><a class="dropdown-item" href="/Account/Reservations"><i class="bi bi-calendar-check me-2"></i><span data-t="Menu.MyReservations">Rezervasyonlarim</span></a></li>
                                     <li><a class="dropdown-item" href="/Account/Messages"><i class="bi bi-chat-dots me-2"></i><span data-t="Menu.Messages">Mesajlarim</span></a></li>
                                     <li id="companyMenuItem" style="display: none;"><a class="dropdown-item" href="/MyCompany"><i class="bi bi-building me-2"></i><span data-t="Menu.CompanyPanel">Firma Paneli</span></a></li>
                                     <li id="adminMenuItem" style="display: none;"><a class="dropdown-item" href="/Admin"><i class="bi bi-gear me-2"></i><span data-t="Menu.AdminPanel">Yonetim Paneli</span></a></li>
@@ -255,20 +269,9 @@
         // ===============================================
         // LOCALIZATION SYSTEM
         // ===============================================
-        var locale = {};
+        // locale, apiBaseUrl ve T() <head>'de tanimlandi
         var currentLang = localStorage.getItem('lang') || 'tr';
         var availableLanguages = [];
-
-        // T() function - translate key to current language
-        function T(key, ...args) {
-            var value = locale[key] || key;
-            if (args.length > 0) {
-                args.forEach((arg, i) => {
-                    value = value.replace('{' + i + '}', arg);
-                });
-            }
-            return value;
-        }
 
         // Load locale from API
         function loadLocale(lang, callback) {
@@ -300,6 +303,20 @@
                     $(this).text(translated);
                 }
             });
+            $('[data-t-title]').each(function() {
+                $(this).attr('title', T($(this).data('t-title')));
+            });
+            $('[data-t-placeholder]').each(function() {
+                $(this).attr('placeholder', T($(this).data('t-placeholder')));
+            });
+            // Push butonunu guncelle (locale yuklendikten sonra)
+            if (typeof PushNotificationManager !== 'undefined' && PushNotificationManager.updateUI) {
+                PushNotificationManager.updateUI();
+            }
+            // Kayitli callback'leri cagir (orn. observable array'leri guncelle)
+            for (var i = 0; i < onLocaleReady.length; i++) {
+                try { onLocaleReady[i](); } catch(e) {}
+            }
         }
 
         // Load available languages
@@ -394,7 +411,7 @@
             "timeOut": "3000"
         };
 
-        var apiBaseUrl = '@Html.Raw(ViewBag.ApiBaseUrl ?? "https://localhost:7078")';
+        // apiBaseUrl <head>'de tanimlandi
 
         // ===============================================
         // AUTH FUNCTIONS
@@ -422,9 +439,11 @@
                 $('#userEmail').text(user.email);
                 if (user.userTypeId === 1) {
                     $('#companyMenuItem').show();
+                    $('#reservationMenuItem').hide();
                 }
                 if (user.userTypeId >= 2) {
                     $('#adminMenuItem').show();
+                    $('#reservationMenuItem').hide();
                 }
                 // Bildirim zili ve mesaj ikonu goster
                 $('#notificationBell').show();
