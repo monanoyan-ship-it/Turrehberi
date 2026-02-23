@@ -1,0 +1,136 @@
+@{
+    ViewData["Title"] = "Mesajlarım";
+}
+
+<div id="messagesApp">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h4><i class="bi bi-chat-dots me-2"></i><span data-t="Message.MyMessages">Mesajlarim</span></h4>
+        <button class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#newConversationModal">
+            <i class="bi bi-plus-lg me-1"></i><span data-t="Message.NewConversation">Yeni Mesaj</span>
+        </button>
+    </div>
+
+    <div class="row" style="min-height: 500px;">
+        <!-- Konusma Listesi -->
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <span data-t="Message.Conversations">Konusmalar</span>
+                    <span class="badge bg-primary" data-bind="text: totalUnread(), visible: totalUnread() > 0"></span>
+                </div>
+                <div class="list-group list-group-flush" style="max-height: 500px; overflow-y: auto;" data-bind="foreach: conversations">
+                    <a href="#" class="list-group-item list-group-item-action" data-bind="click: $parent.selectConversation, css: { 'active': $parent.selectedConversationId() === id, 'bg-light': unreadCount > 0 && $parent.selectedConversationId() !== id }">
+                        <div class="d-flex justify-content-between">
+                            <strong class="small" data-bind="text: companyName"></strong>
+                            <small class="text-muted" data-bind="text: $parent.formatDate(lastMessageAt || createdAt)"></small>
+                        </div>
+                        <div class="small fw-semibold" data-bind="text: subject"></div>
+                        <!-- ko if: tourName -->
+                        <span class="badge bg-info badge-sm" data-bind="text: tourName"></span>
+                        <!-- /ko -->
+                        <!-- ko if: lastMessage -->
+                        <div class="small text-muted text-truncate" data-bind="text: lastMessage.content"></div>
+                        <!-- /ko -->
+                        <!-- ko if: unreadCount > 0 -->
+                        <span class="badge bg-danger rounded-pill float-end" data-bind="text: unreadCount"></span>
+                        <!-- /ko -->
+                    </a>
+                </div>
+                <div class="text-center text-muted py-4" data-bind="visible: conversations().length === 0 && !isLoading()">
+                    <i class="bi bi-chat-dots fs-1 d-block mb-2"></i>
+                    <span data-t="Message.NoConversations">Henuz konusmaniz yok</span>
+                </div>
+                <div class="text-center py-3" data-bind="visible: isLoading">
+                    <div class="spinner-border spinner-border-sm text-primary"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Mesaj Detay -->
+        <div class="col-md-8">
+            <div class="card" data-bind="visible: selectedConversationId()">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <div>
+                        <strong data-bind="text: selectedConversation()?.subject"></strong>
+                        <!-- ko if: selectedConversation()?.tourName -->
+                        <span class="badge bg-info ms-2" data-bind="text: selectedConversation().tourName"></span>
+                        <!-- /ko -->
+                    </div>
+                    <small class="text-muted" data-bind="text: selectedConversation()?.companyName"></small>
+                </div>
+                <div class="card-body p-3" style="height: 400px; overflow-y: auto;" id="messageContainer" data-bind="foreach: messages">
+                    <div class="mb-3" data-bind="css: { 'text-end': senderTypeId === 0, 'text-start': senderTypeId !== 0 }">
+                        <div class="d-inline-block p-2 rounded-3" style="max-width: 75%;" data-bind="css: { 'bg-primary text-white': senderTypeId === 0, 'bg-light': senderTypeId !== 0 }">
+                            <div class="small" data-bind="text: content"></div>
+                        </div>
+                        <div class="small text-muted mt-1">
+                            <span data-bind="text: senderName"></span> &middot;
+                            <span data-bind="text: $parent.formatDateTime(createdAt)"></span>
+                            <!-- ko if: senderTypeId === 0 && isRead -->
+                            <i class="bi bi-check2-all text-primary ms-1"></i>
+                            <!-- /ko -->
+                        </div>
+                    </div>
+                </div>
+                <div class="text-center py-3" data-bind="visible: isLoadingMessages">
+                    <div class="spinner-border spinner-border-sm text-primary"></div>
+                </div>
+                <div class="card-footer">
+                    <div class="input-group" data-bind="visible: !isConversationClosed()">
+                        <input type="text" class="form-control" data-bind="value: newMessage, event: { keypress: onMessageKeypress }" data-t="Message.TypeMessage" />
+                        <button class="btn btn-primary" data-bind="click: sendMessage, disable: !newMessage() || isSending()">
+                            <i class="bi bi-send"></i>
+                        </button>
+                    </div>
+                    <div class="text-center text-muted small py-2" data-bind="visible: isConversationClosed()">
+                        <i class="bi bi-lock me-1"></i><span data-t="Message.ConversationClosed">Bu konusma kapatilmis</span>
+                    </div>
+                </div>
+            </div>
+            <div class="text-center text-muted py-5" data-bind="visible: !selectedConversationId()">
+                <i class="bi bi-chat-left-text fs-1 d-block mb-3"></i>
+                <span data-t="Message.SelectConversation">Bir konusma secin veya yeni mesaj gonderin</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Yeni Konusma Modal -->
+    <div class="modal fade" id="newConversationModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" data-t="Message.NewConversation">Yeni Mesaj</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label class="form-label" data-t="Message.SelectCompany">Firma</label>
+                        <select class="form-select" data-bind="options: companies, optionsText: 'name', optionsValue: 'id', value: newConvCompanyId, optionsCaption: T('Message.SelectCompany')"></select>
+                    </div>
+                    <div class="mb-3" data-bind="visible: companyTours().length > 0">
+                        <label class="form-label" data-t="Message.RelatedTour">Ilgili Tur (Opsiyonel)</label>
+                        <select class="form-select" data-bind="options: companyTours, optionsText: 'name', optionsValue: 'id', value: newConvTourId, optionsCaption: T('Message.NoTourSelected')"></select>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label" data-t="Message.Subject">Konu</label>
+                        <input type="text" class="form-control" data-bind="value: newConvSubject" />
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label" data-t="Message.FirstMessage">Mesajiniz</label>
+                        <textarea class="form-control" rows="3" data-bind="value: newConvMessage"></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" data-t="Common.Cancel">Iptal</button>
+                    <button type="button" class="btn btn-primary" data-bind="click: createConversation, disable: isCreating()">
+                        <i class="bi bi-send me-1"></i><span data-t="Message.Send">Gonder</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="~/js/Account/Messages.js"></script>
+}

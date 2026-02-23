@@ -1,0 +1,170 @@
+@{
+    Layout = "_CompanyLayout";
+}
+
+<div id="companyMessagesApp">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <div>
+            <span class="badge bg-primary" data-bind="text: totalUnread() + ' okunmamis', visible: totalUnread() > 0"></span>
+        </div>
+        <button class="btn btn-outline-secondary btn-sm" data-bs-toggle="modal" data-bs-target="#templateModal">
+            <i class="bi bi-lightning me-1"></i>Hizli Yanitlar
+        </button>
+    </div>
+
+    <div class="row" style="min-height: 550px;">
+        <!-- Konusma Listesi -->
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-header">
+                    <i class="bi bi-chat-dots me-1"></i>Konusmalar
+                </div>
+                <div class="list-group list-group-flush" style="max-height: 550px; overflow-y: auto;" data-bind="foreach: conversations">
+                    <a href="#" class="list-group-item list-group-item-action" data-bind="click: $parent.selectConversation, css: { 'active': $parent.selectedConversationId() === id, 'bg-light': unreadCount > 0 && $parent.selectedConversationId() !== id }">
+                        <div class="d-flex justify-content-between">
+                            <strong class="small" data-bind="text: visitorName"></strong>
+                            <small class="text-muted" data-bind="text: $parent.formatDate(lastMessageAt || createdAt)"></small>
+                        </div>
+                        <div class="small fw-semibold" data-bind="text: subject"></div>
+                        <!-- ko if: tourName -->
+                        <span class="badge bg-info badge-sm" data-bind="text: tourName"></span>
+                        <!-- /ko -->
+                        <!-- ko if: lastMessage -->
+                        <div class="small text-muted text-truncate" data-bind="text: lastMessage.content"></div>
+                        <!-- /ko -->
+                        <!-- ko if: unreadCount > 0 -->
+                        <span class="badge bg-danger rounded-pill float-end" data-bind="text: unreadCount"></span>
+                        <!-- /ko -->
+                    </a>
+                </div>
+                <div class="text-center text-muted py-4" data-bind="visible: conversations().length === 0 && !isLoading()">
+                    <i class="bi bi-chat-dots fs-1 d-block mb-2"></i>
+                    Henuz mesajiniz yok
+                </div>
+                <div class="text-center py-3" data-bind="visible: isLoading">
+                    <div class="spinner-border spinner-border-sm text-primary"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Mesaj Detay -->
+        <div class="col-md-8">
+            <div class="card" data-bind="visible: selectedConversationId()">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <div>
+                        <strong data-bind="text: selectedConversation()?.subject"></strong>
+                        <!-- ko if: selectedConversation()?.tourName -->
+                        <span class="badge bg-info ms-2" data-bind="text: selectedConversation().tourName"></span>
+                        <!-- /ko -->
+                    </div>
+                    <small class="text-muted" data-bind="text: selectedConversation()?.visitorName"></small>
+                </div>
+                <div class="card-body p-3" style="height: 430px; overflow-y: auto;" id="messageContainer" data-bind="foreach: messages">
+                    <div class="mb-3" data-bind="css: { 'text-end': senderTypeId === 1, 'text-start': senderTypeId !== 1 }">
+                        <div class="d-inline-block p-2 rounded-3" style="max-width: 75%;" data-bind="css: { 'bg-primary text-white': senderTypeId === 1, 'bg-light': senderTypeId !== 1 }">
+                            <div class="small" data-bind="text: content"></div>
+                        </div>
+                        <div class="small text-muted mt-1">
+                            <span data-bind="text: senderName"></span> &middot;
+                            <span data-bind="text: $parent.formatDateTime(createdAt)"></span>
+                            <!-- ko if: senderTypeId === 1 && isRead -->
+                            <i class="bi bi-check2-all text-primary ms-1"></i>
+                            <!-- /ko -->
+                        </div>
+                    </div>
+                </div>
+                <div class="text-center py-3" data-bind="visible: isLoadingMessages">
+                    <div class="spinner-border spinner-border-sm text-primary"></div>
+                </div>
+                <div class="card-footer">
+                    <!-- Sablon secici -->
+                    <div class="mb-2" data-bind="visible: templates().length > 0 && !isConversationClosed()">
+                        <div class="dropdown">
+                            <button class="btn btn-outline-secondary btn-sm dropdown-toggle" type="button" data-bs-toggle="dropdown">
+                                <i class="bi bi-lightning me-1"></i>Hazir Yanit
+                            </button>
+                            <ul class="dropdown-menu" data-bind="foreach: templates">
+                                <li><a class="dropdown-item small" href="#" data-bind="text: title, click: $parent.useTemplate"></a></li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="input-group" data-bind="visible: !isConversationClosed()">
+                        <input type="text" class="form-control" placeholder="Mesajinizi yazin..." data-bind="value: newMessage, event: { keypress: onMessageKeypress }" />
+                        <button class="btn btn-primary" data-bind="click: sendMessage, disable: !newMessage() || isSending()">
+                            <i class="bi bi-send"></i>
+                        </button>
+                    </div>
+                    <div class="text-center text-muted small py-2" data-bind="visible: isConversationClosed()">
+                        <i class="bi bi-lock me-1"></i>Bu konusma kapatilmis
+                    </div>
+                </div>
+            </div>
+            <div class="text-center text-muted py-5" data-bind="visible: !selectedConversationId()">
+                <i class="bi bi-chat-left-text fs-1 d-block mb-3"></i>
+                Bir konusma secin
+            </div>
+        </div>
+    </div>
+</div>
+
+    <!-- Sablon Yonetim Modal -->
+    <div class="modal fade" id="templateModal" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title"><i class="bi bi-lightning me-1"></i>Hizli Yanit Sablonlari</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <!-- Yeni sablon formu -->
+                    <div class="card mb-3">
+                        <div class="card-body">
+                            <div class="row g-2">
+                                <div class="col-md-4">
+                                    <input type="text" class="form-control form-control-sm" placeholder="Sablon adi" data-bind="value: tplTitle" />
+                                </div>
+                                <div class="col-md-5">
+                                    <input type="text" class="form-control form-control-sm" placeholder="Sablon icerigi" data-bind="value: tplContent" />
+                                </div>
+                                <div class="col-md-1">
+                                    <input type="number" class="form-control form-control-sm" placeholder="#" data-bind="value: tplOrder" title="Sira" />
+                                </div>
+                                <div class="col-md-2">
+                                    <button class="btn btn-primary btn-sm w-100" data-bind="click: saveTemplate">
+                                        <span data-bind="visible: !editingTemplateId()"><i class="bi bi-plus"></i> Ekle</span>
+                                        <span data-bind="visible: editingTemplateId()"><i class="bi bi-check"></i> Kaydet</span>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Mevcut sablonlar -->
+                    <table class="table table-sm" data-bind="visible: templates().length > 0">
+                        <thead>
+                            <tr><th>Baslik</th><th>Icerik</th><th>Sira</th><th>Kullanim</th><th></th></tr>
+                        </thead>
+                        <tbody data-bind="foreach: templates">
+                            <tr>
+                                <td class="small" data-bind="text: title"></td>
+                                <td class="small text-truncate" style="max-width: 300px;" data-bind="text: content"></td>
+                                <td class="small" data-bind="text: displayOrder"></td>
+                                <td class="small" data-bind="text: usageCount"></td>
+                                <td>
+                                    <button class="btn btn-outline-primary btn-sm" data-bind="click: $parent.editTemplate" title="Duzenle"><i class="bi bi-pencil"></i></button>
+                                    <button class="btn btn-outline-danger btn-sm" data-bind="click: $parent.deleteTemplate" title="Sil"><i class="bi bi-trash"></i></button>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <div class="text-center text-muted py-3" data-bind="visible: templates().length === 0">
+                        Henuz sablon eklenmemis
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="~/js/MyCompany/Messages.js"></script>
+}

@@ -81,6 +81,13 @@ public class MyCompanyController : Controller
         return View();
     }
 
+    // Mesajlar
+    public IActionResult Messages()
+    {
+        SetCommonViewData("Messages", "Mesajlar");
+        return View();
+    }
+
     // Analitik
     public IActionResult Analytics()
     {

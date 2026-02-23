@@ -342,6 +342,31 @@ public static class PromotionStatuses
 }
 
 // ============================================================
+// MESSAGE SENDER TYPES (Mesaj Gonderen Tipleri)
+// ============================================================
+public static class MessageSenderTypes
+{
+    public static readonly TypeItem Visitor = new(0, "Visitor", "MessageSenderType.Visitor",
+        "Ziyaretci/Turist",
+        "bi-person", "bg-info", 1, isDefault: true);
+
+    public static readonly TypeItem Company = new(1, "Company", "MessageSenderType.Company",
+        "Firma",
+        "bi-building", "bg-primary", 2);
+
+    public static IEnumerable<TypeItem> All => new[] { Visitor, Company };
+    public static TypeItem Default => All.First(x => x.IsDefault);
+    public static TypeItem? GetById(int id) => All.FirstOrDefault(x => x.Id == id);
+    public static TypeItem? GetBySystemName(string systemName) => All.FirstOrDefault(x => x.SystemName == systemName);
+
+    public static class Ids
+    {
+        public const int Visitor = 0;
+        public const int Company = 1;
+    }
+}
+
+// ============================================================
 // GUIDE ASSIGNMENT STATUSES (Rehber Atama Durumlari)
 // ============================================================
 public static class GuideAssignmentStatuses
