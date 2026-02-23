@@ -54,9 +54,17 @@ function MyToursViewModel() {
         endDate: '',
         price: '',
         maxCapacity: '',
-        durationDays: 1
+        durationValue: 1,
+        durationUnit: 'Day'
     });
     self.batchSelectedDays = ko.observableArray([]);
+    // DurationUnits TypeDefinition (SystemName degerlerini kullanir)
+    self.durationUnits = [
+        { value: 'Hour', label: T('TourDate.DurationHour') || 'Saat' },
+        { value: 'Day', label: T('TourDate.DurationDay') || 'Gun' },
+        { value: 'Week', label: T('TourDate.DurationWeek') || 'Hafta' },
+        { value: 'Month', label: T('TourDate.DurationMonth') || 'Ay' }
+    ];
     self.batchPreview = ko.observableArray([]);
     self.weekDays = [
         { value: 1, label: 'Pzt' },
@@ -423,11 +431,12 @@ function MyToursViewModel() {
             return;
         }
 
-        var selectedDays = self.batchSelectedDays();
+        var selectedDays = self.batchSelectedDays().map(function(d) { return parseInt(d); });
         var dates = [];
         var current = new Date(start);
 
         if (selectedDays.length > 0) {
+            // Secilen haftanin gunlerinde tarih olustur
             while (current <= end) {
                 if (selectedDays.indexOf(current.getDay()) !== -1) {
                     dates.push(current.toLocaleDateString('tr-TR'));
@@ -435,6 +444,7 @@ function MyToursViewModel() {
                 current.setDate(current.getDate() + 1);
             }
         } else {
+            // Her N gunde bir
             var interval = 7;
             while (current <= end) {
                 dates.push(current.toLocaleDateString('tr-TR'));
@@ -460,14 +470,15 @@ function MyToursViewModel() {
         var requestData = {
             startDate: data.startDate,
             endDate: data.endDate,
-            durationDays: parseInt(data.durationDays) || 1,
+            durationValue: parseInt(data.durationValue) || 1,
+            durationUnit: data.durationUnit || 'day',
             price: data.price ? parseFloat(data.price) : null,
             maxCapacity: data.maxCapacity ? parseInt(data.maxCapacity) : null
         };
 
-        var selectedDays = self.batchSelectedDays();
+        var selectedDays = self.batchSelectedDays().map(function(d) { return parseInt(d); });
         if (selectedDays.length > 0) {
-            requestData.daysOfWeek = selectedDays.map(function(d) { return parseInt(d); });
+            requestData.daysOfWeek = selectedDays;
         } else {
             requestData.repeatEveryDays = 7;
         }
@@ -479,7 +490,7 @@ function MyToursViewModel() {
             data: JSON.stringify(requestData),
             success: function(response) {
                 toastr.success(response.message || T('TourDate.BatchSuccess') || 'Tarihler olusturuldu');
-                self.batchFormData({ startDate: '', endDate: '', price: '', maxCapacity: '', durationDays: 1 });
+                self.batchFormData({ startDate: '', endDate: '', price: '', maxCapacity: '', durationValue: 1, durationUnit: 'Day' });
                 self.batchSelectedDays([]);
                 self.batchPreview([]);
                 self.loadManagedDates(self.managingTourId());

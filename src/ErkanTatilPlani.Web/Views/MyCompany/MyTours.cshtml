@@ -337,11 +337,15 @@
                                         <label class="form-label small" data-t="TourDate.BatchCapacity">Kapasite</label>
                                         <input type="number" class="form-control form-control-sm" data-bind="value: batchFormData().maxCapacity" min="1">
                                     </div>
-                                    <div class="col-md-3">
-                                        <label class="form-label small" data-t="TourDate.Duration">Sure (Gun)</label>
-                                        <input type="number" class="form-control form-control-sm" data-bind="value: batchFormData().durationDays" min="1">
+                                    <div class="col-md-2">
+                                        <label class="form-label small" data-t="TourDate.DurationValue">Sure</label>
+                                        <input type="number" class="form-control form-control-sm" data-bind="value: batchFormData().durationValue" min="1">
                                     </div>
-                                    <div class="col-md-9">
+                                    <div class="col-md-2">
+                                        <label class="form-label small" data-t="TourDate.DurationUnit">Birim</label>
+                                        <select class="form-select form-select-sm" data-bind="options: durationUnits, optionsText: 'label', optionsValue: 'value', value: batchFormData().durationUnit"></select>
+                                    </div>
+                                    <div class="col-md-8">
                                         <label class="form-label small" data-t="TourDate.DaysOfWeek">Haftanin Gunleri</label>
                                         <div class="d-flex flex-wrap gap-1">
                                             <!-- ko foreach: weekDays -->

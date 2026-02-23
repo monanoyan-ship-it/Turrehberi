@@ -61,6 +61,9 @@ public class TourDateFactory : ITourDateFactory
         var check = await CheckTourOwnership(visitorId, tourDate.TourId);
         if (check.errorMessage != null) return (null, check.errorMessage, check.errorCode, check.statusCode);
 
+        tourDate.StartDate = DateTime.SpecifyKind(tourDate.StartDate, DateTimeKind.Utc);
+        tourDate.EndDate = DateTime.SpecifyKind(tourDate.EndDate, DateTimeKind.Utc);
+
         _tourDateService.Add(tourDate);
         await _unitOfWork.SaveChangesAsync();
         return (tourDate, null, null, null);
@@ -74,8 +77,8 @@ public class TourDateFactory : ITourDateFactory
         var check = await CheckTourOwnership(visitorId, existing.TourId);
         if (check.errorMessage != null) return (false, check.errorMessage, check.errorCode, check.statusCode);
 
-        existing.StartDate = tourDate.StartDate;
-        existing.EndDate = tourDate.EndDate;
+        existing.StartDate = DateTime.SpecifyKind(tourDate.StartDate, DateTimeKind.Utc);
+        existing.EndDate = DateTime.SpecifyKind(tourDate.EndDate, DateTimeKind.Utc);
         existing.Price = tourDate.Price;
         existing.MaxCapacity = tourDate.MaxCapacity;
         existing.IsAvailable = tourDate.IsAvailable;
@@ -171,12 +174,25 @@ public class TourDateFactory : ITourDateFactory
         if (request.StartDate >= request.EndDate)
             return (false, new { message = "Bitis tarihi baslangictan sonra olmali" }, 400);
 
-        if (request.DurationDays < 1)
-            return (false, new { message = "Sure en az 1 gun olmali" }, 400);
+        if (request.DurationValue < 1)
+            return (false, new { message = "Sure en az 1 olmali" }, 400);
 
         var dates = new List<TourDate>();
         var currentDate = DateTime.SpecifyKind(request.StartDate.Date, DateTimeKind.Utc);
         var endDate = DateTime.SpecifyKind(request.EndDate.Date, DateTimeKind.Utc);
+
+        // Sure birimine gore bitis tarihini hesapla
+        var durationUnit = DurationUnits.GetBySystemName(request.DurationUnit ?? "Day");
+        DateTime CalculateEndDate(DateTime start)
+        {
+            return durationUnit?.Id switch
+            {
+                DurationUnits.Ids.Hour => start.AddHours(request.DurationValue),
+                DurationUnits.Ids.Week => start.AddDays(request.DurationValue * 7),
+                DurationUnits.Ids.Month => start.AddMonths(request.DurationValue),
+                _ => start.AddDays(request.DurationValue) // Day (default)
+            };
+        }
 
         if (request.DaysOfWeek != null && request.DaysOfWeek.Any())
         {
@@ -189,7 +205,7 @@ public class TourDateFactory : ITourDateFactory
                     {
                         TourId = tourId,
                         StartDate = currentDate,
-                        EndDate = currentDate.AddDays(request.DurationDays - 1),
+                        EndDate = CalculateEndDate(currentDate),
                         Price = request.Price,
                         MaxCapacity = request.MaxCapacity,
                         IsAvailable = true
@@ -208,7 +224,7 @@ public class TourDateFactory : ITourDateFactory
                 {
                     TourId = tourId,
                     StartDate = currentDate,
-                    EndDate = currentDate.AddDays(request.DurationDays - 1),
+                    EndDate = CalculateEndDate(currentDate),
                     Price = request.Price,
                     MaxCapacity = request.MaxCapacity,
                     IsAvailable = true

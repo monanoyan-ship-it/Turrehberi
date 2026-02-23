@@ -85,6 +85,8 @@ public class PromotionCrudFactory : IPromotionCrudFactory
         promotion.CompanyId = visitor.CompanyId.Value;
         promotion.CreatedByVisitorId = visitorId;
         promotion.StatusId = PromotionStatuses.Ids.Active;
+        promotion.StartDate = DateTime.SpecifyKind(promotion.StartDate, DateTimeKind.Utc);
+        promotion.EndDate = DateTime.SpecifyKind(promotion.EndDate, DateTimeKind.Utc);
 
         _promotionService.Add(promotion);
         await _unitOfWork.SaveChangesAsync();
@@ -120,8 +122,8 @@ public class PromotionCrudFactory : IPromotionCrudFactory
         promotion.PromotionTypeId = updated.PromotionTypeId;
         promotion.DiscountTypeId = updated.DiscountTypeId;
         promotion.DiscountValue = updated.DiscountValue;
-        promotion.StartDate = updated.StartDate;
-        promotion.EndDate = updated.EndDate;
+        promotion.StartDate = DateTime.SpecifyKind(updated.StartDate, DateTimeKind.Utc);
+        promotion.EndDate = DateTime.SpecifyKind(updated.EndDate, DateTimeKind.Utc);
         promotion.Code = updated.Code;
         promotion.UsageLimit = updated.UsageLimit;
         promotion.UsageLimitPerUser = updated.UsageLimitPerUser;

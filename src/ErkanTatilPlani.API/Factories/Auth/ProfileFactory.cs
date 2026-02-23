@@ -46,7 +46,9 @@ public class ProfileFactory : IProfileFactory
         visitor.LastName = lastName.Trim();
         visitor.Phone = phone?.Trim() ?? string.Empty;
         visitor.Address = address?.Trim();
-        visitor.BirthDate = birthDate;
+        visitor.BirthDate = birthDate.HasValue
+            ? DateTime.SpecifyKind(birthDate.Value, DateTimeKind.Utc)
+            : null;
         visitor.UpdatedAt = DateTime.UtcNow;
 
         await _unitOfWork.SaveChangesAsync();

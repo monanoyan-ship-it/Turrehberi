@@ -395,3 +395,38 @@ public static class GuideAssignmentStatuses
         public const int Rejected = 2;
     }
 }
+
+// ============================================================
+// DURATION UNITS (Sure Birimleri)
+// ============================================================
+public static class DurationUnits
+{
+    public static readonly TypeItem Hour = new(1, "Hour", "TourDate.DurationHour",
+        "Saat",
+        "bi-clock", null, 1);
+
+    public static readonly TypeItem Day = new(2, "Day", "TourDate.DurationDay",
+        "Gun",
+        "bi-calendar-day", null, 2, isDefault: true);
+
+    public static readonly TypeItem Week = new(3, "Week", "TourDate.DurationWeek",
+        "Hafta",
+        "bi-calendar-week", null, 3);
+
+    public static readonly TypeItem Month = new(4, "Month", "TourDate.DurationMonth",
+        "Ay",
+        "bi-calendar-month", null, 4);
+
+    public static IEnumerable<TypeItem> All => new[] { Hour, Day, Week, Month };
+    public static TypeItem Default => All.First(x => x.IsDefault);
+    public static TypeItem? GetById(int id) => All.FirstOrDefault(x => x.Id == id);
+    public static TypeItem? GetBySystemName(string systemName) => All.FirstOrDefault(x => x.SystemName.Equals(systemName, StringComparison.OrdinalIgnoreCase));
+
+    public static class Ids
+    {
+        public const int Hour = 1;
+        public const int Day = 2;
+        public const int Week = 3;
+        public const int Month = 4;
+    }
+}

@@ -20,7 +20,14 @@ public class BatchTourDateRequest
     public DateTime EndDate { get; set; }
     public int RepeatEveryDays { get; set; } = 7;
     public List<int>? DaysOfWeek { get; set; }
-    public int DurationDays { get; set; } = 1;
+    /// <summary>
+    /// Tur suresi degeri (DurationUnit ile birlikte kullanilir)
+    /// </summary>
+    public int DurationValue { get; set; } = 1;
+    /// <summary>
+    /// Tur suresi birimi: hour, day, week, month
+    /// </summary>
+    public string DurationUnit { get; set; } = "day";
     public decimal? Price { get; set; }
     public int? MaxCapacity { get; set; }
 }
