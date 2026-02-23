@@ -30,6 +30,7 @@ internal static class AuthUserInfoHelper
             info.BirthDate = visitor.BirthDate;
             info.AvatarUrl = visitor.AvatarUrl;
             info.EmailVerified = visitor.EmailVerified;
+            info.NotificationPreference = visitor.NotificationPreference;
         }
 
         return info;

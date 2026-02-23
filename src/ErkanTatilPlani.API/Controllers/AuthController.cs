@@ -95,6 +95,17 @@ public class AuthController : ControllerBase
         return StatusCode(statusCode, result);
     }
 
+    [HttpPut("notification-preferences")]
+    [Authorize]
+    public async Task<IActionResult> UpdateNotificationPreferences([FromBody] object preferences)
+    {
+        var json = System.Text.Json.JsonSerializer.Serialize(preferences);
+        var (success, result, statusCode) = await _profileFactory.UpdateNotificationPreferencesAsync(json);
+        if (!success && statusCode == 401)
+            return Unauthorized();
+        return StatusCode(statusCode, result);
+    }
+
     /// <summary>
     /// Sifremi unuttum - email ile sifre sifirlama linki gonder
     /// </summary>
@@ -255,6 +266,7 @@ public class UserInfo
     public int? CompanyStatusId { get; set; }
     public string? CompanyStatusName { get; set; }
     public string PreferredLanguage { get; set; } = "tr";
+    public string? NotificationPreference { get; set; }
 }
 
 public class UpdateLanguageRequest

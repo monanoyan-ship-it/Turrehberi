@@ -169,4 +169,17 @@ public class ProfileFactory : IProfileFactory
 
         return (true, new { message = "Profil resmi basariyla silindi" }, 200);
     }
+
+    public async Task<(bool success, object result, int statusCode)> UpdateNotificationPreferencesAsync(string preferencesJson)
+    {
+        var visitor = await _currentUserService.GetCurrentVisitorAsync();
+        if (visitor == null)
+            return (false, new { }, 401);
+
+        visitor.NotificationPreference = preferencesJson;
+        visitor.UpdatedAt = DateTime.UtcNow;
+        await _unitOfWork.SaveChangesAsync();
+
+        return (true, new { message = "Bildirim tercihleri kaydedildi" }, 200);
+    }
 }

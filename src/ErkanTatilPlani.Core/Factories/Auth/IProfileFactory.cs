@@ -15,4 +15,5 @@ public interface IProfileFactory
         string fileName, string contentType, long fileLength, Stream fileStream);
 
     Task<(bool success, object result, int statusCode)> DeleteAvatarAsync();
+    Task<(bool success, object result, int statusCode)> UpdateNotificationPreferencesAsync(string preferencesJson);
 }

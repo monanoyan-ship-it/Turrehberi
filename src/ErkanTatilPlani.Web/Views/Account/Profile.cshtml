@@ -120,6 +120,40 @@
                         </select>
                     </div>
                 </div>
+                <!-- Notification Preferences Card -->
+                <div class="card shadow-sm border-0 mt-4">
+                    <div class="card-header bg-white border-0 py-3">
+                        <h6 class="mb-0">
+                            <i class="bi bi-bell me-2 text-primary"></i>
+                            <span data-t="NotificationPref.Title">Bildirim Tercihleri</span>
+                        </h6>
+                    </div>
+                    <div class="card-body">
+                        <div class="form-check form-switch mb-2">
+                            <input class="form-check-input" type="checkbox" id="prefEmail" data-bind="checked: prefEmail" />
+                            <label class="form-check-label" for="prefEmail">
+                                <i class="bi bi-envelope me-1"></i><span data-t="NotificationPref.Email">E-posta Bildirimleri</span>
+                            </label>
+                        </div>
+                        <div class="form-check form-switch mb-2">
+                            <input class="form-check-input" type="checkbox" id="prefWhatsapp" data-bind="checked: prefWhatsapp" />
+                            <label class="form-check-label" for="prefWhatsapp">
+                                <i class="bi bi-whatsapp me-1"></i><span data-t="NotificationPref.WhatsApp">WhatsApp Bildirimleri</span>
+                            </label>
+                        </div>
+                        <div class="form-check form-switch mb-3">
+                            <input class="form-check-input" type="checkbox" id="prefSms" data-bind="checked: prefSms" />
+                            <label class="form-check-label" for="prefSms">
+                                <i class="bi bi-phone me-1"></i><span data-t="NotificationPref.SMS">SMS Bildirimleri</span>
+                            </label>
+                        </div>
+                        <button class="btn btn-primary btn-sm" data-bind="click: saveNotificationPrefs, disable: isSavingPrefs">
+                            <span data-bind="visible: isSavingPrefs" class="spinner-border spinner-border-sm me-1"></span>
+                            <i class="bi bi-check-lg me-1" data-bind="visible: !isSavingPrefs()"></i>
+                            <span data-t="Common.Save">Kaydet</span>
+                        </button>
+                    </div>
+                </div>
             </div>
 
             <!-- Right Column - Forms -->
@@ -250,6 +284,10 @@ function ProfileViewModel() {
     self.companyId = ko.observable(null);
     self.companyName = ko.observable('');
     self.preferredLanguage = ko.observable('tr');
+    self.prefEmail = ko.observable(true);
+    self.prefWhatsapp = ko.observable(false);
+    self.prefSms = ko.observable(false);
+    self.isSavingPrefs = ko.observable(false);
 
     // Computed
     self.fullName = ko.computed(function() {
@@ -310,6 +348,16 @@ function ProfileViewModel() {
                 self.companyId(user.companyId);
                 self.companyName(user.companyName || '');
                 self.preferredLanguage(user.preferredLanguage || 'tr');
+
+                // Bildirim tercihleri
+                if (user.notificationPreference) {
+                    try {
+                        var prefs = typeof user.notificationPreference === 'string' ? JSON.parse(user.notificationPreference) : user.notificationPreference;
+                        self.prefEmail(prefs.email !== false);
+                        self.prefWhatsapp(prefs.whatsapp === true);
+                        self.prefSms(prefs.sms === true);
+                    } catch(e) {}
+                }
 
                 self.isLoggedIn(true);
                 self.isLoading(false);
@@ -447,6 +495,31 @@ function ProfileViewModel() {
             },
             error: function(xhr) {
                 toastr.error(xhr.responseJSON?.error || 'Hata');
+            }
+        });
+    };
+
+    // Save notification preferences
+    self.saveNotificationPrefs = function() {
+        self.isSavingPrefs(true);
+        var prefs = {
+            email: self.prefEmail(),
+            whatsapp: self.prefWhatsapp(),
+            sms: self.prefSms()
+        };
+        $.ajax({
+            url: apiBaseUrl + '/api/auth/notification-preferences',
+            method: 'PUT',
+            headers: { 'Authorization': 'Bearer ' + localStorage.getItem('token') },
+            contentType: 'application/json',
+            data: JSON.stringify(prefs),
+            success: function() {
+                toastr.success(T('NotificationPref.Saved') || 'Bildirim tercihleri kaydedildi');
+                self.isSavingPrefs(false);
+            },
+            error: function(xhr) {
+                toastr.error(xhr.responseJSON?.error || T('Common.Error'));
+                self.isSavingPrefs(false);
             }
         });
     };

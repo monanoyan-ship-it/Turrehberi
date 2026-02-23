@@ -62,6 +62,11 @@ public class Visitor : BaseEntity
     /// </summary>
     public DateTime? EmailVerificationTokenExpiry { get; set; }
 
+    /// <summary>
+    /// Bildirim tercihleri JSON: { "whatsapp": true, "sms": false, "email": true }
+    /// </summary>
+    public string? NotificationPreference { get; set; }
+
     // Firma sahibi ise iliskili firma
     public int? CompanyId { get; set; }
     public virtual Company? Company { get; set; }
@@ -76,4 +81,7 @@ public class Visitor : BaseEntity
     public virtual ICollection<BlogComment> BlogComments { get; set; } = new List<BlogComment>();
     public virtual ICollection<TourWatch> TourWatches { get; set; } = new List<TourWatch>();
     public virtual ICollection<Notification> Notifications { get; set; } = new List<Notification>();
+    public virtual ICollection<Conversation> Conversations { get; set; } = new List<Conversation>();
+    public virtual ICollection<Message> SentMessages { get; set; } = new List<Message>();
+    public virtual ICollection<PushSubscription> PushSubscriptions { get; set; } = new List<PushSubscription>();
 }
