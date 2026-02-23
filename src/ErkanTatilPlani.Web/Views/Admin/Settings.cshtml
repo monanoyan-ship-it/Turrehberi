@@ -103,7 +103,7 @@
                             </td>
                             <td><code data-bind="text: languageCulture"></code></td>
                             <td><code data-bind="text: uniqueSeoCode"></code></td>
-                            <td data-bind="text: resourceCount || 0"></td>
+                            <td data-bind="text: $data.resourceCount != null ? $data.resourceCount : 0"></td>
                             <td>
                                 <!-- ko if: isDefault -->
                                 <span class="badge bg-primary">Varsayilan</span>

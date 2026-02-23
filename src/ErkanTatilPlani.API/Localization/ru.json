@@ -1260,5 +1260,10 @@
   "WeekDay.Sat": "Суббота",
   "WeekDay.Sun": "Воскресенье",
   "Contact.SuccessMessage": "Ваше сообщение успешно отправлено",
-  "Error.CompanyCannotReserve": "Аккаунты компаний не могут бронировать"
+  "Error.CompanyCannotReserve": "Аккаунты компаний не могут бронировать",
+  "Error.SessionExpired": "Сессия истекла, пожалуйста, войдите снова",
+  "Payment.Waiting": "Ожидание",
+  "Payment.Partial": "Частичная оплата",
+  "Payment.Full": "Полная оплата",
+  "Payment.Refund": "Возврат"
 }

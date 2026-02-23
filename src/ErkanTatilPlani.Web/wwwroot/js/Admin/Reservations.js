@@ -9,10 +9,12 @@ function AdminReservationsViewModel() {
     var detailsModal;
 
     self.getStatusBadge = function(s) { return ['bg-warning text-dark', 'bg-success', 'bg-danger', 'bg-primary'][s] || 'bg-secondary'; };
-    self.getStatusText = function(s) { return ['Beklemede', 'Onaylandi', 'Iptal', 'Tamamlandi'][s] || 'Bilinmiyor'; };
+    var statusKeys = ['Status.Pending', 'Status.Confirmed', 'Status.Cancelled', 'Status.Completed'];
+    self.getStatusText = function(s) { return statusKeys[s] ? T(statusKeys[s]) : T('Common.Unknown'); };
 
     self.getPaymentBadge = function(s) { return ['bg-secondary', 'bg-warning text-dark', 'bg-success', 'bg-danger', 'bg-info'][s] || 'bg-secondary'; };
-    self.getPaymentText = function(s) { return ['Bekliyor', 'On Odeme', 'Tam Odeme', 'Basarisiz', 'Iade'][s] || 'Bilinmiyor'; };
+    var paymentKeys = ['Payment.Waiting', 'Payment.Partial', 'Payment.Full', 'Payment.Failed', 'Payment.Refund'];
+    self.getPaymentText = function(s) { return paymentKeys[s] ? T(paymentKeys[s]) : T('Common.Unknown'); };
 
     self.filteredReservations = ko.computed(function() {
         var status = self.filterStatus();
@@ -28,7 +30,11 @@ function AdminReservationsViewModel() {
 
     self.loadData = function() {
         $.when($.ajax({ url: apiBaseUrl + '/api/reservations' }), $.ajax({ url: apiBaseUrl + '/api/tours' }))
-            .done(function(r, t) { self.reservations(r[0]); self.tours(t[0]); });
+            .done(function(r, t) {
+                self.reservations(r[0]);
+                var toursData = t[0];
+                self.tours(Array.isArray(toursData) ? toursData : (toursData.tours || []));
+            });
     };
 
     self.showDetails = function(r) { self.selectedReservation(r); detailsModal.show(); };

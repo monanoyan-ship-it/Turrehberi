@@ -1260,5 +1260,10 @@
   "WeekDay.Sat": "Sábado",
   "WeekDay.Sun": "Domingo",
   "Contact.SuccessMessage": "Su mensaje ha sido enviado exitosamente",
-  "Error.CompanyCannotReserve": "Las cuentas de empresa no pueden hacer reservas"
+  "Error.CompanyCannotReserve": "Las cuentas de empresa no pueden hacer reservas",
+  "Error.SessionExpired": "La sesion ha expirado, por favor inicie sesion de nuevo",
+  "Payment.Waiting": "Esperando",
+  "Payment.Partial": "Pago parcial",
+  "Payment.Full": "Pago completo",
+  "Payment.Refund": "Reembolso"
 }

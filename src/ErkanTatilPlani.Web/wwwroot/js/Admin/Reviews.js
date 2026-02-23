@@ -25,14 +25,16 @@ function AdminReviewsViewModel() {
     var approveModal, rejectModal, flagModal, detailsModal;
 
     // Durum badge'i
+    var reviewStatusIcons = {
+        0: 'bi-hourglass-split', 1: 'bi-check-circle', 2: 'bi-x-circle', 3: 'bi-flag'
+    };
+    var reviewStatusKeys = {
+        0: 'ReviewStatus.Pending', 1: 'ReviewStatus.Approved', 2: 'ReviewStatus.Rejected', 3: 'ReviewStatus.Flagged'
+    };
     self.getStatusBadge = function(statusId) {
-        var statuses = {
-            0: '<i class="bi bi-hourglass-split me-1"></i>Bekliyor',
-            1: '<i class="bi bi-check-circle me-1"></i>Onaylandi',
-            2: '<i class="bi bi-x-circle me-1"></i>Reddedildi',
-            3: '<i class="bi bi-flag me-1"></i>Inceleniyor'
-        };
-        return statuses[statusId] || 'Bilinmiyor';
+        var icon = reviewStatusIcons[statusId] || 'bi-question-circle';
+        var text = reviewStatusKeys[statusId] ? T(reviewStatusKeys[statusId]) : T('Common.Unknown');
+        return '<i class="bi ' + icon + ' me-1"></i>' + text;
     };
 
     self.getStatusBadgeClass = function(statusId) {

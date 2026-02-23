@@ -37,6 +37,7 @@
     <script>
         // Global T() ve apiBaseUrl - tum script'lerden once tanimlanmali
         var locale = {};
+        var localeVersion = 0; // KO re-render icin: locale yuklenince artar
         var apiBaseUrl = '@Html.Raw(ViewBag.ApiBaseUrl ?? "https://localhost:7078")';
         var onLocaleReady = []; // Locale yuklendikten sonra cagrilacak callback'ler
         function T(key) {

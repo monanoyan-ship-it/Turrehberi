@@ -1260,5 +1260,10 @@
   "WeekDay.Sat": "Samstag",
   "WeekDay.Sun": "Sonntag",
   "Contact.SuccessMessage": "Ihre Nachricht wurde erfolgreich gesendet",
-  "Error.CompanyCannotReserve": "Firmenkonten können keine Reservierungen vornehmen"
+  "Error.CompanyCannotReserve": "Firmenkonten können keine Reservierungen vornehmen",
+  "Error.SessionExpired": "Sitzung abgelaufen, bitte erneut anmelden",
+  "Payment.Waiting": "Wartend",
+  "Payment.Partial": "Teilzahlung",
+  "Payment.Full": "Vollstandige Zahlung",
+  "Payment.Refund": "Ruckerstattung"
 }

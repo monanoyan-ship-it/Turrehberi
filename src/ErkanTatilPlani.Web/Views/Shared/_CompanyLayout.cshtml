@@ -7,6 +7,20 @@
     <link rel="stylesheet" href="~/lib/bootstrap/css/bootstrap.min.css" />
     <link rel="stylesheet" href="~/lib/bootstrap-icons/font/bootstrap-icons.css" />
     <link rel="stylesheet" href="~/lib/toastr/toastr.min.css" />
+    <script>
+        // Global T() ve apiBaseUrl - tum script'lerden once tanimlanmali
+        var locale = {};
+        var apiBaseUrl = '@Html.Raw(ViewBag.ApiBaseUrl ?? "https://localhost:7078")';
+        var onLocaleReady = [];
+        function T(key) {
+            var args = Array.prototype.slice.call(arguments, 1);
+            var value = locale[key] || key;
+            for (var i = 0; i < args.length; i++) {
+                value = value.replace('{' + i + '}', args[i]);
+            }
+            return value;
+        }
+    </script>
     @await RenderSectionAsync("Styles", required: false)
 </head>
 <body>
@@ -77,10 +91,10 @@
     <script src="~/lib/toastr/toastr.min.js"></script>
     <script>
         toastr.options = { "closeButton": true, "progressBar": true, "positionClass": "toast-top-right", "timeOut": "3000" };
-        var apiBaseUrl = '@Html.Raw(ViewBag.ApiBaseUrl ?? "https://localhost:7078")';
 
-        // Auth token
-        $(document).ready(function() {
+        // Auth setup - tum AJAX cagrilarindan ONCE ayarlanmali
+        window.currentUser = null;
+        (function() {
             var token = localStorage.getItem('token');
             if (!token) {
                 window.location.href = '/Account/Login';
@@ -89,12 +103,40 @@
             $.ajaxSetup({
                 headers: { 'Authorization': 'Bearer ' + token }
             });
-            var visitor = localStorage.getItem('user');
-            if (visitor) {
+            var userStr = localStorage.getItem('user');
+            if (userStr) {
                 try {
-                    var v = JSON.parse(visitor);
-                    $('#currentUserName').text(v.firstName + ' ' + v.lastName);
+                    window.currentUser = JSON.parse(userStr);
                 } catch(e) {}
+            }
+        })();
+
+        // Global 401 handler - token suresi dolduysa login'e yonlendir
+        $(document).ajaxError(function(event, xhr) {
+            if (xhr.status === 401) {
+                localStorage.removeItem('token');
+                toastr.error(T('Error.SessionExpired') || 'Oturum suresi doldu, giris yapiniz');
+                setTimeout(function() { window.location.href = '/Account/Login'; }, 1500);
+            }
+        });
+
+        // Locale yukle
+        var currentLang = localStorage.getItem('lang') || 'tr';
+        $.ajax({
+            url: apiBaseUrl + '/api/localization/' + currentLang,
+            method: 'GET',
+            success: function(data) {
+                locale = data;
+                for (var i = 0; i < onLocaleReady.length; i++) {
+                    try { onLocaleReady[i](); } catch(e) {}
+                }
+            }
+        });
+
+        // DOM hazir olunca UI guncelle
+        $(document).ready(function() {
+            if (window.currentUser) {
+                $('#currentUserName').text(window.currentUser.firstName + ' ' + window.currentUser.lastName);
             }
             // Okunmamis mesaj sayisi
             $.ajax({

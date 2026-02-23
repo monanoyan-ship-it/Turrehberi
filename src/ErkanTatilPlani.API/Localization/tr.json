@@ -1260,5 +1260,10 @@
   "WeekDay.Sat": "Cumartesi",
   "WeekDay.Sun": "Pazar",
   "Contact.SuccessMessage": "Mesajınız başarıyla gönderildi",
-  "Error.CompanyCannotReserve": "Firma hesaplari rezervasyon yapamaz"
+  "Error.CompanyCannotReserve": "Firma hesaplari rezervasyon yapamaz",
+  "Error.SessionExpired": "Oturum suresi doldu, lutfen tekrar giris yapin",
+  "Payment.Waiting": "Bekliyor",
+  "Payment.Partial": "On Odeme",
+  "Payment.Full": "Tam Odeme",
+  "Payment.Refund": "Iade"
 }

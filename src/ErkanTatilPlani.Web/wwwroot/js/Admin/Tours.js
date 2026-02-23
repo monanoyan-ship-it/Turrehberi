@@ -56,7 +56,9 @@ function AdminToursViewModel() {
             $.ajax({ url: apiBaseUrl + '/api/tours', method: 'GET' }),
             $.ajax({ url: apiBaseUrl + '/api/companies', method: 'GET' })
         ).done(function(toursRes, companiesRes) {
-            self.tours(toursRes[0]);
+            var toursData = toursRes[0];
+            // /api/tours obje dondurur: { tours: [...], filters: {...}, totalCount: N }
+            self.tours(Array.isArray(toursData) ? toursData : (toursData.tours || []));
             self.companies(companiesRes[0]);
             self.isLoading(false);
         }).fail(function() {

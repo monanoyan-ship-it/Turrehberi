@@ -31,20 +31,20 @@ function AdminBlogPostsViewModel() {
     });
 
     // Helpers
-    var categoryNames = {
-        0: 'Seyahat Ipuclari', 1: 'Gezi Rehberleri', 2: 'Haberler',
-        3: 'Kultur & Yasam', 4: 'Yeme & Icme', 5: 'Macera & Doga'
+    var categoryKeys = {
+        0: 'Blog.Category.TravelTips', 1: 'Blog.Category.Destinations', 2: 'Blog.Category.News',
+        3: 'Blog.Category.Culture', 4: 'Blog.Category.FoodAndDrink', 5: 'Blog.Category.Adventure'
     };
     var categoryBadgeClasses = {
         0: 'bg-info', 1: 'bg-success', 2: 'bg-primary',
         3: 'bg-warning text-dark', 4: 'bg-danger', 5: 'bg-dark'
     };
-    var statusNames = { 0: 'Taslak', 1: 'Yayinda', 2: 'Arsiv' };
+    var statusKeys = { 0: 'Blog.Status.Draft', 1: 'Blog.Status.Published', 2: 'Blog.Status.Archived' };
     var statusBadgeClasses = { 0: 'bg-secondary', 1: 'bg-success', 2: 'bg-warning text-dark' };
 
-    self.getCategoryName = function (id) { return categoryNames[id] || 'Diger'; };
+    self.getCategoryName = function (id) { return categoryKeys[id] ? T(categoryKeys[id]) : T('Blog.Category.Other'); };
     self.getCategoryBadgeClass = function (id) { return categoryBadgeClasses[id] || 'bg-secondary'; };
-    self.getStatusName = function (id) { return statusNames[id] || 'Bilinmiyor'; };
+    self.getStatusName = function (id) { return statusKeys[id] ? T(statusKeys[id]) : T('Common.Unknown'); };
     self.getStatusBadgeClass = function (id) { return statusBadgeClasses[id] || 'bg-secondary'; };
 
     self.formatDate = function (dateStr) {

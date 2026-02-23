@@ -1260,5 +1260,10 @@
   "WeekDay.Sat": "السبت",
   "WeekDay.Sun": "الأحد",
   "Contact.SuccessMessage": "تم إرسال رسالتك بنجاح",
-  "Error.CompanyCannotReserve": "حسابات الشركات لا يمكنها إجراء حجوزات"
+  "Error.CompanyCannotReserve": "حسابات الشركات لا يمكنها إجراء حجوزات",
+  "Error.SessionExpired": "انتهت الجلسة، يرجى تسجيل الدخول مرة أخرى",
+  "Payment.Waiting": "في الانتظار",
+  "Payment.Partial": "دفعة جزئية",
+  "Payment.Full": "الدفع الكامل",
+  "Payment.Refund": "استرداد"
 }

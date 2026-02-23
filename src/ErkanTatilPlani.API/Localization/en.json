@@ -1260,5 +1260,10 @@
   "WeekDay.Sat": "Saturday",
   "WeekDay.Sun": "Sunday",
   "Contact.SuccessMessage": "Your message has been sent successfully",
-  "Error.CompanyCannotReserve": "Company accounts cannot make reservations"
+  "Error.CompanyCannotReserve": "Company accounts cannot make reservations",
+  "Error.SessionExpired": "Session expired, please log in again",
+  "Payment.Waiting": "Waiting",
+  "Payment.Partial": "Partial Payment",
+  "Payment.Full": "Full Payment",
+  "Payment.Refund": "Refund"
 }

@@ -123,16 +123,7 @@ function BlogIndexViewModel() {
         self.loadCategories();
         self.loadPosts();
 
-        $(document).on('languageChanged', function () {
-            categoryNames = {
-                0: T('Blog.Category.TravelTips'),
-                1: T('Blog.Category.Destinations'),
-                2: T('Blog.Category.News'),
-                3: T('Blog.Category.Culture'),
-                4: T('Blog.Category.FoodAndDrink'),
-                5: T('Blog.Category.Adventure')
-            };
-        });
+        // categoryKeys zaten lazy T() kullaniyor, languageChanged gereksiz
     });
 }
 
