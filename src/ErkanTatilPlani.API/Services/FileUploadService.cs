@@ -159,8 +159,8 @@ public class FileUploadService : IFileUploadService
             // Ana resmi kaydet
             await image.SaveAsync(filePath, new JpegEncoder { Quality = 85 });
 
-            // Thumbnail olustur
-            using var thumbImage = await Image.LoadAsync(fileStream.CanSeek ? fileStream : File.OpenRead(filePath));
+            // Thumbnail olustur - kaydedilmis dosyadan oku
+            using var thumbImage = await Image.LoadAsync(filePath);
             var thumbRatio = (double)thumbnailWidth / thumbImage.Width;
             var thumbHeight = (int)(thumbImage.Height * thumbRatio);
             thumbImage.Mutate(x => x.Resize(thumbnailWidth, thumbHeight));
