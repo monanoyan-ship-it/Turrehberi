@@ -136,4 +136,6 @@ public class Company : BaseEntity
     public virtual ICollection<CompanyGalleryImage> GalleryImages { get; set; } = new List<CompanyGalleryImage>();
     public virtual ICollection<CompanyPage> Pages { get; set; } = new List<CompanyPage>();
     public virtual ICollection<Guide> Guides { get; set; } = new List<Guide>();
+    public virtual ICollection<Conversation> Conversations { get; set; } = new List<Conversation>();
+    public virtual ICollection<MessageTemplate> MessageTemplates { get; set; } = new List<MessageTemplate>();
 }
