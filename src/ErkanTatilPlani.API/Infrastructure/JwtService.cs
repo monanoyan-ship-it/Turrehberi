@@ -23,7 +23,7 @@ public class JwtService : IJwtService
         var credentials = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
         var expireMinutes = int.Parse(_configuration["Jwt:ExpireMinutes"] ?? "1440");
 
-        var claims = new[]
+        var claimList = new List<Claim>
         {
             new Claim(ClaimTypes.NameIdentifier, visitor.Id.ToString()),
             new Claim(ClaimTypes.Email, visitor.Email),
@@ -31,6 +31,13 @@ public class JwtService : IJwtService
             new Claim("UserTypeId", visitor.UserTypeId.ToString()),
             new Claim(ClaimTypes.Role, UserTypes.GetById(visitor.UserTypeId)?.SystemName ?? "Visitor")
         };
+
+        if (visitor.CompanyId.HasValue)
+        {
+            claimList.Add(new Claim("CompanyId", visitor.CompanyId.Value.ToString()));
+        }
+
+        var claims = claimList.ToArray();
 
         var token = new JwtSecurityToken(
             issuer: _configuration["Jwt:Issuer"],

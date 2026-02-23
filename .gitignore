@@ -63,6 +63,9 @@ appsettings.Local.json
 *.msix
 *.appx
 
+# Uploads
+**/wwwroot/uploads/
+
 # Temp folders
 temp_build/
 temp_build_final/

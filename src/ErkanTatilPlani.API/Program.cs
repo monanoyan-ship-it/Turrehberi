@@ -213,6 +213,16 @@ using (var scope = app.Services.CreateScope())
     dbContext.Database.Migrate();
 }
 
+// Uploads klasorlerini olustur
+var uploadsRoot = Path.Combine(app.Environment.WebRootPath, "uploads");
+var uploadFolders = new[] { "reviews", "galleries", "avatars", "contracts", "tours", "guides" };
+foreach (var folder in uploadFolders)
+{
+    var folderPath = Path.Combine(uploadsRoot, folder);
+    if (!Directory.Exists(folderPath))
+        Directory.CreateDirectory(folderPath);
+}
+
 // Configure the HTTP request pipeline.
 app.UseExceptionHandling(); // Global exception handler - ilk sirada olmali
 
