@@ -39,9 +39,12 @@
                                     <span data-bind="text: firstName + ' ' + lastName"></span>
                                 </h6>
                                 <div class="mb-1">
-                                    <!-- ko if: languages -->
-                                    <span data-bind="foreach: languages.split(',')">
-                                        <span class="badge bg-light text-dark border me-1" data-bind="text: $data.trim().toUpperCase()"></span>
+                                    <!-- ko if: languageList && languageList.length > 0 -->
+                                    <span data-bind="foreach: languageList">
+                                        <span class="badge bg-light text-dark border me-1">
+                                            <span data-bind="text: $parents[1].getLanguageFlag($data)"></span>
+                                            <span data-bind="text: $data.toUpperCase()"></span>
+                                        </span>
                                     </span>
                                     <!-- /ko -->
                                 </div>
@@ -116,10 +119,21 @@
                             <label class="form-label" data-t="Guide.Email">Email</label>
                             <input type="email" class="form-control" data-bind="value: formData().email">
                         </div>
-                        <div class="col-md-6">
+                        <div class="col-12">
                             <label class="form-label" data-t="Guide.Languages">Diller</label>
-                            <input type="text" class="form-control" data-bind="value: formData().languages" placeholder="tr,en,de">
-                            <small class="text-muted">Virgullu ayrilmis</small>
+                            <div class="d-flex flex-wrap gap-2" data-bind="foreach: availableLanguages">
+                                <button type="button" class="btn btn-sm"
+                                        data-bind="click: $parent.toggleLanguage,
+                                                   css: $parent.isLanguageSelected($data.code) ? 'btn-primary' : 'btn-outline-secondary'">
+                                    <span data-bind="text: $data.flagEmoji"></span>
+                                    <span data-bind="text: $data.nativeName"></span>
+                                </button>
+                            </div>
+                            <!-- ko if: selectedLanguages().length > 0 -->
+                            <small class="text-muted mt-1 d-block">
+                                <span data-bind="text: selectedLanguages().length"></span> <span data-t="Guide.LanguagesSelected">dil secildi</span>
+                            </small>
+                            <!-- /ko -->
                         </div>
                         <div class="col-md-6">
                             <label class="form-label" data-t="Guide.ExperienceYears">Deneyim (Yil)</label>

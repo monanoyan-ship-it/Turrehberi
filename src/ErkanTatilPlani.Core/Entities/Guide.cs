@@ -15,9 +15,9 @@ public class Guide : BaseEntity
     public string? PhotoUrl { get; set; }
 
     /// <summary>
-    /// Konustugu diller (virgullu: "tr,en,de")
+    /// Konustugu diller (JSON array: ["tr","en","de"])
     /// </summary>
-    public string Languages { get; set; } = string.Empty;
+    public string Languages { get; set; } = "[]";
 
     /// <summary>
     /// Kisa biyografi

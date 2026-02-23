@@ -7,12 +7,16 @@ function GuidesViewModel() {
     self.isDeleting = ko.observable(false);
     self.guides = ko.observableArray([]);
 
+    // Available languages (from API)
+    self.availableLanguages = ko.observableArray([]);
+    self.selectedLanguages = ko.observableArray([]);
+
     // Form
     self.isEditing = ko.observable(false);
     self.editingGuideId = ko.observable(null);
     self.formData = ko.observable({
         firstName: '', lastName: '', phone: '', email: '',
-        languages: '', bio: '', experienceYears: ''
+        bio: '', experienceYears: ''
     });
 
     // Detail
@@ -42,6 +46,58 @@ function GuidesViewModel() {
     var photoModal = null;
     var assignModal = null;
 
+    // Helper: parse languages JSON string to array
+    self.parseLanguages = function(langStr) {
+        if (!langStr) return [];
+        try {
+            var parsed = JSON.parse(langStr);
+            return Array.isArray(parsed) ? parsed : [];
+        } catch (e) {
+            // Eski format (comma-separated) icin fallback
+            return langStr.split(',').map(function(s) { return s.trim(); }).filter(Boolean);
+        }
+    };
+
+    // Helper: get language display name
+    self.getLanguageName = function(code) {
+        var lang = self.availableLanguages().find(function(l) { return l.code === code; });
+        return lang ? lang.nativeName : code.toUpperCase();
+    };
+
+    // Helper: get language flag
+    self.getLanguageFlag = function(code) {
+        var lang = self.availableLanguages().find(function(l) { return l.code === code; });
+        return lang ? lang.flagEmoji : '';
+    };
+
+    // Toggle language selection
+    self.toggleLanguage = function(lang) {
+        var codes = self.selectedLanguages();
+        var idx = codes.indexOf(lang.code);
+        if (idx >= 0) {
+            codes.splice(idx, 1);
+        } else {
+            codes.push(lang.code);
+        }
+        self.selectedLanguages(codes.slice());
+    };
+
+    // Check if language is selected
+    self.isLanguageSelected = function(code) {
+        return self.selectedLanguages().indexOf(code) >= 0;
+    };
+
+    // Load available languages
+    self.loadLanguages = function() {
+        $.ajax({
+            url: apiBaseUrl + '/api/localization/languages',
+            method: 'GET',
+            success: function(data) {
+                self.availableLanguages(data);
+            }
+        });
+    };
+
     // Load guides
     self.loadData = function() {
         self.isLoading(true);
@@ -49,6 +105,10 @@ function GuidesViewModel() {
             url: apiBaseUrl + '/api/guides',
             method: 'GET',
             success: function(data) {
+                // Her rehberin languages alanini parse et
+                data.forEach(function(g) {
+                    g.languageList = self.parseLanguages(g.languages);
+                });
                 self.guides(data);
                 self.isLoading(false);
             },
@@ -108,9 +168,10 @@ function GuidesViewModel() {
     self.openAddModal = function() {
         self.isEditing(false);
         self.editingGuideId(null);
+        self.selectedLanguages([]);
         self.formData({
             firstName: '', lastName: '', phone: '', email: '',
-            languages: '', bio: '', experienceYears: ''
+            bio: '', experienceYears: ''
         });
         guideModal.show();
     };
@@ -119,12 +180,12 @@ function GuidesViewModel() {
     self.openEditModal = function(guide) {
         self.isEditing(true);
         self.editingGuideId(guide.id);
+        self.selectedLanguages(self.parseLanguages(guide.languages).slice());
         self.formData({
             firstName: guide.firstName,
             lastName: guide.lastName,
             phone: guide.phone || '',
             email: guide.email || '',
-            languages: guide.languages || '',
             bio: guide.bio || '',
             experienceYears: guide.experienceYears || ''
         });
@@ -171,7 +232,7 @@ function GuidesViewModel() {
                 lastName: data.lastName,
                 phone: data.phone || null,
                 email: data.email || null,
-                languages: data.languages || '',
+                languages: JSON.stringify(self.selectedLanguages()),
                 bio: data.bio || null,
                 experienceYears: data.experienceYears ? parseInt(data.experienceYears) : null
             }),
@@ -394,6 +455,7 @@ function GuidesViewModel() {
         deleteGuideModal = new bootstrap.Modal(document.getElementById('deleteGuideModal'));
         photoModal = new bootstrap.Modal(document.getElementById('photoModal'));
         assignModal = new bootstrap.Modal(document.getElementById('assignModal'));
+        self.loadLanguages();
         self.loadData();
     });
 }

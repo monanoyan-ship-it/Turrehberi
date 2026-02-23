@@ -825,6 +825,7 @@
   "Guide.Phone": "Phone",
   "Guide.Email": "Email",
   "Guide.Languages": "Languages",
+  "Guide.LanguagesSelected": "language(s) selected",
   "Guide.ExperienceYears": "Experience (Years)",
   "Guide.PhotoUrl": "Photo URL",
   "Guide.Bio": "Biography",
