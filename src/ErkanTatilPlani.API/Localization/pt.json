@@ -22,7 +22,6 @@
   "Common.Error": "Erro",
   "Common.Success": "Sucesso",
   "Common.Required": "Obrigatorio",
-
   "Menu.Home": "Inicio",
   "Menu.Tours": "Passeios",
   "Menu.Companies": "Empresas",
@@ -35,7 +34,6 @@
   "Menu.CompanyPanel": "Painel da empresa",
   "Menu.AdminPanel": "Painel administrativo",
   "Menu.MyReservations": "Minhas reservas",
-
   "Register.Title": "Cadastrar",
   "Register.Subtitle": "Crie uma nova conta",
   "Register.AccountType": "Tipo de conta",
@@ -65,7 +63,6 @@
   "Register.Submit": "Cadastrar",
   "Register.HasAccount": "Ja tem uma conta?",
   "Register.Success": "Cadastro realizado! Bem-vindo {0}",
-
   "Register.Error.FirstNameRequired": "O nome e obrigatorio",
   "Register.Error.LastNameRequired": "O sobrenome e obrigatorio",
   "Register.Error.NameRequired": "Nome e sobrenome sao obrigatorios",
@@ -76,7 +73,6 @@
   "Register.Error.CompanyNameRequired": "O nome da empresa e obrigatorio",
   "Register.Error.TaxNumberRequired": "O CNPJ e obrigatorio",
   "Register.Error.Failed": "Falha no cadastro",
-
   "Login.Title": "Entrar",
   "Login.Subtitle": "Acesse sua conta",
   "Login.Email": "E-mail",
@@ -87,7 +83,6 @@
   "Login.RememberMe": "Lembrar de mim",
   "Login.Error.Required": "E-mail e senha sao obrigatorios",
   "Login.Error.Invalid": "E-mail ou senha invalidos",
-
   "Tour.Name": "Nome do passeio",
   "Tour.Description": "Descricao",
   "Tour.Destination": "Destino",
@@ -98,7 +93,6 @@
   "Tour.Featured": "Destaque",
   "Tour.Book": "Reservar agora",
   "Tour.Details": "Detalhes",
-
   "Company.Name": "Nome da empresa",
   "Company.Description": "Descricao",
   "Company.Email": "E-mail",
@@ -106,7 +100,6 @@
   "Company.Address": "Endereco",
   "Company.Website": "Site",
   "Company.TaxNumber": "CNPJ",
-
   "Reservation.Tour": "Passeio",
   "Reservation.StartDate": "Data de inicio",
   "Reservation.EndDate": "Data de termino",
@@ -114,17 +107,14 @@
   "Reservation.TotalPrice": "Preco total",
   "Reservation.Status": "Status",
   "Reservation.Notes": "Observacoes",
-
   "Status.Pending": "Pendente",
   "Status.Confirmed": "Confirmado",
   "Status.Cancelled": "Cancelado",
   "Status.Completed": "Concluido",
-
   "UserType.Visitor": "Visitante",
   "UserType.CompanyOwner": "Proprietario de empresa",
   "UserType.Staff": "Funcionario",
   "UserType.Admin": "Administrador do sistema",
-
   "Placeholder.Email": "exemplo@email.com",
   "Placeholder.Phone": "Numero de telefone",
   "Placeholder.CompanyPhone": "Telefone da empresa",
@@ -134,28 +124,22 @@
   "Placeholder.TaxNumber": "Seu CNPJ",
   "Placeholder.Address": "Endereco da empresa",
   "Placeholder.Website": "www.suaempresa.com.br",
-
   "Footer.Rights": "Todos os direitos reservados",
   "Footer.Contact": "Contato",
-
   "Language.Select": "Selecionar idioma",
-
   "CompanyStatus.Pending": "Aguardando aprovacao",
   "CompanyStatus.Approved": "Aprovado",
   "CompanyStatus.Rejected": "Rejeitado",
   "CompanyStatus.Suspended": "Suspenso",
-
   "TravelType.Solo": "Sozinho",
   "TravelType.Couple": "Casal",
   "TravelType.Family": "Familia",
   "TravelType.Friends": "Amigos",
   "TravelType.Business": "Negocios",
-
   "ReviewStatus.Pending": "Pendente",
   "ReviewStatus.Approved": "Publicado",
   "ReviewStatus.Rejected": "Rejeitado",
   "ReviewStatus.Flagged": "Em revisao",
-
   "ReportReason.Spam": "Spam ou publicidade",
   "ReportReason.Inappropriate": "Conteudo inapropriado",
   "ReportReason.FakeReview": "Avaliacao falsa",
@@ -164,7 +148,6 @@
   "ReportReason.OffTopic": "Fora do assunto",
   "ReportReason.CopyrightViolation": "Violacao de direitos autorais",
   "ReportReason.Other": "Outro",
-
   "Review.Title": "Avaliacoes",
   "Review.WriteReview": "Escrever avaliacao",
   "Review.YourReview": "Sua avaliacao",
@@ -204,23 +187,19 @@
   "Review.Stars": "{0} Estrelas",
   "Review.ThankYou": "Obrigado pela sua avaliacao!",
   "Review.PendingApproval": "Sua avaliacao esta aguardando aprovacao",
-
   "Review.Error.AlreadyReviewed": "Voce ja avaliou este passeio",
   "Review.Error.RatingRequired": "Por favor, de uma nota",
   "Review.Error.CommentRequired": "Por favor, escreva uma avaliacao",
   "Review.Error.LoginRequired": "Faca login para avaliar",
-
   "Company.ApplicationNotes": "Notas do cadastro",
   "Company.ApplicationNotesHint": "Notas adicionais para seu cadastro",
   "Company.PendingApproval": "Cadastro em analise",
   "Company.PendingMessage": "Seu cadastro esta sendo analisado. Voce podera adicionar passeios apos aprovacao.",
-
   "Error.CompanyNotApproved": "Voce nao pode gerenciar passeios ate que sua empresa seja aprovada",
   "Error.CompanyPending": "Seu cadastro esta em analise. Voce podera adicionar passeios apos aprovacao.",
   "Error.CompanyRejected": "Seu cadastro foi rejeitado",
   "Error.CompanySuspended": "Sua empresa foi suspensa",
   "Error.NotCompanyOwner": "Voce nao e proprietario de empresa",
-
   "Contract.Title": "Contrato",
   "Contract.Upload": "Enviar Contrato",
   "Contract.Download": "Baixar Contrato",
@@ -239,7 +218,6 @@
   "Contract.Success.Uploaded": "Contrato enviado com sucesso",
   "Contract.Success.Deleted": "Contrato excluido com sucesso",
   "Contract.Confirm.Delete": "Tem certeza de que deseja excluir este contrato?",
-
   "Admin.Reviews.Title": "Moderacao de Avaliacoes",
   "Admin.Reviews.All": "Todas",
   "Admin.Reviews.Pending": "Pendentes",
@@ -259,7 +237,6 @@
   "Admin.Reviews.ConfirmApprove": "Tem certeza de que deseja aprovar esta avaliacao?",
   "Admin.Reviews.ConfirmReject": "Tem certeza de que deseja rejeitar esta avaliacao?",
   "Admin.Reviews.ConfirmFlag": "Tem certeza de que deseja sinalizar esta avaliacao?",
-
   "CompanyProfile.Title": "Perfil da Empresa",
   "CompanyProfile.About": "Sobre Nos",
   "CompanyProfile.OurTours": "Nossos Passeios",
@@ -285,7 +262,6 @@
   "CompanyProfile.Recommends": "Recomenda",
   "CompanyProfile.NotFound": "Empresa nao encontrada",
   "CompanyProfile.BackToList": "Voltar para a lista",
-
   "Menu.Dashboard": "Painel de Controle",
   "Dashboard.Title": "Painel de Controle",
   "Dashboard.Welcome": "Bem-vindo!",
@@ -308,7 +284,6 @@
   "Dashboard.Revenue": "Receita",
   "Dashboard.Rating": "Avaliacao",
   "Dashboard.Reviews": "Avaliacoes",
-
   "MyTours.Title": "Meus Passeios",
   "MyTours.AddTour": "Adicionar Passeio",
   "MyTours.EditTour": "Editar Passeio",
@@ -336,7 +311,6 @@
   "MyTours.PhotoDeleteSuccess": "Foto excluída com sucesso",
   "MyTours.CoverPhotoUpdated": "Foto de capa atualizada",
   "MyTours.FeaturedInfo": "Este tour está marcado como destaque. Esta configuração só pode ser alterada por um administrador.",
-
   "MyReservations.Title": "Minhas Reservas",
   "MyReservations.Total": "Total",
   "MyReservations.Customer": "Cliente",
@@ -345,7 +319,6 @@
   "MyReservations.ConfirmSuccess": "Reserva confirmada",
   "MyReservations.CancelSuccess": "Reserva cancelada",
   "MyReservations.CompleteSuccess": "Reserva concluida",
-
   "MyReviews.Title": "Avaliacoes",
   "MyReviews.Total": "Total de Avaliacoes",
   "MyReviews.AwaitingReply": "Aguardando Resposta",
@@ -353,7 +326,6 @@
   "MyReviews.NoReviews": "Ainda nao ha avaliacoes",
   "MyReviews.SendReply": "Enviar Resposta",
   "MyReviews.ReplySuccess": "Resposta enviada com sucesso",
-
   "Profile.Title": "Perfil",
   "Profile.PersonalInfo": "Informacoes Pessoais",
   "Profile.EditProfile": "Editar Perfil",
@@ -372,7 +344,6 @@
   "Profile.NewPasswordRequired": "A nova senha e obrigatoria",
   "Profile.EmailReadonly": "O endereco de e-mail nao pode ser alterado",
   "Profile.LoginRequired": "Voce precisa fazer login",
-
   "Tours.Subtitle": "Encontre o passeio perfeito e comece suas ferias dos sonhos!",
   "Tours.SearchPlaceholder": "Pesquisar passeios (nome, destino, descricao)...",
   "Tours.AdvancedFilters": "Filtros Avancados",
@@ -402,7 +373,6 @@
   "Tour.Days": "dias",
   "Common.Min": "Min",
   "Common.Max": "Max",
-
   "ForgotPassword.Title": "Esqueci minha senha",
   "ForgotPassword.Subtitle": "Digite seu e-mail e enviaremos um link para redefinir sua senha",
   "ForgotPassword.SendLink": "Enviar link",
@@ -411,7 +381,6 @@
   "ForgotPassword.BackToLogin": "Voltar ao login",
   "ForgotPassword.EmailRequired": "O e-mail e obrigatorio",
   "ForgotPassword.InvalidEmail": "Por favor, insira um e-mail valido",
-
   "ResetPassword.Title": "Nova senha",
   "ResetPassword.Subtitle": "Digite sua nova senha",
   "ResetPassword.InvalidToken": "Link invalido ou expirado",
@@ -420,7 +389,6 @@
   "ResetPassword.SetPassword": "Alterar senha",
   "ResetPassword.Success": "Sua senha foi alterada com sucesso!",
   "ResetPassword.CanLogin": "Agora voce pode entrar com sua nova senha",
-
   "VerifyEmail.Title": "Verificacao de Email",
   "VerifyEmail.Checking": "Verificando seu endereco de e-mail...",
   "VerifyEmail.Success": "Seu e-mail foi verificado com sucesso!",
@@ -436,7 +404,6 @@
   "VerifyEmail.Description": "Verifique seu e-mail para proteger sua conta.",
   "VerifyEmail.SendLink": "Enviar Link de Verificacao",
   "VerifyEmail.LinkSent": "O link de verificacao foi enviado para seu e-mail.",
-
   "Avatar.Upload": "Carregar Foto",
   "Avatar.Delete": "Excluir Foto",
   "Avatar.MaxSize": "O tamanho do arquivo nao pode exceder 2MB",
@@ -444,7 +411,6 @@
   "Avatar.UploadSuccess": "Foto de perfil carregada com sucesso",
   "Avatar.DeleteSuccess": "Foto de perfil excluida com sucesso",
   "Avatar.DeleteConfirm": "Tem certeza de que deseja excluir sua foto de perfil?",
-
   "Gallery.Title": "Galeria",
   "Gallery.Upload": "Carregar Imagem",
   "Gallery.Delete": "Excluir Imagem",
@@ -466,14 +432,12 @@
   "Gallery.ReorderSuccess": "Ordem atualizada",
   "Gallery.SelectFile": "Selecionar imagem",
   "Gallery.DragDrop": "ou arraste e solte",
-
   "ReviewImage.Upload": "Carregar Foto",
   "ReviewImage.Delete": "Excluir Foto",
   "ReviewImage.MaxImages": "Maximo 5 fotos por avaliacao",
   "ReviewImage.UploadSuccess": "Foto carregada",
   "ReviewImage.DeleteSuccess": "Foto excluida",
   "ReviewImage.Caption": "Legenda da foto",
-
   "Companies.Subtitle": "Descubra nossas empresas de viagem confiaveis",
   "Companies.CompanyCount": "Empresas",
   "Companies.SearchPlaceholder": "Pesquisar empresas (nome, cidade, descricao)...",
@@ -490,7 +454,6 @@
   "Companies.NoResults": "Nenhuma empresa encontrada",
   "Companies.TryDifferentSearch": "Tente outros criterios de pesquisa",
   "Companies.ClearFilters": "Limpar filtros",
-
   "MyReservations.Subtitle": "Acompanhe todas as suas reservas aqui",
   "MyReservations.NewReservation": "Nova reserva",
   "MyReservations.ExploreMessage": "Descubra um passeio e faca uma reserva agora!",
@@ -507,7 +470,6 @@
   "MyReservations.NoBrowsedReservations": "Sem reservas passadas consultadas",
   "MyReservations.NoCompletedReservations": "Não tem reservas concluídas",
   "MyReservations.NoCancelledReservations": "Não tem reservas canceladas",
-
   "ReservationDetail.Title": "Detalhes da reserva",
   "ReservationDetail.ViewTour": "Ver passeio",
   "ReservationDetail.ReservationInfo": "Informacoes da reserva",
@@ -522,7 +484,6 @@
   "ReservationDetail.CancelConfirm": "Tem certeza de que deseja cancelar esta reserva?",
   "ReservationDetail.CancelSuccess": "Reserva cancelada com sucesso",
   "ReservationDetail.NotFound": "Reserva nao encontrada",
-
   "Favorites.Title": "Meus Passeios Favoritos",
   "Favorites.Subtitle": "Os passeios que voce gostou estao listados aqui",
   "Favorites.Tours": "Passeio",
@@ -536,7 +497,6 @@
   "Common.LoginRequired": "Por favor, faca login",
   "Common.File": "Arquivo",
   "Common.Upload": "Carregar",
-
   "Email.Greeting": "Ola {0},",
   "Email.ReservationConfirmed.Subject": "Sua reserva foi confirmada - Erkan Plano de Viagem",
   "Email.ReservationConfirmed.Title": "Sua reserva foi confirmada!",
@@ -558,7 +518,6 @@
   "Email.ThankYou": "Obrigado por nos escolher. Boa viagem!",
   "Email.ContactUs": "Entre em contato conosco se tiver alguma duvida.",
   "Email.Reason": "Motivo",
-
   "Payment.Title": "Pagamento",
   "Payment.PayNow": "Pagar agora",
   "Payment.Processing": "Processando...",
@@ -575,7 +534,6 @@
   "Payment.ExploreTours": "Explorar outros passeios",
   "Payment.TryAgain": "Tentar novamente",
   "Payment.ContactSupport": "Suporte",
-
   "Share.Title": "Compartilhar",
   "Share.Facebook": "Compartilhar no Facebook",
   "Share.Twitter": "Compartilhar no X",
@@ -585,18 +543,15 @@
   "Share.CopyLink": "Copiar Link",
   "Share.LinkCopied": "Link copiado para a area de transferencia!",
   "Share.CopyFailed": "Falha ao copiar o link",
-
   "Email.PasswordReset.Subject": "Redefinir senha - Erkan Travel Plan",
   "Email.PasswordReset.Title": "Redefinir senha",
   "Email.PasswordReset.Message": "Clique no botao abaixo para redefinir sua senha. Se voce nao solicitou isso, pode ignorar este email.",
   "Email.PasswordReset.ButtonText": "Redefinir minha senha",
   "Email.PasswordReset.Expiry": "Este link expirara em 1 hora.",
-
   "Email.Verification.Subject": "Verificacao de email - Erkan Travel Plan",
   "Email.Verification.Title": "Verifique seu email",
   "Email.Verification.Message": "Verifique seu email para ativar sua conta e acessar todos os recursos.",
   "Email.Verification.ButtonText": "Verificar meu email",
-
   "Admin.EmailAccounts.Title": "Contas de Email",
   "Admin.EmailAccounts.Subtitle": "Gerenciar contas de email SMTP",
   "Admin.EmailAccounts.AddAccount": "Nova Conta",
@@ -615,7 +570,6 @@
   "Admin.EmailAccounts.TestEmail": "Enviar Email de Teste",
   "Admin.EmailAccounts.RecipientEmail": "Email do Destinatario",
   "Admin.EmailAccounts.SendTest": "Enviar",
-
   "Admin.EmailTemplates.Title": "Modelos de Email",
   "Admin.EmailTemplates.Subtitle": "Gerenciar modelos de email e traducoes",
   "Admin.EmailTemplates.AddTemplate": "Novo Modelo",
@@ -631,7 +585,6 @@
   "Admin.EmailTemplates.Body": "Conteudo do Email",
   "Admin.EmailTemplates.NoTemplates": "Nenhum modelo de email ainda",
   "Admin.EmailTemplates.Preview": "Visualizacao do Email",
-
   "Menu.Blog": "Blog",
   "Blog.Title": "Blog",
   "Blog.Subtitle": "Inspiracao de viagem, guias de viagem e noticias de turismo",
@@ -664,7 +617,6 @@
   "Blog.Tags": "Tags",
   "Blog.Author": "Autor",
   "Blog.RelatedPosts": "Artigos relacionados",
-
   "CompanyPage.Title": "Paginas da empresa",
   "CompanyPage.Create": "Nova pagina",
   "CompanyPage.Edit": "Editar pagina",
@@ -807,7 +759,6 @@
   "Menu.Promotions": "Promocoes",
   "Menu.MyPromotions": "Minhas Promocoes",
   "Admin.Promotions.Title": "Gestao de Promocoes",
-
   "Watch.Title": "Acompanhamento de tour",
   "Watch.Button": "Acompanhar",
   "Watch.Watching": "Acompanhando",
@@ -819,7 +770,6 @@
   "Watch.Limit": "O periodo de acompanhamento deve ser entre 1-90 dias",
   "Watch.AlreadyWatching": "Voce ja esta acompanhando este tour",
   "Watch.MyWatches": "Meus acompanhamentos",
-
   "Notification.Title": "Notificacoes",
   "Notification.Empty": "Sem notificacoes",
   "Notification.MarkAllRead": "Marcar tudo como lido",
@@ -837,16 +787,13 @@
   "Notification.Reservation.Cancelled.Message": "Sua reserva foi cancelada.",
   "Notification.Reservation.Completed.Title": "Tour concluido",
   "Notification.Reservation.Completed.Message": "Seu tour foi concluido. Tenha um bom dia!",
-
   "NotificationType.Scarcity": "Escassez",
   "NotificationType.PriceChange": "Mudanca de preco",
   "NotificationType.NewDate": "Nova data",
   "NotificationType.Reservation": "Reserva",
   "NotificationType.System": "Sistema",
-
   "Scarcity.Badge": "Ultimos {0} lugares!",
   "Scarcity.LastSpots": "Os ultimos lugares estao preenchendo!",
-
   "Participant.Title": "Informacoes do participante",
   "Participant.Name": "Nome completo",
   "Participant.Age": "Idade",
@@ -854,26 +801,21 @@
   "Participant.Health": "Nota de saude",
   "Participant.Add": "Adicionar participante",
   "Participant.Remove": "Remover participante",
-
   "MeetingPoint.Title": "Ponto de encontro",
   "MeetingPoint.Address": "Endereco de encontro",
   "MeetingPoint.Map": "Ver no mapa",
   "MeetingPoint.Note": "Nota de encontro",
-
   "QrCode.Title": "Seu ingresso QR",
   "QrCode.Show": "Mostrar codigo QR",
   "QrCode.Scan": "Escaneie este codigo para entrar",
-
   "DateChange.Title": "Alterar data",
   "DateChange.SelectNew": "Selecione uma nova data",
   "DateChange.Success": "Data alterada com sucesso",
   "DateChange.OnlyConfirmed": "A data so pode ser alterada para reservas confirmadas",
-
   "PhotoLink.Title": "Fotos do tour",
   "PhotoLink.View": "Ver fotos",
   "PhotoLink.Add": "Adicionar link de foto",
   "PhotoLink.Placeholder": "URL do album de fotos",
-
   "Guide.Title": "Gestão de guias",
   "Guide.Add": "Adicionar guia",
   "Guide.Edit": "Editar guia",
@@ -912,7 +854,6 @@
   "GuideAssignmentStatus.Pending": "Pendente",
   "GuideAssignmentStatus.Confirmed": "Confirmado",
   "GuideAssignmentStatus.Rejected": "Rejeitado",
-
   "Calendar.Title": "Calendário de tours",
   "Calendar.Today": "Hoje",
   "Calendar.Available": "Disponível",
@@ -928,13 +869,68 @@
   "Calendar.Sat": "Sáb",
   "Calendar.More": "mais",
   "Calendar.Tour": "tour",
-
   "Analytics.Title": "Analíticos",
   "Analytics.Revenue": "Receita",
   "Analytics.Occupancy": "Taxa de ocupação",
   "Analytics.Cancellations": "Taxa de cancelamento",
   "Analytics.CancellationRate": "Taxa de cancelamento (%)",
   "Analytics.TourComparison": "Comparação de tours",
-
-  "Capacity.Remaining": "restante"
+  "Capacity.Remaining": "restante",
+  "Message.MyMessages": "Minhas Mensagens",
+  "Message.NewConversation": "Nova Mensagem",
+  "Message.Conversations": "Conversas",
+  "Message.SelectConversation": "Selecione uma conversa ou envie uma nova mensagem",
+  "Message.NoConversations": "Nenhuma conversa ainda",
+  "Message.ConversationClosed": "Esta conversa esta encerrada",
+  "Message.SelectCompany": "Selecionar empresa",
+  "Message.RelatedTour": "Tour relacionado (Opcional)",
+  "Message.NoTourSelected": "Nenhum tour selecionado",
+  "Message.Subject": "Assunto",
+  "Message.FirstMessage": "Sua mensagem",
+  "Message.Send": "Enviar",
+  "Message.TypeMessage": "Digite sua mensagem...",
+  "Message.ConversationCreated": "Conversa criada",
+  "Message.FillRequired": "Preencha todos os campos obrigatorios",
+  "Message.LoadError": "Falha ao carregar conversas",
+  "Message.LoadMessagesError": "Falha ao carregar mensagens",
+  "Message.SendError": "Falha ao enviar mensagem",
+  "Message.CreateError": "Falha ao criar conversa",
+  "Menu.Messages": "Minhas Mensagens",
+  "MessageSenderType.Visitor": "Visitante",
+  "MessageSenderType.Company": "Empresa",
+  "MessageTemplate.Title": "Modelos de resposta rapida",
+  "MessageTemplate.Add": "Adicionar modelo",
+  "MessageTemplate.Edit": "Editar modelo",
+  "MessageTemplate.Delete": "Excluir modelo",
+  "MessageTemplate.Name": "Nome do modelo",
+  "MessageTemplate.Content": "Conteudo",
+  "MessageTemplate.Order": "Ordem",
+  "MessageTemplate.Usage": "Uso",
+  "MessageTemplate.UseTemplate": "Resposta rapida",
+  "MessageTemplate.NoTemplates": "Nenhum modelo adicionado ainda",
+  "NotificationPref.Title": "Preferências de notificação",
+  "NotificationPref.Description": "Escolha como deseja receber notificações",
+  "NotificationPref.Email": "Notificações por email",
+  "NotificationPref.WhatsApp": "Notificações por WhatsApp",
+  "NotificationPref.SMS": "Notificações por SMS",
+  "NotificationPref.Saved": "Preferências de notificação salvas",
+  "NotificationPref.EmailDesc": "Receber notificações por email",
+  "NotificationPref.WhatsAppDesc": "Receber notificações por WhatsApp",
+  "NotificationPref.SMSDesc": "Receber notificações por SMS",
+  "Push.Subscribe": "Ativar notificações",
+  "Push.Subscribed": "Notificações ativadas",
+  "Push.NotSupported": "Notificações push não suportadas",
+  "Push.PermissionDenied": "Permissão de notificação negada",
+  "Push.SubscribeSuccess": "Notificações push ativadas",
+  "Push.SubscribeFailed": "Falha na assinatura push",
+  "Push.UnsubscribeSuccess": "Notificações push desativadas",
+  "Push.UnsubscribeFailed": "Falha ao cancelar assinatura",
+  "Weather.Alert.Title": "Alerta meteorológico",
+  "Weather.Alert.RainMessage": "Chuva prevista para amanhã. Não esqueça o guarda-chuva!",
+  "Weather.Recommendation.Rainy": "Chuva prevista, traga guarda-chuva",
+  "Weather.Recommendation.VeryHot": "Muito quente, beba bastante água",
+  "Weather.Recommendation.Hot": "Tempo quente, use roupas leves",
+  "Weather.Recommendation.Cold": "Tempo frio, traga roupas quentes",
+  "Weather.Recommendation.Windy": "Ventoso, use roupas corta-vento",
+  "Weather.Recommendation.Good": "Condições climáticas favoráveis, aproveite!"
 }

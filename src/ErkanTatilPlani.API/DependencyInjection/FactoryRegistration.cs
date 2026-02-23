@@ -5,6 +5,7 @@ using ErkanTatilPlani.API.Factories.EmailAccounts;
 using ErkanTatilPlani.API.Factories.EmailTemplates;
 using ErkanTatilPlani.API.Factories.Favorites;
 using ErkanTatilPlani.API.Factories.Guides;
+using ErkanTatilPlani.API.Factories.Messages;
 using ErkanTatilPlani.API.Factories.Languages;
 using ErkanTatilPlani.API.Factories.Notifications;
 using ErkanTatilPlani.API.Factories.Payments;
@@ -15,6 +16,7 @@ using ErkanTatilPlani.API.Factories.Tours;
 using ErkanTatilPlani.API.Factories.TourWatches;
 using ErkanTatilPlani.API.Factories.Promotions;
 using ErkanTatilPlani.API.Factories.Visitors;
+using ErkanTatilPlani.API.Factories.Weather;
 using ErkanTatilPlani.Core.Factories.Auth;
 using ErkanTatilPlani.Core.Factories.Blogs;
 using ErkanTatilPlani.Core.Factories.Companies;
@@ -22,6 +24,7 @@ using ErkanTatilPlani.Core.Factories.EmailAccounts;
 using ErkanTatilPlani.Core.Factories.EmailTemplates;
 using ErkanTatilPlani.Core.Factories.Favorites;
 using ErkanTatilPlani.Core.Factories.Guides;
+using ErkanTatilPlani.Core.Factories.Messages;
 using ErkanTatilPlani.Core.Factories.Languages;
 using ErkanTatilPlani.Core.Factories.Notifications;
 using ErkanTatilPlani.Core.Factories.Payments;
@@ -32,6 +35,7 @@ using ErkanTatilPlani.Core.Factories.TourDates;
 using ErkanTatilPlani.Core.Factories.Tours;
 using ErkanTatilPlani.Core.Factories.TourWatches;
 using ErkanTatilPlani.Core.Factories.Visitors;
+using ErkanTatilPlani.Core.Factories.Weather;
 
 namespace ErkanTatilPlani.API.DependencyInjection;
 
@@ -97,6 +101,10 @@ public static class FactoryRegistration
         // Guide factories (1)
         services.AddScoped<IGuideFactory, GuideFactory>();
 
+        // Message factories (2)
+        services.AddScoped<IMessageFactory, MessageFactory>();
+        services.AddScoped<IMessageTemplateFactory, MessageTemplateFactory>();
+
         // Company factories (7)
         services.AddScoped<ICompanyCrudFactory, CompanyCrudFactory>();
         services.AddScoped<ICompanyProfileFactory, CompanyProfileFactory>();
@@ -105,6 +113,9 @@ public static class FactoryRegistration
         services.AddScoped<ICompanyGalleryFactory, CompanyGalleryFactory>();
         services.AddScoped<ICompanyPageFactory, CompanyPageFactory>();
         services.AddScoped<ICompanyAnalyticsFactory, CompanyAnalyticsFactory>();
+
+        // Weather factories (1)
+        services.AddScoped<IWeatherAlertFactory, WeatherAlertFactory>();
 
         return services;
     }

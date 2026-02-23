@@ -789,6 +789,59 @@ namespace ErkanTatilPlani.Data.Migrations
                     b.ToTable("CompanyPages");
                 });
 
+            modelBuilder.Entity("ErkanTatilPlani.Core.Entities.Conversation", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("CompanyId")
+                        .HasColumnType("integer");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("boolean");
+
+                    b.Property<bool>("IsClosedByCompany")
+                        .HasColumnType("boolean");
+
+                    b.Property<bool>("IsClosedByVisitor")
+                        .HasColumnType("boolean");
+
+                    b.Property<DateTime?>("LastMessageAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("Subject")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)");
+
+                    b.Property<int?>("TourId")
+                        .HasColumnType("integer");
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<int>("VisitorId")
+                        .HasColumnType("integer");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CompanyId");
+
+                    b.HasIndex("LastMessageAt");
+
+                    b.HasIndex("TourId");
+
+                    b.HasIndex("VisitorId", "CompanyId");
+
+                    b.ToTable("Conversations");
+                });
+
             modelBuilder.Entity("ErkanTatilPlani.Core.Entities.EmailAccount", b =>
                 {
                     b.Property<int>("Id")
@@ -1430,6 +1483,95 @@ namespace ErkanTatilPlani.Data.Migrations
                         });
                 });
 
+            modelBuilder.Entity("ErkanTatilPlani.Core.Entities.Message", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Content")
+                        .IsRequired()
+                        .HasMaxLength(5000)
+                        .HasColumnType("character varying(5000)");
+
+                    b.Property<int>("ConversationId")
+                        .HasColumnType("integer");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("boolean");
+
+                    b.Property<bool>("IsRead")
+                        .HasColumnType("boolean");
+
+                    b.Property<DateTime?>("ReadAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<int>("SenderId")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("SenderTypeId")
+                        .HasColumnType("integer");
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("SenderId");
+
+                    b.HasIndex("ConversationId", "CreatedAt");
+
+                    b.ToTable("Messages");
+                });
+
+            modelBuilder.Entity("ErkanTatilPlani.Core.Entities.MessageTemplate", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("CompanyId")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("Content")
+                        .IsRequired()
+                        .HasMaxLength(5000)
+                        .HasColumnType("character varying(5000)");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<int>("DisplayOrder")
+                        .HasColumnType("integer");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("boolean");
+
+                    b.Property<string>("Title")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)");
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<int>("UsageCount")
+                        .HasColumnType("integer");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CompanyId");
+
+                    b.ToTable("MessageTemplates");
+                });
+
             modelBuilder.Entity("ErkanTatilPlani.Core.Entities.Notification", b =>
                 {
                     b.Property<int>("Id")
@@ -1661,6 +1803,51 @@ namespace ErkanTatilPlani.Data.Migrations
                     b.HasIndex("VisitorId");
 
                     b.ToTable("PromotionUsages");
+                });
+
+            modelBuilder.Entity("ErkanTatilPlani.Core.Entities.PushSubscription", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Auth")
+                        .IsRequired()
+                        .HasMaxLength(500)
+                        .HasColumnType("character varying(500)");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("Endpoint")
+                        .IsRequired()
+                        .HasMaxLength(500)
+                        .HasColumnType("character varying(500)");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("boolean");
+
+                    b.Property<string>("P256dh")
+                        .IsRequired()
+                        .HasMaxLength(500)
+                        .HasColumnType("character varying(500)");
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<int>("VisitorId")
+                        .HasColumnType("integer");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("Endpoint")
+                        .IsUnique();
+
+                    b.HasIndex("VisitorId");
+
+                    b.ToTable("PushSubscriptions");
                 });
 
             modelBuilder.Entity("ErkanTatilPlani.Core.Entities.Reservation", b =>
@@ -2871,6 +3058,10 @@ namespace ErkanTatilPlani.Data.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
+                    b.Property<string>("NotificationPreference")
+                        .HasMaxLength(500)
+                        .HasColumnType("character varying(500)");
+
                     b.Property<string>("PasswordHash")
                         .IsRequired()
                         .HasColumnType("text");
@@ -3168,6 +3359,32 @@ namespace ErkanTatilPlani.Data.Migrations
                     b.Navigation("Company");
                 });
 
+            modelBuilder.Entity("ErkanTatilPlani.Core.Entities.Conversation", b =>
+                {
+                    b.HasOne("ErkanTatilPlani.Core.Entities.Company", "Company")
+                        .WithMany("Conversations")
+                        .HasForeignKey("CompanyId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("ErkanTatilPlani.Core.Entities.Tour", "Tour")
+                        .WithMany()
+                        .HasForeignKey("TourId")
+                        .OnDelete(DeleteBehavior.SetNull);
+
+                    b.HasOne("ErkanTatilPlani.Core.Entities.Visitor", "Visitor")
+                        .WithMany("Conversations")
+                        .HasForeignKey("VisitorId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Company");
+
+                    b.Navigation("Tour");
+
+                    b.Navigation("Visitor");
+                });
+
             modelBuilder.Entity("ErkanTatilPlani.Core.Entities.EmailTemplate", b =>
                 {
                     b.HasOne("ErkanTatilPlani.Core.Entities.EmailAccount", "EmailAccount")
@@ -3212,6 +3429,36 @@ namespace ErkanTatilPlani.Data.Migrations
                 {
                     b.HasOne("ErkanTatilPlani.Core.Entities.Company", "Company")
                         .WithMany("Guides")
+                        .HasForeignKey("CompanyId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Company");
+                });
+
+            modelBuilder.Entity("ErkanTatilPlani.Core.Entities.Message", b =>
+                {
+                    b.HasOne("ErkanTatilPlani.Core.Entities.Conversation", "Conversation")
+                        .WithMany("Messages")
+                        .HasForeignKey("ConversationId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("ErkanTatilPlani.Core.Entities.Visitor", "Sender")
+                        .WithMany("SentMessages")
+                        .HasForeignKey("SenderId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Conversation");
+
+                    b.Navigation("Sender");
+                });
+
+            modelBuilder.Entity("ErkanTatilPlani.Core.Entities.MessageTemplate", b =>
+                {
+                    b.HasOne("ErkanTatilPlani.Core.Entities.Company", "Company")
+                        .WithMany("MessageTemplates")
                         .HasForeignKey("CompanyId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -3271,6 +3518,17 @@ namespace ErkanTatilPlani.Data.Migrations
                     b.Navigation("Promotion");
 
                     b.Navigation("Reservation");
+
+                    b.Navigation("Visitor");
+                });
+
+            modelBuilder.Entity("ErkanTatilPlani.Core.Entities.PushSubscription", b =>
+                {
+                    b.HasOne("ErkanTatilPlani.Core.Entities.Visitor", "Visitor")
+                        .WithMany("PushSubscriptions")
+                        .HasForeignKey("VisitorId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.Navigation("Visitor");
                 });
@@ -3521,13 +3779,22 @@ namespace ErkanTatilPlani.Data.Migrations
 
             modelBuilder.Entity("ErkanTatilPlani.Core.Entities.Company", b =>
                 {
+                    b.Navigation("Conversations");
+
                     b.Navigation("GalleryImages");
 
                     b.Navigation("Guides");
 
+                    b.Navigation("MessageTemplates");
+
                     b.Navigation("Pages");
 
                     b.Navigation("Tours");
+                });
+
+            modelBuilder.Entity("ErkanTatilPlani.Core.Entities.Conversation", b =>
+                {
+                    b.Navigation("Messages");
                 });
 
             modelBuilder.Entity("ErkanTatilPlani.Core.Entities.EmailAccount", b =>
@@ -3590,17 +3857,23 @@ namespace ErkanTatilPlani.Data.Migrations
 
                     b.Navigation("BlogPosts");
 
+                    b.Navigation("Conversations");
+
                     b.Navigation("FavoriteTours");
 
                     b.Navigation("HelpfulVotes");
 
                     b.Navigation("Notifications");
 
+                    b.Navigation("PushSubscriptions");
+
                     b.Navigation("Reservations");
 
                     b.Navigation("ReviewReplies");
 
                     b.Navigation("Reviews");
+
+                    b.Navigation("SentMessages");
 
                     b.Navigation("TourWatches");
                 });

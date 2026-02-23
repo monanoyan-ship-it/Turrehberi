@@ -22,7 +22,6 @@
   "Common.Error": "Ошибка",
   "Common.Success": "Успешно",
   "Common.Required": "Обязательно",
-
   "Menu.Home": "Главная",
   "Menu.Tours": "Туры",
   "Menu.Companies": "Компании",
@@ -35,7 +34,6 @@
   "Menu.CompanyPanel": "Панель компании",
   "Menu.AdminPanel": "Панель управления",
   "Menu.MyReservations": "Мои бронирования",
-
   "Register.Title": "Регистрация",
   "Register.Subtitle": "Создайте новый аккаунт",
   "Register.AccountType": "Тип аккаунта",
@@ -65,7 +63,6 @@
   "Register.Submit": "Зарегистрироваться",
   "Register.HasAccount": "Уже есть аккаунт?",
   "Register.Success": "Регистрация успешна! Добро пожаловать {0}",
-
   "Register.Error.FirstNameRequired": "Имя обязательно",
   "Register.Error.LastNameRequired": "Фамилия обязательна",
   "Register.Error.NameRequired": "Имя и фамилия обязательны",
@@ -76,7 +73,6 @@
   "Register.Error.CompanyNameRequired": "Название компании обязательно",
   "Register.Error.TaxNumberRequired": "ИНН обязателен",
   "Register.Error.Failed": "Регистрация не удалась",
-
   "Login.Title": "Вход",
   "Login.Subtitle": "Войдите в свой аккаунт",
   "Login.Email": "Эл. почта",
@@ -87,7 +83,6 @@
   "Login.RememberMe": "Запомнить меня",
   "Login.Error.Required": "Эл. почта и пароль обязательны",
   "Login.Error.Invalid": "Неверная эл. почта или пароль",
-
   "Tour.Name": "Название тура",
   "Tour.Description": "Описание",
   "Tour.Destination": "Направление",
@@ -98,7 +93,6 @@
   "Tour.Featured": "Рекомендуемый",
   "Tour.Book": "Забронировать",
   "Tour.Details": "Подробнее",
-
   "Company.Name": "Название компании",
   "Company.Description": "Описание",
   "Company.Email": "Эл. почта",
@@ -106,7 +100,6 @@
   "Company.Address": "Адрес",
   "Company.Website": "Веб-сайт",
   "Company.TaxNumber": "ИНН",
-
   "Reservation.Tour": "Тур",
   "Reservation.StartDate": "Дата начала",
   "Reservation.EndDate": "Дата окончания",
@@ -114,17 +107,14 @@
   "Reservation.TotalPrice": "Общая стоимость",
   "Reservation.Status": "Статус",
   "Reservation.Notes": "Примечания",
-
   "Status.Pending": "Ожидает",
   "Status.Confirmed": "Подтверждено",
   "Status.Cancelled": "Отменено",
   "Status.Completed": "Завершено",
-
   "UserType.Visitor": "Посетитель",
   "UserType.CompanyOwner": "Владелец компании",
   "UserType.Staff": "Сотрудник",
   "UserType.Admin": "Системный администратор",
-
   "Placeholder.Email": "example@email.com",
   "Placeholder.Phone": "Номер телефона",
   "Placeholder.CompanyPhone": "Телефон компании",
@@ -134,28 +124,22 @@
   "Placeholder.TaxNumber": "Ваш ИНН",
   "Placeholder.Address": "Адрес компании",
   "Placeholder.Website": "www.yourcompany.com",
-
   "Footer.Rights": "Все права защищены",
   "Footer.Contact": "Контакты",
-
   "Language.Select": "Выберите язык",
-
   "CompanyStatus.Pending": "На рассмотрении",
   "CompanyStatus.Approved": "Одобрено",
   "CompanyStatus.Rejected": "Отклонено",
   "CompanyStatus.Suspended": "Приостановлено",
-
   "TravelType.Solo": "Один",
   "TravelType.Couple": "Пара",
   "TravelType.Family": "Семья",
   "TravelType.Friends": "Друзья",
   "TravelType.Business": "Деловая поездка",
-
   "ReviewStatus.Pending": "На модерации",
   "ReviewStatus.Approved": "Опубликовано",
   "ReviewStatus.Rejected": "Отклонено",
   "ReviewStatus.Flagged": "На проверке",
-
   "ReportReason.Spam": "Спам или реклама",
   "ReportReason.Inappropriate": "Неприемлемый контент",
   "ReportReason.FakeReview": "Поддельный отзыв",
@@ -164,7 +148,6 @@
   "ReportReason.OffTopic": "Не по теме",
   "ReportReason.CopyrightViolation": "Нарушение авторских прав",
   "ReportReason.Other": "Другое",
-
   "Review.Title": "Отзывы",
   "Review.WriteReview": "Написать отзыв",
   "Review.YourReview": "Ваш отзыв",
@@ -204,23 +187,19 @@
   "Review.Stars": "{0} звезд",
   "Review.ThankYou": "Спасибо за отзыв!",
   "Review.PendingApproval": "Ваш отзыв на модерации",
-
   "Review.Error.AlreadyReviewed": "Вы уже оставили отзыв",
   "Review.Error.RatingRequired": "Пожалуйста, поставьте оценку",
   "Review.Error.CommentRequired": "Пожалуйста, напишите отзыв",
   "Review.Error.LoginRequired": "Войдите, чтобы оставить отзыв",
-
   "Company.ApplicationNotes": "Примечания к заявке",
   "Company.ApplicationNotesHint": "Дополнительная информация к заявке",
   "Company.PendingApproval": "Заявка на рассмотрении",
   "Company.PendingMessage": "Ваша заявка рассматривается. После одобрения вы сможете добавлять туры.",
-
   "Error.CompanyNotApproved": "Вы не можете управлять турами, пока ваша компания не одобрена",
   "Error.CompanyPending": "Ваша заявка на рассмотрении. После одобрения вы сможете добавлять туры.",
   "Error.CompanyRejected": "Ваша заявка была отклонена",
   "Error.CompanySuspended": "Ваша компания была приостановлена",
   "Error.NotCompanyOwner": "Вы не являетесь владельцем компании",
-
   "Contract.Title": "Договор",
   "Contract.Upload": "Загрузить договор",
   "Contract.Download": "Скачать договор",
@@ -239,7 +218,6 @@
   "Contract.Success.Uploaded": "Договор успешно загружен",
   "Contract.Success.Deleted": "Договор успешно удален",
   "Contract.Confirm.Delete": "Вы уверены, что хотите удалить этот договор?",
-
   "Admin.Reviews.Title": "Модерация отзывов",
   "Admin.Reviews.All": "Все",
   "Admin.Reviews.Pending": "Ожидающие",
@@ -259,7 +237,6 @@
   "Admin.Reviews.ConfirmApprove": "Вы уверены, что хотите одобрить этот отзыв?",
   "Admin.Reviews.ConfirmReject": "Вы уверены, что хотите отклонить этот отзыв?",
   "Admin.Reviews.ConfirmFlag": "Вы уверены, что хотите отметить этот отзыв?",
-
   "CompanyProfile.Title": "Профиль компании",
   "CompanyProfile.About": "О нас",
   "CompanyProfile.OurTours": "Наши туры",
@@ -285,7 +262,6 @@
   "CompanyProfile.Recommends": "Рекомендует",
   "CompanyProfile.NotFound": "Компания не найдена",
   "CompanyProfile.BackToList": "Вернуться к списку",
-
   "Menu.Dashboard": "Панель управления",
   "Dashboard.Title": "Панель управления",
   "Dashboard.Welcome": "Добро пожаловать!",
@@ -308,7 +284,6 @@
   "Dashboard.Revenue": "Доход",
   "Dashboard.Rating": "Рейтинг",
   "Dashboard.Reviews": "Отзывы",
-
   "MyTours.Title": "Мои туры",
   "MyTours.AddTour": "Добавить тур",
   "MyTours.EditTour": "Редактировать тур",
@@ -336,7 +311,6 @@
   "MyTours.PhotoDeleteSuccess": "Фотография успешно удалена",
   "MyTours.CoverPhotoUpdated": "Обложка обновлена",
   "MyTours.FeaturedInfo": "Этот тур отмечен как избранный. Этот параметр может быть изменен только администратором.",
-
   "MyReservations.Title": "Мои бронирования",
   "MyReservations.Total": "Всего",
   "MyReservations.Customer": "Клиент",
@@ -345,7 +319,6 @@
   "MyReservations.ConfirmSuccess": "Бронирование подтверждено",
   "MyReservations.CancelSuccess": "Бронирование отменено",
   "MyReservations.CompleteSuccess": "Бронирование завершено",
-
   "MyReviews.Title": "Отзывы",
   "MyReviews.Total": "Всего отзывов",
   "MyReviews.AwaitingReply": "Ожидают ответа",
@@ -353,7 +326,6 @@
   "MyReviews.NoReviews": "Отзывов пока нет",
   "MyReviews.SendReply": "Отправить ответ",
   "MyReviews.ReplySuccess": "Ответ успешно отправлен",
-
   "Profile.Title": "Профиль",
   "Profile.PersonalInfo": "Личная информация",
   "Profile.EditProfile": "Редактировать профиль",
@@ -372,7 +344,6 @@
   "Profile.NewPasswordRequired": "Новый пароль обязателен",
   "Profile.EmailReadonly": "Адрес электронной почты нельзя изменить",
   "Profile.LoginRequired": "Необходимо войти в систему",
-
   "Tours.Subtitle": "Найдите идеальный тур и начните отпуск своей мечты!",
   "Tours.SearchPlaceholder": "Поиск туров (название, направление, описание)...",
   "Tours.AdvancedFilters": "Расширенные фильтры",
@@ -402,7 +373,6 @@
   "Tour.Days": "дней",
   "Common.Min": "Мин",
   "Common.Max": "Макс",
-
   "ForgotPassword.Title": "Забыли пароль",
   "ForgotPassword.Subtitle": "Введите ваш email и мы отправим ссылку для сброса пароля",
   "ForgotPassword.SendLink": "Отправить ссылку",
@@ -411,7 +381,6 @@
   "ForgotPassword.BackToLogin": "Вернуться к входу",
   "ForgotPassword.EmailRequired": "Email обязателен",
   "ForgotPassword.InvalidEmail": "Введите корректный email",
-
   "ResetPassword.Title": "Новый пароль",
   "ResetPassword.Subtitle": "Введите новый пароль",
   "ResetPassword.InvalidToken": "Недействительная или просроченная ссылка",
@@ -420,7 +389,6 @@
   "ResetPassword.SetPassword": "Изменить пароль",
   "ResetPassword.Success": "Пароль успешно изменен!",
   "ResetPassword.CanLogin": "Теперь вы можете войти с новым паролем",
-
   "VerifyEmail.Title": "Подтверждение email",
   "VerifyEmail.Checking": "Подтверждение вашего email...",
   "VerifyEmail.Success": "Ваш email успешно подтвержден!",
@@ -436,7 +404,6 @@
   "VerifyEmail.Description": "Подтвердите email для защиты вашего аккаунта.",
   "VerifyEmail.SendLink": "Отправить ссылку",
   "VerifyEmail.LinkSent": "Ссылка для подтверждения отправлена на ваш email.",
-
   "Avatar.Upload": "Загрузить фото",
   "Avatar.Delete": "Удалить фото",
   "Avatar.MaxSize": "Размер файла не может превышать 2МБ",
@@ -444,7 +411,6 @@
   "Avatar.UploadSuccess": "Фото профиля успешно загружено",
   "Avatar.DeleteSuccess": "Фото профиля успешно удалено",
   "Avatar.DeleteConfirm": "Вы уверены, что хотите удалить фото профиля?",
-
   "Gallery.Title": "Галерея",
   "Gallery.Upload": "Загрузить изображение",
   "Gallery.Delete": "Удалить изображение",
@@ -466,14 +432,12 @@
   "Gallery.ReorderSuccess": "Порядок обновлен",
   "Gallery.SelectFile": "Выбрать изображение",
   "Gallery.DragDrop": "или перетащите",
-
   "ReviewImage.Upload": "Загрузить фото",
   "ReviewImage.Delete": "Удалить фото",
   "ReviewImage.MaxImages": "Максимум 5 фото на отзыв",
   "ReviewImage.UploadSuccess": "Фото загружено",
   "ReviewImage.DeleteSuccess": "Фото удалено",
   "ReviewImage.Caption": "Подпись к фото",
-
   "Companies.Subtitle": "Откройте для себя наши надежные туристические компании",
   "Companies.CompanyCount": "Компании",
   "Companies.SearchPlaceholder": "Поиск компаний (название, город, описание)...",
@@ -490,7 +454,6 @@
   "Companies.NoResults": "Компании не найдены",
   "Companies.TryDifferentSearch": "Попробуйте другие критерии поиска",
   "Companies.ClearFilters": "Очистить фильтры",
-
   "MyReservations.Subtitle": "Отслеживайте все ваши бронирования здесь",
   "MyReservations.NewReservation": "Новое бронирование",
   "MyReservations.ExploreMessage": "Откройте для себя тур и забронируйте прямо сейчас!",
@@ -507,7 +470,6 @@
   "MyReservations.NoBrowsedReservations": "Нет просмотренных прошлых бронирований",
   "MyReservations.NoCompletedReservations": "У вас нет завершённых бронирований",
   "MyReservations.NoCancelledReservations": "У вас нет отменённых бронирований",
-
   "ReservationDetail.Title": "Детали бронирования",
   "ReservationDetail.ViewTour": "Посмотреть тур",
   "ReservationDetail.ReservationInfo": "Информация о бронировании",
@@ -522,7 +484,6 @@
   "ReservationDetail.CancelConfirm": "Вы уверены, что хотите отменить это бронирование?",
   "ReservationDetail.CancelSuccess": "Бронирование успешно отменено",
   "ReservationDetail.NotFound": "Бронирование не найдено",
-
   "Favorites.Title": "Мои избранные туры",
   "Favorites.Subtitle": "Понравившиеся туры отображаются здесь",
   "Favorites.Tours": "Тур",
@@ -536,7 +497,6 @@
   "Common.LoginRequired": "Пожалуйста, войдите",
   "Common.File": "Файл",
   "Common.Upload": "Загрузить",
-
   "Email.Greeting": "Здравствуйте, {0},",
   "Email.ReservationConfirmed.Subject": "Ваше бронирование подтверждено - Erkan Travel Plan",
   "Email.ReservationConfirmed.Title": "Ваше бронирование подтверждено!",
@@ -558,7 +518,6 @@
   "Email.ThankYou": "Спасибо, что выбрали нас. Хорошего путешествия!",
   "Email.ContactUs": "Свяжитесь с нами, если у вас есть вопросы.",
   "Email.Reason": "Причина",
-
   "Payment.Title": "Оплата",
   "Payment.PayNow": "Оплатить сейчас",
   "Payment.Processing": "Обработка...",
@@ -575,7 +534,6 @@
   "Payment.ExploreTours": "Посмотреть другие туры",
   "Payment.TryAgain": "Попробовать снова",
   "Payment.ContactSupport": "Поддержка",
-
   "Share.Title": "Поделиться",
   "Share.Facebook": "Поделиться в Facebook",
   "Share.Twitter": "Поделиться в X",
@@ -585,18 +543,15 @@
   "Share.CopyLink": "Копировать ссылку",
   "Share.LinkCopied": "Ссылка скопирована!",
   "Share.CopyFailed": "Не удалось скопировать ссылку",
-
   "Email.PasswordReset.Subject": "Сброс пароля - Erkan Travel Plan",
   "Email.PasswordReset.Title": "Сброс пароля",
   "Email.PasswordReset.Message": "Нажмите кнопку ниже, чтобы сбросить пароль. Если вы не запрашивали это, проигнорируйте это письмо.",
   "Email.PasswordReset.ButtonText": "Сбросить пароль",
   "Email.PasswordReset.Expiry": "Эта ссылка действительна в течение 1 часа.",
-
   "Email.Verification.Subject": "Подтверждение email - Erkan Travel Plan",
   "Email.Verification.Title": "Подтвердите ваш email",
   "Email.Verification.Message": "Подтвердите свой email, чтобы активировать аккаунт и получить доступ ко всем функциям.",
   "Email.Verification.ButtonText": "Подтвердить email",
-
   "Admin.EmailAccounts.Title": "Учетные записи email",
   "Admin.EmailAccounts.Subtitle": "Управление учетными записями SMTP email",
   "Admin.EmailAccounts.AddAccount": "Новая учетная запись",
@@ -615,7 +570,6 @@
   "Admin.EmailAccounts.TestEmail": "Отправить тестовое письмо",
   "Admin.EmailAccounts.RecipientEmail": "Email получателя",
   "Admin.EmailAccounts.SendTest": "Отправить",
-
   "Admin.EmailTemplates.Title": "Шаблоны email",
   "Admin.EmailTemplates.Subtitle": "Управление шаблонами email и переводами",
   "Admin.EmailTemplates.AddTemplate": "Новый шаблон",
@@ -631,7 +585,6 @@
   "Admin.EmailTemplates.Body": "Содержимое письма",
   "Admin.EmailTemplates.NoTemplates": "Пока нет шаблонов email",
   "Admin.EmailTemplates.Preview": "Предпросмотр email",
-
   "Menu.Blog": "Блог",
   "Blog.Title": "Блог",
   "Blog.Subtitle": "Вдохновение для путешествий, путеводители и новости туризма",
@@ -664,7 +617,6 @@
   "Blog.Tags": "Теги",
   "Blog.Author": "Автор",
   "Blog.RelatedPosts": "Похожие статьи",
-
   "CompanyPage.Title": "Страницы компании",
   "CompanyPage.Create": "Новая страница",
   "CompanyPage.Edit": "Редактировать страницу",
@@ -807,7 +759,6 @@
   "Menu.Promotions": "Акции",
   "Menu.MyPromotions": "Мои акции",
   "Admin.Promotions.Title": "Управление акциями",
-
   "Watch.Title": "Отслеживание тура",
   "Watch.Button": "Отслеживать",
   "Watch.Watching": "Отслеживается",
@@ -819,7 +770,6 @@
   "Watch.Limit": "Срок отслеживания должен быть от 1 до 90 дней",
   "Watch.AlreadyWatching": "Вы уже отслеживаете этот тур",
   "Watch.MyWatches": "Мои отслеживания",
-
   "Notification.Title": "Уведомления",
   "Notification.Empty": "Нет уведомлений",
   "Notification.MarkAllRead": "Отметить все как прочитанные",
@@ -837,16 +787,13 @@
   "Notification.Reservation.Cancelled.Message": "Ваше бронирование отменено.",
   "Notification.Reservation.Completed.Title": "Тур завершен",
   "Notification.Reservation.Completed.Message": "Ваш тур завершен. Хорошего дня!",
-
   "NotificationType.Scarcity": "Дефицит",
   "NotificationType.PriceChange": "Изменение цены",
   "NotificationType.NewDate": "Новая дата",
   "NotificationType.Reservation": "Бронирование",
   "NotificationType.System": "Система",
-
   "Scarcity.Badge": "Последние {0} мест!",
   "Scarcity.LastSpots": "Последние места заполняются!",
-
   "Participant.Title": "Информация об участниках",
   "Participant.Name": "ФИО",
   "Participant.Age": "Возраст",
@@ -854,26 +801,21 @@
   "Participant.Health": "Заметка о здоровье",
   "Participant.Add": "Добавить участника",
   "Participant.Remove": "Удалить участника",
-
   "MeetingPoint.Title": "Место встречи",
   "MeetingPoint.Address": "Адрес встречи",
   "MeetingPoint.Map": "Посмотреть на карте",
   "MeetingPoint.Note": "Заметка о встрече",
-
   "QrCode.Title": "Ваш QR-код билет",
   "QrCode.Show": "Показать QR-код",
   "QrCode.Scan": "Отсканируйте этот код для входа",
-
   "DateChange.Title": "Изменить дату",
   "DateChange.SelectNew": "Выберите новую дату",
   "DateChange.Success": "Дата успешно изменена",
   "DateChange.OnlyConfirmed": "Дату можно изменить только для подтвержденных бронирований",
-
   "PhotoLink.Title": "Фотографии тура",
   "PhotoLink.View": "Просмотреть фотографии",
   "PhotoLink.Add": "Добавить ссылку на фото",
   "PhotoLink.Placeholder": "URL фотоальбома",
-
   "Guide.Title": "Управление гидами",
   "Guide.Add": "Добавить гида",
   "Guide.Edit": "Редактировать гида",
@@ -912,7 +854,6 @@
   "GuideAssignmentStatus.Pending": "Ожидание",
   "GuideAssignmentStatus.Confirmed": "Подтверждено",
   "GuideAssignmentStatus.Rejected": "Отклонено",
-
   "Calendar.Title": "Календарь туров",
   "Calendar.Today": "Сегодня",
   "Calendar.Available": "Доступно",
@@ -928,13 +869,68 @@
   "Calendar.Sat": "Сб",
   "Calendar.More": "ещё",
   "Calendar.Tour": "тур",
-
   "Analytics.Title": "Аналитика",
   "Analytics.Revenue": "Доход",
   "Analytics.Occupancy": "Заполняемость",
   "Analytics.Cancellations": "Отмены",
   "Analytics.CancellationRate": "Процент отмен (%)",
   "Analytics.TourComparison": "Сравнение туров",
-
-  "Capacity.Remaining": "осталось"
+  "Capacity.Remaining": "осталось",
+  "Message.MyMessages": "Мои сообщения",
+  "Message.NewConversation": "Новое сообщение",
+  "Message.Conversations": "Беседы",
+  "Message.SelectConversation": "Выберите беседу или отправьте новое сообщение",
+  "Message.NoConversations": "Пока нет бесед",
+  "Message.ConversationClosed": "Эта беседа закрыта",
+  "Message.SelectCompany": "Выберите компанию",
+  "Message.RelatedTour": "Связанный тур (необязательно)",
+  "Message.NoTourSelected": "Тур не выбран",
+  "Message.Subject": "Тема",
+  "Message.FirstMessage": "Ваше сообщение",
+  "Message.Send": "Отправить",
+  "Message.TypeMessage": "Введите сообщение...",
+  "Message.ConversationCreated": "Беседа создана",
+  "Message.FillRequired": "Заполните все обязательные поля",
+  "Message.LoadError": "Не удалось загрузить беседы",
+  "Message.LoadMessagesError": "Не удалось загрузить сообщения",
+  "Message.SendError": "Не удалось отправить сообщение",
+  "Message.CreateError": "Не удалось создать беседу",
+  "Menu.Messages": "Мои сообщения",
+  "MessageSenderType.Visitor": "Посетитель",
+  "MessageSenderType.Company": "Компания",
+  "MessageTemplate.Title": "Шаблоны быстрых ответов",
+  "MessageTemplate.Add": "Добавить шаблон",
+  "MessageTemplate.Edit": "Редактировать шаблон",
+  "MessageTemplate.Delete": "Удалить шаблон",
+  "MessageTemplate.Name": "Название шаблона",
+  "MessageTemplate.Content": "Содержание",
+  "MessageTemplate.Order": "Порядок",
+  "MessageTemplate.Usage": "Использование",
+  "MessageTemplate.UseTemplate": "Быстрый ответ",
+  "MessageTemplate.NoTemplates": "Шаблоны еще не добавлены",
+  "NotificationPref.Title": "Настройки уведомлений",
+  "NotificationPref.Description": "Выберите способ получения уведомлений",
+  "NotificationPref.Email": "Уведомления по email",
+  "NotificationPref.WhatsApp": "Уведомления WhatsApp",
+  "NotificationPref.SMS": "SMS уведомления",
+  "NotificationPref.Saved": "Настройки уведомлений сохранены",
+  "NotificationPref.EmailDesc": "Получать уведомления по email",
+  "NotificationPref.WhatsAppDesc": "Получать уведомления через WhatsApp",
+  "NotificationPref.SMSDesc": "Получать уведомления по SMS",
+  "Push.Subscribe": "Включить уведомления",
+  "Push.Subscribed": "Уведомления включены",
+  "Push.NotSupported": "Push-уведомления не поддерживаются",
+  "Push.PermissionDenied": "Разрешение на уведомления отклонено",
+  "Push.SubscribeSuccess": "Push-уведомления включены",
+  "Push.SubscribeFailed": "Ошибка подписки",
+  "Push.UnsubscribeSuccess": "Push-уведомления отключены",
+  "Push.UnsubscribeFailed": "Ошибка отписки",
+  "Weather.Alert.Title": "Прогноз погоды",
+  "Weather.Alert.RainMessage": "На завтра ожидается дождь. Не забудьте зонт!",
+  "Weather.Recommendation.Rainy": "Ожидается дождь, возьмите зонт и дождевик",
+  "Weather.Recommendation.VeryHot": "Очень жарко, пейте воду и используйте крем от солнца",
+  "Weather.Recommendation.Hot": "Жаркая погода, носите легкую одежду",
+  "Weather.Recommendation.Cold": "Холодная погода, оденьтесь тепло",
+  "Weather.Recommendation.Windy": "Ветрено, наденьте ветрозащитную одежду",
+  "Weather.Recommendation.Good": "Погода подходит для тура, приятного отдыха!"
 }

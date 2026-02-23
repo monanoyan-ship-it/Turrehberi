@@ -22,7 +22,6 @@
   "Common.Error": "Fehler",
   "Common.Success": "Erfolg",
   "Common.Required": "Erforderlich",
-
   "Menu.Home": "Startseite",
   "Menu.Tours": "Touren",
   "Menu.Companies": "Unternehmen",
@@ -35,7 +34,6 @@
   "Menu.CompanyPanel": "Firmenpanel",
   "Menu.AdminPanel": "Admin-Panel",
   "Menu.MyReservations": "Meine Reservierungen",
-
   "Register.Title": "Registrieren",
   "Register.Subtitle": "Neues Konto erstellen",
   "Register.AccountType": "Kontotyp",
@@ -65,7 +63,6 @@
   "Register.Submit": "Registrieren",
   "Register.HasAccount": "Haben Sie bereits ein Konto?",
   "Register.Success": "Registrierung erfolgreich! Willkommen {0}",
-
   "Register.Error.FirstNameRequired": "Vorname ist erforderlich",
   "Register.Error.LastNameRequired": "Nachname ist erforderlich",
   "Register.Error.NameRequired": "Vor- und Nachname sind erforderlich",
@@ -76,7 +73,6 @@
   "Register.Error.CompanyNameRequired": "Firmenname ist erforderlich",
   "Register.Error.TaxNumberRequired": "Steuernummer ist erforderlich",
   "Register.Error.Failed": "Registrierung fehlgeschlagen",
-
   "Login.Title": "Anmelden",
   "Login.Subtitle": "Melden Sie sich bei Ihrem Konto an",
   "Login.Email": "E-Mail",
@@ -87,7 +83,6 @@
   "Login.RememberMe": "Angemeldet bleiben",
   "Login.Error.Required": "E-Mail und Passwort sind erforderlich",
   "Login.Error.Invalid": "Ungultige E-Mail oder Passwort",
-
   "Tour.Name": "Tourname",
   "Tour.Description": "Beschreibung",
   "Tour.Destination": "Reiseziel",
@@ -98,7 +93,6 @@
   "Tour.Featured": "Empfohlen",
   "Tour.Book": "Jetzt buchen",
   "Tour.Details": "Details",
-
   "Company.Name": "Firmenname",
   "Company.Description": "Beschreibung",
   "Company.Email": "E-Mail",
@@ -106,7 +100,6 @@
   "Company.Address": "Adresse",
   "Company.Website": "Webseite",
   "Company.TaxNumber": "Steuernummer",
-
   "Reservation.Tour": "Tour",
   "Reservation.StartDate": "Startdatum",
   "Reservation.EndDate": "Enddatum",
@@ -114,17 +107,14 @@
   "Reservation.TotalPrice": "Gesamtpreis",
   "Reservation.Status": "Status",
   "Reservation.Notes": "Notizen",
-
   "Status.Pending": "Ausstehend",
   "Status.Confirmed": "Bestatigt",
   "Status.Cancelled": "Storniert",
   "Status.Completed": "Abgeschlossen",
-
   "UserType.Visitor": "Besucher",
   "UserType.CompanyOwner": "Firmeninhaber",
   "UserType.Staff": "Mitarbeiter",
   "UserType.Admin": "Systemadministrator",
-
   "Placeholder.Email": "beispiel@email.com",
   "Placeholder.Phone": "Telefonnummer",
   "Placeholder.CompanyPhone": "Firmentelefon",
@@ -134,28 +124,22 @@
   "Placeholder.TaxNumber": "Ihre Steuernummer",
   "Placeholder.Address": "Firmenadresse",
   "Placeholder.Website": "www.ihrefirma.com",
-
   "Footer.Rights": "Alle Rechte vorbehalten",
   "Footer.Contact": "Kontakt",
-
   "Language.Select": "Sprache wahlen",
-
   "CompanyStatus.Pending": "Ausstehend",
   "CompanyStatus.Approved": "Genehmigt",
   "CompanyStatus.Rejected": "Abgelehnt",
   "CompanyStatus.Suspended": "Ausgesetzt",
-
   "TravelType.Solo": "Alleinreisend",
   "TravelType.Couple": "Paar",
   "TravelType.Family": "Familie",
   "TravelType.Friends": "Freunde",
   "TravelType.Business": "Geschaftsreise",
-
   "ReviewStatus.Pending": "Ausstehend",
   "ReviewStatus.Approved": "Veroffentlicht",
   "ReviewStatus.Rejected": "Abgelehnt",
   "ReviewStatus.Flagged": "In Prufung",
-
   "ReportReason.Spam": "Spam oder Werbung",
   "ReportReason.Inappropriate": "Unangemessener Inhalt",
   "ReportReason.FakeReview": "Gefalschte Bewertung",
@@ -164,7 +148,6 @@
   "ReportReason.OffTopic": "Themenfremd",
   "ReportReason.CopyrightViolation": "Urheberrechtsverletzung",
   "ReportReason.Other": "Sonstiges",
-
   "Review.Title": "Bewertungen",
   "Review.WriteReview": "Bewertung schreiben",
   "Review.YourReview": "Ihre Bewertung",
@@ -204,23 +187,19 @@
   "Review.Stars": "{0} Sterne",
   "Review.ThankYou": "Danke fur Ihre Bewertung!",
   "Review.PendingApproval": "Ihre Bewertung wird gepruft",
-
   "Review.Error.AlreadyReviewed": "Sie haben diese Tour bereits bewertet",
   "Review.Error.RatingRequired": "Bitte geben Sie eine Bewertung ab",
   "Review.Error.CommentRequired": "Bitte schreiben Sie eine Bewertung",
   "Review.Error.LoginRequired": "Bitte melden Sie sich an",
-
   "Company.ApplicationNotes": "Anmerkungen",
   "Company.ApplicationNotesHint": "Zusatzliche Informationen zu Ihrem Antrag",
   "Company.PendingApproval": "Antrag wird gepruft",
   "Company.PendingMessage": "Ihr Antrag wird gepruft. Nach der Genehmigung konnen Sie Touren hinzufugen.",
-
   "Error.CompanyNotApproved": "Sie konnen keine Touren verwalten, bis Ihr Unternehmen genehmigt wurde",
   "Error.CompanyPending": "Ihr Antrag wird gepruft. Nach der Genehmigung konnen Sie Touren hinzufugen.",
   "Error.CompanyRejected": "Ihr Antrag wurde abgelehnt",
   "Error.CompanySuspended": "Ihr Unternehmen wurde ausgesetzt",
   "Error.NotCompanyOwner": "Sie sind kein Firmeninhaber",
-
   "Contract.Title": "Vertrag",
   "Contract.Upload": "Vertrag hochladen",
   "Contract.Download": "Vertrag herunterladen",
@@ -239,7 +218,6 @@
   "Contract.Success.Uploaded": "Vertrag erfolgreich hochgeladen",
   "Contract.Success.Deleted": "Vertrag erfolgreich geloscht",
   "Contract.Confirm.Delete": "Sind Sie sicher, dass Sie diesen Vertrag loschen mochten?",
-
   "Admin.Reviews.Title": "Bewertungsmoderation",
   "Admin.Reviews.All": "Alle",
   "Admin.Reviews.Pending": "Ausstehend",
@@ -259,7 +237,6 @@
   "Admin.Reviews.ConfirmApprove": "Sind Sie sicher, dass Sie diese Bewertung genehmigen mochten?",
   "Admin.Reviews.ConfirmReject": "Sind Sie sicher, dass Sie diese Bewertung ablehnen mochten?",
   "Admin.Reviews.ConfirmFlag": "Sind Sie sicher, dass Sie diese Bewertung markieren mochten?",
-
   "CompanyProfile.Title": "Firmenprofil",
   "CompanyProfile.About": "Uber uns",
   "CompanyProfile.OurTours": "Unsere Touren",
@@ -285,7 +262,6 @@
   "CompanyProfile.Recommends": "Empfiehlt",
   "CompanyProfile.NotFound": "Unternehmen nicht gefunden",
   "CompanyProfile.BackToList": "Zuruck zur Liste",
-
   "Menu.Dashboard": "Dashboard",
   "Dashboard.Title": "Dashboard",
   "Dashboard.Welcome": "Willkommen!",
@@ -308,7 +284,6 @@
   "Dashboard.Revenue": "Umsatz",
   "Dashboard.Rating": "Bewertung",
   "Dashboard.Reviews": "Bewertungen",
-
   "MyTours.Title": "Meine Touren",
   "MyTours.AddTour": "Neue Tour hinzufugen",
   "MyTours.EditTour": "Tour bearbeiten",
@@ -336,7 +311,6 @@
   "MyTours.PhotoDeleteSuccess": "Foto erfolgreich gelöscht",
   "MyTours.CoverPhotoUpdated": "Titelbild aktualisiert",
   "MyTours.FeaturedInfo": "Diese Tour ist als empfohlen markiert. Diese Einstellung kann nur von einem Administrator geändert werden.",
-
   "MyReservations.Title": "Meine Buchungen",
   "MyReservations.Total": "Gesamt",
   "MyReservations.Customer": "Kunde",
@@ -345,7 +319,6 @@
   "MyReservations.ConfirmSuccess": "Buchung bestatigt",
   "MyReservations.CancelSuccess": "Buchung storniert",
   "MyReservations.CompleteSuccess": "Buchung abgeschlossen",
-
   "MyReviews.Title": "Bewertungen",
   "MyReviews.Total": "Bewertungen gesamt",
   "MyReviews.AwaitingReply": "Warten auf Antwort",
@@ -353,7 +326,6 @@
   "MyReviews.NoReviews": "Noch keine Bewertungen",
   "MyReviews.SendReply": "Antwort senden",
   "MyReviews.ReplySuccess": "Antwort erfolgreich gesendet",
-
   "Profile.Title": "Profil",
   "Profile.PersonalInfo": "Personliche Informationen",
   "Profile.EditProfile": "Profil bearbeiten",
@@ -372,7 +344,6 @@
   "Profile.NewPasswordRequired": "Neues Passwort ist erforderlich",
   "Profile.EmailReadonly": "E-Mail-Adresse kann nicht geandert werden",
   "Profile.LoginRequired": "Sie mussen sich anmelden",
-
   "Tours.Subtitle": "Finden Sie die perfekte Tour und starten Sie Ihren Traumurlaub!",
   "Tours.SearchPlaceholder": "Touren suchen (Name, Ziel, Beschreibung)...",
   "Tours.AdvancedFilters": "Erweiterte Filter",
@@ -402,7 +373,6 @@
   "Tour.Days": "Tage",
   "Common.Min": "Min",
   "Common.Max": "Max",
-
   "ForgotPassword.Title": "Passwort vergessen",
   "ForgotPassword.Subtitle": "Geben Sie Ihre E-Mail-Adresse ein und wir senden Ihnen einen Link zum Zurucksetzen des Passworts",
   "ForgotPassword.SendLink": "Link senden",
@@ -411,7 +381,6 @@
   "ForgotPassword.BackToLogin": "Zuruck zur Anmeldung",
   "ForgotPassword.EmailRequired": "E-Mail-Adresse ist erforderlich",
   "ForgotPassword.InvalidEmail": "Bitte geben Sie eine gultige E-Mail-Adresse ein",
-
   "ResetPassword.Title": "Neues Passwort festlegen",
   "ResetPassword.Subtitle": "Geben Sie Ihr neues Passwort ein",
   "ResetPassword.InvalidToken": "Ungultiger oder abgelaufener Link zum Zurucksetzen des Passworts",
@@ -420,7 +389,6 @@
   "ResetPassword.SetPassword": "Passwort andern",
   "ResetPassword.Success": "Ihr Passwort wurde erfolgreich geandert!",
   "ResetPassword.CanLogin": "Sie konnen sich jetzt mit Ihrem neuen Passwort anmelden",
-
   "VerifyEmail.Title": "E-Mail-Verifizierung",
   "VerifyEmail.Checking": "Ihre E-Mail-Adresse wird verifiziert...",
   "VerifyEmail.Success": "Ihre E-Mail wurde erfolgreich verifiziert!",
@@ -436,7 +404,6 @@
   "VerifyEmail.Description": "Verifizieren Sie Ihre E-Mail-Adresse, um Ihr Konto zu sichern.",
   "VerifyEmail.SendLink": "Verifizierungslink senden",
   "VerifyEmail.LinkSent": "Verifizierungslink wurde an Ihre E-Mail gesendet.",
-
   "Avatar.Upload": "Foto hochladen",
   "Avatar.Delete": "Foto loschen",
   "Avatar.MaxSize": "Dateigrose darf 2MB nicht uberschreiten",
@@ -444,7 +411,6 @@
   "Avatar.UploadSuccess": "Profilfoto erfolgreich hochgeladen",
   "Avatar.DeleteSuccess": "Profilfoto erfolgreich geloscht",
   "Avatar.DeleteConfirm": "Sind Sie sicher, dass Sie Ihr Profilfoto loschen mochten?",
-
   "Gallery.Title": "Galerie",
   "Gallery.Upload": "Bild hochladen",
   "Gallery.Delete": "Bild loschen",
@@ -466,14 +432,12 @@
   "Gallery.ReorderSuccess": "Reihenfolge aktualisiert",
   "Gallery.SelectFile": "Bild auswahlen",
   "Gallery.DragDrop": "oder ziehen und ablegen",
-
   "ReviewImage.Upload": "Foto hochladen",
   "ReviewImage.Delete": "Foto loschen",
   "ReviewImage.MaxImages": "Maximal 5 Fotos pro Bewertung",
   "ReviewImage.UploadSuccess": "Foto hochgeladen",
   "ReviewImage.DeleteSuccess": "Foto geloscht",
   "ReviewImage.Caption": "Fotobeschreibung",
-
   "Companies.Subtitle": "Entdecken Sie unsere vertrauenswurdigen Reiseunternehmen",
   "Companies.CompanyCount": "Unternehmen",
   "Companies.SearchPlaceholder": "Unternehmen suchen (Name, Stadt, Beschreibung)...",
@@ -490,7 +454,6 @@
   "Companies.NoResults": "Keine Unternehmen gefunden",
   "Companies.TryDifferentSearch": "Versuchen Sie andere Suchkriterien",
   "Companies.ClearFilters": "Filter loschen",
-
   "MyReservations.Subtitle": "Verfolgen Sie alle Ihre Reservierungen hier",
   "MyReservations.NewReservation": "Neue Reservierung",
   "MyReservations.ExploreMessage": "Entdecken Sie eine Tour und machen Sie jetzt eine Reservierung!",
@@ -507,7 +470,6 @@
   "MyReservations.NoBrowsedReservations": "Keine angesehenen vergangenen Reservierungen",
   "MyReservations.NoCompletedReservations": "Sie haben keine abgeschlossenen Reservierungen",
   "MyReservations.NoCancelledReservations": "Sie haben keine stornierten Reservierungen",
-
   "ReservationDetail.Title": "Reservierungsdetails",
   "ReservationDetail.ViewTour": "Tour anzeigen",
   "ReservationDetail.ReservationInfo": "Reservierungsinformationen",
@@ -522,7 +484,6 @@
   "ReservationDetail.CancelConfirm": "Sind Sie sicher, dass Sie diese Reservierung stornieren mochten?",
   "ReservationDetail.CancelSuccess": "Reservierung erfolgreich storniert",
   "ReservationDetail.NotFound": "Reservierung nicht gefunden",
-
   "Favorites.Title": "Meine Lieblingstouren",
   "Favorites.Subtitle": "Touren, die Ihnen gefallen, werden hier aufgelistet",
   "Favorites.Tours": "Tour",
@@ -536,7 +497,6 @@
   "Common.LoginRequired": "Bitte melden Sie sich an",
   "Common.File": "Datei",
   "Common.Upload": "Hochladen",
-
   "Email.Greeting": "Hallo {0},",
   "Email.ReservationConfirmed.Subject": "Ihre Reservierung ist bestatigt - Erkan Reiseplan",
   "Email.ReservationConfirmed.Title": "Ihre Reservierung ist bestatigt!",
@@ -558,7 +518,6 @@
   "Email.ThankYou": "Vielen Dank, dass Sie sich fur uns entschieden haben. Gute Reise!",
   "Email.ContactUs": "Bei Fragen kontaktieren Sie uns bitte.",
   "Email.Reason": "Grund",
-
   "Payment.Title": "Zahlung",
   "Payment.PayNow": "Jetzt bezahlen",
   "Payment.Processing": "Wird verarbeitet...",
@@ -575,7 +534,6 @@
   "Payment.ExploreTours": "Andere Touren entdecken",
   "Payment.TryAgain": "Erneut versuchen",
   "Payment.ContactSupport": "Support",
-
   "Share.Title": "Teilen",
   "Share.Facebook": "Auf Facebook teilen",
   "Share.Twitter": "Auf X teilen",
@@ -585,18 +543,15 @@
   "Share.CopyLink": "Link kopieren",
   "Share.LinkCopied": "Link in die Zwischenablage kopiert!",
   "Share.CopyFailed": "Link konnte nicht kopiert werden",
-
   "Email.PasswordReset.Subject": "Passwort zurucksetzen - Erkan Reiseplan",
   "Email.PasswordReset.Title": "Passwort zurucksetzen",
   "Email.PasswordReset.Message": "Klicken Sie auf die Schaltflache unten, um Ihr Passwort zuruckzusetzen. Wenn Sie dies nicht angefordert haben, ignorieren Sie diese E-Mail.",
   "Email.PasswordReset.ButtonText": "Passwort zurucksetzen",
   "Email.PasswordReset.Expiry": "Dieser Link ist 1 Stunde gultig.",
-
   "Email.Verification.Subject": "E-Mail-Verifizierung - Erkan Reiseplan",
   "Email.Verification.Title": "Bestatigen Sie Ihre E-Mail-Adresse",
   "Email.Verification.Message": "Bestatigen Sie Ihre E-Mail-Adresse, um Ihr Konto zu aktivieren und alle Funktionen zu nutzen.",
   "Email.Verification.ButtonText": "E-Mail bestatigen",
-
   "Admin.EmailAccounts.Title": "E-Mail-Konten",
   "Admin.EmailAccounts.Subtitle": "SMTP E-Mail-Konten verwalten",
   "Admin.EmailAccounts.AddAccount": "Neues Konto",
@@ -615,7 +570,6 @@
   "Admin.EmailAccounts.TestEmail": "Test-E-Mail senden",
   "Admin.EmailAccounts.RecipientEmail": "Empfanger-E-Mail-Adresse",
   "Admin.EmailAccounts.SendTest": "Senden",
-
   "Admin.EmailTemplates.Title": "E-Mail-Vorlagen",
   "Admin.EmailTemplates.Subtitle": "E-Mail-Vorlagen und Ubersetzungsinhalte verwalten",
   "Admin.EmailTemplates.AddTemplate": "Neue Vorlage",
@@ -631,7 +585,6 @@
   "Admin.EmailTemplates.Body": "E-Mail-Inhalt",
   "Admin.EmailTemplates.NoTemplates": "Noch keine E-Mail-Vorlagen",
   "Admin.EmailTemplates.Preview": "E-Mail-Vorschau",
-
   "Menu.Blog": "Blog",
   "Blog.Title": "Blog",
   "Blog.Subtitle": "Reiseinspiration, Reisefuhrer und Tourismusnachrichten",
@@ -664,7 +617,6 @@
   "Blog.Tags": "Tags",
   "Blog.Author": "Autor",
   "Blog.RelatedPosts": "Ahnliche Beitrage",
-
   "CompanyPage.Title": "Unternehmensseiten",
   "CompanyPage.Create": "Neue Seite",
   "CompanyPage.Edit": "Seite bearbeiten",
@@ -807,7 +759,6 @@
   "Menu.Promotions": "Aktionen",
   "Menu.MyPromotions": "Meine Aktionen",
   "Admin.Promotions.Title": "Aktionsverwaltung",
-
   "Watch.Title": "Tour-Beobachtung",
   "Watch.Button": "Beobachten",
   "Watch.Watching": "Wird beobachtet",
@@ -819,7 +770,6 @@
   "Watch.Limit": "Beobachtungszeitraum muss zwischen 1-90 Tagen liegen",
   "Watch.AlreadyWatching": "Sie beobachten diese Tour bereits",
   "Watch.MyWatches": "Meine Beobachtungen",
-
   "Notification.Title": "Benachrichtigungen",
   "Notification.Empty": "Keine Benachrichtigungen",
   "Notification.MarkAllRead": "Alle als gelesen markieren",
@@ -837,16 +787,13 @@
   "Notification.Reservation.Cancelled.Message": "Ihre Reservierung wurde storniert.",
   "Notification.Reservation.Completed.Title": "Tour abgeschlossen",
   "Notification.Reservation.Completed.Message": "Ihre Tour ist abgeschlossen. Schonen Tag noch!",
-
   "NotificationType.Scarcity": "Knappheit",
   "NotificationType.PriceChange": "Preisanderung",
   "NotificationType.NewDate": "Neues Datum",
   "NotificationType.Reservation": "Reservierung",
   "NotificationType.System": "System",
-
   "Scarcity.Badge": "Letzte {0} Platze!",
   "Scarcity.LastSpots": "Letzte Platze werden gefullt!",
-
   "Participant.Title": "Teilnehmerinformationen",
   "Participant.Name": "Vollstandiger Name",
   "Participant.Age": "Alter",
@@ -854,26 +801,21 @@
   "Participant.Health": "Gesundheitshinweis",
   "Participant.Add": "Teilnehmer hinzufugen",
   "Participant.Remove": "Teilnehmer entfernen",
-
   "MeetingPoint.Title": "Treffpunkt",
   "MeetingPoint.Address": "Treffpunktadresse",
   "MeetingPoint.Map": "Auf Karte anzeigen",
   "MeetingPoint.Note": "Treffpunkthinweis",
-
   "QrCode.Title": "Ihr QR-Code-Ticket",
   "QrCode.Show": "QR-Code anzeigen",
   "QrCode.Scan": "Scannen Sie diesen Code fur den Einlass",
-
   "DateChange.Title": "Datum andern",
   "DateChange.SelectNew": "Neues Datum wahlen",
   "DateChange.Success": "Datum erfolgreich geandert",
   "DateChange.OnlyConfirmed": "Datum kann nur fur bestatigte Reservierungen geandert werden",
-
   "PhotoLink.Title": "Tour-Fotos",
   "PhotoLink.View": "Fotos ansehen",
   "PhotoLink.Add": "Foto-Link hinzufugen",
   "PhotoLink.Placeholder": "Fotoalbum-URL",
-
   "Guide.Title": "Reiseleiter-Verwaltung",
   "Guide.Add": "Reiseleiter hinzufügen",
   "Guide.Edit": "Reiseleiter bearbeiten",
@@ -912,7 +854,6 @@
   "GuideAssignmentStatus.Pending": "Ausstehend",
   "GuideAssignmentStatus.Confirmed": "Bestätigt",
   "GuideAssignmentStatus.Rejected": "Abgelehnt",
-
   "Calendar.Title": "Tourkalender",
   "Calendar.Today": "Heute",
   "Calendar.Available": "Verfügbar",
@@ -928,13 +869,68 @@
   "Calendar.Sat": "Sa",
   "Calendar.More": "mehr",
   "Calendar.Tour": "Tour",
-
   "Analytics.Title": "Analytik",
   "Analytics.Revenue": "Umsatz",
   "Analytics.Occupancy": "Auslastung",
   "Analytics.Cancellations": "Stornierungsrate",
   "Analytics.CancellationRate": "Stornierungsrate (%)",
   "Analytics.TourComparison": "Tourvergleich",
-
-  "Capacity.Remaining": "verbleibend"
+  "Capacity.Remaining": "verbleibend",
+  "Message.MyMessages": "Meine Nachrichten",
+  "Message.NewConversation": "Neue Nachricht",
+  "Message.Conversations": "Unterhaltungen",
+  "Message.SelectConversation": "Wahlen Sie eine Unterhaltung oder senden Sie eine neue Nachricht",
+  "Message.NoConversations": "Noch keine Unterhaltungen",
+  "Message.ConversationClosed": "Diese Unterhaltung ist geschlossen",
+  "Message.SelectCompany": "Unternehmen auswahlen",
+  "Message.RelatedTour": "Zugehorige Tour (Optional)",
+  "Message.NoTourSelected": "Keine Tour ausgewahlt",
+  "Message.Subject": "Betreff",
+  "Message.FirstMessage": "Ihre Nachricht",
+  "Message.Send": "Senden",
+  "Message.TypeMessage": "Nachricht eingeben...",
+  "Message.ConversationCreated": "Unterhaltung erstellt",
+  "Message.FillRequired": "Bitte fullen Sie alle Felder aus",
+  "Message.LoadError": "Unterhaltungen konnten nicht geladen werden",
+  "Message.LoadMessagesError": "Nachrichten konnten nicht geladen werden",
+  "Message.SendError": "Nachricht konnte nicht gesendet werden",
+  "Message.CreateError": "Unterhaltung konnte nicht erstellt werden",
+  "Menu.Messages": "Meine Nachrichten",
+  "MessageSenderType.Visitor": "Besucher",
+  "MessageSenderType.Company": "Unternehmen",
+  "MessageTemplate.Title": "Schnellantwort-Vorlagen",
+  "MessageTemplate.Add": "Vorlage hinzufugen",
+  "MessageTemplate.Edit": "Vorlage bearbeiten",
+  "MessageTemplate.Delete": "Vorlage loschen",
+  "MessageTemplate.Name": "Vorlagenname",
+  "MessageTemplate.Content": "Inhalt",
+  "MessageTemplate.Order": "Reihenfolge",
+  "MessageTemplate.Usage": "Verwendung",
+  "MessageTemplate.UseTemplate": "Schnellantwort",
+  "MessageTemplate.NoTemplates": "Noch keine Vorlagen hinzugefugt",
+  "NotificationPref.Title": "Benachrichtigungseinstellungen",
+  "NotificationPref.Description": "Wählen Sie wie Sie Benachrichtigungen erhalten möchten",
+  "NotificationPref.Email": "E-Mail-Benachrichtigungen",
+  "NotificationPref.WhatsApp": "WhatsApp-Benachrichtigungen",
+  "NotificationPref.SMS": "SMS-Benachrichtigungen",
+  "NotificationPref.Saved": "Benachrichtigungseinstellungen gespeichert",
+  "NotificationPref.EmailDesc": "Benachrichtigungen per E-Mail erhalten",
+  "NotificationPref.WhatsAppDesc": "Benachrichtigungen per WhatsApp erhalten",
+  "NotificationPref.SMSDesc": "Benachrichtigungen per SMS erhalten",
+  "Push.Subscribe": "Benachrichtigungen aktivieren",
+  "Push.Subscribed": "Benachrichtigungen aktiv",
+  "Push.NotSupported": "Push-Benachrichtigungen nicht unterstützt",
+  "Push.PermissionDenied": "Benachrichtigungsberechtigung verweigert",
+  "Push.SubscribeSuccess": "Push-Benachrichtigungen aktiviert",
+  "Push.SubscribeFailed": "Push-Abonnement fehlgeschlagen",
+  "Push.UnsubscribeSuccess": "Push-Benachrichtigungen deaktiviert",
+  "Push.UnsubscribeFailed": "Abmeldung fehlgeschlagen",
+  "Weather.Alert.Title": "Wetterwarnung",
+  "Weather.Alert.RainMessage": "Für morgen wird Regen erwartet. Vergessen Sie Ihren Regenschirm nicht!",
+  "Weather.Recommendation.Rainy": "Regen erwartet, bringen Sie einen Regenschirm mit",
+  "Weather.Recommendation.VeryHot": "Sehr heiß, trinken Sie viel Wasser",
+  "Weather.Recommendation.Hot": "Heißes Wetter, tragen Sie leichte Kleidung",
+  "Weather.Recommendation.Cold": "Kaltes Wetter, ziehen Sie sich warm an",
+  "Weather.Recommendation.Windy": "Windig, tragen Sie windfeste Kleidung",
+  "Weather.Recommendation.Good": "Wetterbedingungen sind geeignet, viel Spaß!"
 }

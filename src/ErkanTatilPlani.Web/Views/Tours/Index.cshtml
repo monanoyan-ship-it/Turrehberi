@@ -381,6 +381,26 @@
                             <dd class="col-sm-8" data-bind="text: description || '-'"></dd>
                         </dl>
 
+                        <!-- Hava Durumu Widget -->
+                        <div id="weatherWidget" class="card border-info mb-3" style="display: none;">
+                            <div class="card-body py-2">
+                                <div class="d-flex align-items-center justify-content-between">
+                                    <div class="d-flex align-items-center">
+                                        <img id="weatherIcon" src="" alt="weather" style="width: 40px; height: 40px;" />
+                                        <div class="ms-2">
+                                            <strong id="weatherTemp"></strong>
+                                            <small id="weatherCondition" class="d-block text-muted"></small>
+                                        </div>
+                                    </div>
+                                    <div class="text-end small">
+                                        <span id="weatherHumidity" class="text-muted"></span><br />
+                                        <span id="weatherWind" class="text-muted"></span>
+                                    </div>
+                                </div>
+                                <div id="weatherRecommendation" class="mt-1 small"></div>
+                            </div>
+                        </div>
+
                         <!-- Puan Ozeti -->
                         <div class="card bg-light">
                             <div class="card-body">
@@ -1805,7 +1825,38 @@ function ToursViewModel() {
             platforms: ['facebook', 'twitter', 'whatsapp', 'telegram', 'copy']
         }));
 
+        // Hava durumu yukle
+        self.loadWeather(tour.id);
+
         detailsModal.show();
+    };
+
+    // Hava durumu widget'i
+    self.loadWeather = function(tourId) {
+        $('#weatherWidget').hide();
+        $.ajax({
+            url: apiBaseUrl + '/api/weather/tour/' + tourId,
+            method: 'GET'
+        }).done(function(data) {
+            if (data) {
+                var iconUrl = 'https://openweathermap.org/img/wn/' + (data.icon || '01d') + '@@2x.png';
+                $('#weatherIcon').attr('src', iconUrl);
+                $('#weatherTemp').text(data.temperature + '\u00B0C');
+                $('#weatherCondition').text(data.condition);
+                $('#weatherHumidity').html('<i class="bi bi-droplet"></i> ' + data.humidity + '%');
+                $('#weatherWind').html('<i class="bi bi-wind"></i> ' + data.windSpeed + ' m/s');
+
+                var recText = T(data.recommendation) || '';
+                if (recText) {
+                    var alertClass = data.isRainy ? 'text-warning' : 'text-success';
+                    $('#weatherRecommendation').html('<i class="bi bi-info-circle ' + alertClass + '"></i> <span class="' + alertClass + '">' + recText + '</span>');
+                } else {
+                    $('#weatherRecommendation').empty();
+                }
+
+                $('#weatherWidget').show();
+            }
+        });
     };
 
     // Yorum yazma modali

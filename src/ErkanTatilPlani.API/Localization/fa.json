@@ -22,7 +22,6 @@
   "Common.Error": "خطا",
   "Common.Success": "موفقیت",
   "Common.Required": "الزامی",
-
   "Menu.Home": "خانه",
   "Menu.Tours": "تورها",
   "Menu.Companies": "شرکت‌ها",
@@ -35,7 +34,6 @@
   "Menu.CompanyPanel": "پنل شرکت",
   "Menu.AdminPanel": "پنل مدیریت",
   "Menu.MyReservations": "رزروهای من",
-
   "Register.Title": "ثبت نام",
   "Register.Subtitle": "یک حساب جدید بسازید",
   "Register.AccountType": "نوع حساب",
@@ -65,7 +63,6 @@
   "Register.Submit": "ثبت نام",
   "Register.HasAccount": "قبلاً حساب دارید؟",
   "Register.Success": "ثبت نام موفق! خوش آمدید {0}",
-
   "Register.Error.FirstNameRequired": "نام الزامی است",
   "Register.Error.LastNameRequired": "نام خانوادگی الزامی است",
   "Register.Error.NameRequired": "نام و نام خانوادگی الزامی است",
@@ -76,7 +73,6 @@
   "Register.Error.CompanyNameRequired": "نام شرکت الزامی است",
   "Register.Error.TaxNumberRequired": "شماره مالیاتی الزامی است",
   "Register.Error.Failed": "ثبت نام ناموفق",
-
   "Login.Title": "ورود",
   "Login.Subtitle": "وارد حساب خود شوید",
   "Login.Email": "ایمیل",
@@ -87,7 +83,6 @@
   "Login.RememberMe": "مرا به خاطر بسپار",
   "Login.Error.Required": "ایمیل و رمز عبور الزامی است",
   "Login.Error.Invalid": "ایمیل یا رمز عبور نامعتبر",
-
   "Tour.Name": "نام تور",
   "Tour.Description": "توضیحات",
   "Tour.Destination": "مقصد",
@@ -98,7 +93,6 @@
   "Tour.Featured": "ویژه",
   "Tour.Book": "رزرو کنید",
   "Tour.Details": "جزئیات",
-
   "Company.Name": "نام شرکت",
   "Company.Description": "توضیحات",
   "Company.Email": "ایمیل",
@@ -106,7 +100,6 @@
   "Company.Address": "آدرس",
   "Company.Website": "وب‌سایت",
   "Company.TaxNumber": "شماره مالیاتی",
-
   "Reservation.Tour": "تور",
   "Reservation.StartDate": "تاریخ شروع",
   "Reservation.EndDate": "تاریخ پایان",
@@ -114,17 +107,14 @@
   "Reservation.TotalPrice": "قیمت کل",
   "Reservation.Status": "وضعیت",
   "Reservation.Notes": "یادداشت‌ها",
-
   "Status.Pending": "در انتظار",
   "Status.Confirmed": "تایید شده",
   "Status.Cancelled": "لغو شده",
   "Status.Completed": "تکمیل شده",
-
   "UserType.Visitor": "بازدیدکننده",
   "UserType.CompanyOwner": "صاحب شرکت",
   "UserType.Staff": "کارمند",
   "UserType.Admin": "مدیر سیستم",
-
   "Placeholder.Email": "example@email.com",
   "Placeholder.Phone": "شماره تلفن",
   "Placeholder.CompanyPhone": "تلفن شرکت",
@@ -134,28 +124,22 @@
   "Placeholder.TaxNumber": "شماره مالیاتی شما",
   "Placeholder.Address": "آدرس شرکت",
   "Placeholder.Website": "www.yourcompany.com",
-
   "Footer.Rights": "تمامی حقوق محفوظ است",
   "Footer.Contact": "تماس با ما",
-
   "Language.Select": "زبان را انتخاب کنید",
-
   "CompanyStatus.Pending": "در انتظار تایید",
   "CompanyStatus.Approved": "تایید شده",
   "CompanyStatus.Rejected": "رد شده",
   "CompanyStatus.Suspended": "معلق",
-
   "TravelType.Solo": "تنها",
   "TravelType.Couple": "زوج",
   "TravelType.Family": "خانواده",
   "TravelType.Friends": "دوستان",
   "TravelType.Business": "کاری",
-
   "ReviewStatus.Pending": "در انتظار بررسی",
   "ReviewStatus.Approved": "منتشر شده",
   "ReviewStatus.Rejected": "رد شده",
   "ReviewStatus.Flagged": "در حال بررسی",
-
   "ReportReason.Spam": "اسپم یا تبلیغات",
   "ReportReason.Inappropriate": "محتوای نامناسب",
   "ReportReason.FakeReview": "نظر جعلی",
@@ -164,7 +148,6 @@
   "ReportReason.OffTopic": "خارج از موضوع",
   "ReportReason.CopyrightViolation": "نقض کپی‌رایت",
   "ReportReason.Other": "سایر",
-
   "Review.Title": "نظرات",
   "Review.WriteReview": "نوشتن نظر",
   "Review.YourReview": "نظر شما",
@@ -204,23 +187,19 @@
   "Review.Stars": "{0} ستاره",
   "Review.ThankYou": "از نظر شما متشکریم!",
   "Review.PendingApproval": "نظر شما در انتظار تایید است",
-
   "Review.Error.AlreadyReviewed": "شما قبلاً نظر داده‌اید",
   "Review.Error.RatingRequired": "لطفاً امتیاز دهید",
   "Review.Error.CommentRequired": "لطفاً نظر بنویسید",
   "Review.Error.LoginRequired": "برای نظر دادن وارد شوید",
-
   "Company.ApplicationNotes": "یادداشت‌های درخواست",
   "Company.ApplicationNotesHint": "یادداشت‌های اضافی برای درخواست شما",
   "Company.PendingApproval": "درخواست در حال بررسی",
   "Company.PendingMessage": "درخواست شما در حال بررسی است. پس از تایید می‌توانید تور اضافه کنید.",
-
   "Error.CompanyNotApproved": "تا زمانی که شرکت شما تایید نشود نمی‌توانید تور مدیریت کنید",
   "Error.CompanyPending": "درخواست شما در حال بررسی است. پس از تایید می‌توانید تور اضافه کنید.",
   "Error.CompanyRejected": "درخواست شما رد شده است",
   "Error.CompanySuspended": "شرکت شما معلق شده است",
   "Error.NotCompanyOwner": "شما صاحب شرکت نیستید",
-
   "Contract.Title": "قرارداد",
   "Contract.Upload": "بارگذاری قرارداد",
   "Contract.Download": "دانلود قرارداد",
@@ -239,7 +218,6 @@
   "Contract.Success.Uploaded": "قرارداد با موفقیت بارگذاری شد",
   "Contract.Success.Deleted": "قرارداد با موفقیت حذف شد",
   "Contract.Confirm.Delete": "آیا مطمئن هستید که می‌خواهید این قرارداد را حذف کنید؟",
-
   "Admin.Reviews.Title": "مدیریت نظرات",
   "Admin.Reviews.All": "همه",
   "Admin.Reviews.Pending": "در انتظار",
@@ -259,7 +237,6 @@
   "Admin.Reviews.ConfirmApprove": "آیا مطمئن هستید که می‌خواهید این نظر را تایید کنید؟",
   "Admin.Reviews.ConfirmReject": "آیا مطمئن هستید که می‌خواهید این نظر را رد کنید؟",
   "Admin.Reviews.ConfirmFlag": "آیا مطمئن هستید که می‌خواهید این نظر را علامت‌گذاری کنید؟",
-
   "CompanyProfile.Title": "پروفایل شرکت",
   "CompanyProfile.About": "درباره ما",
   "CompanyProfile.OurTours": "تورهای ما",
@@ -285,7 +262,6 @@
   "CompanyProfile.Recommends": "پیشنهاد می‌کند",
   "CompanyProfile.NotFound": "شرکت یافت نشد",
   "CompanyProfile.BackToList": "بازگشت به لیست",
-
   "Menu.Dashboard": "داشبورد",
   "Dashboard.Title": "داشبورد",
   "Dashboard.Welcome": "خوش آمدید!",
@@ -308,7 +284,6 @@
   "Dashboard.Revenue": "درآمد",
   "Dashboard.Rating": "امتیاز",
   "Dashboard.Reviews": "نظرات",
-
   "MyTours.Title": "تورهای من",
   "MyTours.AddTour": "افزودن تور",
   "MyTours.EditTour": "ویرایش تور",
@@ -336,7 +311,6 @@
   "MyTours.PhotoDeleteSuccess": "تصویر با موفقیت حذف شد",
   "MyTours.CoverPhotoUpdated": "تصویر کاور به‌روزرسانی شد",
   "MyTours.FeaturedInfo": "این تور به عنوان ویژه علامت‌گذاری شده است. این تنظیم فقط توسط مدیر قابل تغییر است.",
-
   "MyReservations.Title": "رزروهای من",
   "MyReservations.Total": "مجموع",
   "MyReservations.Customer": "مشتری",
@@ -345,7 +319,6 @@
   "MyReservations.ConfirmSuccess": "رزرو تایید شد",
   "MyReservations.CancelSuccess": "رزرو لغو شد",
   "MyReservations.CompleteSuccess": "رزرو تکمیل شد",
-
   "MyReviews.Title": "نظرات",
   "MyReviews.Total": "کل نظرات",
   "MyReviews.AwaitingReply": "در انتظار پاسخ",
@@ -353,7 +326,6 @@
   "MyReviews.NoReviews": "هنوز نظری وجود ندارد",
   "MyReviews.SendReply": "ارسال پاسخ",
   "MyReviews.ReplySuccess": "پاسخ با موفقیت ارسال شد",
-
   "Profile.Title": "پروفایل",
   "Profile.PersonalInfo": "اطلاعات شخصی",
   "Profile.EditProfile": "ویرایش پروفایل",
@@ -372,7 +344,6 @@
   "Profile.NewPasswordRequired": "رمز عبور جدید الزامی است",
   "Profile.EmailReadonly": "آدرس ایمیل قابل تغییر نیست",
   "Profile.LoginRequired": "باید وارد شوید",
-
   "Tours.Subtitle": "تور مناسب خود را پیدا کنید و تعطیلات رویایی خود را شروع کنید!",
   "Tours.SearchPlaceholder": "جستجوی تورها (نام، مقصد، توضیحات)...",
   "Tours.AdvancedFilters": "فیلترهای پیشرفته",
@@ -402,7 +373,6 @@
   "Tour.Days": "روز",
   "Common.Min": "حداقل",
   "Common.Max": "حداکثر",
-
   "ForgotPassword.Title": "فراموشی رمز عبور",
   "ForgotPassword.Subtitle": "ایمیل خود را وارد کنید تا لینک بازنشانی رمز عبور برایتان ارسال شود",
   "ForgotPassword.SendLink": "ارسال لینک",
@@ -411,7 +381,6 @@
   "ForgotPassword.BackToLogin": "بازگشت به ورود",
   "ForgotPassword.EmailRequired": "ایمیل الزامی است",
   "ForgotPassword.InvalidEmail": "لطفاً یک ایمیل معتبر وارد کنید",
-
   "ResetPassword.Title": "رمز عبور جدید",
   "ResetPassword.Subtitle": "رمز عبور جدید خود را وارد کنید",
   "ResetPassword.InvalidToken": "لینک نامعتبر یا منقضی شده",
@@ -420,7 +389,6 @@
   "ResetPassword.SetPassword": "تغییر رمز عبور",
   "ResetPassword.Success": "رمز عبور شما با موفقیت تغییر کرد!",
   "ResetPassword.CanLogin": "اکنون می‌توانید با رمز عبور جدید وارد شوید",
-
   "VerifyEmail.Title": "تایید ایمیل",
   "VerifyEmail.Checking": "در حال تایید ایمیل شما...",
   "VerifyEmail.Success": "ایمیل شما با موفقیت تایید شد!",
@@ -436,7 +404,6 @@
   "VerifyEmail.Description": "ایمیل خود را برای امنیت حساب تایید کنید.",
   "VerifyEmail.SendLink": "ارسال لینک تایید",
   "VerifyEmail.LinkSent": "لینک تایید به ایمیل شما ارسال شد.",
-
   "Avatar.Upload": "بارگذاری عکس",
   "Avatar.Delete": "حذف عکس",
   "Avatar.MaxSize": "حجم فایل نمی‌تواند بیش از 2 مگابایت باشد",
@@ -444,7 +411,6 @@
   "Avatar.UploadSuccess": "عکس پروفایل با موفقیت بارگذاری شد",
   "Avatar.DeleteSuccess": "عکس پروفایل با موفقیت حذف شد",
   "Avatar.DeleteConfirm": "آیا مطمئن هستید که می‌خواهید عکس پروفایل خود را حذف کنید؟",
-
   "Gallery.Title": "گالری",
   "Gallery.Upload": "بارگذاری تصویر",
   "Gallery.Delete": "حذف تصویر",
@@ -466,14 +432,12 @@
   "Gallery.ReorderSuccess": "ترتیب به‌روز شد",
   "Gallery.SelectFile": "انتخاب تصویر",
   "Gallery.DragDrop": "یا بکشید و رها کنید",
-
   "ReviewImage.Upload": "بارگذاری عکس",
   "ReviewImage.Delete": "حذف عکس",
   "ReviewImage.MaxImages": "حداکثر 5 عکس برای هر نظر",
   "ReviewImage.UploadSuccess": "عکس بارگذاری شد",
   "ReviewImage.DeleteSuccess": "عکس حذف شد",
   "ReviewImage.Caption": "توضیحات عکس",
-
   "Companies.Subtitle": "شرکت‌های مسافرتی مورد اعتماد ما را کشف کنید",
   "Companies.CompanyCount": "شرکت",
   "Companies.SearchPlaceholder": "جستجوی شرکت‌ها (نام، شهر، توضیحات)...",
@@ -490,7 +454,6 @@
   "Companies.NoResults": "شرکتی یافت نشد",
   "Companies.TryDifferentSearch": "معیارهای جستجوی دیگری را امتحان کنید",
   "Companies.ClearFilters": "پاک کردن فیلترها",
-
   "MyReservations.Subtitle": "همه رزروهای خود را از اینجا پیگیری کنید",
   "MyReservations.NewReservation": "رزرو جدید",
   "MyReservations.ExploreMessage": "یک تور کشف کنید و همین الان رزرو کنید!",
@@ -507,7 +470,6 @@
   "MyReservations.NoBrowsedReservations": "رزرو گذشته بررسی شده‌ای وجود ندارد",
   "MyReservations.NoCompletedReservations": "رزرو تکمیل شده‌ای ندارید",
   "MyReservations.NoCancelledReservations": "رزرو لغو شده‌ای ندارید",
-
   "ReservationDetail.Title": "جزئیات رزرو",
   "ReservationDetail.ViewTour": "مشاهده تور",
   "ReservationDetail.ReservationInfo": "اطلاعات رزرو",
@@ -522,7 +484,6 @@
   "ReservationDetail.CancelConfirm": "آیا مطمئن هستید که می‌خواهید این رزرو را لغو کنید؟",
   "ReservationDetail.CancelSuccess": "رزرو با موفقیت لغو شد",
   "ReservationDetail.NotFound": "رزرو یافت نشد",
-
   "Favorites.Title": "تورهای مورد علاقه من",
   "Favorites.Subtitle": "تورهایی که دوست دارید اینجا نمایش داده می‌شوند",
   "Favorites.Tours": "تور",
@@ -536,7 +497,6 @@
   "Common.LoginRequired": "لطفاً وارد شوید",
   "Common.File": "فایل",
   "Common.Upload": "آپلود",
-
   "Email.Greeting": "سلام {0}،",
   "Email.ReservationConfirmed.Subject": "رزرو شما تایید شد - ارکان سفر",
   "Email.ReservationConfirmed.Title": "رزرو شما تایید شد!",
@@ -558,7 +518,6 @@
   "Email.ThankYou": "از اینکه ما را انتخاب کردید متشکریم. سفر خوبی داشته باشید!",
   "Email.ContactUs": "در صورت داشتن سوال با ما تماس بگیرید.",
   "Email.Reason": "دلیل",
-
   "Payment.Title": "پرداخت",
   "Payment.PayNow": "الان پرداخت کنید",
   "Payment.Processing": "در حال پردازش...",
@@ -575,7 +534,6 @@
   "Payment.ExploreTours": "کاوش تورهای دیگر",
   "Payment.TryAgain": "تلاش مجدد",
   "Payment.ContactSupport": "پشتیبانی",
-
   "Share.Title": "اشتراک‌گذاری",
   "Share.Facebook": "اشتراک در فیسبوک",
   "Share.Twitter": "اشتراک در X",
@@ -585,18 +543,15 @@
   "Share.CopyLink": "کپی لینک",
   "Share.LinkCopied": "لینک کپی شد!",
   "Share.CopyFailed": "کپی لینک ناموفق بود",
-
   "Email.PasswordReset.Subject": "بازنشانی رمز عبور - Erkan Travel Plan",
   "Email.PasswordReset.Title": "بازنشانی رمز عبور",
   "Email.PasswordReset.Message": "برای بازنشانی رمز عبور خود روی دکمه زیر کلیک کنید. اگر این درخواست را نداده‌اید، این ایمیل را نادیده بگیرید.",
   "Email.PasswordReset.ButtonText": "بازنشانی رمز عبور",
   "Email.PasswordReset.Expiry": "این لینک تا ۱ ساعت معتبر است.",
-
   "Email.Verification.Subject": "تأیید ایمیل - Erkan Travel Plan",
   "Email.Verification.Title": "ایمیل خود را تأیید کنید",
   "Email.Verification.Message": "ایمیل خود را تأیید کنید تا حساب کاربری شما فعال شود و به تمام امکانات دسترسی داشته باشید.",
   "Email.Verification.ButtonText": "تأیید ایمیل من",
-
   "Admin.EmailAccounts.Title": "حساب‌های ایمیل",
   "Admin.EmailAccounts.Subtitle": "مدیریت حساب‌های SMTP ایمیل",
   "Admin.EmailAccounts.AddAccount": "حساب جدید",
@@ -615,7 +570,6 @@
   "Admin.EmailAccounts.TestEmail": "ارسال ایمیل آزمایشی",
   "Admin.EmailAccounts.RecipientEmail": "ایمیل گیرنده",
   "Admin.EmailAccounts.SendTest": "ارسال",
-
   "Admin.EmailTemplates.Title": "قالب‌های ایمیل",
   "Admin.EmailTemplates.Subtitle": "مدیریت قالب‌های ایمیل و ترجمه‌ها",
   "Admin.EmailTemplates.AddTemplate": "قالب جدید",
@@ -631,7 +585,6 @@
   "Admin.EmailTemplates.Body": "محتوای ایمیل",
   "Admin.EmailTemplates.NoTemplates": "هنوز قالب ایمیلی وجود ندارد",
   "Admin.EmailTemplates.Preview": "پیش‌نمایش ایمیل",
-
   "Menu.Blog": "وبلاگ",
   "Blog.Title": "وبلاگ",
   "Blog.Subtitle": "الهام سفر، راهنمای سفر و اخبار گردشگری",
@@ -664,7 +617,6 @@
   "Blog.Tags": "برچسب‌ها",
   "Blog.Author": "نویسنده",
   "Blog.RelatedPosts": "مقالات مرتبط",
-
   "CompanyPage.Title": "صفحات شرکت",
   "CompanyPage.Create": "صفحه جدید",
   "CompanyPage.Edit": "ویرایش صفحه",
@@ -807,7 +759,6 @@
   "Menu.Promotions": "تخفیف‌ها",
   "Menu.MyPromotions": "تخفیف‌های من",
   "Admin.Promotions.Title": "مدیریت تخفیف‌ها",
-
   "Watch.Title": "پیگیری تور",
   "Watch.Button": "پیگیری",
   "Watch.Watching": "در حال پیگیری",
@@ -819,7 +770,6 @@
   "Watch.Limit": "مدت پیگیری باید بین 1 تا 90 روز باشد",
   "Watch.AlreadyWatching": "شما در حال حاضر این تور را پیگیری می‌کنید",
   "Watch.MyWatches": "پیگیری‌های من",
-
   "Notification.Title": "اعلان‌ها",
   "Notification.Empty": "اعلانی وجود ندارد",
   "Notification.MarkAllRead": "همه را خوانده شده علامت بزنید",
@@ -837,16 +787,13 @@
   "Notification.Reservation.Cancelled.Message": "رزرو شما لغو شد.",
   "Notification.Reservation.Completed.Title": "تور تکمیل شد",
   "Notification.Reservation.Completed.Message": "تور شما تکمیل شد. روز خوبی داشته باشید!",
-
   "NotificationType.Scarcity": "کمبود",
   "NotificationType.PriceChange": "تغییر قیمت",
   "NotificationType.NewDate": "تاریخ جدید",
   "NotificationType.Reservation": "رزرو",
   "NotificationType.System": "سیستم",
-
   "Scarcity.Badge": "آخرین {0} جا!",
   "Scarcity.LastSpots": "آخرین جاها در حال پر شدن!",
-
   "Participant.Title": "اطلاعات شرکت‌کننده",
   "Participant.Name": "نام کامل",
   "Participant.Age": "سن",
@@ -854,26 +801,21 @@
   "Participant.Health": "یادداشت سلامت",
   "Participant.Add": "افزودن شرکت‌کننده",
   "Participant.Remove": "حذف شرکت‌کننده",
-
   "MeetingPoint.Title": "نقطه ملاقات",
   "MeetingPoint.Address": "آدرس ملاقات",
   "MeetingPoint.Map": "مشاهده روی نقشه",
   "MeetingPoint.Note": "یادداشت ملاقات",
-
   "QrCode.Title": "بلیط QR کد شما",
   "QrCode.Show": "نمایش QR کد",
   "QrCode.Scan": "این کد را برای ورود اسکن کنید",
-
   "DateChange.Title": "تغییر تاریخ",
   "DateChange.SelectNew": "تاریخ جدید انتخاب کنید",
   "DateChange.Success": "تاریخ با موفقیت تغییر کرد",
   "DateChange.OnlyConfirmed": "تاریخ فقط برای رزروهای تأیید شده قابل تغییر است",
-
   "PhotoLink.Title": "عکس‌های تور",
   "PhotoLink.View": "مشاهده عکس‌ها",
   "PhotoLink.Add": "افزودن لینک عکس",
   "PhotoLink.Placeholder": "آدرس آلبوم عکس",
-
   "Guide.Title": "مدیریت راهنماها",
   "Guide.Add": "افزودن راهنما",
   "Guide.Edit": "ویرایش راهنما",
@@ -912,7 +854,6 @@
   "GuideAssignmentStatus.Pending": "در انتظار",
   "GuideAssignmentStatus.Confirmed": "تایید شده",
   "GuideAssignmentStatus.Rejected": "رد شده",
-
   "Calendar.Title": "تقویم تورها",
   "Calendar.Today": "امروز",
   "Calendar.Available": "موجود",
@@ -928,13 +869,68 @@
   "Calendar.Sat": "شنبه",
   "Calendar.More": "بیشتر",
   "Calendar.Tour": "تور",
-
   "Analytics.Title": "تحلیل‌ها",
   "Analytics.Revenue": "درآمد",
   "Analytics.Occupancy": "نرخ اشغال",
   "Analytics.Cancellations": "نرخ لغو",
   "Analytics.CancellationRate": "نرخ لغو (%)",
   "Analytics.TourComparison": "مقایسه تورها",
-
-  "Capacity.Remaining": "باقیمانده"
+  "Capacity.Remaining": "باقیمانده",
+  "Message.MyMessages": "پیام‌های من",
+  "Message.NewConversation": "پیام جدید",
+  "Message.Conversations": "مکالمات",
+  "Message.SelectConversation": "یک مکالمه انتخاب کنید یا پیام جدید ارسال کنید",
+  "Message.NoConversations": "هنوز مکالمه‌ای وجود ندارد",
+  "Message.ConversationClosed": "این مکالمه بسته شده است",
+  "Message.SelectCompany": "شرکت را انتخاب کنید",
+  "Message.RelatedTour": "تور مرتبط (اختیاری)",
+  "Message.NoTourSelected": "توری انتخاب نشده",
+  "Message.Subject": "موضوع",
+  "Message.FirstMessage": "پیام شما",
+  "Message.Send": "ارسال",
+  "Message.TypeMessage": "پیام خود را بنویسید...",
+  "Message.ConversationCreated": "مکالمه ایجاد شد",
+  "Message.FillRequired": "لطفا تمام فیلدها را پر کنید",
+  "Message.LoadError": "بارگذاری مکالمات ناموفق بود",
+  "Message.LoadMessagesError": "بارگذاری پیام‌ها ناموفق بود",
+  "Message.SendError": "ارسال پیام ناموفق بود",
+  "Message.CreateError": "ایجاد مکالمه ناموفق بود",
+  "Menu.Messages": "پیام‌های من",
+  "MessageSenderType.Visitor": "بازدیدکننده",
+  "MessageSenderType.Company": "شرکت",
+  "MessageTemplate.Title": "الگوهای پاسخ سریع",
+  "MessageTemplate.Add": "افزودن الگو",
+  "MessageTemplate.Edit": "ویرایش الگو",
+  "MessageTemplate.Delete": "حذف الگو",
+  "MessageTemplate.Name": "نام الگو",
+  "MessageTemplate.Content": "محتوا",
+  "MessageTemplate.Order": "ترتیب",
+  "MessageTemplate.Usage": "استفاده",
+  "MessageTemplate.UseTemplate": "پاسخ سریع",
+  "MessageTemplate.NoTemplates": "هنوز الگویی اضافه نشده",
+  "NotificationPref.Title": "تنظیمات اعلان",
+  "NotificationPref.Description": "نحوه دریافت اعلان‌ها را انتخاب کنید",
+  "NotificationPref.Email": "اعلان‌های ایمیل",
+  "NotificationPref.WhatsApp": "اعلان‌های واتساپ",
+  "NotificationPref.SMS": "اعلان‌های پیامک",
+  "NotificationPref.Saved": "تنظیمات اعلان ذخیره شد",
+  "NotificationPref.EmailDesc": "دریافت اعلان از طریق ایمیل",
+  "NotificationPref.WhatsAppDesc": "دریافت اعلان از طریق واتساپ",
+  "NotificationPref.SMSDesc": "دریافت اعلان از طریق پیامک",
+  "Push.Subscribe": "فعال‌سازی اعلان‌ها",
+  "Push.Subscribed": "اعلان‌ها فعال",
+  "Push.NotSupported": "اعلان‌های فوری پشتیبانی نمی‌شود",
+  "Push.PermissionDenied": "مجوز اعلان رد شد",
+  "Push.SubscribeSuccess": "اعلان‌های فوری فعال شد",
+  "Push.SubscribeFailed": "خطا در اشتراک اعلان",
+  "Push.UnsubscribeSuccess": "اعلان‌های فوری غیرفعال شد",
+  "Push.UnsubscribeFailed": "خطا در لغو اشتراک",
+  "Weather.Alert.Title": "هشدار آب و هوا",
+  "Weather.Alert.RainMessage": "فردا باران پیش‌بینی شده. چتر فراموش نشود!",
+  "Weather.Recommendation.Rainy": "باران پیش‌بینی شده، چتر بیاورید",
+  "Weather.Recommendation.VeryHot": "خیلی گرم، آب زیاد بنوشید",
+  "Weather.Recommendation.Hot": "هوای گرم، لباس سبک بپوشید",
+  "Weather.Recommendation.Cold": "هوای سرد، لباس گرم بپوشید",
+  "Weather.Recommendation.Windy": "باد شدید، لباس ضد باد بپوشید",
+  "Weather.Recommendation.Good": "شرایط آب و هوا مناسب است!"
 }

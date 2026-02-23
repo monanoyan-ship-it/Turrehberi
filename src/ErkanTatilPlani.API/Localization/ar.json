@@ -22,7 +22,6 @@
   "Common.Error": "خطأ",
   "Common.Success": "نجاح",
   "Common.Required": "مطلوب",
-
   "Menu.Home": "الرئيسية",
   "Menu.Tours": "الجولات",
   "Menu.Companies": "الشركات",
@@ -35,7 +34,6 @@
   "Menu.CompanyPanel": "لوحة الشركة",
   "Menu.AdminPanel": "لوحة الإدارة",
   "Menu.MyReservations": "حجوزاتي",
-
   "Register.Title": "إنشاء حساب",
   "Register.Subtitle": "أنشئ حساباً جديداً",
   "Register.AccountType": "نوع الحساب",
@@ -65,7 +63,6 @@
   "Register.Submit": "إنشاء حساب",
   "Register.HasAccount": "لديك حساب بالفعل؟",
   "Register.Success": "تم التسجيل بنجاح! مرحباً {0}",
-
   "Register.Error.FirstNameRequired": "الاسم الأول مطلوب",
   "Register.Error.LastNameRequired": "اسم العائلة مطلوب",
   "Register.Error.NameRequired": "الاسم الأول واسم العائلة مطلوبان",
@@ -76,7 +73,6 @@
   "Register.Error.CompanyNameRequired": "اسم الشركة مطلوب",
   "Register.Error.TaxNumberRequired": "الرقم الضريبي مطلوب",
   "Register.Error.Failed": "فشل التسجيل",
-
   "Login.Title": "تسجيل الدخول",
   "Login.Subtitle": "سجل الدخول إلى حسابك",
   "Login.Email": "البريد الإلكتروني",
@@ -87,7 +83,6 @@
   "Login.RememberMe": "تذكرني",
   "Login.Error.Required": "البريد الإلكتروني وكلمة المرور مطلوبان",
   "Login.Error.Invalid": "البريد الإلكتروني أو كلمة المرور غير صحيحة",
-
   "Tour.Name": "اسم الجولة",
   "Tour.Description": "الوصف",
   "Tour.Destination": "الوجهة",
@@ -98,7 +93,6 @@
   "Tour.Featured": "مميز",
   "Tour.Book": "احجز الآن",
   "Tour.Details": "التفاصيل",
-
   "Company.Name": "اسم الشركة",
   "Company.Description": "الوصف",
   "Company.Email": "البريد الإلكتروني",
@@ -106,7 +100,6 @@
   "Company.Address": "العنوان",
   "Company.Website": "الموقع الإلكتروني",
   "Company.TaxNumber": "الرقم الضريبي",
-
   "Reservation.Tour": "الجولة",
   "Reservation.StartDate": "تاريخ البدء",
   "Reservation.EndDate": "تاريخ الانتهاء",
@@ -114,17 +107,14 @@
   "Reservation.TotalPrice": "السعر الإجمالي",
   "Reservation.Status": "الحالة",
   "Reservation.Notes": "ملاحظات",
-
   "Status.Pending": "قيد الانتظار",
   "Status.Confirmed": "مؤكد",
   "Status.Cancelled": "ملغي",
   "Status.Completed": "مكتمل",
-
   "UserType.Visitor": "زائر",
   "UserType.CompanyOwner": "صاحب شركة",
   "UserType.Staff": "موظف",
   "UserType.Admin": "مدير النظام",
-
   "Placeholder.Email": "example@email.com",
   "Placeholder.Phone": "رقم الهاتف",
   "Placeholder.CompanyPhone": "هاتف الشركة",
@@ -134,28 +124,22 @@
   "Placeholder.TaxNumber": "رقمك الضريبي",
   "Placeholder.Address": "عنوان الشركة",
   "Placeholder.Website": "www.yourcompany.com",
-
   "Footer.Rights": "جميع الحقوق محفوظة",
   "Footer.Contact": "اتصل بنا",
-
   "Language.Select": "اختر اللغة",
-
   "CompanyStatus.Pending": "في انتظار الموافقة",
   "CompanyStatus.Approved": "تمت الموافقة",
   "CompanyStatus.Rejected": "مرفوض",
   "CompanyStatus.Suspended": "معلق",
-
   "TravelType.Solo": "منفرد",
   "TravelType.Couple": "زوجين",
   "TravelType.Family": "عائلة",
   "TravelType.Friends": "أصدقاء",
   "TravelType.Business": "عمل",
-
   "ReviewStatus.Pending": "قيد المراجعة",
   "ReviewStatus.Approved": "منشور",
   "ReviewStatus.Rejected": "مرفوض",
   "ReviewStatus.Flagged": "قيد التحقيق",
-
   "ReportReason.Spam": "بريد مزعج أو إعلان",
   "ReportReason.Inappropriate": "محتوى غير لائق",
   "ReportReason.FakeReview": "تقييم مزيف",
@@ -164,7 +148,6 @@
   "ReportReason.OffTopic": "خارج الموضوع",
   "ReportReason.CopyrightViolation": "انتهاك حقوق الطبع",
   "ReportReason.Other": "أخرى",
-
   "Review.Title": "التقييمات",
   "Review.WriteReview": "اكتب تقييم",
   "Review.YourReview": "تقييمك",
@@ -204,23 +187,19 @@
   "Review.Stars": "{0} نجوم",
   "Review.ThankYou": "شكراً لتقييمك!",
   "Review.PendingApproval": "تقييمك قيد المراجعة",
-
   "Review.Error.AlreadyReviewed": "لقد قيمت هذه الجولة مسبقاً",
   "Review.Error.RatingRequired": "يرجى إعطاء تقييم",
   "Review.Error.CommentRequired": "يرجى كتابة تقييم",
   "Review.Error.LoginRequired": "سجل دخول للتقييم",
-
   "Company.ApplicationNotes": "ملاحظات الطلب",
   "Company.ApplicationNotesHint": "ملاحظات إضافية لطلبك",
   "Company.PendingApproval": "الطلب قيد المراجعة",
   "Company.PendingMessage": "طلبك قيد المراجعة. ستتمكن من إضافة جولات بعد الموافقة.",
-
   "Error.CompanyNotApproved": "لا يمكنك إدارة الجولات حتى تتم الموافقة على شركتك",
   "Error.CompanyPending": "طلبك قيد المراجعة. يمكنك إضافة جولات بعد الموافقة.",
   "Error.CompanyRejected": "تم رفض طلبك",
   "Error.CompanySuspended": "تم تعليق شركتك",
   "Error.NotCompanyOwner": "أنت لست صاحب شركة",
-
   "Contract.Title": "العقد",
   "Contract.Upload": "رفع العقد",
   "Contract.Download": "تحميل العقد",
@@ -239,7 +218,6 @@
   "Contract.Success.Uploaded": "تم رفع العقد بنجاح",
   "Contract.Success.Deleted": "تم حذف العقد بنجاح",
   "Contract.Confirm.Delete": "هل أنت متأكد أنك تريد حذف هذا العقد؟",
-
   "Admin.Reviews.Title": "إدارة التقييمات",
   "Admin.Reviews.All": "الكل",
   "Admin.Reviews.Pending": "قيد الانتظار",
@@ -259,7 +237,6 @@
   "Admin.Reviews.ConfirmApprove": "هل أنت متأكد أنك تريد الموافقة على هذا التقييم؟",
   "Admin.Reviews.ConfirmReject": "هل أنت متأكد أنك تريد رفض هذا التقييم؟",
   "Admin.Reviews.ConfirmFlag": "هل أنت متأكد أنك تريد الإبلاغ عن هذا التقييم؟",
-
   "CompanyProfile.Title": "ملف الشركة",
   "CompanyProfile.About": "عن الشركة",
   "CompanyProfile.OurTours": "جولاتنا",
@@ -285,7 +262,6 @@
   "CompanyProfile.Recommends": "يوصي",
   "CompanyProfile.NotFound": "الشركة غير موجودة",
   "CompanyProfile.BackToList": "العودة إلى القائمة",
-
   "Menu.Dashboard": "لوحة التحكم",
   "Dashboard.Title": "لوحة التحكم",
   "Dashboard.Welcome": "مرحباً!",
@@ -308,7 +284,6 @@
   "Dashboard.Revenue": "الإيرادات",
   "Dashboard.Rating": "التقييم",
   "Dashboard.Reviews": "التقييمات",
-
   "MyTours.Title": "جولاتي",
   "MyTours.AddTour": "إضافة جولة",
   "MyTours.EditTour": "تعديل الجولة",
@@ -336,7 +311,6 @@
   "MyTours.PhotoDeleteSuccess": "تم حذف الصورة بنجاح",
   "MyTours.CoverPhotoUpdated": "تم تحديث صورة الغلاف",
   "MyTours.FeaturedInfo": "هذه الجولة مميزة. يمكن تغيير هذا الإعداد فقط من قبل المسؤول.",
-
   "MyReservations.Title": "حجوزاتي",
   "MyReservations.Total": "المجموع",
   "MyReservations.Customer": "العميل",
@@ -345,7 +319,6 @@
   "MyReservations.ConfirmSuccess": "تم تأكيد الحجز",
   "MyReservations.CancelSuccess": "تم إلغاء الحجز",
   "MyReservations.CompleteSuccess": "تم إكمال الحجز",
-
   "MyReviews.Title": "التقييمات",
   "MyReviews.Total": "إجمالي التقييمات",
   "MyReviews.AwaitingReply": "في انتظار الرد",
@@ -353,7 +326,6 @@
   "MyReviews.NoReviews": "لا توجد تقييمات بعد",
   "MyReviews.SendReply": "إرسال الرد",
   "MyReviews.ReplySuccess": "تم إرسال الرد بنجاح",
-
   "Profile.Title": "الملف الشخصي",
   "Profile.PersonalInfo": "المعلومات الشخصية",
   "Profile.EditProfile": "تعديل الملف الشخصي",
@@ -372,7 +344,6 @@
   "Profile.NewPasswordRequired": "كلمة المرور الجديدة مطلوبة",
   "Profile.EmailReadonly": "لا يمكن تغيير عنوان البريد الإلكتروني",
   "Profile.LoginRequired": "يجب تسجيل الدخول",
-
   "Tours.Subtitle": "اعثر على الجولة المثالية وابدأ إجازة أحلامك!",
   "Tours.SearchPlaceholder": "البحث في الجولات (الاسم، الوجهة، الوصف)...",
   "Tours.AdvancedFilters": "فلاتر متقدمة",
@@ -402,7 +373,6 @@
   "Tour.Days": "أيام",
   "Common.Min": "أدنى",
   "Common.Max": "أقصى",
-
   "ForgotPassword.Title": "نسيت كلمة المرور",
   "ForgotPassword.Subtitle": "أدخل بريدك الإلكتروني وسنرسل لك رابط إعادة تعيين كلمة المرور",
   "ForgotPassword.SendLink": "إرسال الرابط",
@@ -411,7 +381,6 @@
   "ForgotPassword.BackToLogin": "العودة إلى تسجيل الدخول",
   "ForgotPassword.EmailRequired": "البريد الإلكتروني مطلوب",
   "ForgotPassword.InvalidEmail": "يرجى إدخال بريد إلكتروني صالح",
-
   "ResetPassword.Title": "كلمة مرور جديدة",
   "ResetPassword.Subtitle": "أدخل كلمة المرور الجديدة",
   "ResetPassword.InvalidToken": "رابط غير صالح أو منتهي الصلاحية",
@@ -420,7 +389,6 @@
   "ResetPassword.SetPassword": "تغيير كلمة المرور",
   "ResetPassword.Success": "تم تغيير كلمة المرور بنجاح!",
   "ResetPassword.CanLogin": "يمكنك الآن تسجيل الدخول بكلمة المرور الجديدة",
-
   "VerifyEmail.Title": "التحقق من البريد الإلكتروني",
   "VerifyEmail.Checking": "جاري التحقق من بريدك الإلكتروني...",
   "VerifyEmail.Success": "تم التحقق من بريدك الإلكتروني بنجاح!",
@@ -436,7 +404,6 @@
   "VerifyEmail.Description": "تحقق من بريدك الإلكتروني لتأمين حسابك.",
   "VerifyEmail.SendLink": "إرسال رابط التحقق",
   "VerifyEmail.LinkSent": "تم إرسال رابط التحقق إلى بريدك الإلكتروني.",
-
   "Avatar.Upload": "تحميل صورة",
   "Avatar.Delete": "حذف الصورة",
   "Avatar.MaxSize": "حجم الملف لا يمكن أن يتجاوز 2 ميجابايت",
@@ -444,7 +411,6 @@
   "Avatar.UploadSuccess": "تم تحميل صورة الملف الشخصي بنجاح",
   "Avatar.DeleteSuccess": "تم حذف صورة الملف الشخصي بنجاح",
   "Avatar.DeleteConfirm": "هل أنت متأكد أنك تريد حذف صورة ملفك الشخصي؟",
-
   "Gallery.Title": "المعرض",
   "Gallery.Upload": "تحميل صورة",
   "Gallery.Delete": "حذف الصورة",
@@ -466,14 +432,12 @@
   "Gallery.ReorderSuccess": "تم تحديث الترتيب",
   "Gallery.SelectFile": "اختر صورة",
   "Gallery.DragDrop": "أو اسحب وأفلت",
-
   "ReviewImage.Upload": "تحميل صورة",
   "ReviewImage.Delete": "حذف الصورة",
   "ReviewImage.MaxImages": "الحد الأقصى 5 صور لكل مراجعة",
   "ReviewImage.UploadSuccess": "تم تحميل الصورة",
   "ReviewImage.DeleteSuccess": "تم حذف الصورة",
   "ReviewImage.Caption": "وصف الصورة",
-
   "Companies.Subtitle": "اكتشف شركات السفر الموثوقة لدينا",
   "Companies.CompanyCount": "شركة",
   "Companies.SearchPlaceholder": "البحث عن شركات (الاسم، المدينة، الوصف)...",
@@ -490,7 +454,6 @@
   "Companies.NoResults": "لم يتم العثور على شركات",
   "Companies.TryDifferentSearch": "جرب معايير بحث مختلفة",
   "Companies.ClearFilters": "مسح الفلاتر",
-
   "MyReservations.Subtitle": "تتبع جميع حجوزاتك هنا",
   "MyReservations.NewReservation": "حجز جديد",
   "MyReservations.ExploreMessage": "اكتشف جولة واحجز الآن!",
@@ -507,7 +470,6 @@
   "MyReservations.NoBrowsedReservations": "لا توجد حجوزات سابقة مستعرضة",
   "MyReservations.NoCompletedReservations": "لا توجد حجوزات مكتملة",
   "MyReservations.NoCancelledReservations": "لا توجد حجوزات ملغاة",
-
   "ReservationDetail.Title": "تفاصيل الحجز",
   "ReservationDetail.ViewTour": "عرض الجولة",
   "ReservationDetail.ReservationInfo": "معلومات الحجز",
@@ -522,7 +484,6 @@
   "ReservationDetail.CancelConfirm": "هل أنت متأكد أنك تريد إلغاء هذا الحجز؟",
   "ReservationDetail.CancelSuccess": "تم إلغاء الحجز بنجاح",
   "ReservationDetail.NotFound": "الحجز غير موجود",
-
   "Favorites.Title": "جولاتي المفضلة",
   "Favorites.Subtitle": "الجولات التي أعجبتك مدرجة هنا",
   "Favorites.Tours": "جولة",
@@ -536,7 +497,6 @@
   "Common.LoginRequired": "يرجى تسجيل الدخول",
   "Common.File": "ملف",
   "Common.Upload": "رفع",
-
   "Email.Greeting": "مرحباً {0}،",
   "Email.ReservationConfirmed.Subject": "تم تأكيد حجزك - إركان للسفر",
   "Email.ReservationConfirmed.Title": "تم تأكيد حجزك!",
@@ -558,7 +518,6 @@
   "Email.ThankYou": "شكراً لاختيارك لنا. رحلة سعيدة!",
   "Email.ContactUs": "تواصل معنا إذا كان لديك أي أسئلة.",
   "Email.Reason": "السبب",
-
   "Payment.Title": "الدفع",
   "Payment.PayNow": "ادفع الآن",
   "Payment.Processing": "جاري المعالجة...",
@@ -575,7 +534,6 @@
   "Payment.ExploreTours": "استكشاف جولات أخرى",
   "Payment.TryAgain": "حاول مرة أخرى",
   "Payment.ContactSupport": "الدعم",
-
   "Share.Title": "مشاركة",
   "Share.Facebook": "مشاركة على فيسبوك",
   "Share.Twitter": "مشاركة على X",
@@ -585,18 +543,15 @@
   "Share.CopyLink": "نسخ الرابط",
   "Share.LinkCopied": "تم نسخ الرابط!",
   "Share.CopyFailed": "فشل نسخ الرابط",
-
   "Email.PasswordReset.Subject": "إعادة تعيين كلمة المرور - Erkan Travel Plan",
   "Email.PasswordReset.Title": "إعادة تعيين كلمة المرور",
   "Email.PasswordReset.Message": "انقر على الزر أدناه لإعادة تعيين كلمة المرور. إذا لم تطلب هذا، يمكنك تجاهل هذا البريد.",
   "Email.PasswordReset.ButtonText": "إعادة تعيين كلمة المرور",
   "Email.PasswordReset.Expiry": "سينتهي هذا الرابط خلال ساعة واحدة.",
-
   "Email.Verification.Subject": "التحقق من البريد الإلكتروني - Erkan Travel Plan",
   "Email.Verification.Title": "تحقق من بريدك الإلكتروني",
   "Email.Verification.Message": "تحقق من بريدك الإلكتروني لتفعيل حسابك والوصول إلى جميع الميزات.",
   "Email.Verification.ButtonText": "تحقق من بريدي",
-
   "Admin.EmailAccounts.Title": "حسابات البريد الإلكتروني",
   "Admin.EmailAccounts.Subtitle": "إدارة حسابات SMTP للبريد الإلكتروني",
   "Admin.EmailAccounts.AddAccount": "حساب جديد",
@@ -615,7 +570,6 @@
   "Admin.EmailAccounts.TestEmail": "إرسال بريد اختبار",
   "Admin.EmailAccounts.RecipientEmail": "بريد المستلم",
   "Admin.EmailAccounts.SendTest": "إرسال",
-
   "Admin.EmailTemplates.Title": "قوالب البريد الإلكتروني",
   "Admin.EmailTemplates.Subtitle": "إدارة قوالب البريد الإلكتروني والترجمات",
   "Admin.EmailTemplates.AddTemplate": "قالب جديد",
@@ -631,7 +585,6 @@
   "Admin.EmailTemplates.Body": "محتوى البريد",
   "Admin.EmailTemplates.NoTemplates": "لا توجد قوالب بريد إلكتروني بعد",
   "Admin.EmailTemplates.Preview": "معاينة البريد",
-
   "Menu.Blog": "المدونة",
   "Blog.Title": "المدونة",
   "Blog.Subtitle": "إلهام السفر وأدلة السياحة وأخبار السياحة",
@@ -664,7 +617,6 @@
   "Blog.Tags": "الوسوم",
   "Blog.Author": "الكاتب",
   "Blog.RelatedPosts": "مقالات ذات صلة",
-
   "CompanyPage.Title": "صفحات الشركة",
   "CompanyPage.Create": "صفحة جديدة",
   "CompanyPage.Edit": "تعديل الصفحة",
@@ -807,7 +759,6 @@
   "Menu.Promotions": "العروض",
   "Menu.MyPromotions": "عروضي",
   "Admin.Promotions.Title": "إدارة العروض",
-
   "Watch.Title": "متابعة الجولة",
   "Watch.Button": "متابعة",
   "Watch.Watching": "قيد المتابعة",
@@ -819,7 +770,6 @@
   "Watch.Limit": "مدة المتابعة يجب أن تكون بين 1-90 يوم",
   "Watch.AlreadyWatching": "أنت تتابع هذه الجولة بالفعل",
   "Watch.MyWatches": "متابعاتي",
-
   "Notification.Title": "الإشعارات",
   "Notification.Empty": "لا توجد إشعارات",
   "Notification.MarkAllRead": "تحديد الكل كمقروء",
@@ -837,16 +787,13 @@
   "Notification.Reservation.Cancelled.Message": "تم إلغاء حجزك.",
   "Notification.Reservation.Completed.Title": "اكتملت الجولة",
   "Notification.Reservation.Completed.Message": "اكتملت جولتك. نتمنى لك يوماً سعيداً!",
-
   "NotificationType.Scarcity": "ندرة",
   "NotificationType.PriceChange": "تغيير السعر",
   "NotificationType.NewDate": "تاريخ جديد",
   "NotificationType.Reservation": "حجز",
   "NotificationType.System": "نظام",
-
   "Scarcity.Badge": "آخر {0} أماكن!",
   "Scarcity.LastSpots": "الأماكن الأخيرة تمتلئ!",
-
   "Participant.Title": "معلومات المشارك",
   "Participant.Name": "الاسم الكامل",
   "Participant.Age": "العمر",
@@ -854,26 +801,21 @@
   "Participant.Health": "ملاحظة صحية",
   "Participant.Add": "إضافة مشارك",
   "Participant.Remove": "إزالة مشارك",
-
   "MeetingPoint.Title": "نقطة الالتقاء",
   "MeetingPoint.Address": "عنوان الالتقاء",
   "MeetingPoint.Map": "عرض على الخريطة",
   "MeetingPoint.Note": "ملاحظة الالتقاء",
-
   "QrCode.Title": "تذكرتك بكود QR",
   "QrCode.Show": "عرض كود QR",
   "QrCode.Scan": "امسح هذا الكود للدخول",
-
   "DateChange.Title": "تغيير التاريخ",
   "DateChange.SelectNew": "اختر تاريخاً جديداً",
   "DateChange.Success": "تم تغيير التاريخ بنجاح",
   "DateChange.OnlyConfirmed": "يمكن تغيير التاريخ فقط للحجوزات المؤكدة",
-
   "PhotoLink.Title": "صور الجولة",
   "PhotoLink.View": "عرض الصور",
   "PhotoLink.Add": "إضافة رابط صورة",
   "PhotoLink.Placeholder": "رابط ألبوم الصور",
-
   "Guide.Title": "إدارة المرشدين",
   "Guide.Add": "إضافة مرشد",
   "Guide.Edit": "تعديل المرشد",
@@ -912,7 +854,6 @@
   "GuideAssignmentStatus.Pending": "قيد الانتظار",
   "GuideAssignmentStatus.Confirmed": "مؤكد",
   "GuideAssignmentStatus.Rejected": "مرفوض",
-
   "Calendar.Title": "تقويم الجولات",
   "Calendar.Today": "اليوم",
   "Calendar.Available": "متاح",
@@ -928,13 +869,68 @@
   "Calendar.Sat": "سبت",
   "Calendar.More": "المزيد",
   "Calendar.Tour": "جولة",
-
   "Analytics.Title": "التحليلات",
   "Analytics.Revenue": "الإيرادات",
   "Analytics.Occupancy": "نسبة الإشغال",
   "Analytics.Cancellations": "نسبة الإلغاء",
   "Analytics.CancellationRate": "نسبة الإلغاء (%)",
   "Analytics.TourComparison": "مقارنة الجولات",
-
-  "Capacity.Remaining": "متبقي"
+  "Capacity.Remaining": "متبقي",
+  "Message.MyMessages": "رسائلي",
+  "Message.NewConversation": "رسالة جديدة",
+  "Message.Conversations": "المحادثات",
+  "Message.SelectConversation": "اختر محادثة أو أرسل رسالة جديدة",
+  "Message.NoConversations": "لا توجد محادثات بعد",
+  "Message.ConversationClosed": "هذه المحادثة مغلقة",
+  "Message.SelectCompany": "اختر شركة",
+  "Message.RelatedTour": "الجولة المرتبطة (اختياري)",
+  "Message.NoTourSelected": "لم يتم اختيار جولة",
+  "Message.Subject": "الموضوع",
+  "Message.FirstMessage": "رسالتك",
+  "Message.Send": "إرسال",
+  "Message.TypeMessage": "اكتب رسالتك...",
+  "Message.ConversationCreated": "تم إنشاء المحادثة",
+  "Message.FillRequired": "يرجى ملء جميع الحقول",
+  "Message.LoadError": "فشل تحميل المحادثات",
+  "Message.LoadMessagesError": "فشل تحميل الرسائل",
+  "Message.SendError": "فشل إرسال الرسالة",
+  "Message.CreateError": "فشل إنشاء المحادثة",
+  "Menu.Messages": "رسائلي",
+  "MessageSenderType.Visitor": "زائر",
+  "MessageSenderType.Company": "شركة",
+  "MessageTemplate.Title": "قوالب الرد السريع",
+  "MessageTemplate.Add": "إضافة قالب",
+  "MessageTemplate.Edit": "تعديل القالب",
+  "MessageTemplate.Delete": "حذف القالب",
+  "MessageTemplate.Name": "اسم القالب",
+  "MessageTemplate.Content": "المحتوى",
+  "MessageTemplate.Order": "الترتيب",
+  "MessageTemplate.Usage": "الاستخدام",
+  "MessageTemplate.UseTemplate": "رد سريع",
+  "MessageTemplate.NoTemplates": "لم تتم إضافة قوالب بعد",
+  "NotificationPref.Title": "تفضيلات الإشعارات",
+  "NotificationPref.Description": "اختر كيف تريد تلقي الإشعارات",
+  "NotificationPref.Email": "إشعارات البريد الإلكتروني",
+  "NotificationPref.WhatsApp": "إشعارات واتساب",
+  "NotificationPref.SMS": "إشعارات الرسائل القصيرة",
+  "NotificationPref.Saved": "تم حفظ تفضيلات الإشعارات",
+  "NotificationPref.EmailDesc": "تلقي الإشعارات عبر البريد الإلكتروني",
+  "NotificationPref.WhatsAppDesc": "تلقي الإشعارات عبر واتساب",
+  "NotificationPref.SMSDesc": "تلقي الإشعارات عبر الرسائل القصيرة",
+  "Push.Subscribe": "تفعيل الإشعارات",
+  "Push.Subscribed": "الإشعارات مفعلة",
+  "Push.NotSupported": "إشعارات الدفع غير مدعومة",
+  "Push.PermissionDenied": "تم رفض إذن الإشعارات",
+  "Push.SubscribeSuccess": "تم تفعيل إشعارات الدفع",
+  "Push.SubscribeFailed": "فشل الاشتراك في الإشعارات",
+  "Push.UnsubscribeSuccess": "تم إلغاء إشعارات الدفع",
+  "Push.UnsubscribeFailed": "فشل إلغاء الاشتراك",
+  "Weather.Alert.Title": "تنبيه الطقس",
+  "Weather.Alert.RainMessage": "من المتوقع هطول أمطار غداً. لا تنسَ مظلتك!",
+  "Weather.Recommendation.Rainy": "أمطار متوقعة، أحضر مظلة",
+  "Weather.Recommendation.VeryHot": "حار جداً، اشرب الكثير من الماء",
+  "Weather.Recommendation.Hot": "طقس حار، ارتدِ ملابس خفيفة",
+  "Weather.Recommendation.Cold": "طقس بارد، أحضر ملابس دافئة",
+  "Weather.Recommendation.Windy": "رياح قوية، ارتدِ ملابس مقاومة للرياح",
+  "Weather.Recommendation.Good": "ظروف الطقس مناسبة، استمتع!"
 }

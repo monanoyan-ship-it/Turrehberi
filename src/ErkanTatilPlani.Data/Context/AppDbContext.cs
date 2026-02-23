@@ -62,6 +62,14 @@ public class AppDbContext : DbContext
     // Tour Photos
     public DbSet<TourPhoto> TourPhotos => Set<TourPhoto>();
 
+    // Push Subscriptions
+    public DbSet<PushSubscription> PushSubscriptions => Set<PushSubscription>();
+
+    // Messaging
+    public DbSet<Conversation> Conversations => Set<Conversation>();
+    public DbSet<Message> Messages => Set<Message>();
+    public DbSet<MessageTemplate> MessageTemplates => Set<MessageTemplate>();
+
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         base.OnModelCreating(modelBuilder);
@@ -115,6 +123,7 @@ public class AppDbContext : DbContext
             entity.HasKey(e => e.Id);
             entity.Property(e => e.Email).IsRequired().HasMaxLength(100);
             entity.HasIndex(e => e.Email).IsUnique();
+            entity.Property(e => e.NotificationPreference).HasMaxLength(500);
             entity.HasOne(e => e.Company)
                   .WithMany()
                   .HasForeignKey(e => e.CompanyId)
@@ -636,6 +645,84 @@ public class AppDbContext : DbContext
             entity.HasOne(e => e.Tour)
                   .WithMany(t => t.Photos)
                   .HasForeignKey(e => e.TourId)
+                  .OnDelete(DeleteBehavior.Cascade);
+        });
+
+        // ===============================================
+        // PUSH SUBSCRIPTIONS
+        // ===============================================
+
+        modelBuilder.Entity<PushSubscription>(entity =>
+        {
+            entity.HasKey(e => e.Id);
+            entity.Property(e => e.Endpoint).IsRequired().HasMaxLength(500);
+            entity.Property(e => e.P256dh).IsRequired().HasMaxLength(500);
+            entity.Property(e => e.Auth).IsRequired().HasMaxLength(500);
+
+            entity.HasIndex(e => e.Endpoint).IsUnique();
+
+            entity.HasOne(e => e.Visitor)
+                  .WithMany(v => v.PushSubscriptions)
+                  .HasForeignKey(e => e.VisitorId)
+                  .OnDelete(DeleteBehavior.Cascade);
+        });
+
+        // ===============================================
+        // MESAJLASMA SISTEMI
+        // ===============================================
+
+        modelBuilder.Entity<Conversation>(entity =>
+        {
+            entity.HasKey(e => e.Id);
+            entity.Property(e => e.Subject).IsRequired().HasMaxLength(200);
+
+            entity.HasIndex(e => new { e.VisitorId, e.CompanyId });
+            entity.HasIndex(e => e.LastMessageAt);
+
+            entity.HasOne(e => e.Visitor)
+                  .WithMany(v => v.Conversations)
+                  .HasForeignKey(e => e.VisitorId)
+                  .OnDelete(DeleteBehavior.Cascade);
+
+            entity.HasOne(e => e.Company)
+                  .WithMany(c => c.Conversations)
+                  .HasForeignKey(e => e.CompanyId)
+                  .OnDelete(DeleteBehavior.Cascade);
+
+            entity.HasOne(e => e.Tour)
+                  .WithMany()
+                  .HasForeignKey(e => e.TourId)
+                  .IsRequired(false)
+                  .OnDelete(DeleteBehavior.SetNull);
+        });
+
+        modelBuilder.Entity<Message>(entity =>
+        {
+            entity.HasKey(e => e.Id);
+            entity.Property(e => e.Content).IsRequired().HasMaxLength(5000);
+
+            entity.HasIndex(e => new { e.ConversationId, e.CreatedAt });
+
+            entity.HasOne(e => e.Conversation)
+                  .WithMany(c => c.Messages)
+                  .HasForeignKey(e => e.ConversationId)
+                  .OnDelete(DeleteBehavior.Cascade);
+
+            entity.HasOne(e => e.Sender)
+                  .WithMany(v => v.SentMessages)
+                  .HasForeignKey(e => e.SenderId)
+                  .OnDelete(DeleteBehavior.Restrict);
+        });
+
+        modelBuilder.Entity<MessageTemplate>(entity =>
+        {
+            entity.HasKey(e => e.Id);
+            entity.Property(e => e.Title).IsRequired().HasMaxLength(200);
+            entity.Property(e => e.Content).IsRequired().HasMaxLength(5000);
+
+            entity.HasOne(e => e.Company)
+                  .WithMany(c => c.MessageTemplates)
+                  .HasForeignKey(e => e.CompanyId)
                   .OnDelete(DeleteBehavior.Cascade);
         });
 

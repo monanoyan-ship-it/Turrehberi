@@ -141,6 +141,17 @@
                             <!-- Dinamik olarak doldurulacak -->
                         </ul>
                     </div>
+                    <!-- Push Bildirim Butonu (Sadece giris yapmis kullanicilar) -->
+                    <button id="pushNotificationBtn" class="btn btn-outline-primary btn-sm me-2" style="display: none;" onclick="PushNotificationManager.toggle()" title="Push Bildirimleri">
+                        <i class="bi bi-bell"></i>
+                    </button>
+                    <!-- Mesaj Ikonu (Sadece giris yapmis kullanicilar) -->
+                    <div id="messageBell" class="me-2" style="display: none;">
+                        <a href="/Account/Messages" class="btn btn-outline-secondary btn-sm position-relative">
+                            <i class="bi bi-chat-dots"></i>
+                            <span id="messageBadge" class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-success" style="display: none; font-size: 0.6rem;">0</span>
+                        </a>
+                    </div>
                     <!-- Bildirim Zili (Sadece giris yapmis kullanicilar) -->
                     <div id="notificationBell" class="dropdown me-2" style="display: none;">
                         <button class="btn btn-outline-secondary btn-sm position-relative" type="button" data-bs-toggle="dropdown" aria-expanded="false" id="notificationBellBtn">
@@ -185,6 +196,7 @@
                                     <li><hr class="dropdown-divider"></li>
                                     <li><a class="dropdown-item" href="/Account/Profile"><i class="bi bi-person me-2"></i><span data-t="Menu.Profile">Profilim</span></a></li>
                                     <li><a class="dropdown-item" href="/Account/Reservations"><i class="bi bi-calendar-check me-2"></i><span data-t="Menu.MyReservations">Rezervasyonlarim</span></a></li>
+                                    <li><a class="dropdown-item" href="/Account/Messages"><i class="bi bi-chat-dots me-2"></i><span data-t="Menu.Messages">Mesajlarim</span></a></li>
                                     <li id="companyMenuItem" style="display: none;"><a class="dropdown-item" href="/MyCompany"><i class="bi bi-building me-2"></i><span data-t="Menu.CompanyPanel">Firma Paneli</span></a></li>
                                     <li id="adminMenuItem" style="display: none;"><a class="dropdown-item" href="/Admin"><i class="bi bi-gear me-2"></i><span data-t="Menu.AdminPanel">Yonetim Paneli</span></a></li>
                                     <li><hr class="dropdown-divider"></li>
@@ -414,9 +426,12 @@
                 if (user.userTypeId >= 2) {
                     $('#adminMenuItem').show();
                 }
-                // Bildirim zili goster ve yukle
+                // Bildirim zili ve mesaj ikonu goster
                 $('#notificationBell').show();
+                $('#messageBell').show();
+                $('#pushNotificationBtn').show();
                 loadNotificationCount();
+                loadMessageCount();
             } else {
                 $('#notLoggedIn').show();
                 $('#loggedIn').hide();
@@ -427,6 +442,20 @@
         // ===============================================
         // BILDIRIM SISTEMI
         // ===============================================
+        function loadMessageCount() {
+            $.ajax({
+                url: apiBaseUrl + '/api/messages/unread-count',
+                method: 'GET'
+            }).done(function(data) {
+                var count = (data.visitorCount || 0) + (data.companyCount || 0);
+                if (count > 0) {
+                    $('#messageBadge').text(count > 99 ? '99+' : count).show();
+                } else {
+                    $('#messageBadge').hide();
+                }
+            });
+        }
+
         function loadNotificationCount() {
             $.ajax({
                 url: apiBaseUrl + '/api/notifications/unread-count',
@@ -836,6 +865,7 @@
             });
         });
     </script>
+    <script src="~/js/push-notification.js"></script>
     @await RenderSectionAsync("Scripts", required: false)
 </body>
 </html>

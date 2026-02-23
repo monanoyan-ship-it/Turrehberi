@@ -25,6 +25,9 @@ public static class EntityServiceRegistration
         services.AddScoped<INotificationEntityService, NotificationEntityService>();
         services.AddScoped<IGuideEntityService, GuideEntityService>();
         services.AddScoped<ITourPhotoEntityService, TourPhotoEntityService>();
+        services.AddScoped<IMessageEntityService, MessageEntityService>();
+        services.AddScoped<IMessageTemplateEntityService, MessageTemplateEntityService>();
+        services.AddScoped<IPushSubscriptionEntityService, PushSubscriptionEntityService>();
         return services;
     }
 }
