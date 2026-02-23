@@ -55,8 +55,8 @@ public class GuideFactory : IGuideFactory
         if (check.errorMessage != null) return (false, new { message = check.errorMessage }, check.statusCode);
 
         var guide = await _guideService.GetByIdWithAssignmentsAsync(guideId);
-        if (guide == null || !guide.IsActive) return (false, new { message = "Rehber bulunamadi" }, 404);
-        if (guide.CompanyId != check.companyId) return (false, new { message = "Bu rehber firmaniza ait degil" }, 403);
+        if (guide == null || !guide.IsActive) return (false, new { message = "Error.GuideNotFound" }, 404);
+        if (guide.CompanyId != check.companyId) return (false, new { message = "Error.GuideNotOwnedByCompany" }, 403);
 
         var assignments = guide.Assignments
             .OrderByDescending(a => a.TourDate.StartDate)
@@ -88,7 +88,7 @@ public class GuideFactory : IGuideFactory
         _guideService.Add(guide);
         await _unitOfWork.SaveChangesAsync();
 
-        return (true, new { guide.Id, message = "Rehber olusturuldu" }, 201);
+        return (true, new { guide.Id, message = "Success.GuideCreated" }, 201);
     }
 
     public async Task<(bool success, object result, int statusCode)> UpdateGuideAsync(int visitorId, int guideId, Guide guideData)
@@ -97,8 +97,8 @@ public class GuideFactory : IGuideFactory
         if (check.errorMessage != null) return (false, new { message = check.errorMessage }, check.statusCode);
 
         var guide = await _guideService.GetByIdAsync(guideId);
-        if (guide == null || !guide.IsActive) return (false, new { message = "Rehber bulunamadi" }, 404);
-        if (guide.CompanyId != check.companyId) return (false, new { message = "Bu rehber firmaniza ait degil" }, 403);
+        if (guide == null || !guide.IsActive) return (false, new { message = "Error.GuideNotFound" }, 404);
+        if (guide.CompanyId != check.companyId) return (false, new { message = "Error.GuideNotOwnedByCompany" }, 403);
 
         guide.FirstName = guideData.FirstName;
         guide.LastName = guideData.LastName;
@@ -111,7 +111,7 @@ public class GuideFactory : IGuideFactory
         guide.UpdatedAt = DateTime.UtcNow;
 
         await _unitOfWork.SaveChangesAsync();
-        return (true, new { message = "Rehber guncellendi" }, 200);
+        return (true, new { message = "Success.GuideUpdated" }, 200);
     }
 
     public async Task<(bool success, object result, int statusCode)> DeleteGuideAsync(int visitorId, int guideId)
@@ -120,14 +120,14 @@ public class GuideFactory : IGuideFactory
         if (check.errorMessage != null) return (false, new { message = check.errorMessage }, check.statusCode);
 
         var guide = await _guideService.GetByIdAsync(guideId);
-        if (guide == null || !guide.IsActive) return (false, new { message = "Rehber bulunamadi" }, 404);
-        if (guide.CompanyId != check.companyId) return (false, new { message = "Bu rehber firmaniza ait degil" }, 403);
+        if (guide == null || !guide.IsActive) return (false, new { message = "Error.GuideNotFound" }, 404);
+        if (guide.CompanyId != check.companyId) return (false, new { message = "Error.GuideNotOwnedByCompany" }, 403);
 
         guide.IsActive = false;
         guide.UpdatedAt = DateTime.UtcNow;
         await _unitOfWork.SaveChangesAsync();
 
-        return (true, new { message = "Rehber silindi" }, 200);
+        return (true, new { message = "Success.GuideDeleted" }, 200);
     }
 
     public async Task<(bool success, object result, int statusCode)> AssignGuideToDateAsync(int visitorId, int guideId, int tourDateId, string? notes)
@@ -136,15 +136,15 @@ public class GuideFactory : IGuideFactory
         if (check.errorMessage != null) return (false, new { message = check.errorMessage }, check.statusCode);
 
         var guide = await _guideService.GetByIdAsync(guideId);
-        if (guide == null || !guide.IsActive) return (false, new { message = "Rehber bulunamadi" }, 404);
-        if (guide.CompanyId != check.companyId) return (false, new { message = "Bu rehber firmaniza ait degil" }, 403);
+        if (guide == null || !guide.IsActive) return (false, new { message = "Error.GuideNotFound" }, 404);
+        if (guide.CompanyId != check.companyId) return (false, new { message = "Error.GuideNotOwnedByCompany" }, 403);
 
         var tourDate = await _tourDateService.GetByIdAsync(tourDateId);
-        if (tourDate == null || !tourDate.IsActive) return (false, new { message = "Tur tarihi bulunamadi" }, 404);
+        if (tourDate == null || !tourDate.IsActive) return (false, new { message = "Error.TourDateNotFound" }, 404);
 
         var existing = await _guideService.GetAssignmentsByGuideId(guideId)
             .FirstOrDefaultAsync(a => a.TourDateId == tourDateId);
-        if (existing != null) return (false, new { message = "Rehber bu tarihe zaten atanmis" }, 400);
+        if (existing != null) return (false, new { message = "Error.GuideAlreadyAssigned" }, 400);
 
         var assignment = new TourGuideAssignment
         {
@@ -157,7 +157,7 @@ public class GuideFactory : IGuideFactory
         _guideService.AddAssignment(assignment);
         await _unitOfWork.SaveChangesAsync();
 
-        return (true, new { assignment.Id, message = "Rehber atandi" }, 201);
+        return (true, new { assignment.Id, message = "Success.GuideAssigned" }, 201);
     }
 
     public async Task<(bool success, object result, int statusCode)> RemoveAssignmentAsync(int visitorId, int assignmentId)
@@ -166,13 +166,13 @@ public class GuideFactory : IGuideFactory
         if (check.errorMessage != null) return (false, new { message = check.errorMessage }, check.statusCode);
 
         var assignment = await _guideService.GetAssignmentByIdAsync(assignmentId);
-        if (assignment == null || !assignment.IsActive) return (false, new { message = "Atama bulunamadi" }, 404);
-        if (assignment.Guide.CompanyId != check.companyId) return (false, new { message = "Bu atama firmaniza ait degil" }, 403);
+        if (assignment == null || !assignment.IsActive) return (false, new { message = "Error.AssignmentNotFound" }, 404);
+        if (assignment.Guide.CompanyId != check.companyId) return (false, new { message = "Error.AssignmentNotOwnedByCompany" }, 403);
 
         _guideService.RemoveAssignment(assignment);
         await _unitOfWork.SaveChangesAsync();
 
-        return (true, new { message = "Atama kaldirildi" }, 200);
+        return (true, new { message = "Success.AssignmentRemoved" }, 200);
     }
 
     public async Task<(bool success, object result, int statusCode)> GetGuideAvailabilityAsync(int visitorId, int guideId, int year, int month)
@@ -181,8 +181,8 @@ public class GuideFactory : IGuideFactory
         if (check.errorMessage != null) return (false, new { message = check.errorMessage }, check.statusCode);
 
         var guide = await _guideService.GetByIdAsync(guideId);
-        if (guide == null || !guide.IsActive) return (false, new { message = "Rehber bulunamadi" }, 404);
-        if (guide.CompanyId != check.companyId) return (false, new { message = "Bu rehber firmaniza ait degil" }, 403);
+        if (guide == null || !guide.IsActive) return (false, new { message = "Error.GuideNotFound" }, 404);
+        if (guide.CompanyId != check.companyId) return (false, new { message = "Error.GuideNotOwnedByCompany" }, 403);
 
         var monthStart = new DateTime(year, month, 1, 0, 0, 0, DateTimeKind.Utc);
         var monthEnd = monthStart.AddMonths(1);
@@ -207,8 +207,8 @@ public class GuideFactory : IGuideFactory
         if (check.errorMessage != null) return (false, new { message = check.errorMessage }, check.statusCode);
 
         var guide = await _guideService.GetByIdAsync(guideId);
-        if (guide == null || !guide.IsActive) return (false, new { message = "Rehber bulunamadi" }, 404);
-        if (guide.CompanyId != check.companyId) return (false, new { message = "Bu rehber firmaniza ait degil" }, 403);
+        if (guide == null || !guide.IsActive) return (false, new { message = "Error.GuideNotFound" }, 404);
+        if (guide.CompanyId != check.companyId) return (false, new { message = "Error.GuideNotOwnedByCompany" }, 403);
 
         var totalAssignments = await _guideService.GetAssignmentsByGuideId(guideId).CountAsync();
         var completedAssignments = await _guideService.GetAssignmentsByGuideId(guideId)
@@ -233,11 +233,11 @@ public class GuideFactory : IGuideFactory
         if (check.errorMessage != null) return (false, new { message = check.errorMessage }, check.statusCode);
 
         var guide = await _guideService.GetByIdAsync(guideId);
-        if (guide == null || !guide.IsActive) return (false, new { message = "Rehber bulunamadi" }, 404);
-        if (guide.CompanyId != check.companyId) return (false, new { message = "Bu rehber firmaniza ait degil" }, 403);
+        if (guide == null || !guide.IsActive) return (false, new { message = "Error.GuideNotFound" }, 404);
+        if (guide.CompanyId != check.companyId) return (false, new { message = "Error.GuideNotOwnedByCompany" }, 403);
 
         if (fileStream == null || fileStream.Length == 0)
-            return (false, new { message = "Dosya secilmedi" }, 400);
+            return (false, new { message = "Error.NoFileSelected" }, 400);
 
         // Eski fotoyu sil
         if (!string.IsNullOrEmpty(guide.PhotoUrl) && guide.PhotoUrl.StartsWith("/uploads/"))
@@ -253,7 +253,7 @@ public class GuideFactory : IGuideFactory
         guide.UpdatedAt = DateTime.UtcNow;
         await _unitOfWork.SaveChangesAsync();
 
-        return (true, new { message = "Fotograf yuklendi", photoUrl = result.Url }, 200);
+        return (true, new { message = "Success.PhotoUploaded", photoUrl = result.Url }, 200);
     }
 
     public async Task<(bool success, object result, int statusCode)> DeleteGuidePhotoAsync(int visitorId, int guideId)
@@ -262,8 +262,8 @@ public class GuideFactory : IGuideFactory
         if (check.errorMessage != null) return (false, new { message = check.errorMessage }, check.statusCode);
 
         var guide = await _guideService.GetByIdAsync(guideId);
-        if (guide == null || !guide.IsActive) return (false, new { message = "Rehber bulunamadi" }, 404);
-        if (guide.CompanyId != check.companyId) return (false, new { message = "Bu rehber firmaniza ait degil" }, 403);
+        if (guide == null || !guide.IsActive) return (false, new { message = "Error.GuideNotFound" }, 404);
+        if (guide.CompanyId != check.companyId) return (false, new { message = "Error.GuideNotOwnedByCompany" }, 403);
 
         if (!string.IsNullOrEmpty(guide.PhotoUrl) && guide.PhotoUrl.StartsWith("/uploads/"))
         {
@@ -274,16 +274,16 @@ public class GuideFactory : IGuideFactory
         guide.UpdatedAt = DateTime.UtcNow;
         await _unitOfWork.SaveChangesAsync();
 
-        return (true, new { message = "Fotograf silindi" }, 200);
+        return (true, new { message = "Success.PhotoDeleted" }, 200);
     }
 
     private async Task<(string? errorMessage, int statusCode, int? companyId)> CheckCompanyOwnership(int visitorId)
     {
         var visitor = await _visitorService.GetByIdWithCompanyAsync(visitorId);
-        if (visitor == null) return ("Kullanici bulunamadi", 401, null);
-        if (visitor.Company == null) return ("Firma sahibi degilsiniz", 403, null);
+        if (visitor == null) return ("Error.UserNotFound", 401, null);
+        if (visitor.Company == null) return ("Error.NotCompanyOwner", 403, null);
         if (visitor.Company.StatusId != CompanyStatuses.Ids.Approved)
-            return ("Firma durumu uygun degil", 403, null);
+            return ("Error.CompanyStatusInvalid", 403, null);
 
         return (null, 200, visitor.Company.Id);
     }

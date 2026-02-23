@@ -172,14 +172,14 @@ public class PromotionCalculationFactory : IPromotionCalculationFactory
     {
         var tour = await _tourService.GetByIdWithCompanyAsync(tourId);
         if (tour == null)
-            return (false, 0, "Tur bulunamadi");
+            return (false, 0, "Error.TourNotFound");
 
         var coupon = await _promotionService.GetByCodeAsync(tour.CompanyId, code);
         if (coupon == null)
-            return (false, 0, "Gecersiz kupon kodu");
+            return (false, 0, "Error.InvalidCouponCode");
 
         if (!IsApplicableToTour(coupon, tourId))
-            return (false, 0, "Bu kupon bu tur icin gecerli degil");
+            return (false, 0, "Error.CouponNotValidForTour");
 
         var validation = await ValidateCouponInternal(coupon, totalPrice, visitorId);
         if (!validation.valid)
@@ -187,7 +187,7 @@ public class PromotionCalculationFactory : IPromotionCalculationFactory
 
         var discount = CalculateDiscount(coupon, totalPrice);
         if (discount == null)
-            return (false, 0, "Indirim hesaplanamadi");
+            return (false, 0, "Error.DiscountCalculationFailed");
 
         return (true, discount.DiscountAmount, null);
     }
@@ -277,19 +277,19 @@ public class PromotionCalculationFactory : IPromotionCalculationFactory
     {
         // Kullanim limiti kontrolu
         if (coupon.UsageLimit.HasValue && coupon.UsageCount >= coupon.UsageLimit.Value)
-            return (false, "Bu kuponun kullanim limiti dolmus");
+            return (false, "Error.CouponUsageLimitReached");
 
         // Kullanici basi limit kontrolu
         if (visitorId.HasValue && coupon.UsageLimitPerUser.HasValue)
         {
             var userUsageCount = await _promotionService.GetUsageCountByVisitorAsync(coupon.Id, visitorId.Value);
             if (userUsageCount >= coupon.UsageLimitPerUser.Value)
-                return (false, "Bu kuponu daha fazla kullanamazsiniz");
+                return (false, "Error.CouponPerUserLimitReached");
         }
 
         // Minimum siparis tutari kontrolu
         if (coupon.MinOrderAmount.HasValue && totalPrice < coupon.MinOrderAmount.Value)
-            return (false, $"Minimum siparis tutari {coupon.MinOrderAmount.Value:N2} TL");
+            return (false, "Error.MinOrderAmountNotMet");
 
         return (true, null);
     }
@@ -392,15 +392,15 @@ public class PromotionCalculationFactory : IPromotionCalculationFactory
             case 1: // EarlyBird
                 var daysAhead = (startDate - DateTime.UtcNow).TotalDays;
                 if (p.MinDaysAhead.HasValue && daysAhead >= p.MinDaysAhead.Value)
-                    return new { type = type.SystemName, icon = type.Icon, cssClass = type.CssClass, label = $"%{p.DiscountValue} Erken Rez.", nameKey = "Badge.EarlyBird" };
+                    return new { type = type.SystemName, icon = type.Icon, cssClass = type.CssClass, label = $"%{p.DiscountValue}", nameKey = "Badge.EarlyBird" };
                 break;
             case 2: // LastMinute
-                return new { type = type.SystemName, icon = type.Icon, cssClass = type.CssClass, label = $"%{p.DiscountValue} Son Dakika", nameKey = "Badge.LastMinute" };
+                return new { type = type.SystemName, icon = type.Icon, cssClass = type.CssClass, label = $"%{p.DiscountValue}", nameKey = "Badge.LastMinute" };
             case 3: // GroupDiscount
-                return new { type = type.SystemName, icon = type.Icon, cssClass = type.CssClass, label = $"%{p.DiscountValue} Grup Ind.", nameKey = "Badge.GroupDiscount" };
+                return new { type = type.SystemName, icon = type.Icon, cssClass = type.CssClass, label = $"%{p.DiscountValue}", nameKey = "Badge.GroupDiscount" };
             case 4: // FlashSale
                 if (p.FlashSaleStock == null || p.FlashSaleSoldCount < p.FlashSaleStock)
-                    return new { type = type.SystemName, icon = type.Icon, cssClass = type.CssClass, label = $"%{p.DiscountValue} Flash Sale", nameKey = "Badge.FlashSale", endDate = p.EndDate };
+                    return new { type = type.SystemName, icon = type.Icon, cssClass = type.CssClass, label = $"%{p.DiscountValue}", nameKey = "Badge.FlashSale", endDate = p.EndDate };
                 break;
         }
         return null;

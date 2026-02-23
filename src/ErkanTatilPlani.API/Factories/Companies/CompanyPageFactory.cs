@@ -31,10 +31,10 @@ public class CompanyPageFactory : ICompanyPageFactory
     {
         var visitor = await _visitorService.GetByIdWithCompanyAsync(visitorId);
         if (visitor == null)
-            return (false, "Kullanici bulunamadi", null, 401);
+            return (false, "Error.UserNotFound", null, 401);
 
         if (visitor.UserTypeId < UserTypes.Ids.Staff && visitor.CompanyId != companyId)
-            return (false, "Bu firmaya erisim yetkiniz yok", "NO_PERMISSION", 403);
+            return (false, "Error.CompanyAccessDenied", "NO_PERMISSION", 403);
 
         return (true, null, null, null);
     }
@@ -65,7 +65,7 @@ public class CompanyPageFactory : ICompanyPageFactory
 
         var page = await _pageService.GetByIdAsync(id);
         if (page == null || page.CompanyId != companyId || !page.IsActive)
-            return (null, "Sayfa bulunamadi", null, 404);
+            return (null, "Error.PageNotFound", null, 404);
 
         return (new
         {
@@ -102,7 +102,7 @@ public class CompanyPageFactory : ICompanyPageFactory
 
         var existing = await _pageService.GetByIdAsync(id);
         if (existing == null || existing.CompanyId != companyId || !existing.IsActive)
-            return (false, "Sayfa bulunamadi", null, 404);
+            return (false, "Error.PageNotFound", null, 404);
 
         existing.Title = page.Title;
         existing.Content = page.Content;
@@ -128,7 +128,7 @@ public class CompanyPageFactory : ICompanyPageFactory
 
         var page = await _pageService.GetByIdAsync(id);
         if (page == null || page.CompanyId != companyId || !page.IsActive)
-            return (false, "Sayfa bulunamadi", null, 404);
+            return (false, "Error.PageNotFound", null, 404);
 
         page.IsActive = false;
         page.UpdatedAt = DateTime.UtcNow;

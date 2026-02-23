@@ -54,17 +54,17 @@ public class BlogCommentFactory : IBlogCommentFactory
     public async Task<(bool success, string? errorMessage, string? errorCode, int? statusCode)> AddCommentAsync(int visitorId, int postId, string content, int? parentCommentId)
     {
         var visitor = await _visitorService.GetByIdAsync(visitorId);
-        if (visitor == null) return (false, "Kullanici bulunamadi", null, 401);
+        if (visitor == null) return (false, "Error.UserNotFound", null, 401);
 
         var post = await _blogService.GetByIdAsync(postId);
         if (post == null || !post.IsActive || post.StatusId != BlogStatuses.Ids.Published)
-            return (false, "Yazi bulunamadi", null, 404);
+            return (false, "Error.PostNotFound", null, 404);
 
         if (parentCommentId.HasValue)
         {
             var parent = await _blogService.GetActiveComments()
                 .FirstOrDefaultAsync(c => c.Id == parentCommentId.Value && c.BlogPostId == postId);
-            if (parent == null) return (false, "Yanit verilecek yorum bulunamadi", null, 404);
+            if (parent == null) return (false, "Error.ParentCommentNotFound", null, 404);
         }
 
         var comment = new BlogComment
@@ -88,7 +88,7 @@ public class BlogCommentFactory : IBlogCommentFactory
         if (comment == null) return (false, true, null, null, null);
 
         if (comment.VisitorId != visitorId)
-            return (false, false, "Bu yorumu silme yetkiniz yok", "NO_PERMISSION", 403);
+            return (false, false, "Error.CommentDeletePermissionDenied", "NO_PERMISSION", 403);
 
         comment.IsActive = false;
         comment.UpdatedAt = DateTime.UtcNow;

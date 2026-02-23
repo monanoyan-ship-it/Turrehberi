@@ -161,10 +161,10 @@ public class CompanyAnalyticsFactory : ICompanyAnalyticsFactory
     private async Task<(string? errorMessage, int statusCode, int? companyId)> CheckCompanyOwnership(int visitorId)
     {
         var visitor = await _visitorService.GetByIdWithCompanyAsync(visitorId);
-        if (visitor == null) return ("Kullanici bulunamadi", 401, null);
-        if (visitor.Company == null) return ("Firma sahibi degilsiniz", 403, null);
+        if (visitor == null) return ("Error.UserNotFound", 401, null);
+        if (visitor.Company == null) return ("Error.NotCompanyOwner", 403, null);
         if (visitor.Company.StatusId != CompanyStatuses.Ids.Approved)
-            return ("Firma durumu uygun degil", 403, null);
+            return ("Error.CompanyStatusInvalid", 403, null);
 
         return (null, 200, visitor.Company.Id);
     }

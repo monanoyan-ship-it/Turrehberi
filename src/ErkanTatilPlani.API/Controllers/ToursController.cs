@@ -70,7 +70,7 @@ public class ToursController : ControllerBase
     public async Task<ActionResult<object>> GetMyTours()
     {
         var visitorId = GetVisitorId();
-        if (visitorId == null) return Unauthorized(new { message = "Giris yapmaniz gerekiyor" });
+        if (visitorId == null) return Unauthorized(new { message = "Error.LoginRequired" });
 
         var (result, errorMessage, errorCode, statusCode) = await _tourFactory.GetMyToursAsync(visitorId.Value);
         if (errorMessage != null)
@@ -86,7 +86,7 @@ public class ToursController : ControllerBase
     public async Task<ActionResult<Tour>> CreateTour(Tour tour)
     {
         var visitorId = GetVisitorId();
-        if (visitorId == null) return Unauthorized(new { message = "Giris yapmaniz gerekiyor" });
+        if (visitorId == null) return Unauthorized(new { message = "Error.LoginRequired" });
 
         var (created, errorMessage, errorCode, statusCode) = await _tourFactory.CreateTourAsync(visitorId.Value, tour);
         if (errorMessage != null)
@@ -103,7 +103,7 @@ public class ToursController : ControllerBase
     {
         if (id != tour.Id) return BadRequest();
         var visitorId = GetVisitorId();
-        if (visitorId == null) return Unauthorized(new { message = "Giris yapmaniz gerekiyor" });
+        if (visitorId == null) return Unauthorized(new { message = "Error.LoginRequired" });
 
         var (success, errorMessage, errorCode, statusCode) = await _tourFactory.UpdateTourAsync(visitorId.Value, id, tour);
         if (!success)
@@ -119,7 +119,7 @@ public class ToursController : ControllerBase
     public async Task<IActionResult> DeleteTour(int id)
     {
         var visitorId = GetVisitorId();
-        if (visitorId == null) return Unauthorized(new { message = "Giris yapmaniz gerekiyor" });
+        if (visitorId == null) return Unauthorized(new { message = "Error.LoginRequired" });
 
         var (success, notFound, errorMessage, errorCode, statusCode) = await _tourFactory.DeleteTourAsync(visitorId.Value, id);
         if (notFound) return NotFound();
@@ -140,7 +140,7 @@ public class ToursController : ControllerBase
     {
         var (found, result) = await _photoFactory.GetPhotosAsync(id);
         if (!found)
-            return NotFound(new { message = "Tur bulunamadi" });
+            return NotFound(new { message = "Error.TourNotFound" });
         return Ok(result);
     }
 

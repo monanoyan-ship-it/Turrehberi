@@ -97,10 +97,10 @@
                                 <div class="btn-group btn-group-sm">
                                     <!-- Bekleyen icin Onayla/Reddet -->
                                     <!-- ko if: statusId === 0 || statusId === 3 -->
-                                    <button class="btn btn-success" data-bind="click: $parent.openApproveModal" title="Onayla">
+                                    <button class="btn btn-success" data-bind="click: $parent.openApproveModal" data-t-title="Common.Approve" title="Onayla">
                                         <i class="bi bi-check-lg"></i>
                                     </button>
-                                    <button class="btn btn-danger" data-bind="click: $parent.openRejectModal" title="Reddet">
+                                    <button class="btn btn-danger" data-bind="click: $parent.openRejectModal" data-t-title="Common.Reject" title="Reddet">
                                         <i class="bi bi-x-lg"></i>
                                     </button>
                                     <!-- /ko -->
@@ -111,7 +111,7 @@
                                     </button>
                                     <!-- /ko -->
                                     <!-- Detay butonu -->
-                                    <button class="btn btn-outline-info" data-bind="click: $parent.openDetailsModal" title="Detay">
+                                    <button class="btn btn-outline-info" data-bind="click: $parent.openDetailsModal" data-t-title="Common.Detail" title="Detay">
                                         <i class="bi bi-eye"></i>
                                     </button>
                                 </div>

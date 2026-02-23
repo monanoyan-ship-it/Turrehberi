@@ -36,19 +36,19 @@ function CompanyBlogViewModel() {
 
     // Helpers
     var categoryNames = {
-        0: 'Seyahat Ipuclari', 1: 'Gezi Rehberleri', 2: 'Haberler',
-        3: 'Kultur & Yasam', 4: 'Yeme & Icme', 5: 'Macera & Doga'
+        0: T('Blog.Category.TravelTips'), 1: T('Blog.Category.Destinations'), 2: T('Blog.Category.News'),
+        3: T('Blog.Category.Culture'), 4: T('Blog.Category.FoodAndDrink'), 5: T('Blog.Category.Adventure')
     };
     var categoryBadgeClasses = {
         0: 'bg-info', 1: 'bg-success', 2: 'bg-primary',
         3: 'bg-warning text-dark', 4: 'bg-danger', 5: 'bg-dark'
     };
-    var statusNames = { 0: 'Taslak', 1: 'Yayinda', 2: 'Arsiv' };
+    var statusNames = { 0: T('Blog.Status.Draft'), 1: T('Blog.Status.Published'), 2: T('Blog.Status.Archived') };
     var statusBadgeClasses = { 0: 'bg-secondary', 1: 'bg-success', 2: 'bg-warning text-dark' };
 
-    self.getCategoryName = function (id) { return categoryNames[id] || 'Diger'; };
+    self.getCategoryName = function (id) { return categoryNames[id] || T('Blog.Category.Other'); };
     self.getCategoryBadgeClass = function (id) { return categoryBadgeClasses[id] || 'bg-secondary'; };
-    self.getStatusName = function (id) { return statusNames[id] || 'Bilinmiyor'; };
+    self.getStatusName = function (id) { return statusNames[id] || T('Common.Unknown'); };
     self.getStatusBadgeClass = function (id) { return statusBadgeClasses[id] || 'bg-secondary'; };
 
     self.formatDate = function (dateStr) {
@@ -67,7 +67,7 @@ function CompanyBlogViewModel() {
             self.allPosts(data);
             self.isLoading(false);
         }).fail(function () {
-            toastr.error('Veriler yuklenemedi');
+            toastr.error(T('Error.DataLoadFailed'));
             self.isLoading(false);
         });
     };
@@ -154,7 +154,7 @@ function CompanyBlogViewModel() {
     self.savePost = function () {
         var fd = self.formData();
         if (!fd.title || !fd.summary) {
-            toastr.warning('Baslik ve ozet zorunludur');
+            toastr.warning(T('Validation.TitleSummaryRequired'));
             return;
         }
 
@@ -163,7 +163,7 @@ function CompanyBlogViewModel() {
         }
 
         if (!fd.content || fd.content === '<p><br></p>') {
-            toastr.warning('Icerik zorunludur');
+            toastr.warning(T('Validation.ContentRequired'));
             return;
         }
 
@@ -189,12 +189,12 @@ function CompanyBlogViewModel() {
                 contentType: 'application/json',
                 data: JSON.stringify(postData)
             }).done(function () {
-                toastr.success('Yazi guncellendi');
+                toastr.success(T('Success.PostUpdated'));
                 formModal.hide();
                 self.loadData();
                 self.isSaving(false);
             }).fail(function (xhr) {
-                toastr.error(xhr.responseJSON?.message || 'Guncelleme basarisiz');
+                toastr.error(T(xhr.responseJSON?.message) || T('Common.Error'));
                 self.isSaving(false);
             });
         } else {
@@ -204,12 +204,12 @@ function CompanyBlogViewModel() {
                 contentType: 'application/json',
                 data: JSON.stringify(postData)
             }).done(function () {
-                toastr.success('Yazi olusturuldu');
+                toastr.success(T('Success.PostCreated'));
                 formModal.hide();
                 self.loadData();
                 self.isSaving(false);
             }).fail(function (xhr) {
-                toastr.error(xhr.responseJSON?.message || 'Olusturma basarisiz');
+                toastr.error(T(xhr.responseJSON?.message) || T('Common.Error'));
                 self.isSaving(false);
             });
         }
@@ -223,12 +223,12 @@ function CompanyBlogViewModel() {
             url: apiBaseUrl + '/api/blogs/' + self.selectedPost().id,
             method: 'DELETE',
         }).done(function () {
-            toastr.success('Yazi silindi');
+            toastr.success(T('Success.PostDeleted'));
             deleteModal.hide();
             self.loadData();
             self.isSaving(false);
         }).fail(function (xhr) {
-            toastr.error(xhr.responseJSON?.message || 'Silme basarisiz');
+            toastr.error(T(xhr.responseJSON?.message) || T('Common.Error'));
             self.isSaving(false);
         });
     };

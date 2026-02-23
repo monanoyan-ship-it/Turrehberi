@@ -58,14 +58,14 @@ public class FavoriteFactory : IFavoriteFactory
     {
         var tour = await _tourService.GetActiveTours().FirstOrDefaultAsync(t => t.Id == tourId);
         if (tour == null)
-            return (false, "Tur bulunamadi");
+            return (false, "Error.TourNotFound");
 
         var existingFavorite = await _favoriteService.GetByVisitorAndTourAsync(visitorId, tourId);
 
         if (existingFavorite != null)
         {
             if (existingFavorite.IsActive)
-                return (false, "Bu tur zaten favorilerinizde");
+                return (false, "Error.TourAlreadyFavorited");
 
             existingFavorite.IsActive = true;
             existingFavorite.UpdatedAt = DateTime.UtcNow;
@@ -83,26 +83,26 @@ public class FavoriteFactory : IFavoriteFactory
         }
 
         await _unitOfWork.SaveChangesAsync();
-        return (true, "Tur favorilere eklendi");
+        return (true, "Success.TourAddedToFavorites");
     }
 
     public async Task<(bool success, string message)> RemoveFavoriteAsync(int visitorId, int tourId)
     {
         var favorite = await _favoriteService.GetByVisitorAndTourAsync(visitorId, tourId);
         if (favorite == null || !favorite.IsActive)
-            return (false, "Bu tur favorilerinizde degil");
+            return (false, "Error.TourNotInFavorites");
 
         favorite.IsActive = false;
         favorite.UpdatedAt = DateTime.UtcNow;
         await _unitOfWork.SaveChangesAsync();
-        return (true, "Tur favorilerden cikarildi");
+        return (true, "Success.TourRemovedFromFavorites");
     }
 
     public async Task<(bool isFavorite, string message, bool tourNotFound)> ToggleFavoriteAsync(int visitorId, int tourId)
     {
         var tour = await _tourService.GetActiveTours().FirstOrDefaultAsync(t => t.Id == tourId);
         if (tour == null)
-            return (false, "Tur bulunamadi", true);
+            return (false, "Error.TourNotFound", true);
 
         var favorite = await _favoriteService.GetByVisitorAndTourAsync(visitorId, tourId);
         bool isFavorite;
@@ -127,6 +127,6 @@ public class FavoriteFactory : IFavoriteFactory
         }
 
         await _unitOfWork.SaveChangesAsync();
-        return (isFavorite, isFavorite ? "Tur favorilere eklendi" : "Tur favorilerden cikarildi", false);
+        return (isFavorite, isFavorite ? "Success.TourAddedToFavorites" : "Success.TourRemovedFromFavorites", false);
     }
 }

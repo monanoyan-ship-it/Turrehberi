@@ -26,12 +26,12 @@ function BlogIndexViewModel() {
 
     // Category helpers
     var categoryNames = {
-        0: T('Blog.Category.TravelTips') !== 'Blog.Category.TravelTips' ? T('Blog.Category.TravelTips') : 'Seyahat Ipuclari',
-        1: T('Blog.Category.Destinations') !== 'Blog.Category.Destinations' ? T('Blog.Category.Destinations') : 'Gezi Rehberleri',
-        2: T('Blog.Category.News') !== 'Blog.Category.News' ? T('Blog.Category.News') : 'Haberler',
-        3: T('Blog.Category.Culture') !== 'Blog.Category.Culture' ? T('Blog.Category.Culture') : 'Kultur & Yasam',
-        4: T('Blog.Category.FoodAndDrink') !== 'Blog.Category.FoodAndDrink' ? T('Blog.Category.FoodAndDrink') : 'Yeme & Icme',
-        5: T('Blog.Category.Adventure') !== 'Blog.Category.Adventure' ? T('Blog.Category.Adventure') : 'Macera & Doga'
+        0: T('Blog.Category.TravelTips'),
+        1: T('Blog.Category.Destinations'),
+        2: T('Blog.Category.News'),
+        3: T('Blog.Category.Culture'),
+        4: T('Blog.Category.FoodAndDrink'),
+        5: T('Blog.Category.Adventure')
     };
 
     var categoryBadgeClasses = {
@@ -44,7 +44,7 @@ function BlogIndexViewModel() {
     };
 
     self.getCategoryName = function (id) {
-        return categoryNames[id] || 'Diger';
+        return categoryNames[id] || T('Blog.Category.Other');
     };
 
     self.getCategoryBadgeClass = function (id) {
@@ -77,7 +77,7 @@ function BlogIndexViewModel() {
             self.totalCount(data.totalCount);
             self.isLoading(false);
         }).fail(function () {
-            toastr.error('Yazilar yuklenemedi');
+            toastr.error(T('Error.PostsLoadFailed'));
             self.isLoading(false);
         });
     };

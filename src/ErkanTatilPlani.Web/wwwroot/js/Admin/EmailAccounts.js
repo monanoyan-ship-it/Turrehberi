@@ -33,7 +33,7 @@ function EmailAccountsViewModel() {
                 self.accounts(data);
             })
             .fail(function(xhr) {
-                toastr.error('Hesaplar yuklenemedi');
+                toastr.error(T('Error.AccountsLoadFailed'));
             })
             .always(function() {
                 self.loading(false);
@@ -81,7 +81,7 @@ function EmailAccountsViewModel() {
 
     self.saveAccount = function() {
         if (!self.formData.name() || !self.formData.smtpHost() || !self.formData.fromEmail()) {
-            toastr.warning('Lutfen zorunlu alanlari doldurun');
+            toastr.warning(T('Validation.FillRequiredFields'));
             return;
         }
 
@@ -114,13 +114,12 @@ function EmailAccountsViewModel() {
             data: JSON.stringify(data)
         })
         .done(function() {
-            toastr.success(self.editingAccount() ? 'Hesap guncellendi' : 'Hesap olusturuldu');
+            toastr.success(self.editingAccount() ? T('Success.AccountUpdated') : T('Success.AccountCreated'));
             $('#accountModal').modal('hide');
             self.loadAccounts();
         })
         .fail(function(xhr) {
-            var msg = xhr.responseJSON?.message || 'Islem basarisiz';
-            toastr.error(msg);
+            toastr.error(T(xhr.responseJSON?.message) || T('Common.Error'));
         })
         .always(function() {
             self.saving(false);
@@ -128,50 +127,47 @@ function EmailAccountsViewModel() {
     };
 
     self.copyAccount = function(account) {
-        if (!confirm('Bu hesabi kopyalamak istediginizden emin misiniz?')) return;
+        if (!confirm(T('Confirm.CopyAccount'))) return;
 
         $.post(apiBaseUrl + '/api/admin/email-accounts/' + account.id + '/copy')
             .done(function() {
-                toastr.success('Hesap kopyalandi');
+                toastr.success(T('Success.AccountCopied'));
                 self.loadAccounts();
             })
             .fail(function(xhr) {
-                var msg = xhr.responseJSON?.message || 'Kopyalama basarisiz';
-                toastr.error(msg);
+                toastr.error(T(xhr.responseJSON?.message) || T('Common.Error'));
             });
     };
 
     self.setDefault = function(account) {
-        if (!confirm('Bu hesabi varsayilan yapmak istediginizden emin misiniz?')) return;
+        if (!confirm(T('Confirm.SetDefaultAccount'))) return;
 
         $.ajax({
             url: apiBaseUrl + '/api/admin/email-accounts/' + account.id + '/set-default',
             method: 'PUT'
         })
         .done(function() {
-            toastr.success('Varsayilan hesap ayarlandi');
+            toastr.success(T('Success.DefaultAccountSet'));
             self.loadAccounts();
         })
         .fail(function(xhr) {
-            var msg = xhr.responseJSON?.message || 'Islem basarisiz';
-            toastr.error(msg);
+            toastr.error(T(xhr.responseJSON?.message) || T('Common.Error'));
         });
     };
 
     self.deleteAccount = function(account) {
-        if (!confirm('Bu hesabi silmek istediginizden emin misiniz?')) return;
+        if (!confirm(T('Confirm.DeleteAccount'))) return;
 
         $.ajax({
             url: apiBaseUrl + '/api/admin/email-accounts/' + account.id,
             method: 'DELETE'
         })
         .done(function() {
-            toastr.success('Hesap silindi');
+            toastr.success(T('Success.AccountDeleted'));
             self.loadAccounts();
         })
         .fail(function(xhr) {
-            var msg = xhr.responseJSON?.message || 'Silme basarisiz';
-            toastr.error(msg);
+            toastr.error(T(xhr.responseJSON?.message) || T('Common.Error'));
         });
     };
 
@@ -184,7 +180,7 @@ function EmailAccountsViewModel() {
 
     self.sendTestEmail = function() {
         if (!self.testEmail()) {
-            toastr.warning('Lutfen alici email adresini girin');
+            toastr.warning(T('Validation.EnterRecipientEmail'));
             return;
         }
 
@@ -196,12 +192,11 @@ function EmailAccountsViewModel() {
             data: JSON.stringify({ toEmail: self.testEmail() })
         })
         .done(function(response) {
-            toastr.success(response.message || 'Test emaili gonderildi');
+            toastr.success(T(response.message) || T('Success.TestEmailSent'));
             $('#testModal').modal('hide');
         })
         .fail(function(xhr) {
-            var msg = xhr.responseJSON?.message || 'Email gonderilemedi';
-            toastr.error(msg);
+            toastr.error(T(xhr.responseJSON?.message) || T('Common.Error'));
         })
         .always(function() {
             self.sendingTest(false);

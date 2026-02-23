@@ -59,18 +59,18 @@ public class TourWatchFactory : ITourWatchFactory
     public async Task<(bool success, string message)> AddWatchAsync(int visitorId, int tourId, int watchDays)
     {
         if (watchDays < 1 || watchDays > 90)
-            return (false, "Takip suresi 1-90 gun arasinda olmalidir");
+            return (false, "Validation.WatchDurationRange");
 
         var tour = await _tourService.GetActiveTours().FirstOrDefaultAsync(t => t.Id == tourId);
         if (tour == null)
-            return (false, "Tur bulunamadi");
+            return (false, "Error.TourNotFound");
 
         var existingWatch = await _watchService.GetByVisitorAndTourAsync(visitorId, tourId);
 
         if (existingWatch != null)
         {
             if (existingWatch.IsActive && existingWatch.ExpiresAt > DateTime.UtcNow)
-                return (false, "Bu turu zaten takip ediyorsunuz");
+                return (false, "Error.TourAlreadyWatched");
 
             existingWatch.IsActive = true;
             existingWatch.WatchDays = watchDays;
@@ -92,29 +92,29 @@ public class TourWatchFactory : ITourWatchFactory
         }
 
         await _unitOfWork.SaveChangesAsync();
-        return (true, "Tur takibe alindi");
+        return (true, "Success.TourWatchAdded");
     }
 
     public async Task<(bool success, string message)> RemoveWatchAsync(int visitorId, int tourId)
     {
         var watch = await _watchService.GetByVisitorAndTourAsync(visitorId, tourId);
         if (watch == null || !watch.IsActive)
-            return (false, "Bu turu takip etmiyorsunuz");
+            return (false, "Error.TourNotWatched");
 
         watch.IsActive = false;
         watch.UpdatedAt = DateTime.UtcNow;
         await _unitOfWork.SaveChangesAsync();
-        return (true, "Tur takipten cikarildi");
+        return (true, "Success.TourWatchRemoved");
     }
 
     public async Task<(bool isWatching, string message, bool tourNotFound)> ToggleWatchAsync(int visitorId, int tourId, int watchDays)
     {
         if (watchDays < 1 || watchDays > 90)
-            return (false, "Takip suresi 1-90 gun arasinda olmalidir", false);
+            return (false, "Validation.WatchDurationRange", false);
 
         var tour = await _tourService.GetActiveTours().FirstOrDefaultAsync(t => t.Id == tourId);
         if (tour == null)
-            return (false, "Tur bulunamadi", true);
+            return (false, "Error.TourNotFound", true);
 
         var watch = await _watchService.GetByVisitorAndTourAsync(visitorId, tourId);
         bool isWatching;
@@ -152,6 +152,6 @@ public class TourWatchFactory : ITourWatchFactory
         }
 
         await _unitOfWork.SaveChangesAsync();
-        return (isWatching, isWatching ? "Tur takibe alindi" : "Tur takipten cikarildi", false);
+        return (isWatching, isWatching ? "Success.TourWatchAdded" : "Success.TourWatchRemoved", false);
     }
 }

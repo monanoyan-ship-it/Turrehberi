@@ -85,7 +85,7 @@ function AdminCompaniesViewModel() {
                 self.isLoading(false);
             })
             .fail(function() {
-                toastr.error('Veriler yuklenemedi');
+                toastr.error(T('Error.DataLoadFailed'));
                 self.isLoading(false);
             });
     };
@@ -153,14 +153,14 @@ function AdminCompaniesViewModel() {
         if (file) {
             // Dosya tipi kontrolu
             if (file.type !== 'application/pdf' && !file.name.toLowerCase().endsWith('.pdf')) {
-                toastr.error('Sadece PDF dosyalari yuklenebilir');
+                toastr.error(T('Validation.OnlyPdfAllowed'));
                 event.target.value = '';
                 self.selectedFile(null);
                 return;
             }
             // Boyut kontrolu (10MB)
             if (file.size > 10 * 1024 * 1024) {
-                toastr.error('Dosya boyutu 10MB\'i gecemez');
+                toastr.error(T('Validation.FileSizeMax10MB'));
                 event.target.value = '';
                 self.selectedFile(null);
                 return;
@@ -174,7 +174,7 @@ function AdminCompaniesViewModel() {
     // Sozlesme yukle
     self.uploadContract = function() {
         if (!self.selectedFile()) {
-            toastr.warning('Lutfen bir dosya secin');
+            toastr.warning(T('Validation.PleaseSelectFile'));
             return;
         }
 
@@ -202,7 +202,7 @@ function AdminCompaniesViewModel() {
             }
         })
         .done(function(response) {
-            toastr.success(response.message || 'Sozlesme basariyla yuklendi');
+            toastr.success(T(response.message) || T('Success.ContractUploaded'));
             // Secili firmayi guncelle
             self.selectedCompany().contractFileUrl = response.contractFileUrl;
             self.selectedCompany().contractUploadedAt = response.contractUploadedAt;
@@ -215,15 +215,14 @@ function AdminCompaniesViewModel() {
             self.isUploading(false);
         })
         .fail(function(xhr) {
-            var msg = xhr.responseJSON ? xhr.responseJSON.message : 'Yukleme hatasi';
-            toastr.error(msg);
+            toastr.error(T(xhr.responseJSON?.message) || T('Common.Error'));
             self.isUploading(false);
         });
     };
 
     // Sozlesme sil
     self.deleteContract = function() {
-        if (!confirm('Sozlesmeyi silmek istediginizden emin misiniz?')) return;
+        if (!confirm(T('Confirm.DeleteContract'))) return;
 
         self.isUploading(true);
         $.ajax({
@@ -231,7 +230,7 @@ function AdminCompaniesViewModel() {
             method: 'DELETE'
         })
         .done(function(response) {
-            toastr.success(response.message || 'Sozlesme basariyla silindi');
+            toastr.success(T(response.message) || T('Success.ContractDeleted'));
             // Secili firmayi guncelle
             self.selectedCompany().contractFileUrl = '';
             self.selectedCompany().contractUploadedAt = null;
@@ -240,8 +239,7 @@ function AdminCompaniesViewModel() {
             self.isUploading(false);
         })
         .fail(function(xhr) {
-            var msg = xhr.responseJSON ? xhr.responseJSON.message : 'Silme hatasi';
-            toastr.error(msg);
+            toastr.error(T(xhr.responseJSON?.message) || T('Common.Error'));
             self.isUploading(false);
         });
     };
@@ -259,11 +257,11 @@ function AdminCompaniesViewModel() {
         .done(function() {
             formModal.hide();
             self.loadData();
-            toastr.success('Kaydedildi');
+            toastr.success(T('Common.Saved'));
             self.isSaving(false);
         })
         .fail(function() {
-            toastr.error('Hata olustu');
+            toastr.error(T('Common.Error'));
             self.isSaving(false);
         });
     };
@@ -274,11 +272,11 @@ function AdminCompaniesViewModel() {
             .done(function() {
                 deleteModal.hide();
                 self.loadData();
-                toastr.success('Silindi');
+                toastr.success(T('Common.Deleted'));
                 self.isSaving(false);
             })
             .fail(function() {
-                toastr.error('Hata olustu');
+                toastr.error(T('Common.Error'));
                 self.isSaving(false);
             });
     };
@@ -296,19 +294,18 @@ function AdminCompaniesViewModel() {
         .done(function(response) {
             approveModal.hide();
             self.loadData();
-            toastr.success(response.message || 'Firma onaylandi');
+            toastr.success(T(response.message) || T('Success.CompanyApproved'));
             self.isSaving(false);
         })
         .fail(function(xhr) {
-            var msg = xhr.responseJSON ? xhr.responseJSON.message : 'Hata olustu';
-            toastr.error(msg);
+            toastr.error(T(xhr.responseJSON?.message) || T('Common.Error'));
             self.isSaving(false);
         });
     };
 
     self.rejectCompany = function() {
         if (!self.rejectionReason()) {
-            toastr.warning('Red sebebi zorunludur');
+            toastr.warning(T('Validation.RejectionReasonRequired'));
             return;
         }
         self.isSaving(true);
@@ -322,19 +319,18 @@ function AdminCompaniesViewModel() {
         .done(function(response) {
             rejectModal.hide();
             self.loadData();
-            toastr.success(response.message || 'Firma reddedildi');
+            toastr.success(T(response.message) || T('Success.CompanyRejected'));
             self.isSaving(false);
         })
         .fail(function(xhr) {
-            var msg = xhr.responseJSON ? xhr.responseJSON.message : 'Hata olustu';
-            toastr.error(msg);
+            toastr.error(T(xhr.responseJSON?.message) || T('Common.Error'));
             self.isSaving(false);
         });
     };
 
     self.suspendCompany = function() {
         if (!self.suspendReason()) {
-            toastr.warning('Askiya alma sebebi zorunludur');
+            toastr.warning(T('Validation.SuspensionReasonRequired'));
             return;
         }
         self.isSaving(true);
@@ -348,12 +344,11 @@ function AdminCompaniesViewModel() {
         .done(function(response) {
             suspendModal.hide();
             self.loadData();
-            toastr.success(response.message || 'Firma askiya alindi');
+            toastr.success(T(response.message) || T('Success.CompanySuspended'));
             self.isSaving(false);
         })
         .fail(function(xhr) {
-            var msg = xhr.responseJSON ? xhr.responseJSON.message : 'Hata olustu';
-            toastr.error(msg);
+            toastr.error(T(xhr.responseJSON?.message) || T('Common.Error'));
             self.isSaving(false);
         });
     };
@@ -370,12 +365,11 @@ function AdminCompaniesViewModel() {
         .done(function(response) {
             reactivateModal.hide();
             self.loadData();
-            toastr.success(response.message || 'Firma tekrar aktiflendi');
+            toastr.success(T(response.message) || T('Success.CompanyReactivated'));
             self.isSaving(false);
         })
         .fail(function(xhr) {
-            var msg = xhr.responseJSON ? xhr.responseJSON.message : 'Hata olustu';
-            toastr.error(msg);
+            toastr.error(T(xhr.responseJSON?.message) || T('Common.Error'));
             self.isSaving(false);
         });
     };

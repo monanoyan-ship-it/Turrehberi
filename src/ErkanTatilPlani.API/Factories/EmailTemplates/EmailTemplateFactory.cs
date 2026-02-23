@@ -43,7 +43,7 @@ public class EmailTemplateFactory : IEmailTemplateFactory
     {
         var template = await _service.GetByIdWithTranslationsAsync(id);
         if (template == null)
-            return (false, new { message = "Email sablonu bulunamadi" }, 404);
+            return (false, new { message = "Error.EmailTemplateNotFound" }, 404);
 
         return (true, MapTemplateDetail(template), 200);
     }
@@ -52,7 +52,7 @@ public class EmailTemplateFactory : IEmailTemplateFactory
     {
         var template = await _service.GetByKeyWithTranslationsAsync(key);
         if (template == null)
-            return (false, new { message = "Email sablonu bulunamadi" }, 404);
+            return (false, new { message = "Error.EmailTemplateNotFound" }, 404);
 
         return (true, MapTemplateDetail(template), 200);
     }
@@ -60,12 +60,12 @@ public class EmailTemplateFactory : IEmailTemplateFactory
     public async Task<(bool success, object result, int statusCode)> CreateAsync(string key, string name, string? description, int? emailAccountId, List<string>? placeholders)
     {
         if (await _service.KeyExistsAsync(key))
-            return (false, new { message = "Bu anahtara sahip bir sablon zaten mevcut" }, 400);
+            return (false, new { message = "Error.TemplateKeyExists" }, 400);
 
         if (emailAccountId.HasValue)
         {
             if (!await _service.AccountExistsAsync(emailAccountId.Value))
-                return (false, new { message = "Belirtilen email hesabi bulunamadi" }, 400);
+                return (false, new { message = "Error.SpecifiedEmailAccountNotFound" }, 400);
         }
 
         var template = new EmailTemplate
@@ -98,12 +98,12 @@ public class EmailTemplateFactory : IEmailTemplateFactory
     {
         var template = await _service.GetByIdAsync(id);
         if (template == null || !template.IsActive)
-            return (false, "Email sablonu bulunamadi", 404);
+            return (false, "Error.EmailTemplateNotFound", 404);
 
         if (emailAccountId.HasValue)
         {
             if (!await _service.AccountExistsAsync(emailAccountId.Value))
-                return (false, "Belirtilen email hesabi bulunamadi", 400);
+                return (false, "Error.SpecifiedEmailAccountNotFound", 400);
         }
 
         template.Name = name;
@@ -115,17 +115,17 @@ public class EmailTemplateFactory : IEmailTemplateFactory
         await _unitOfWork.SaveChangesAsync();
         _logger.LogInformation("Email template updated: {Key}", template.Key);
 
-        return (true, "Email sablonu guncellendi", 200);
+        return (true, "Success.EmailTemplateUpdated", 200);
     }
 
     public async Task<(bool success, string message, int statusCode)> DeleteAsync(int id)
     {
         var template = await _service.GetByIdAsync(id);
         if (template == null || !template.IsActive)
-            return (false, "Email sablonu bulunamadi", 404);
+            return (false, "Error.EmailTemplateNotFound", 404);
 
         if (template.IsSystemTemplate)
-            return (false, "Sistem sablonu silinemez", 400);
+            return (false, "Error.SystemTemplateCannotBeDeleted", 400);
 
         template.IsActive = false;
         template.UpdatedAt = DateTime.UtcNow;
@@ -133,18 +133,18 @@ public class EmailTemplateFactory : IEmailTemplateFactory
         await _unitOfWork.SaveChangesAsync();
         _logger.LogInformation("Email template deleted: {Key}", template.Key);
 
-        return (true, "Email sablonu silindi", 200);
+        return (true, "Success.EmailTemplateDeleted", 200);
     }
 
     public async Task<(bool success, string message, int statusCode)> UpdateTranslationAsync(int id, string languageCode, string subject, string body)
     {
         languageCode = languageCode.ToLower();
         if (!SupportedLanguages.Contains(languageCode))
-            return (false, $"Desteklenmeyen dil kodu: {languageCode}. Desteklenen diller: {string.Join(", ", SupportedLanguages)}", 400);
+            return (false, "Error.UnsupportedLanguageCode", 400);
 
         var template = await _service.GetByIdAsync(id);
         if (template == null || !template.IsActive)
-            return (false, "Email sablonu bulunamadi", 404);
+            return (false, "Error.EmailTemplateNotFound", 404);
 
         var translation = await _service.GetTranslationAsync(id, languageCode);
 
@@ -172,7 +172,7 @@ public class EmailTemplateFactory : IEmailTemplateFactory
         await _unitOfWork.SaveChangesAsync();
         _logger.LogInformation("Email template translation updated: {Key} - {Lang}", template.Key, languageCode);
 
-        return (true, $"{languageCode.ToUpper()} cevirisi guncellendi", 200);
+        return (true, "Success.TranslationUpdated", 200);
     }
 
     public async Task<(bool success, string message, int statusCode)> DeleteTranslationAsync(int id, string languageCode)
@@ -181,7 +181,7 @@ public class EmailTemplateFactory : IEmailTemplateFactory
 
         var translation = await _service.GetTranslationAsync(id, languageCode);
         if (translation == null || !translation.IsActive)
-            return (false, "Ceviri bulunamadi", 404);
+            return (false, "Error.TranslationNotFound", 404);
 
         translation.IsActive = false;
         translation.UpdatedAt = DateTime.UtcNow;
@@ -189,14 +189,14 @@ public class EmailTemplateFactory : IEmailTemplateFactory
         await _unitOfWork.SaveChangesAsync();
         _logger.LogInformation("Email template translation deleted: TemplateId={Id} - {Lang}", id, languageCode);
 
-        return (true, "Ceviri silindi", 200);
+        return (true, "Success.TranslationDeleted", 200);
     }
 
     public async Task<(bool success, object? result, int statusCode)> PreviewAsync(int id, string languageCode, Dictionary<string, string>? placeholderValues)
     {
         var template = await _service.GetByIdWithTranslationsAsync(id);
         if (template == null)
-            return (false, new { message = "Email sablonu bulunamadi" }, 404);
+            return (false, new { message = "Error.EmailTemplateNotFound" }, 404);
 
         var activeTranslations = template.Translations.Where(t => t.IsActive).ToList();
 
@@ -206,7 +206,7 @@ public class EmailTemplateFactory : IEmailTemplateFactory
             ?? activeTranslations.FirstOrDefault();
 
         if (translation == null)
-            return (false, new { message = "Bu sablon icin hicbir ceviri bulunamadi" }, 400);
+            return (false, new { message = "Error.NoTranslationsFound" }, 400);
 
         var subject = translation.Subject;
         var body = translation.Body;

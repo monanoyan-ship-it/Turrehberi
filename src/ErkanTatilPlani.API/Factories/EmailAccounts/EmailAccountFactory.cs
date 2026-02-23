@@ -52,7 +52,7 @@ public class EmailAccountFactory : IEmailAccountFactory
     public async Task<(bool success, object result, int statusCode)> CreateAsync(string name, string? description, string smtpHost, int smtpPort, string smtpUsername, string smtpPassword, string fromEmail, string fromName, bool enableSsl, bool isDefault, int displayOrder)
     {
         if (await _service.NameExistsAsync(name))
-            return (false, new { message = "Bu isimde bir email hesabi zaten mevcut" }, 400);
+            return (false, new { message = "Error.EmailAccountNameExists" }, 400);
 
         if (isDefault)
             await _service.ClearDefaultAsync();
@@ -81,7 +81,7 @@ public class EmailAccountFactory : IEmailAccountFactory
     {
         var account = await _service.GetByIdAsync(id);
         if (account == null || !account.IsActive)
-            return (false, "Email hesabi bulunamadi", 404);
+            return (false, "Error.EmailAccountNotFound", 404);
 
         if (await _service.NameExistsAsync(name, id))
             return (false, "Bu isimde bir email hesabi zaten mevcut", 400);
@@ -102,43 +102,43 @@ public class EmailAccountFactory : IEmailAccountFactory
 
         await _unitOfWork.SaveChangesAsync();
         _logger.LogInformation("Email account updated: {Name}", account.Name);
-        return (true, "Email hesabi guncellendi", 200);
+        return (true, "Success.EmailAccountUpdated", 200);
     }
 
     public async Task<(bool success, string message, int statusCode)> DeleteAsync(int id)
     {
         var account = await _service.GetByIdAsync(id);
         if (account == null || !account.IsActive)
-            return (false, "Email hesabi bulunamadi", 404);
+            return (false, "Error.EmailAccountNotFound", 404);
         if (account.IsDefault)
-            return (false, "Varsayilan email hesabi silinemez", 400);
+            return (false, "Error.DefaultEmailAccountCannotBeDeleted", 400);
 
         account.IsActive = false;
         account.UpdatedAt = DateTime.UtcNow;
         await _unitOfWork.SaveChangesAsync();
         _logger.LogInformation("Email account deleted: {Name}", account.Name);
-        return (true, "Email hesabi silindi", 200);
+        return (true, "Success.EmailAccountDeleted", 200);
     }
 
     public async Task<(bool success, string message, int statusCode)> SetDefaultAsync(int id)
     {
         var account = await _service.GetByIdAsync(id);
         if (account == null || !account.IsActive)
-            return (false, "Email hesabi bulunamadi", 404);
+            return (false, "Error.EmailAccountNotFound", 404);
 
         await _service.ClearDefaultExceptAsync(id);
         account.IsDefault = true;
         account.UpdatedAt = DateTime.UtcNow;
         await _unitOfWork.SaveChangesAsync();
         _logger.LogInformation("Email account set as default: {Name}", account.Name);
-        return (true, "Varsayilan email hesabi ayarlandi", 200);
+        return (true, "Success.DefaultEmailAccountSet", 200);
     }
 
     public async Task<(bool success, object? result, int statusCode)> CopyAsync(int id)
     {
         var source = await _service.GetByIdAsync(id);
         if (source == null || !source.IsActive)
-            return (false, new { message = "Email hesabi bulunamadi" }, 404);
+            return (false, new { message = "Error.EmailAccountNotFound" }, 404);
 
         var baseName = source.Name + " (Kopya)";
         var newName = baseName;
@@ -170,10 +170,10 @@ public class EmailAccountFactory : IEmailAccountFactory
     {
         var account = await _service.GetByIdAsync(id);
         if (account == null || !account.IsActive)
-            return (false, "Email hesabi bulunamadi", 404);
+            return (false, "Error.EmailAccountNotFound", 404);
 
         if (string.IsNullOrWhiteSpace(toEmail))
-            return (false, "Alici email adresi zorunludur", 400);
+            return (false, "Validation.RecipientEmailRequired", 400);
 
         try
         {
@@ -198,12 +198,12 @@ public class EmailAccountFactory : IEmailAccountFactory
             await client.SendMailAsync(mailMessage);
 
             _logger.LogInformation("Test email sent from account {Name} to {ToEmail}", account.Name, toEmail);
-            return (true, $"Test emaili {toEmail} adresine basariyla gonderildi", 200);
+            return (true, "Success.TestEmailSent", 200);
         }
         catch (Exception ex)
         {
             _logger.LogError(ex, "Failed to send test email from account {Name} to {ToEmail}", account.Name, toEmail);
-            return (false, $"Email gonderilemedi: {ex.Message}", 400);
+            return (false, "Error.EmailSendFailed", 400);
         }
     }
 }

@@ -27,7 +27,7 @@ public class MessageTemplatesController : ControllerBase
     public async Task<ActionResult<object>> GetAll()
     {
         var companyId = GetCompanyId();
-        if (companyId == null) return BadRequest(new { message = "Firma bilgisi bulunamadi" });
+        if (companyId == null) return BadRequest(new { message = "Error.CompanyInfoNotFound" });
         return Ok(await _templateFactory.GetAllAsync(companyId.Value));
     }
 
@@ -35,7 +35,7 @@ public class MessageTemplatesController : ControllerBase
     public async Task<ActionResult<object>> Create([FromBody] TemplateRequest request)
     {
         var companyId = GetCompanyId();
-        if (companyId == null) return BadRequest(new { message = "Firma bilgisi bulunamadi" });
+        if (companyId == null) return BadRequest(new { message = "Error.CompanyInfoNotFound" });
 
         var (success, message, data) = await _templateFactory.CreateAsync(
             companyId.Value, request.Title, request.Content, request.DisplayOrder);
@@ -48,7 +48,7 @@ public class MessageTemplatesController : ControllerBase
     public async Task<IActionResult> Update(int id, [FromBody] TemplateRequest request)
     {
         var companyId = GetCompanyId();
-        if (companyId == null) return BadRequest(new { message = "Firma bilgisi bulunamadi" });
+        if (companyId == null) return BadRequest(new { message = "Error.CompanyInfoNotFound" });
 
         var (success, message) = await _templateFactory.UpdateAsync(
             companyId.Value, id, request.Title, request.Content, request.DisplayOrder);
@@ -61,7 +61,7 @@ public class MessageTemplatesController : ControllerBase
     public async Task<IActionResult> Delete(int id)
     {
         var companyId = GetCompanyId();
-        if (companyId == null) return BadRequest(new { message = "Firma bilgisi bulunamadi" });
+        if (companyId == null) return BadRequest(new { message = "Error.CompanyInfoNotFound" });
 
         var (success, message) = await _templateFactory.DeleteAsync(companyId.Value, id);
 

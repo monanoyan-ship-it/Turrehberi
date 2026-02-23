@@ -115,11 +115,11 @@ public class VisitorReservationFactory : IVisitorReservationFactory
             .FirstOrDefaultAsync(r => r.Id == reservationId);
 
         if (reservation == null)
-            return (false, new { message = "Rezervasyon bulunamadi" }, 404);
+            return (false, new { message = "Error.ReservationNotFound" }, 404);
 
         // Sadece Pending veya Confirmed durumundaki rezervasyonlar iptal edilebilir
         if (reservation.Status != ReservationStatuses.Ids.Pending && reservation.Status != ReservationStatuses.Ids.Confirmed)
-            return (false, new { message = "Bu rezervasyon iptal edilemez" }, 400);
+            return (false, new { message = "Error.ReservationCannotBeCancelled" }, 400);
 
         reservation.Status = ReservationStatuses.Ids.Cancelled;
         reservation.UpdatedAt = DateTime.UtcNow;
@@ -141,16 +141,16 @@ public class VisitorReservationFactory : IVisitorReservationFactory
         };
         await _emailService.SendReservationCancelledEmailAsync(emailModel);
 
-        return (true, new { message = "Rezervasyon iptal edildi" }, 200);
+        return (true, new { message = "Success.ReservationCancelled" }, 200);
     }
 
     public async Task<(object? result, string? errorMessage, string? errorCode, int? statusCode)> GetMyReservationsAsync(int visitorId, string? status)
     {
         var visitor = await _visitorService.GetByIdWithCompanyAsync(visitorId);
         if (visitor == null)
-            return (null, "Kullanici bulunamadi", null, 401);
+            return (null, "Error.UserNotFound", null, 401);
         if (visitor.Company == null)
-            return (null, "Firma sahibi degilsiniz", "NOT_COMPANY_OWNER", 403);
+            return (null, "Error.NotCompanyOwner", "NOT_COMPANY_OWNER", 403);
 
         // Firmanin turlarinin ID'leri
         var companyTours = await _tourService.GetByCompanyIdAsync(visitor.Company.Id);
@@ -212,20 +212,20 @@ public class VisitorReservationFactory : IVisitorReservationFactory
     {
         var visitor = await _visitorService.GetByIdWithCompanyAsync(visitorId);
         if (visitor == null)
-            return (false, new { message = "Kullanici bulunamadi" }, 401);
+            return (false, new { message = "Error.UserNotFound" }, 401);
         if (visitor.Company == null)
-            return (false, new { message = "Firma sahibi degilsiniz" }, 403);
+            return (false, new { message = "Error.NotCompanyOwner" }, 403);
 
         var reservation = await _reservationService.GetByIdWithDetailsAsync(reservationId);
         if (reservation == null)
-            return (false, new { message = "Rezervasyon bulunamadi" }, 404);
+            return (false, new { message = "Error.ReservationNotFound" }, 404);
 
         // Rezervasyonun firmaya ait oldugunu kontrol et
         if (reservation.Tour.CompanyId != visitor.Company.Id)
-            return (false, new { message = "Bu rezervasyonu duzenleme yetkiniz yok" }, 403);
+            return (false, new { message = "Error.ReservationAccessDenied" }, 403);
 
         var newStatusItem = ReservationStatuses.GetBySystemName(status); if (newStatusItem == null)
-            return (false, new { message = "Gecersiz durum" }, 400);
+            return (false, new { message = "Error.InvalidStatus" }, 400);
 
         var oldStatus = reservation.Status;
         reservation.Status = newStatusItem!.Id;
@@ -261,40 +261,40 @@ public class VisitorReservationFactory : IVisitorReservationFactory
             }
         }
 
-        return (true, new { message = "Rezervasyon durumu guncellendi", status = newStatusItem!.SystemName }, 200);
+        return (true, new { message = "Success.ReservationStatusUpdated", status = newStatusItem!.SystemName }, 200);
     }
 
     public async Task<(bool success, string message)> ChangeDateAsync(int visitorId, int reservationId, DateTime newStartDate)
     {
         var reservation = await _reservationService.GetByIdAsync(reservationId);
         if (reservation == null || reservation.VisitorId != visitorId)
-            return (false, "Rezervasyon bulunamadi");
+            return (false, "Error.ReservationNotFound");
 
         if (reservation.Status != ReservationStatuses.Ids.Confirmed)
-            return (false, "Sadece onaylanmis rezervasyonlar icin tarih degistirilebilir");
+            return (false, "Error.OnlyConfirmedReservationsCanChangeDate");
 
         var tour = await _tourService.GetByIdAsync(reservation.TourId);
         if (tour == null)
-            return (false, "Tur bulunamadi");
+            return (false, "Error.TourNotFound");
 
         reservation.StartDate = DateTime.SpecifyKind(newStartDate, DateTimeKind.Utc);
         reservation.EndDate = DateTime.SpecifyKind(newStartDate.AddDays(tour.DurationDays - 1), DateTimeKind.Utc);
         reservation.UpdatedAt = DateTime.UtcNow;
 
         await _unitOfWork.SaveChangesAsync();
-        return (true, "Tarih basariyla degistirildi");
+        return (true, "Success.DateChanged");
     }
 
     public async Task<(bool success, string message)> UpdatePhotoLinkAsync(int reservationId, string photoLink)
     {
         var reservation = await _reservationService.GetByIdAsync(reservationId);
         if (reservation == null)
-            return (false, "Rezervasyon bulunamadi");
+            return (false, "Error.ReservationNotFound");
 
         reservation.PhotoLink = photoLink;
         reservation.UpdatedAt = DateTime.UtcNow;
 
         await _unitOfWork.SaveChangesAsync();
-        return (true, "Fotograf linki guncellendi");
+        return (true, "Success.PhotoLinkUpdated");
     }
 }

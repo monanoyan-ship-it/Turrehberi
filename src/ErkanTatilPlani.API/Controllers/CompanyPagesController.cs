@@ -32,7 +32,7 @@ public class CompanyPagesController : ControllerBase
     public async Task<IActionResult> GetPages(int companyId)
     {
         var visitorId = GetVisitorId();
-        if (visitorId == null) return Unauthorized(new { message = "Giris yapmaniz gerekiyor" });
+        if (visitorId == null) return Unauthorized(new { message = "Error.LoginRequired" });
 
         var (result, errorMessage, errorCode, statusCode) = await _pageFactory.GetPagesAsync(visitorId.Value, companyId);
         if (errorMessage != null)
@@ -48,7 +48,7 @@ public class CompanyPagesController : ControllerBase
     public async Task<IActionResult> GetPage(int companyId, int id)
     {
         var visitorId = GetVisitorId();
-        if (visitorId == null) return Unauthorized(new { message = "Giris yapmaniz gerekiyor" });
+        if (visitorId == null) return Unauthorized(new { message = "Error.LoginRequired" });
 
         var (result, errorMessage, errorCode, statusCode) = await _pageFactory.GetPageAsync(visitorId.Value, companyId, id);
         if (errorMessage != null)
@@ -64,7 +64,7 @@ public class CompanyPagesController : ControllerBase
     public async Task<IActionResult> CreatePage(int companyId, [FromBody] CompanyPage page)
     {
         var visitorId = GetVisitorId();
-        if (visitorId == null) return Unauthorized(new { message = "Giris yapmaniz gerekiyor" });
+        if (visitorId == null) return Unauthorized(new { message = "Error.LoginRequired" });
 
         var (created, errorMessage, errorCode, statusCode) = await _pageFactory.CreatePageAsync(visitorId.Value, companyId, page);
         if (errorMessage != null)
@@ -80,7 +80,7 @@ public class CompanyPagesController : ControllerBase
     public async Task<IActionResult> UpdatePage(int companyId, int id, [FromBody] CompanyPage page)
     {
         var visitorId = GetVisitorId();
-        if (visitorId == null) return Unauthorized(new { message = "Giris yapmaniz gerekiyor" });
+        if (visitorId == null) return Unauthorized(new { message = "Error.LoginRequired" });
 
         var (success, errorMessage, errorCode, statusCode) = await _pageFactory.UpdatePageAsync(visitorId.Value, companyId, id, page);
         if (!success)
@@ -96,7 +96,7 @@ public class CompanyPagesController : ControllerBase
     public async Task<IActionResult> DeletePage(int companyId, int id)
     {
         var visitorId = GetVisitorId();
-        if (visitorId == null) return Unauthorized(new { message = "Giris yapmaniz gerekiyor" });
+        if (visitorId == null) return Unauthorized(new { message = "Error.LoginRequired" });
 
         var (success, errorMessage, errorCode, statusCode) = await _pageFactory.DeletePageAsync(visitorId.Value, companyId, id);
         if (!success)
@@ -112,7 +112,7 @@ public class CompanyPagesController : ControllerBase
     public async Task<IActionResult> ReorderPages(int companyId, [FromBody] List<int> pageIds)
     {
         var visitorId = GetVisitorId();
-        if (visitorId == null) return Unauthorized(new { message = "Giris yapmaniz gerekiyor" });
+        if (visitorId == null) return Unauthorized(new { message = "Error.LoginRequired" });
 
         var (success, errorMessage, errorCode, statusCode) = await _pageFactory.ReorderPagesAsync(visitorId.Value, companyId, pageIds);
         if (!success)

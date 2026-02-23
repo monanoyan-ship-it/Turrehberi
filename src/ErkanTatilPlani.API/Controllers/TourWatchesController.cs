@@ -28,7 +28,7 @@ public class TourWatchesController : ControllerBase
     {
         var visitorId = GetVisitorId();
         if (visitorId == null)
-            return Unauthorized(new { message = "Giris yapmaniz gerekiyor" });
+            return Unauthorized(new { message = "Error.LoginRequired" });
 
         return Ok(await _watchFactory.GetWatchedToursAsync(visitorId.Value));
     }
@@ -60,12 +60,12 @@ public class TourWatchesController : ControllerBase
     {
         var visitorId = GetVisitorId();
         if (visitorId == null)
-            return Unauthorized(new { message = "Giris yapmaniz gerekiyor" });
+            return Unauthorized(new { message = "Error.LoginRequired" });
 
         var (success, message) = await _watchFactory.AddWatchAsync(visitorId.Value, tourId, request.WatchDays);
         if (!success)
         {
-            if (message == "Tur bulunamadi") return NotFound(new { message });
+            if (message == "Error.TourNotFound") return NotFound(new { message });
             return BadRequest(new { message });
         }
         return Ok(new { message });
@@ -76,7 +76,7 @@ public class TourWatchesController : ControllerBase
     {
         var visitorId = GetVisitorId();
         if (visitorId == null)
-            return Unauthorized(new { message = "Giris yapmaniz gerekiyor" });
+            return Unauthorized(new { message = "Error.LoginRequired" });
 
         var (success, message) = await _watchFactory.RemoveWatchAsync(visitorId.Value, tourId);
         if (!success) return NotFound(new { message });
@@ -88,7 +88,7 @@ public class TourWatchesController : ControllerBase
     {
         var visitorId = GetVisitorId();
         if (visitorId == null)
-            return Unauthorized(new { message = "Giris yapmaniz gerekiyor" });
+            return Unauthorized(new { message = "Error.LoginRequired" });
 
         var (isWatching, message, tourNotFound) = await _watchFactory.ToggleWatchAsync(visitorId.Value, tourId, request.WatchDays);
         if (tourNotFound) return NotFound(new { message });

@@ -34,7 +34,7 @@ public class PushSubscriptionsController : ControllerBase
     {
         var visitorId = GetVisitorId();
         if (visitorId == null)
-            return Unauthorized(new { message = "Giris yapmaniz gerekiyor" });
+            return Unauthorized(new { message = "Error.LoginRequired" });
 
         // Ayni endpoint varsa guncelle
         var existing = await _subscriptionService.GetByEndpointAsync(request.Endpoint);
@@ -60,7 +60,7 @@ public class PushSubscriptionsController : ControllerBase
         }
 
         await _unitOfWork.SaveChangesAsync();
-        return Ok(new { message = "Push bildirim aboneligi kaydedildi" });
+        return Ok(new { message = "Success.PushSubscriptionSaved" });
     }
 
     [HttpDelete("unsubscribe")]
@@ -68,7 +68,7 @@ public class PushSubscriptionsController : ControllerBase
     {
         var visitorId = GetVisitorId();
         if (visitorId == null)
-            return Unauthorized(new { message = "Giris yapmaniz gerekiyor" });
+            return Unauthorized(new { message = "Error.LoginRequired" });
 
         var existing = await _subscriptionService.GetByEndpointAsync(request.Endpoint);
         if (existing != null && existing.VisitorId == visitorId.Value)
@@ -77,7 +77,7 @@ public class PushSubscriptionsController : ControllerBase
             await _unitOfWork.SaveChangesAsync();
         }
 
-        return Ok(new { message = "Push bildirim aboneligi kaldirildi" });
+        return Ok(new { message = "Success.PushSubscriptionRemoved" });
     }
 }
 

@@ -43,37 +43,37 @@ public class LanguageFactory : ILanguageFactory
     public async Task<(bool success, string message, int statusCode)> UpdateLanguageAsync(int id, Language language)
     {
         if (id != language.Id)
-            return (false, "Id uyusmazligi", 400);
+            return (false, "Error.IdMismatch", 400);
 
         language.UpdatedAt = DateTime.UtcNow;
         _service.Update(language);
         await _unitOfWork.SaveChangesAsync();
-        return (true, "Guncellendi", 204);
+        return (true, "Success.Updated", 204);
     }
 
     public async Task<(bool success, string message, int statusCode)> DeleteLanguageAsync(int id)
     {
         var language = await _service.GetByIdAsync(id);
         if (language == null)
-            return (false, "Dil bulunamadi", 404);
+            return (false, "Error.LanguageNotFound", 404);
 
         language.IsActive = false;
         language.UpdatedAt = DateTime.UtcNow;
         await _unitOfWork.SaveChangesAsync();
-        return (true, "Dil silindi", 204);
+        return (true, "Success.LanguageDeleted", 204);
     }
 
     public async Task<(bool success, string message, int statusCode)> SetDefaultAsync(int id)
     {
         var language = await _service.GetByIdAsync(id);
         if (language == null)
-            return (false, "Dil bulunamadi", 404);
+            return (false, "Error.LanguageNotFound", 404);
 
         await _service.ClearDefaultAsync();
 
         language.IsDefault = true;
         language.UpdatedAt = DateTime.UtcNow;
         await _unitOfWork.SaveChangesAsync();
-        return (true, "Varsayilan dil ayarlandi", 204);
+        return (true, "Success.DefaultLanguageSet", 204);
     }
 }

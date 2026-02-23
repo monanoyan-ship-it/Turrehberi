@@ -29,14 +29,14 @@ public class AuthFactory : IAuthFactory
     public async Task<(bool success, object result, int statusCode)> LoginAsync(string email, string password)
     {
         if (string.IsNullOrEmpty(email) || string.IsNullOrEmpty(password))
-            return (false, new { error = "Email ve sifre zorunludur" }, 400);
+            return (false, new { error = "Validation.EmailPasswordRequired" }, 400);
 
         var visitor = await _visitorService.GetActiveByEmailAsync(email);
         if (visitor == null)
-            return (false, new { error = "Email veya sifre hatali" }, 401);
+            return (false, new { error = "Error.InvalidCredentials" }, 401);
 
         if (!PasswordHelper.VerifyPassword(password, visitor.PasswordHash))
-            return (false, new { error = "Email veya sifre hatali" }, 401);
+            return (false, new { error = "Error.InvalidCredentials" }, 401);
 
         var token = _jwtService.GenerateToken(visitor);
         return (true, AuthUserInfoHelper.BuildLoginResponse(token, visitor), 200);
@@ -47,16 +47,16 @@ public class AuthFactory : IAuthFactory
         string? phone, string? identityNumber)
     {
         if (string.IsNullOrEmpty(email) || string.IsNullOrEmpty(password))
-            return (false, new { error = "Email ve sifre zorunludur" }, 400);
+            return (false, new { error = "Validation.EmailPasswordRequired" }, 400);
 
         if (string.IsNullOrEmpty(firstName) || string.IsNullOrEmpty(lastName))
-            return (false, new { error = "Ad ve soyad zorunludur" }, 400);
+            return (false, new { error = "Validation.NameRequired" }, 400);
 
         if (password.Length < 6)
-            return (false, new { error = "Sifre en az 6 karakter olmalidir" }, 400);
+            return (false, new { error = "Validation.PasswordMinLength" }, 400);
 
         if (await _visitorService.EmailExistsAsync(email))
-            return (false, new { error = "Bu email adresi zaten kayitli" }, 400);
+            return (false, new { error = "Error.EmailAlreadyRegistered" }, 400);
 
         var visitor = new Visitor
         {
@@ -85,26 +85,26 @@ public class AuthFactory : IAuthFactory
         string? companyAddress, string? companyWebsite, string? applicationNotes)
     {
         if (string.IsNullOrEmpty(email) || string.IsNullOrEmpty(password))
-            return (false, new { error = "Email ve sifre zorunludur" }, 400);
+            return (false, new { error = "Validation.EmailPasswordRequired" }, 400);
 
         if (string.IsNullOrEmpty(firstName) || string.IsNullOrEmpty(lastName))
-            return (false, new { error = "Ad ve soyad zorunludur" }, 400);
+            return (false, new { error = "Validation.NameRequired" }, 400);
 
         if (password.Length < 6)
-            return (false, new { error = "Sifre en az 6 karakter olmalidir" }, 400);
+            return (false, new { error = "Validation.PasswordMinLength" }, 400);
 
         if (string.IsNullOrEmpty(companyName))
-            return (false, new { error = "Firma adi zorunludur" }, 400);
+            return (false, new { error = "Validation.CompanyNameRequired" }, 400);
 
         if (string.IsNullOrEmpty(taxNumber))
-            return (false, new { error = "Vergi numarasi zorunludur" }, 400);
+            return (false, new { error = "Validation.TaxNumberRequired" }, 400);
 
         if (await _visitorService.EmailExistsAsync(email))
-            return (false, new { error = "Bu email adresi zaten kayitli" }, 400);
+            return (false, new { error = "Error.EmailAlreadyRegistered" }, 400);
 
         var existingCompany = await _companyService.GetByTaxNumberAsync(taxNumber);
         if (existingCompany != null)
-            return (false, new { error = "Bu vergi numarasi zaten kayitli" }, 400);
+            return (false, new { error = "Error.TaxNumberAlreadyRegistered" }, 400);
 
         var company = new Company
         {

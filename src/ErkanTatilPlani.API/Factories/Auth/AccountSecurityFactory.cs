@@ -30,13 +30,13 @@ public class AccountSecurityFactory : IAccountSecurityFactory
     public async Task<(bool success, object result, int statusCode)> ForgotPasswordAsync(string email, string? baseUrl)
     {
         if (string.IsNullOrWhiteSpace(email))
-            return (false, new { error = "Email zorunludur" }, 400);
+            return (false, new { error = "Validation.EmailRequired" }, 400);
 
         var visitor = await _visitorService.GetActiveByEmailAsync(email);
 
         // Guvenlik: Kullanici bulunamasa bile basarili mesaji dondur
         if (visitor == null)
-            return (true, new { message = "Eger bu email adresi sistemde kayitliysa, sifre sifirlama linki gonderildi." }, 200);
+            return (true, new { message = "Success.PasswordResetLinkSent" }, 200);
 
         // Token olustur (GUID + timestamp)
         var token = Guid.NewGuid().ToString("N") + DateTime.UtcNow.Ticks.ToString();
@@ -58,19 +58,19 @@ public class AccountSecurityFactory : IAccountSecurityFactory
             customerName,
             visitor.PreferredLanguage);
 
-        return (true, new { message = "Eger bu email adresi sistemde kayitliysa, sifre sifirlama linki gonderildi." }, 200);
+        return (true, new { message = "Success.PasswordResetLinkSent" }, 200);
     }
 
     public async Task<(bool success, object result, int statusCode)> ResetPasswordAsync(string email, string token, string newPassword)
     {
         if (string.IsNullOrWhiteSpace(email))
-            return (false, new { error = "Email zorunludur" }, 400);
+            return (false, new { error = "Validation.EmailRequired" }, 400);
         if (string.IsNullOrWhiteSpace(token))
-            return (false, new { error = "Token zorunludur" }, 400);
+            return (false, new { error = "Validation.TokenRequired" }, 400);
         if (string.IsNullOrWhiteSpace(newPassword))
-            return (false, new { error = "Yeni sifre zorunludur" }, 400);
+            return (false, new { error = "Validation.NewPasswordRequired" }, 400);
         if (newPassword.Length < 6)
-            return (false, new { error = "Sifre en az 6 karakter olmalidir" }, 400);
+            return (false, new { error = "Validation.PasswordMinLength" }, 400);
 
         var tokenHash = Convert.ToBase64String(SHA256.HashData(Encoding.UTF8.GetBytes(token)));
 
@@ -79,7 +79,7 @@ public class AccountSecurityFactory : IAccountSecurityFactory
             visitor.PasswordResetToken != tokenHash ||
             visitor.PasswordResetTokenExpiry <= DateTime.UtcNow)
         {
-            return (false, new { error = "Gecersiz veya suresi dolmus sifre sifirlama linki" }, 400);
+            return (false, new { error = "Error.InvalidOrExpiredResetLink" }, 400);
         }
 
         visitor.PasswordHash = PasswordHelper.HashPassword(newPassword);
@@ -88,13 +88,13 @@ public class AccountSecurityFactory : IAccountSecurityFactory
         visitor.UpdatedAt = DateTime.UtcNow;
         await _unitOfWork.SaveChangesAsync();
 
-        return (true, new { message = "Sifreniz basariyla degistirildi. Simdi giris yapabilirsiniz." }, 200);
+        return (true, new { message = "Success.PasswordChanged" }, 200);
     }
 
     public async Task<(bool success, object result, int statusCode)> VerifyResetTokenAsync(string email, string token)
     {
         if (string.IsNullOrWhiteSpace(email) || string.IsNullOrWhiteSpace(token))
-            return (false, new { valid = false, error = "Email ve token zorunludur" }, 400);
+            return (false, new { valid = false, error = "Validation.EmailTokenRequired" }, 400);
 
         var tokenHash = Convert.ToBase64String(SHA256.HashData(Encoding.UTF8.GetBytes(token)));
 
@@ -113,7 +113,7 @@ public class AccountSecurityFactory : IAccountSecurityFactory
             return (false, new { }, 401);
 
         if (visitor.EmailVerified)
-            return (false, new { error = "Email adresi zaten dogrulanmis" }, 400);
+            return (false, new { error = "Error.EmailAlreadyVerified" }, 400);
 
         // Token olustur (GUID + timestamp)
         var token = Guid.NewGuid().ToString("N") + DateTime.UtcNow.Ticks.ToString();
@@ -135,13 +135,13 @@ public class AccountSecurityFactory : IAccountSecurityFactory
             customerName,
             visitor.PreferredLanguage);
 
-        return (true, new { message = "Dogrulama linki email adresinize gonderildi." }, 200);
+        return (true, new { message = "Success.VerificationEmailSent" }, 200);
     }
 
     public async Task<(bool success, object result, int statusCode)> VerifyEmailAsync(string email, string token)
     {
         if (string.IsNullOrWhiteSpace(email) || string.IsNullOrWhiteSpace(token))
-            return (false, new { success = false, error = "Email ve token zorunludur" }, 400);
+            return (false, new { success = false, error = "Validation.EmailTokenRequired" }, 400);
 
         var tokenHash = Convert.ToBase64String(SHA256.HashData(Encoding.UTF8.GetBytes(token)));
 
@@ -150,7 +150,7 @@ public class AccountSecurityFactory : IAccountSecurityFactory
             visitor.EmailVerificationToken != tokenHash ||
             visitor.EmailVerificationTokenExpiry <= DateTime.UtcNow)
         {
-            return (false, new { success = false, error = "Gecersiz veya suresi dolmus dogrulama linki" }, 400);
+            return (false, new { success = false, error = "Error.InvalidOrExpiredVerificationLink" }, 400);
         }
 
         // Email dogrulandi
@@ -160,13 +160,13 @@ public class AccountSecurityFactory : IAccountSecurityFactory
         visitor.UpdatedAt = DateTime.UtcNow;
         await _unitOfWork.SaveChangesAsync();
 
-        return (true, new { success = true, message = "Email adresiniz basariyla dogrulandi." }, 200);
+        return (true, new { success = true, message = "Success.EmailVerified" }, 200);
     }
 
     public async Task<(bool success, object result, int statusCode)> VerifyEmailTokenAsync(string email, string token)
     {
         if (string.IsNullOrWhiteSpace(email) || string.IsNullOrWhiteSpace(token))
-            return (false, new { valid = false, error = "Email ve token zorunludur" }, 400);
+            return (false, new { valid = false, error = "Validation.EmailTokenRequired" }, 400);
 
         var tokenHash = Convert.ToBase64String(SHA256.HashData(Encoding.UTF8.GetBytes(token)));
 

@@ -33,7 +33,7 @@ function CompanyPagesViewModel() {
             self.pages(data);
             self.isLoading(false);
         }).fail(function () {
-            toastr.error('Veriler yuklenemedi');
+            toastr.error(T('Error.DataLoadFailed'));
             self.isLoading(false);
         });
     };
@@ -114,7 +114,7 @@ function CompanyPagesViewModel() {
     self.savePage = function () {
         var fd = self.formData();
         if (!fd.title) {
-            toastr.warning('Baslik zorunludur');
+            toastr.warning(T('Validation.TitleRequired'));
             return;
         }
 
@@ -123,7 +123,7 @@ function CompanyPagesViewModel() {
         }
 
         if (!fd.content || fd.content === '<p><br></p>') {
-            toastr.warning('Icerik zorunludur');
+            toastr.warning(T('Validation.ContentRequired'));
             return;
         }
 
@@ -145,12 +145,12 @@ function CompanyPagesViewModel() {
                 contentType: 'application/json',
                 data: JSON.stringify(pageData)
             }).done(function () {
-                toastr.success('Sayfa guncellendi');
+                toastr.success(T('Success.PageUpdated'));
                 formModal.hide();
                 self.loadData();
                 self.isSaving(false);
             }).fail(function (xhr) {
-                toastr.error(xhr.responseJSON?.message || 'Guncelleme basarisiz');
+                toastr.error(T(xhr.responseJSON?.message) || T('Common.Error'));
                 self.isSaving(false);
             });
         } else {
@@ -160,12 +160,12 @@ function CompanyPagesViewModel() {
                 contentType: 'application/json',
                 data: JSON.stringify(pageData)
             }).done(function () {
-                toastr.success('Sayfa olusturuldu');
+                toastr.success(T('Success.PageCreated'));
                 formModal.hide();
                 self.loadData();
                 self.isSaving(false);
             }).fail(function (xhr) {
-                toastr.error(xhr.responseJSON?.message || 'Olusturma basarisiz');
+                toastr.error(T(xhr.responseJSON?.message) || T('Common.Error'));
                 self.isSaving(false);
             });
         }
@@ -179,12 +179,12 @@ function CompanyPagesViewModel() {
             url: apiBaseUrl + '/api/companies/' + companyId + '/pages/' + self.selectedPage().id,
             method: 'DELETE',
         }).done(function () {
-            toastr.success('Sayfa silindi');
+            toastr.success(T('Success.PageDeleted'));
             deleteModal.hide();
             self.loadData();
             self.isSaving(false);
         }).fail(function (xhr) {
-            toastr.error(xhr.responseJSON?.message || 'Silme basarisiz');
+            toastr.error(T(xhr.responseJSON?.message) || T('Common.Error'));
             self.isSaving(false);
         });
     };
@@ -220,10 +220,10 @@ function CompanyPagesViewModel() {
             contentType: 'application/json',
             data: JSON.stringify(ids)
         }).done(function () {
-            toastr.success('Siralama guncellendi');
+            toastr.success(T('Success.OrderUpdated'));
             self.loadData();
         }).fail(function (xhr) {
-            toastr.error(xhr.responseJSON?.message || 'Siralama basarisiz');
+            toastr.error(T(xhr.responseJSON?.message) || T('Common.Error'));
         });
     }
 

@@ -71,7 +71,7 @@ public class CompaniesController : ControllerBase
     {
         var (found, result) = await _profile.GetCompanyProfileAsync(slug);
         if (!found)
-            return NotFound(new { message = "Firma bulunamadi" });
+            return NotFound(new { message = "Error.CompanyNotFound" });
         return Ok(result);
     }
 
@@ -174,7 +174,7 @@ public class CompaniesController : ControllerBase
     {
         var (found, result) = await _dashboard.GetCompanyDashboardAsync(id);
         if (!found)
-            return NotFound(new { message = "Firma bulunamadi" });
+            return NotFound(new { message = "Error.CompanyNotFound" });
         return Ok(result);
     }
 
@@ -253,7 +253,7 @@ public class CompaniesController : ControllerBase
     {
         var (found, result) = await _gallery.GetGalleryImagesAsync(id);
         if (!found)
-            return NotFound(new { message = "Firma bulunamadi" });
+            return NotFound(new { message = "Error.CompanyNotFound" });
         return Ok(result);
     }
 

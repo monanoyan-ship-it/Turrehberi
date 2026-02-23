@@ -109,7 +109,7 @@ public class AdminReviewFactory : IAdminReviewFactory
     public async Task<(object? result, string? errorMessage, int statusCode)> ApproveReviewAsync(int id, int? moderatedById, string? note)
     {
         var review = await _reviewService.GetByIdAsync(id);
-        if (review == null) return (null, "Yorum bulunamadi", 404);
+        if (review == null) return (null, "Error.ReviewNotFound", 404);
 
         review.StatusId = ReviewStatuses.Ids.Approved;
         review.ModeratedAt = DateTime.UtcNow;
@@ -121,16 +121,16 @@ public class AdminReviewFactory : IAdminReviewFactory
         await _unitOfWork.SaveChangesAsync();
         await UpdateTourReviewStats(review.TourId);
 
-        return (new { message = "Yorum onaylandi" }, null, 200);
+        return (new { message = "Success.ReviewApproved" }, null, 200);
     }
 
     public async Task<(object? result, string? errorMessage, int statusCode)> RejectReviewAsync(int id, int? moderatedById, string rejectionReason, string? note)
     {
         var review = await _reviewService.GetByIdAsync(id);
-        if (review == null) return (null, "Yorum bulunamadi", 404);
+        if (review == null) return (null, "Error.ReviewNotFound", 404);
 
         if (string.IsNullOrWhiteSpace(rejectionReason))
-            return (null, "Red sebebi zorunludur", 400);
+            return (null, "Validation.RejectionReasonRequired", 400);
 
         review.StatusId = ReviewStatuses.Ids.Rejected;
         review.ModeratedAt = DateTime.UtcNow;
@@ -143,13 +143,13 @@ public class AdminReviewFactory : IAdminReviewFactory
         await _unitOfWork.SaveChangesAsync();
         await UpdateTourReviewStats(review.TourId);
 
-        return (new { message = "Yorum reddedildi" }, null, 200);
+        return (new { message = "Success.ReviewRejected" }, null, 200);
     }
 
     public async Task<(object? result, string? errorMessage, int statusCode)> FlagReviewAsync(int id, int? moderatedById, string? note)
     {
         var review = await _reviewService.GetByIdAsync(id);
-        if (review == null) return (null, "Yorum bulunamadi", 404);
+        if (review == null) return (null, "Error.ReviewNotFound", 404);
 
         review.StatusId = ReviewStatuses.Ids.Flagged;
         review.ModeratedAt = DateTime.UtcNow;
@@ -160,7 +160,7 @@ public class AdminReviewFactory : IAdminReviewFactory
         _reviewService.Update(review);
         await _unitOfWork.SaveChangesAsync();
 
-        return (new { message = "Yorum incelemeye alindi" }, null, 200);
+        return (new { message = "Success.ReviewFlagged" }, null, 200);
     }
 
     public async Task<object> GetReportsAsync(int? statusId)
@@ -203,7 +203,7 @@ public class AdminReviewFactory : IAdminReviewFactory
             .Include(r => r.Review)
             .FirstOrDefaultAsync(r => r.Id == id);
 
-        if (report == null) return (null, "Sikayet bulunamadi", 404);
+        if (report == null) return (null, "Error.ComplaintNotFound", 404);
 
         report.StatusId = removeReview ? 1 : 2; // 1=Kaldirildi, 2=Reddedildi
         report.ReviewedAt = DateTime.UtcNow;
@@ -214,7 +214,7 @@ public class AdminReviewFactory : IAdminReviewFactory
         if (removeReview && report.Review != null)
         {
             report.Review.StatusId = ReviewStatuses.Ids.Rejected;
-            report.Review.RejectionReason = "Sikayet sonucu kaldirildi: " + (note ?? "");
+            report.Review.RejectionReason = "RemovedDueToComplaint: " + (note ?? "");
             report.Review.ModeratedAt = DateTime.UtcNow;
             report.Review.ModeratedById = reviewedById;
             _reviewService.Update(report.Review);
@@ -223,7 +223,7 @@ public class AdminReviewFactory : IAdminReviewFactory
 
         await _unitOfWork.SaveChangesAsync();
 
-        return (new { message = removeReview ? "Yorum kaldirildi" : "Sikayet reddedildi" }, null, 200);
+        return (new { message = removeReview ? "Success.ReviewRemoved" : "Success.ComplaintRejected" }, null, 200);
     }
 
     private async Task UpdateTourReviewStats(int tourId)

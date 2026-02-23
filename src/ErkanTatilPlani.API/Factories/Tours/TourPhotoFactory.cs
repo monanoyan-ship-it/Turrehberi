@@ -30,16 +30,16 @@ public class TourPhotoFactory : ITourPhotoFactory
     {
         var tour = await _tourService.GetByIdAsync(tourId);
         if (tour == null)
-            return (false, new { message = "Tur bulunamadi" }, 404);
+            return (false, new { message = "Error.TourNotFound" }, 404);
 
         // Maksimum 20 fotograf
         var photoCount = await _photoService.GetPhotoCountAsync(tourId);
         if (photoCount >= 20)
-            return (false, new { message = "Tura en fazla 20 fotograf yuklenebilir" }, 400);
+            return (false, new { message = "Error.MaxTourPhotosReached" }, 400);
 
         // Dosya kontrolu
         if (fileStream == null || fileStream.Length == 0)
-            return (false, new { message = "Dosya secilmedi" }, 400);
+            return (false, new { message = "Error.NoFileSelected" }, 400);
 
         // Yukleme
         var result = await _fileUploadService.UploadImageWithThumbnailAsync(fileStream, fileName, "tours");
@@ -73,7 +73,7 @@ public class TourPhotoFactory : ITourPhotoFactory
 
         return (true, new
         {
-            message = "Fotograf yuklendi",
+            message = "Success.PhotoUploaded",
             photo = new
             {
                 photo.Id,
@@ -114,7 +114,7 @@ public class TourPhotoFactory : ITourPhotoFactory
     {
         var photo = await _photoService.GetByIdAsync(photoId, tourId);
         if (photo == null)
-            return (false, new { message = "Fotograf bulunamadi" }, 404);
+            return (false, new { message = "Error.PhotoNotFound" }, 404);
 
         // Dosyalari sil
         await _fileUploadService.DeleteFileAsync(photo.ImageUrl);
@@ -126,27 +126,27 @@ public class TourPhotoFactory : ITourPhotoFactory
         photo.UpdatedAt = DateTime.UtcNow;
         await _unitOfWork.SaveChangesAsync();
 
-        return (true, new { message = "Fotograf silindi" }, 200);
+        return (true, new { message = "Success.PhotoDeleted" }, 200);
     }
 
     public async Task<(bool success, object? result, int statusCode)> SetCoverPhotoAsync(int tourId, int photoId)
     {
         var photo = await _photoService.GetByIdAsync(photoId, tourId);
         if (photo == null || !photo.IsActive)
-            return (false, new { message = "Fotograf bulunamadi" }, 404);
+            return (false, new { message = "Error.PhotoNotFound" }, 404);
 
         await _photoService.ClearCoverExceptAsync(tourId, photoId);
         photo.IsCover = true;
         photo.UpdatedAt = DateTime.UtcNow;
         await _unitOfWork.SaveChangesAsync();
 
-        return (true, new { message = "Kapak fotografı guncellendi" }, 200);
+        return (true, new { message = "Success.CoverPhotoUpdated" }, 200);
     }
 
     public async Task<(bool success, object? result, int statusCode)> ReorderPhotosAsync(int tourId, List<int> photoIds)
     {
         if (photoIds == null || !photoIds.Any())
-            return (false, new { message = "Fotograf listesi bos olamaz" }, 400);
+            return (false, new { message = "Validation.PhotoListRequired" }, 400);
 
         var photos = await _photoService.GetByIdsAsync(tourId, photoIds);
 
@@ -162,6 +162,6 @@ public class TourPhotoFactory : ITourPhotoFactory
 
         await _unitOfWork.SaveChangesAsync();
 
-        return (true, new { message = "Siralama guncellendi" }, 200);
+        return (true, new { message = "Success.OrderUpdated" }, 200);
     }
 }

@@ -58,7 +58,7 @@ public class EmailAccountsController : ControllerBase
     public async Task<ActionResult> GetById(int id)
     {
         var result = await _emailAccountFactory.GetByIdAsync(id);
-        if (result == null) return NotFound(new { message = "Email hesabi bulunamadi" });
+        if (result == null) return NotFound(new { message = "Error.EmailAccountNotFound" });
         return Ok(result);
     }
 

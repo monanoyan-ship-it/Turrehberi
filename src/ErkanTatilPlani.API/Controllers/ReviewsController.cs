@@ -139,7 +139,7 @@ public class ReviewsController : ControllerBase
     public async Task<ActionResult<object>> UploadReviewImage(int id, [FromForm] IFormFile file, [FromForm] int visitorId, [FromForm] string? caption = null)
     {
         if (file == null || file.Length == 0)
-            return BadRequest(new { message = "Dosya secilmedi" });
+            return BadRequest(new { message = "Error.NoFileSelected" });
 
         using var stream = file.OpenReadStream();
         var (result, errorMessage, statusCode) = await _reviewInteraction.UploadReviewImageAsync(id, visitorId, stream, file.FileName, caption);

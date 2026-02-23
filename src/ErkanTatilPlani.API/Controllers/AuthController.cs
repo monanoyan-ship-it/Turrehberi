@@ -180,7 +180,7 @@ public class AuthController : ControllerBase
     public async Task<IActionResult> UploadAvatar(IFormFile file)
     {
         if (file == null || file.Length == 0)
-            return BadRequest(new { error = "Dosya secilmedi" });
+            return BadRequest(new { error = "Error.NoFileSelected" });
 
         using var stream = file.OpenReadStream();
         var (success, result, statusCode) = await _profileFactory.UploadAvatarAsync(

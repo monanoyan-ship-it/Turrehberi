@@ -36,7 +36,7 @@ public class LogsController : ControllerBase
         // Admin kontrolu
         var userType = User.FindFirst("UserType")?.Value;
         if (userType != "2") // Admin
-            return StatusCode(403, new { message = "Bu islem icin yetkiniz yok" });
+            return StatusCode(403, new { message = "Error.InsufficientPermission" });
 
         var query = new LogQuery
         {
@@ -62,7 +62,7 @@ public class LogsController : ControllerBase
     {
         var userType = User.FindFirst("UserType")?.Value;
         if (userType != "2")
-            return StatusCode(403, new { message = "Bu islem icin yetkiniz yok" });
+            return StatusCode(403, new { message = "Error.InsufficientPermission" });
 
         var today = DateTime.UtcNow.Date;
         var lastWeek = today.AddDays(-7);
@@ -106,13 +106,13 @@ public class LogsController : ControllerBase
     {
         var userType = User.FindFirst("UserType")?.Value;
         if (userType != "2")
-            return StatusCode(403, new { message = "Bu islem icin yetkiniz yok" });
+            return StatusCode(403, new { message = "Error.InsufficientPermission" });
 
         if (daysToKeep < 7)
-            return BadRequest(new { message = "En az 7 gunluk log tutulmalidir" });
+            return BadRequest(new { message = "Error.MinLogRetention7Days" });
 
         var deletedCount = await _logService.CleanupOldLogsAsync(daysToKeep);
 
-        return Ok(new { message = $"{deletedCount} adet eski log silindi", deletedCount });
+        return Ok(new { message = "Success.OldLogsDeleted", deletedCount });
     }
 }

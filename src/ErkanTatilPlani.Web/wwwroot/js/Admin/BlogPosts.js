@@ -70,7 +70,7 @@ function AdminBlogPostsViewModel() {
             self.totalCount(data.totalCount);
             self.isLoading(false);
         }).fail(function () {
-            toastr.error('Veriler yuklenemedi');
+            toastr.error(T('Error.DataLoadFailed'));
             self.isLoading(false);
         });
     };
@@ -83,11 +83,11 @@ function AdminBlogPostsViewModel() {
             contentType: 'application/json',
             data: JSON.stringify({ statusId: statusId })
         }).done(function () {
-            var statusMsg = statusId === 1 ? 'Yazi yayinlandi' : 'Yazi arsivlendi';
+            var statusMsg = statusId === 1 ? T('Success.PostPublished') : T('Success.PostArchived');
             toastr.success(statusMsg);
             self.loadData();
         }).fail(function (xhr) {
-            toastr.error(xhr.responseJSON?.message || 'Islem basarisiz');
+            toastr.error(T(xhr.responseJSON?.message) || T('Common.Error'));
         });
     };
 
@@ -167,7 +167,7 @@ function AdminBlogPostsViewModel() {
     self.savePost = function () {
         var fd = self.formData();
         if (!fd.title || !fd.summary) {
-            toastr.warning('Baslik ve ozet zorunludur');
+            toastr.warning(T('Validation.TitleSummaryRequired'));
             return;
         }
 
@@ -177,7 +177,7 @@ function AdminBlogPostsViewModel() {
         }
 
         if (!fd.content || fd.content === '<p><br></p>') {
-            toastr.warning('Icerik zorunludur');
+            toastr.warning(T('Validation.ContentRequired'));
             return;
         }
 
@@ -203,12 +203,12 @@ function AdminBlogPostsViewModel() {
                 contentType: 'application/json',
                 data: JSON.stringify(postData)
             }).done(function () {
-                toastr.success('Yazi guncellendi');
+                toastr.success(T('Success.PostUpdated'));
                 formModal.hide();
                 self.loadData();
                 self.isSaving(false);
             }).fail(function (xhr) {
-                toastr.error(xhr.responseJSON?.message || 'Guncelleme basarisiz');
+                toastr.error(T(xhr.responseJSON?.message) || T('Common.Error'));
                 self.isSaving(false);
             });
         } else {
@@ -218,12 +218,12 @@ function AdminBlogPostsViewModel() {
                 contentType: 'application/json',
                 data: JSON.stringify(postData)
             }).done(function () {
-                toastr.success('Yazi olusturuldu');
+                toastr.success(T('Success.PostCreated'));
                 formModal.hide();
                 self.loadData();
                 self.isSaving(false);
             }).fail(function (xhr) {
-                toastr.error(xhr.responseJSON?.message || 'Olusturma basarisiz');
+                toastr.error(T(xhr.responseJSON?.message) || T('Common.Error'));
                 self.isSaving(false);
             });
         }
@@ -237,12 +237,12 @@ function AdminBlogPostsViewModel() {
             url: apiBaseUrl + '/api/blogs/' + self.selectedPost().id,
             method: 'DELETE'
         }).done(function () {
-            toastr.success('Yazi silindi');
+            toastr.success(T('Success.PostDeleted'));
             deleteModal.hide();
             self.loadData();
             self.isSaving(false);
         }).fail(function (xhr) {
-            toastr.error(xhr.responseJSON?.message || 'Silme basarisiz');
+            toastr.error(T(xhr.responseJSON?.message) || T('Common.Error'));
             self.isSaving(false);
         });
     };

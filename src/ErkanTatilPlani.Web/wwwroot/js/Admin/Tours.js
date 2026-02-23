@@ -60,7 +60,7 @@ function AdminToursViewModel() {
             self.companies(companiesRes[0]);
             self.isLoading(false);
         }).fail(function() {
-            toastr.error('Veriler yuklenirken hata olustu');
+            toastr.error(T('Error.DataLoadFailed'));
             self.isLoading(false);
         });
     };
@@ -138,11 +138,11 @@ function AdminToursViewModel() {
             success: function() {
                 formModal.hide();
                 self.loadData();
-                toastr.success(isEdit ? 'Tur guncellendi' : 'Tur eklendi');
+                toastr.success(isEdit ? T('Success.TourUpdated') : T('Success.TourCreated'));
                 self.isSaving(false);
             },
             error: function() {
-                toastr.error('Islem sirasinda hata olustu');
+                toastr.error(T('Error.OperationFailed'));
                 self.isSaving(false);
             }
         });
@@ -158,11 +158,11 @@ function AdminToursViewModel() {
             success: function() {
                 deleteModal.hide();
                 self.loadData();
-                toastr.success('Tur silindi');
+                toastr.success(T('Success.TourDeleted'));
                 self.isSaving(false);
             },
             error: function() {
-                toastr.error('Silme sirasinda hata olustu');
+                toastr.error(T('Error.DeleteFailed'));
                 self.isSaving(false);
             }
         });

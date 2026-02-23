@@ -34,18 +34,17 @@ function DashboardViewModel() {
 
     // Cache temizleme fonksiyonlari
     self.clearAllCache = function() {
-        if (!confirm('Tum cache temizlenecek. Emin misiniz?')) return;
+        if (!confirm(T('Confirm.ClearAllCache'))) return;
         self.isCacheClearing(true);
         $.ajax({
             url: apiBaseUrl + '/api/cache/clear',
             method: 'POST',
             success: function(response) {
-                toastr.success(response.message || 'Tum cache temizlendi');
+                toastr.success(T(response.message) || T('Success.CacheCleared'));
                 self.loadData(); // Verileri yenile
             },
             error: function(xhr) {
-                var msg = xhr.responseJSON ? xhr.responseJSON.message : 'Hata olustu';
-                toastr.error(msg);
+                toastr.error(T(xhr.responseJSON?.message) || T('Common.Error'));
             },
             complete: function() {
                 self.isCacheClearing(false);
@@ -59,11 +58,10 @@ function DashboardViewModel() {
             url: apiBaseUrl + '/api/cache/clear/' + type,
             method: 'POST',
             success: function(response) {
-                toastr.success(response.message || type + ' cache temizlendi');
+                toastr.success(T(response.message) || T('Success.CacheCleared'));
             },
             error: function(xhr) {
-                var msg = xhr.responseJSON ? xhr.responseJSON.message : 'Hata olustu';
-                toastr.error(msg);
+                toastr.error(T(xhr.responseJSON?.message) || T('Common.Error'));
             },
             complete: function() {
                 self.isCacheClearing(false);
@@ -102,7 +100,7 @@ function DashboardViewModel() {
             var featured = tours.filter(function(t) { return t.isFeatured; });
             self.featuredTours(featured.slice(0, 5));
         }).fail(function() {
-            toastr.error('Veriler yuklenirken hata olustu');
+            toastr.error(T('Error.DataLoadFailed'));
         });
     };
 

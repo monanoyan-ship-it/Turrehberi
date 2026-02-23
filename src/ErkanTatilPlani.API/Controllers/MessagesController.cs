@@ -41,12 +41,12 @@ public class MessagesController : ControllerBase
     public async Task<ActionResult<object>> GetConversations([FromQuery] int page = 1, [FromQuery] int pageSize = 20)
     {
         var visitorId = GetVisitorId();
-        if (visitorId == null) return Unauthorized(new { message = "Giris yapmaniz gerekiyor" });
+        if (visitorId == null) return Unauthorized(new { message = "Error.LoginRequired" });
 
         if (IsCompanyOwner())
         {
             var companyId = GetCompanyId();
-            if (companyId == null) return BadRequest(new { message = "Firma bilgisi bulunamadi" });
+            if (companyId == null) return BadRequest(new { message = "Error.CompanyInfoNotFound" });
             return Ok(await _messageFactory.GetConversationsForCompanyAsync(companyId.Value, page, pageSize));
         }
 
@@ -58,7 +58,7 @@ public class MessagesController : ControllerBase
     public async Task<ActionResult<object>> GetVisitorConversations([FromQuery] int page = 1, [FromQuery] int pageSize = 20)
     {
         var visitorId = GetVisitorId();
-        if (visitorId == null) return Unauthorized(new { message = "Giris yapmaniz gerekiyor" });
+        if (visitorId == null) return Unauthorized(new { message = "Error.LoginRequired" });
         return Ok(await _messageFactory.GetConversationsForVisitorAsync(visitorId.Value, page, pageSize));
     }
 
@@ -67,9 +67,9 @@ public class MessagesController : ControllerBase
     public async Task<ActionResult<object>> GetCompanyConversations([FromQuery] int page = 1, [FromQuery] int pageSize = 20)
     {
         var visitorId = GetVisitorId();
-        if (visitorId == null) return Unauthorized(new { message = "Giris yapmaniz gerekiyor" });
+        if (visitorId == null) return Unauthorized(new { message = "Error.LoginRequired" });
         var companyId = GetCompanyId();
-        if (companyId == null) return BadRequest(new { message = "Firma bilgisi bulunamadi" });
+        if (companyId == null) return BadRequest(new { message = "Error.CompanyInfoNotFound" });
         return Ok(await _messageFactory.GetConversationsForCompanyAsync(companyId.Value, page, pageSize));
     }
 
@@ -78,7 +78,7 @@ public class MessagesController : ControllerBase
     public async Task<ActionResult<object>> GetMessages(int conversationId, [FromQuery] int page = 1, [FromQuery] int pageSize = 50)
     {
         var visitorId = GetVisitorId();
-        if (visitorId == null) return Unauthorized(new { message = "Giris yapmaniz gerekiyor" });
+        if (visitorId == null) return Unauthorized(new { message = "Error.LoginRequired" });
 
         var isCompany = IsCompanyOwner();
         return Ok(await _messageFactory.GetMessagesAsync(conversationId, visitorId.Value, isCompany, page, pageSize));
@@ -89,7 +89,7 @@ public class MessagesController : ControllerBase
     public async Task<ActionResult<object>> CreateConversation([FromBody] CreateConversationRequest request)
     {
         var visitorId = GetVisitorId();
-        if (visitorId == null) return Unauthorized(new { message = "Giris yapmaniz gerekiyor" });
+        if (visitorId == null) return Unauthorized(new { message = "Error.LoginRequired" });
 
         var (success, message, data) = await _messageFactory.CreateConversationAsync(
             visitorId.Value, request.CompanyId, request.TourId, request.Subject, request.Message);
@@ -103,7 +103,7 @@ public class MessagesController : ControllerBase
     public async Task<ActionResult<object>> SendMessage([FromBody] SendMessageRequest request)
     {
         var visitorId = GetVisitorId();
-        if (visitorId == null) return Unauthorized(new { message = "Giris yapmaniz gerekiyor" });
+        if (visitorId == null) return Unauthorized(new { message = "Error.LoginRequired" });
 
         var senderTypeId = IsCompanyOwner() ? MessageSenderTypes.Ids.Company : MessageSenderTypes.Ids.Visitor;
         var (success, message, data) = await _messageFactory.SendMessageAsync(
@@ -118,7 +118,7 @@ public class MessagesController : ControllerBase
     public async Task<IActionResult> MarkAsRead(int conversationId)
     {
         var visitorId = GetVisitorId();
-        if (visitorId == null) return Unauthorized(new { message = "Giris yapmaniz gerekiyor" });
+        if (visitorId == null) return Unauthorized(new { message = "Error.LoginRequired" });
 
         var isCompany = IsCompanyOwner();
         var (success, message) = await _messageFactory.MarkAsReadAsync(conversationId, visitorId.Value, isCompany);

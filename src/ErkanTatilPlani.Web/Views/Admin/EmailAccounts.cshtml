@@ -56,10 +56,10 @@
                         </td>
                         <td>
                             <div class="btn-group btn-group-sm">
-                                <button class="btn btn-outline-primary" data-bind="click: $parent.openEditModal" title="Duzenle">
+                                <button class="btn btn-outline-primary" data-bind="click: $parent.openEditModal" data-t-title="Common.Edit" title="Duzenle">
                                     <i class="bi bi-pencil"></i>
                                 </button>
-                                <button class="btn btn-outline-info" data-bind="click: $parent.copyAccount" title="Kopyala">
+                                <button class="btn btn-outline-info" data-bind="click: $parent.copyAccount" data-t-title="Common.Copy" title="Kopyala">
                                     <i class="bi bi-copy"></i>
                                 </button>
                                 <button class="btn btn-outline-success" data-bind="click: $parent.openTestModal" title="Test Email">
@@ -68,7 +68,7 @@
                                 <button class="btn btn-outline-warning" data-bind="click: $parent.setDefault, visible: !isDefault" title="Varsayilan Yap">
                                     <i class="bi bi-star"></i>
                                 </button>
-                                <button class="btn btn-outline-danger" data-bind="click: $parent.deleteAccount, visible: !isDefault" title="Sil">
+                                <button class="btn btn-outline-danger" data-bind="click: $parent.deleteAccount, visible: !isDefault" data-t-title="Common.Delete" title="Sil">
                                     <i class="bi bi-trash"></i>
                                 </button>
                             </div>

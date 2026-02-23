@@ -77,7 +77,7 @@ function EmailTemplatesViewModel() {
                 self.templates(data);
             })
             .fail(function () {
-                toastr.error('Sablonlar yuklenemedi');
+                toastr.error(T('Error.TemplatesLoadFailed'));
             })
             .always(function () {
                 self.loading(false);
@@ -171,7 +171,7 @@ function EmailTemplatesViewModel() {
                 }, 300);
             })
             .fail(function () {
-                toastr.error('Sablon detaylari yuklenemedi');
+                toastr.error(T('Error.TemplateDetailsLoadFailed'));
                 $('#templateModal').modal('hide');
                 self.loadingModal(false);
             });
@@ -189,13 +189,13 @@ function EmailTemplatesViewModel() {
             $('#emailBodyEditor').summernote('insertText', placeholder);
             self.translationData.body($('#emailBodyEditor').summernote('code'));
         }
-        toastr.info(placeholder + ' eklendi', '', { timeOut: 1000 });
+        toastr.info(T('Success.PlaceholderInserted'), '', { timeOut: 1000 });
         return false;
     };
 
     self.saveTemplate = function () {
         if (!self.formData.key() || !self.formData.name()) {
-            toastr.warning('Key ve Sablon Adi zorunludur');
+            toastr.warning(T('Validation.KeyAndNameRequired'));
             return;
         }
 
@@ -213,13 +213,13 @@ function EmailTemplatesViewModel() {
             })
         })
             .done(function (newTemplate) {
-                toastr.success('Sablon olusturuldu');
+                toastr.success(T('Success.TemplateCreated'));
                 self.editingTemplate(newTemplate);
                 self.translations([]);
                 self.loadTemplates();
             })
             .fail(function (xhr) {
-                toastr.error(xhr.responseJSON?.message || 'Islem basarisiz');
+                toastr.error(T(xhr.responseJSON?.message) || T('Common.Error'));
             })
             .always(function () {
                 self.saving(false);
@@ -228,7 +228,7 @@ function EmailTemplatesViewModel() {
 
     self.updateTemplate = function () {
         if (!self.formData.name()) {
-            toastr.warning('Sablon adi zorunludur');
+            toastr.warning(T('Validation.TemplateNameRequired'));
             return;
         }
 
@@ -245,11 +245,11 @@ function EmailTemplatesViewModel() {
             })
         })
             .done(function () {
-                toastr.success('Sablon guncellendi');
+                toastr.success(T('Success.TemplateUpdated'));
                 self.loadTemplates();
             })
             .fail(function (xhr) {
-                toastr.error(xhr.responseJSON?.message || 'Islem basarisiz');
+                toastr.error(T(xhr.responseJSON?.message) || T('Common.Error'));
             })
             .always(function () {
                 self.saving(false);
@@ -258,7 +258,7 @@ function EmailTemplatesViewModel() {
 
     self.saveTranslation = function () {
         if (!self.editingTemplate()) {
-            toastr.warning('Once sablonu kaydedin');
+            toastr.warning(T('Validation.SaveTemplateFirst'));
             return;
         }
 
@@ -266,7 +266,7 @@ function EmailTemplatesViewModel() {
         var body = self.summernoteInitialized ? $('#emailBodyEditor').summernote('code') : self.translationData.body();
 
         if (!subject || !body) {
-            toastr.warning('Konu ve icerik zorunludur');
+            toastr.warning(T('Validation.SubjectContentRequired'));
             return;
         }
 
@@ -278,7 +278,7 @@ function EmailTemplatesViewModel() {
             data: JSON.stringify({ subject: subject, body: body })
         })
             .done(function () {
-                toastr.success(self.selectedLanguage().toUpperCase() + ' cevirisi kaydedildi');
+                toastr.success(T('Success.TranslationSaved'));
 
                 var existing = self.translations().find(function (t) { return t.languageCode === self.selectedLanguage(); });
                 if (existing) {
@@ -295,7 +295,7 @@ function EmailTemplatesViewModel() {
                 self.loadTemplates();
             })
             .fail(function (xhr) {
-                toastr.error(xhr.responseJSON?.message || 'Kaydetme basarisiz');
+                toastr.error(T(xhr.responseJSON?.message) || T('Common.Error'));
             })
             .always(function () {
                 self.savingTranslation(false);
@@ -303,14 +303,14 @@ function EmailTemplatesViewModel() {
     };
 
     self.deleteTranslation = function () {
-        if (!confirm(self.selectedLanguage().toUpperCase() + ' cevirisini silmek istediginizden emin misiniz?')) return;
+        if (!confirm(T('Confirm.DeleteTranslation'))) return;
 
         $.ajax({
             url: apiBaseUrl + '/api/admin/email-templates/' + self.editingTemplate().id + '/translations/' + self.selectedLanguage(),
             method: 'DELETE'
         })
             .done(function () {
-                toastr.success('Ceviri silindi');
+                toastr.success(T('Success.TranslationDeleted'));
                 self.translations.remove(function (t) { return t.languageCode === self.selectedLanguage(); });
                 self.translationData.subject('');
                 self.translationData.body('');
@@ -320,23 +320,23 @@ function EmailTemplatesViewModel() {
                 self.loadTemplates();
             })
             .fail(function (xhr) {
-                toastr.error(xhr.responseJSON?.message || 'Silme basarisiz');
+                toastr.error(T(xhr.responseJSON?.message) || T('Common.Error'));
             });
     };
 
     self.deleteTemplate = function (template) {
-        if (!confirm('Bu sablonu silmek istediginizden emin misiniz?')) return;
+        if (!confirm(T('Confirm.DeleteTemplate'))) return;
 
         $.ajax({
             url: apiBaseUrl + '/api/admin/email-templates/' + template.id,
             method: 'DELETE'
         })
             .done(function () {
-                toastr.success('Sablon silindi');
+                toastr.success(T('Success.TemplateDeleted'));
                 self.loadTemplates();
             })
             .fail(function (xhr) {
-                toastr.error(xhr.responseJSON?.message || 'Silme basarisiz');
+                toastr.error(T(xhr.responseJSON?.message) || T('Common.Error'));
             });
     };
 
@@ -370,7 +370,7 @@ function EmailTemplatesViewModel() {
                 doc.close();
             })
             .fail(function (xhr) {
-                toastr.error(xhr.responseJSON?.message || 'Onizleme yuklenemedi');
+                toastr.error(T(xhr.responseJSON?.message) || T('Common.Error'));
             })
             .always(function () {
                 self.loadingPreview(false);

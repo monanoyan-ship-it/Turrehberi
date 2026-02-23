@@ -21,7 +21,7 @@ public class WeatherController : ControllerBase
         var forecast = await _weatherAlertFactory.GetTourWeatherAsync(tourId, targetDate);
 
         if (forecast == null)
-            return NotFound(new { message = "Hava durumu bilgisi alinamadi" });
+            return NotFound(new { message = "Error.WeatherDataFailed" });
 
         return Ok(forecast);
     }

@@ -55,7 +55,7 @@ function CompanyMessagesViewModel() {
             (data.conversations || []).forEach(function (c) { total += c.unreadCount || 0; });
             self.totalUnread(total);
         }).fail(function () {
-            toastr.error('Konusmalar yuklenemedi');
+            toastr.error(T('Error.ConversationsLoadFailed'));
         }).always(function () {
             self.isLoading(false);
         });
@@ -89,7 +89,7 @@ function CompanyMessagesViewModel() {
                 if (container) container.scrollTop = container.scrollHeight;
             }, 100);
         }).fail(function () {
-            toastr.error('Mesajlar yuklenemedi');
+            toastr.error(T('Error.MessagesLoadFailed'));
         }).always(function () {
             self.isLoadingMessages(false);
         });
@@ -113,7 +113,7 @@ function CompanyMessagesViewModel() {
             self.loadMessages(self.selectedConversationId());
             self.loadConversations();
         }).fail(function (xhr) {
-            toastr.error(xhr.responseJSON?.message || 'Mesaj gonderilemedi');
+            toastr.error(T(xhr.responseJSON?.message) || T('Common.Error'));
         }).always(function () {
             self.isSending(false);
         });
@@ -145,7 +145,7 @@ function CompanyMessagesViewModel() {
 
     self.saveTemplate = function () {
         if (!self.tplTitle() || !self.tplContent()) {
-            toastr.warning('Baslik ve icerik zorunlu');
+            toastr.warning(T('Validation.TitleContentRequired'));
             return;
         }
         var data = { title: self.tplTitle(), content: self.tplContent(), displayOrder: self.tplOrder() || 0 };
@@ -157,11 +157,11 @@ function CompanyMessagesViewModel() {
                 contentType: 'application/json',
                 data: JSON.stringify(data)
             }).done(function () {
-                toastr.success('Sablon guncellendi');
+                toastr.success(T('Success.TemplateUpdated'));
                 self.resetTemplateForm();
                 self.loadTemplates();
             }).fail(function (xhr) {
-                toastr.error(xhr.responseJSON?.message || 'Guncelleme basarisiz');
+                toastr.error(T(xhr.responseJSON?.message) || T('Common.Error'));
             });
         } else {
             $.ajax({
@@ -170,11 +170,11 @@ function CompanyMessagesViewModel() {
                 contentType: 'application/json',
                 data: JSON.stringify(data)
             }).done(function () {
-                toastr.success('Sablon eklendi');
+                toastr.success(T('Success.TemplateAdded'));
                 self.resetTemplateForm();
                 self.loadTemplates();
             }).fail(function (xhr) {
-                toastr.error(xhr.responseJSON?.message || 'Ekleme basarisiz');
+                toastr.error(T(xhr.responseJSON?.message) || T('Common.Error'));
             });
         }
     };
@@ -187,15 +187,15 @@ function CompanyMessagesViewModel() {
     };
 
     self.deleteTemplate = function (tpl) {
-        if (!confirm('Bu sablonu silmek istediginize emin misiniz?')) return;
+        if (!confirm(T('Confirm.DeleteTemplate'))) return;
         $.ajax({
             url: apiBaseUrl + '/api/messagetemplates/' + tpl.id,
             method: 'DELETE'
         }).done(function () {
-            toastr.success('Sablon silindi');
+            toastr.success(T('Success.TemplateDeleted'));
             self.loadTemplates();
         }).fail(function (xhr) {
-            toastr.error(xhr.responseJSON?.message || 'Silme basarisiz');
+            toastr.error(T(xhr.responseJSON?.message) || T('Common.Error'));
         });
     };
 

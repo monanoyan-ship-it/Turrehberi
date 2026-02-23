@@ -28,7 +28,7 @@ public class FavoritesController : ControllerBase
     {
         var visitorId = GetVisitorId();
         if (visitorId == null)
-            return Unauthorized(new { message = "Giris yapmaniz gerekiyor" });
+            return Unauthorized(new { message = "Error.LoginRequired" });
 
         return Ok(await _favoriteFactory.GetFavoritesAsync(visitorId.Value));
     }
@@ -60,12 +60,12 @@ public class FavoritesController : ControllerBase
     {
         var visitorId = GetVisitorId();
         if (visitorId == null)
-            return Unauthorized(new { message = "Giris yapmaniz gerekiyor" });
+            return Unauthorized(new { message = "Error.LoginRequired" });
 
         var (success, message) = await _favoriteFactory.AddFavoriteAsync(visitorId.Value, tourId);
         if (!success)
         {
-            if (message == "Tur bulunamadi") return NotFound(new { message });
+            if (message == "Error.TourNotFound") return NotFound(new { message });
             return BadRequest(new { message });
         }
         return Ok(new { message });
@@ -76,7 +76,7 @@ public class FavoritesController : ControllerBase
     {
         var visitorId = GetVisitorId();
         if (visitorId == null)
-            return Unauthorized(new { message = "Giris yapmaniz gerekiyor" });
+            return Unauthorized(new { message = "Error.LoginRequired" });
 
         var (success, message) = await _favoriteFactory.RemoveFavoriteAsync(visitorId.Value, tourId);
         if (!success) return NotFound(new { message });
@@ -88,7 +88,7 @@ public class FavoritesController : ControllerBase
     {
         var visitorId = GetVisitorId();
         if (visitorId == null)
-            return Unauthorized(new { message = "Giris yapmaniz gerekiyor" });
+            return Unauthorized(new { message = "Error.LoginRequired" });
 
         var (isFavorite, message, tourNotFound) = await _favoriteFactory.ToggleFavoriteAsync(visitorId.Value, tourId);
         if (tourNotFound) return NotFound(new { message });

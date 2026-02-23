@@ -171,41 +171,41 @@ public class CompanyDashboardFactory : ICompanyDashboardFactory
     {
         var company = await _companyService.GetByIdAsync(id);
         if (company == null)
-            return (false, new { message = "Firma bulunamadi" }, 404);
+            return (false, new { message = "Error.CompanyNotFound" }, 404);
 
         // Validasyon
         if (depositPercentage < 10 || depositPercentage > 100)
-            return (false, new { message = "On odeme yuzdesi 10 ile 100 arasinda olmalidir" }, 400);
+            return (false, new { message = "Validation.DepositPercentageRange" }, 400);
 
         company.DepositPercentage = depositPercentage;
         company.UpdatedAt = DateTime.UtcNow;
 
         await _unitOfWork.SaveChangesAsync();
 
-        return (true, new { message = "Ayarlar guncellendi", depositPercentage = company.DepositPercentage }, 200);
+        return (true, new { message = "Success.SettingsUpdated", depositPercentage = company.DepositPercentage }, 200);
     }
 
     public async Task<(bool success, object? result, int statusCode)> UploadContractAsync(int id, Stream fileStream, string fileName, string contentType, long fileLength)
     {
         if (fileStream == null || fileLength == 0)
-            return (false, new { message = "Dosya secilmedi" }, 400);
+            return (false, new { message = "Error.NoFileSelected" }, 400);
 
         // Boyut kontrolu
         if (fileLength > MaxFileSize)
-            return (false, new { message = "Dosya boyutu 10MB'i gecemez" }, 400);
+            return (false, new { message = "Error.FileSizeMax10MB" }, 400);
 
         // Extension kontrolu
         var extension = Path.GetExtension(fileName).ToLowerInvariant();
         if (extension != ".pdf")
-            return (false, new { message = "Sadece PDF dosyalari yuklenebilir" }, 400);
+            return (false, new { message = "Error.OnlyPdfFilesAllowed" }, 400);
 
         // Content-Type kontrolu
         if (contentType != "application/pdf")
-            return (false, new { message = "Gecersiz dosya formati" }, 400);
+            return (false, new { message = "Error.InvalidFileFormat" }, 400);
 
         var company = await _companyService.GetByIdAsync(id);
         if (company == null)
-            return (false, new { message = "Firma bulunamadi" }, 404);
+            return (false, new { message = "Error.CompanyNotFound" }, 404);
 
         // Eski dosyayi sil (varsa)
         if (!string.IsNullOrEmpty(company.ContractFileUrl))
@@ -245,7 +245,7 @@ public class CompanyDashboardFactory : ICompanyDashboardFactory
 
         return (true, new
         {
-            message = "Sozlesme basariyla yuklendi",
+            message = "Success.ContractUploaded",
             contractFileUrl = company.ContractFileUrl,
             contractUploadedAt = company.ContractUploadedAt
         }, 200);
@@ -255,10 +255,10 @@ public class CompanyDashboardFactory : ICompanyDashboardFactory
     {
         var company = await _companyService.GetByIdAsync(id);
         if (company == null)
-            return (false, new { message = "Firma bulunamadi" }, 404);
+            return (false, new { message = "Error.CompanyNotFound" }, 404);
 
         if (string.IsNullOrEmpty(company.ContractFileUrl))
-            return (false, new { message = "Silinecek sozlesme bulunamadi" }, 400);
+            return (false, new { message = "Error.NoContractToDelete" }, 400);
 
         // Dosyayi sil
         var filePath = Path.Combine(_env.WebRootPath, company.ContractFileUrl.TrimStart('/'));
@@ -274,6 +274,6 @@ public class CompanyDashboardFactory : ICompanyDashboardFactory
 
         await _unitOfWork.SaveChangesAsync();
 
-        return (true, new { message = "Sozlesme basariyla silindi" }, 200);
+        return (true, new { message = "Success.ContractDeleted" }, 200);
     }
 }

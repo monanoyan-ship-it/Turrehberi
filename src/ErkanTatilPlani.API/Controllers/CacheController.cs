@@ -30,7 +30,7 @@ public class CacheController : ControllerBase
         // Admin kontrolu
         var userType = User.FindFirst("UserType")?.Value;
         if (userType != "2") // Admin
-            return StatusCode(403, new { message = "Bu islem icin yetkiniz yok" });
+            return StatusCode(403, new { message = "Error.InsufficientPermission" });
 
         _cache.RemoveByPrefix("tours:");
         _cache.RemoveByPrefix("companies:");
@@ -40,7 +40,7 @@ public class CacheController : ControllerBase
 
         _logger.LogInformation("Tum cache temizlendi - Kullanici: {UserId}", User.FindFirst("sub")?.Value);
 
-        return Ok(new { message = "Tum cache temizlendi" });
+        return Ok(new { message = "Success.AllCacheCleared" });
     }
 
     /// <summary>
@@ -51,12 +51,12 @@ public class CacheController : ControllerBase
     {
         var userType = User.FindFirst("UserType")?.Value;
         if (userType != "2" && userType != "1") // Admin veya CompanyOwner
-            return StatusCode(403, new { message = "Bu islem icin yetkiniz yok" });
+            return StatusCode(403, new { message = "Error.InsufficientPermission" });
 
         _cache.RemoveByPrefix(CacheKeys.ToursPrefix);
         _logger.LogInformation("Tur cache temizlendi - Kullanici: {UserId}", User.FindFirst("sub")?.Value);
 
-        return Ok(new { message = "Tur cache temizlendi" });
+        return Ok(new { message = "Success.TourCacheCleared" });
     }
 
     /// <summary>
@@ -67,12 +67,12 @@ public class CacheController : ControllerBase
     {
         var userType = User.FindFirst("UserType")?.Value;
         if (userType != "2") // Sadece Admin
-            return StatusCode(403, new { message = "Bu islem icin yetkiniz yok" });
+            return StatusCode(403, new { message = "Error.InsufficientPermission" });
 
         _cache.RemoveByPrefix(CacheKeys.CompaniesPrefix);
         _logger.LogInformation("Firma cache temizlendi - Kullanici: {UserId}", User.FindFirst("sub")?.Value);
 
-        return Ok(new { message = "Firma cache temizlendi" });
+        return Ok(new { message = "Success.CompanyCacheCleared" });
     }
 
     /// <summary>
@@ -83,13 +83,13 @@ public class CacheController : ControllerBase
     {
         var userType = User.FindFirst("UserType")?.Value;
         if (userType != "2") // Sadece Admin
-            return StatusCode(403, new { message = "Bu islem icin yetkiniz yok" });
+            return StatusCode(403, new { message = "Error.InsufficientPermission" });
 
         _cache.RemoveByPrefix("locale:");
         _cache.Remove(CacheKeys.Languages);
         _logger.LogInformation("Localization cache temizlendi - Kullanici: {UserId}", User.FindFirst("sub")?.Value);
 
-        return Ok(new { message = "Localization cache temizlendi" });
+        return Ok(new { message = "Success.LocalizationCacheCleared" });
     }
 
     /// <summary>
@@ -100,11 +100,11 @@ public class CacheController : ControllerBase
     {
         var userType = User.FindFirst("UserType")?.Value;
         if (userType != "2" && userType != "1") // Admin veya CompanyOwner
-            return StatusCode(403, new { message = "Bu islem icin yetkiniz yok" });
+            return StatusCode(403, new { message = "Error.InsufficientPermission" });
 
         _cache.RemoveByPrefix(CacheKeys.StatsPrefix);
         _logger.LogInformation("Istatistik cache temizlendi - Kullanici: {UserId}", User.FindFirst("sub")?.Value);
 
-        return Ok(new { message = "Istatistik cache temizlendi" });
+        return Ok(new { message = "Success.StatsCacheCleared" });
     }
 }

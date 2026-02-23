@@ -32,7 +32,7 @@ public class TourReviewFactory : ITourReviewFactory
     public async Task<(object? result, string? errorMessage, int statusCode)> GetTourReviewsAsync(int tourId, string? sort, int? rating, int page, int pageSize)
     {
         var tour = await _tourService.GetByIdAsync(tourId);
-        if (tour == null) return (null, "Tur bulunamadi", 404);
+        if (tour == null) return (null, "Error.TourNotFound", 404);
 
         var query = _reviewService.GetApprovedReviews()
             .Include(r => r.Visitor)
@@ -146,15 +146,15 @@ public class TourReviewFactory : ITourReviewFactory
         bool wouldRecommend, string ipAddress, string userAgent)
     {
         var tour = await _tourService.GetByIdAsync(tourId);
-        if (tour == null) return (null, "Tur bulunamadi", 404);
+        if (tour == null) return (null, "Error.TourNotFound", 404);
 
         var visitor = await _visitorService.GetByIdAsync(visitorId);
-        if (visitor == null) return (null, "Gecersiz kullanici", 400);
+        if (visitor == null) return (null, "Error.InvalidUser", 400);
 
         // Ayni kullanici ayni tura birden fazla yorum yapamaz
         var existingReview = await _reviewService.GetByTourAndVisitorAsync(tourId, visitorId);
         if (existingReview != null)
-            return (null, "Bu tura zaten yorum yapdiniz", 400);
+            return (null, "Error.AlreadyReviewedTour", 400);
 
         // Dogrulanmis yorum kontrolu (rezervasyon yapti mi)
         var hasReservation = await _reservationService.GetActiveReservations()
@@ -190,7 +190,7 @@ public class TourReviewFactory : ITourReviewFactory
         // Tour istatistiklerini guncelle
         await UpdateTourReviewStats(tourId);
 
-        return (new { message = "Yorumunuz eklendi", reviewId = review.Id }, null, 200);
+        return (new { message = "Success.ReviewCreated", reviewId = review.Id }, null, 200);
     }
 
     public async Task<(object? result, string? errorMessage, int statusCode)> UpdateReviewAsync(
@@ -200,7 +200,7 @@ public class TourReviewFactory : ITourReviewFactory
         bool wouldRecommend)
     {
         var review = await _reviewService.GetByIdAsync(id);
-        if (review == null) return (null, "Yorum bulunamadi", 404);
+        if (review == null) return (null, "Error.ReviewNotFound", 404);
 
         // Sadece yorum sahibi guncelleyebilir
         if (review.VisitorId != visitorId)
@@ -225,13 +225,13 @@ public class TourReviewFactory : ITourReviewFactory
         await _unitOfWork.SaveChangesAsync();
         await UpdateTourReviewStats(review.TourId);
 
-        return (new { message = "Yorum guncellendi" }, null, 200);
+        return (new { message = "Success.ReviewUpdated" }, null, 200);
     }
 
     public async Task<(object? result, string? errorMessage, int statusCode)> DeleteReviewAsync(int id, int visitorId)
     {
         var review = await _reviewService.GetByIdAsync(id);
-        if (review == null) return (null, "Yorum bulunamadi", 404);
+        if (review == null) return (null, "Error.ReviewNotFound", 404);
 
         // Sadece yorum sahibi silebilir
         if (review.VisitorId != visitorId)
@@ -243,7 +243,7 @@ public class TourReviewFactory : ITourReviewFactory
         await _unitOfWork.SaveChangesAsync();
         await UpdateTourReviewStats(review.TourId);
 
-        return (new { message = "Yorum silindi" }, null, 200);
+        return (new { message = "Success.ReviewDeleted" }, null, 200);
     }
 
     public async Task<object> GetMyReviewsAsync(int companyId, bool? hasReply)

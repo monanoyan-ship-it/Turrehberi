@@ -38,13 +38,13 @@ public class PaymentFactory : IPaymentFactory
             .FirstOrDefaultAsync(r => r.Id == reservationId && r.VisitorId == visitorId);
 
         if (reservation == null)
-            return (false, new { message = "Rezervasyon bulunamadi" }, 404);
+            return (false, new { message = "Error.ReservationNotFound" }, 404);
 
         if (reservation.PaymentStatus == PaymentStatuses.Ids.FullyPaid)
-            return (false, new { message = "Bu rezervasyon zaten odenmis" }, 400);
+            return (false, new { message = "Error.ReservationAlreadyPaid" }, 400);
 
         if (reservation.Status == ReservationStatuses.Ids.Cancelled)
-            return (false, new { message = "Iptal edilmis rezervasyon icin odeme yapilamaz" }, 400);
+            return (false, new { message = "Error.CannotPayCancelledReservation" }, 400);
 
         var callbackUrl = $"{scheme}://{host}/api/payments/callback";
         var paymentRequest = new PaymentRequest
@@ -83,14 +83,14 @@ public class PaymentFactory : IPaymentFactory
             .FirstOrDefaultAsync(r => r.Id == reservationId && r.VisitorId == visitorId);
 
         if (reservation == null)
-            return (false, new { message = "Rezervasyon bulunamadi" }, 404);
+            return (false, new { message = "Error.ReservationNotFound" }, 404);
 
         if (reservation.PaymentStatus != PaymentStatuses.Ids.DepositPaid)
-            return (false, new { message = "Bu islem icin once on odeme yapilmis olmalidir" }, 400);
+            return (false, new { message = "Error.DepositPaymentRequired" }, 400);
 
         var remainingAmount = reservation.TotalPrice - reservation.PaidAmount;
         if (remainingAmount <= 0)
-            return (false, new { message = "Odenecek tutar kalmadi" }, 400);
+            return (false, new { message = "Error.NoRemainingBalance" }, 400);
 
         var callbackUrl = $"{scheme}://{host}/api/payments/callback";
         var paymentRequest = new PaymentRequest
@@ -103,7 +103,7 @@ public class PaymentFactory : IPaymentFactory
             CustomerPhone = reservation.Visitor.Phone ?? "",
             CustomerIp = "127.0.0.1",
             CustomerAddress = reservation.Visitor.Address ?? "",
-            ProductName = $"{reservation.Tour.Name} - Kalan Odeme",
+            ProductName = $"{reservation.Tour.Name} - Remaining Payment",
             ProductCategory = "Tur",
             CallbackUrl = callbackUrl
         };
@@ -178,7 +178,7 @@ public class PaymentFactory : IPaymentFactory
             }
 
             _logger.LogWarning("Payment failed for reservation {ReservationId}: {ErrorMessage}", result.ReservationId, result.ErrorMessage);
-            return (false, $"/Account/PaymentResult?status=failed&reservationId={result.ReservationId}&error={Uri.EscapeDataString(result.ErrorMessage ?? "Odeme basarisiz")}");
+            return (false, $"/Account/PaymentResult?status=failed&reservationId={result.ReservationId}&error={Uri.EscapeDataString(result.ErrorMessage ?? "Error.PaymentFailed")}");
         }
 
         return (false, "/Account/Reservations");

@@ -28,7 +28,7 @@ public class NotificationsController : ControllerBase
     {
         var visitorId = GetVisitorId();
         if (visitorId == null)
-            return Unauthorized(new { message = "Giris yapmaniz gerekiyor" });
+            return Unauthorized(new { message = "Error.LoginRequired" });
 
         return Ok(await _notificationFactory.GetNotificationsAsync(visitorId.Value, page, pageSize));
     }
@@ -49,7 +49,7 @@ public class NotificationsController : ControllerBase
     {
         var visitorId = GetVisitorId();
         if (visitorId == null)
-            return Unauthorized(new { message = "Giris yapmaniz gerekiyor" });
+            return Unauthorized(new { message = "Error.LoginRequired" });
 
         var (success, message) = await _notificationFactory.MarkAsReadAsync(visitorId.Value, id);
         if (!success) return NotFound(new { message });
@@ -61,7 +61,7 @@ public class NotificationsController : ControllerBase
     {
         var visitorId = GetVisitorId();
         if (visitorId == null)
-            return Unauthorized(new { message = "Giris yapmaniz gerekiyor" });
+            return Unauthorized(new { message = "Error.LoginRequired" });
 
         var (success, message) = await _notificationFactory.MarkAllAsReadAsync(visitorId.Value);
         return Ok(new { message });

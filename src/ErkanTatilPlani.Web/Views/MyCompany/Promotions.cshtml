@@ -108,13 +108,13 @@
                                 </td>
                                 <td>
                                     <div class="btn-group btn-group-sm">
-                                        <button class="btn btn-outline-primary" data-bind="click: $parent.openEditModal" title="Duzenle">
+                                        <button class="btn btn-outline-primary" data-bind="click: $parent.openEditModal" data-t-title="Common.Edit" title="Duzenle">
                                             <i class="bi bi-pencil"></i>
                                         </button>
                                         <button class="btn btn-outline-warning" data-bind="click: $parent.toggleStatus" title="Durum Degistir">
                                             <i class="bi bi-toggle-on"></i>
                                         </button>
-                                        <button class="btn btn-outline-danger" data-bind="click: $parent.deletePromotion" title="Sil">
+                                        <button class="btn btn-outline-danger" data-bind="click: $parent.deletePromotion" data-t-title="Common.Delete" title="Sil">
                                             <i class="bi bi-trash"></i>
                                         </button>
                                     </div>
@@ -184,13 +184,13 @@
                                     </td>
                                     <td>
                                         <div class="btn-group btn-group-sm">
-                                            <button class="btn btn-outline-primary" data-bind="click: $parent.openEditModal" title="Duzenle">
+                                            <button class="btn btn-outline-primary" data-bind="click: $parent.openEditModal" data-t-title="Common.Edit" title="Duzenle">
                                                 <i class="bi bi-pencil"></i>
                                             </button>
                                             <button class="btn btn-outline-warning" data-bind="click: $parent.toggleStatus" title="Durum Degistir">
                                                 <i class="bi bi-toggle-on"></i>
                                             </button>
-                                            <button class="btn btn-outline-danger" data-bind="click: $parent.deletePromotion" title="Sil">
+                                            <button class="btn btn-outline-danger" data-bind="click: $parent.deletePromotion" data-t-title="Common.Delete" title="Sil">
                                                 <i class="bi bi-trash"></i>
                                             </button>
                                         </div>
@@ -264,7 +264,7 @@
                             <div class="row g-3">
                                 <div class="col-md-4">
                                     <label class="form-label" data-t="Promotion.Code">Kupon Kodu</label>
-                                    <input type="text" class="form-control" data-bind="value: formData().code" placeholder="INDIRIM20" />
+                                    <input type="text" class="form-control" data-bind="value: formData().code" data-t-placeholder="Promotion.CodePlaceholder" placeholder="INDIRIM20" />
                                 </div>
                                 <div class="col-md-4">
                                     <label class="form-label" data-t="Promotion.UsageLimit">Kullanim Limiti</label>

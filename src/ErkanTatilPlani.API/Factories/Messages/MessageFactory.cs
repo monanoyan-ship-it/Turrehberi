@@ -164,7 +164,7 @@ public class MessageFactory : IMessageFactory
     {
         var company = await _companyService.GetByIdAsync(companyId);
         if (company == null)
-            return (false, "Firma bulunamadi", null);
+            return (false, "Error.CompanyNotFound", null);
 
         var conversation = new Conversation
         {
@@ -191,7 +191,7 @@ public class MessageFactory : IMessageFactory
         _messageService.AddMessage(message);
         await _unitOfWork.SaveChangesAsync();
 
-        return (true, "Konusma olusturuldu", new { conversationId = conversation.Id, messageId = message.Id });
+        return (true, "Success.ConversationCreated", new { conversationId = conversation.Id, messageId = message.Id });
     }
 
     public async Task<(bool success, string message, object? data)> SendMessageAsync(
@@ -199,13 +199,13 @@ public class MessageFactory : IMessageFactory
     {
         var conversation = await _messageService.GetConversationByIdAsync(conversationId);
         if (conversation == null)
-            return (false, "Konusma bulunamadi", null);
+            return (false, "Error.ConversationNotFound", null);
 
         // Kapalı konuşma kontrolü
         if (senderTypeId == MessageSenderTypes.Ids.Visitor && conversation.IsClosedByVisitor)
-            return (false, "Bu konusma kapatilmis", null);
+            return (false, "Error.ConversationClosed", null);
         if (senderTypeId == MessageSenderTypes.Ids.Company && conversation.IsClosedByCompany)
-            return (false, "Bu konusma kapatilmis", null);
+            return (false, "Error.ConversationClosed", null);
 
         var message = new Message
         {
@@ -222,14 +222,14 @@ public class MessageFactory : IMessageFactory
         conversation.UpdatedAt = DateTime.UtcNow;
         await _unitOfWork.SaveChangesAsync();
 
-        return (true, "Mesaj gonderildi", new { messageId = message.Id });
+        return (true, "Success.MessageSent", new { messageId = message.Id });
     }
 
     public async Task<(bool success, string message)> MarkAsReadAsync(int conversationId, int requesterId, bool isCompany)
     {
         var conversation = await _messageService.GetConversationByIdAsync(conversationId);
         if (conversation == null)
-            return (false, "Konusma bulunamadi");
+            return (false, "Error.ConversationNotFound");
 
         // Karsi tarafin mesajlarini okundu isaretle
         var targetSenderType = isCompany ? MessageSenderTypes.Ids.Visitor : MessageSenderTypes.Ids.Company;
@@ -246,6 +246,6 @@ public class MessageFactory : IMessageFactory
         }
 
         await _unitOfWork.SaveChangesAsync();
-        return (true, $"{unreadMessages.Count} mesaj okundu olarak isaretlendi");
+        return (true, "Success.MessagesMarkedAsRead");
     }
 }

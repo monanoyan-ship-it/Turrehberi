@@ -15,8 +15,8 @@ function BlogDetailViewModel() {
 
     // Category helpers
     var categoryNames = {
-        0: 'Seyahat Ipuclari', 1: 'Gezi Rehberleri', 2: 'Haberler',
-        3: 'Kultur & Yasam', 4: 'Yeme & Icme', 5: 'Macera & Doga'
+        0: T('Blog.Category.TravelTips'), 1: T('Blog.Category.Destinations'), 2: T('Blog.Category.News'),
+        3: T('Blog.Category.Culture'), 4: T('Blog.Category.FoodAndDrink'), 5: T('Blog.Category.Adventure')
     };
     var categoryBadgeClasses = {
         0: 'bg-info', 1: 'bg-success', 2: 'bg-primary',
@@ -24,7 +24,7 @@ function BlogDetailViewModel() {
     };
 
     self.getCategoryName = function (id) {
-        return categoryNames[id] || 'Diger';
+        return categoryNames[id] || T('Blog.Category.Other');
     };
 
     self.getCategoryBadgeClass = function (id) {
@@ -88,12 +88,12 @@ function BlogDetailViewModel() {
             contentType: 'application/json',
             data: JSON.stringify({ content: self.newComment(), parentCommentId: null })
         }).done(function () {
-            toastr.success('Yorum eklendi');
+            toastr.success(T('Success.CommentAdded'));
             self.newComment('');
             self.loadComments();
             self.isSaving(false);
         }).fail(function (xhr) {
-            toastr.error(xhr.responseJSON?.message || 'Yorum eklenemedi');
+            toastr.error(T(xhr.responseJSON?.message) || T('Common.Error'));
             self.isSaving(false);
         });
     };
@@ -118,28 +118,28 @@ function BlogDetailViewModel() {
             contentType: 'application/json',
             data: JSON.stringify({ content: self.replyContent(), parentCommentId: parentCommentId })
         }).done(function () {
-            toastr.success('Yanit eklendi');
+            toastr.success(T('Success.ReplyAdded'));
             self.replyContent('');
             self.replyingTo(null);
             self.loadComments();
             self.isSaving(false);
         }).fail(function (xhr) {
-            toastr.error(xhr.responseJSON?.message || 'Yanit eklenemedi');
+            toastr.error(T(xhr.responseJSON?.message) || T('Common.Error'));
             self.isSaving(false);
         });
     };
 
     // Delete comment
     self.deleteComment = function (commentId) {
-        if (!confirm('Bu yorumu silmek istediginizden emin misiniz?')) return;
+        if (!confirm(T('Confirm.DeleteComment'))) return;
         $.ajax({
             url: apiBaseUrl + '/api/blogs/comments/' + commentId,
             method: 'DELETE'
         }).done(function () {
-            toastr.success('Yorum silindi');
+            toastr.success(T('Success.CommentDeleted'));
             self.loadComments();
         }).fail(function (xhr) {
-            toastr.error(xhr.responseJSON?.message || 'Yorum silinemedi');
+            toastr.error(T(xhr.responseJSON?.message) || T('Common.Error'));
         });
     };
 

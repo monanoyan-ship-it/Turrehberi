@@ -36,13 +36,13 @@ function AdminVisitorsViewModel() {
         self.isSaving(true);
         var data = self.formData();
         $.ajax({ url: apiBaseUrl + '/api/visitors' + (self.isEditing() ? '/' + data.id : ''), method: self.isEditing() ? 'PUT' : 'POST', contentType: 'application/json', data: JSON.stringify(data) })
-            .done(function() { formModal.hide(); self.loadData(); toastr.success('Kaydedildi'); self.isSaving(false); })
-            .fail(function() { toastr.error('Hata'); self.isSaving(false); });
+            .done(function() { formModal.hide(); self.loadData(); toastr.success(T('Common.Saved')); self.isSaving(false); })
+            .fail(function() { toastr.error(T('Common.Error')); self.isSaving(false); });
     };
 
     self.deleteVisitor = function() {
         $.ajax({ url: apiBaseUrl + '/api/visitors/' + self.selectedVisitor().id, method: 'DELETE' })
-            .done(function() { deleteModal.hide(); self.loadData(); toastr.success('Silindi'); });
+            .done(function() { deleteModal.hide(); self.loadData(); toastr.success(T('Common.Deleted')); });
     };
 
     $(document).ready(function() { formModal = new bootstrap.Modal(document.getElementById('formModal')); deleteModal = new bootstrap.Modal(document.getElementById('deleteModal')); self.loadData(); });

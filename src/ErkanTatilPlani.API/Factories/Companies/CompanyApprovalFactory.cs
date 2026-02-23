@@ -26,10 +26,10 @@ public class CompanyApprovalFactory : ICompanyApprovalFactory
     {
         var company = await _companyService.GetByIdAsync(id);
         if (company == null)
-            return (false, new { message = "Firma bulunamadi" }, 404);
+            return (false, new { message = "Error.CompanyNotFound" }, 404);
 
         if (company.StatusId != CompanyStatuses.Ids.Pending)
-            return (false, new { message = "Sadece bekleyen basvurular onaylanabilir" }, 400);
+            return (false, new { message = "Error.OnlyPendingCanBeApproved" }, 400);
 
         company.StatusId = CompanyStatuses.Ids.Approved;
         company.ReviewedAt = DateTime.UtcNow;
@@ -39,20 +39,20 @@ public class CompanyApprovalFactory : ICompanyApprovalFactory
 
         await _unitOfWork.SaveChangesAsync();
 
-        return (true, new { message = "Firma onaylandi", company }, 200);
+        return (true, new { message = "Success.CompanyApproved", company }, 200);
     }
 
     public async Task<(bool success, object? result, int statusCode)> RejectCompanyAsync(int id, int? reviewedById, string rejectionReason, string? reviewNotes)
     {
         var company = await _companyService.GetByIdAsync(id);
         if (company == null)
-            return (false, new { message = "Firma bulunamadi" }, 404);
+            return (false, new { message = "Error.CompanyNotFound" }, 404);
 
         if (company.StatusId != CompanyStatuses.Ids.Pending)
-            return (false, new { message = "Sadece bekleyen basvurular reddedilebilir" }, 400);
+            return (false, new { message = "Error.OnlyPendingCanBeRejected" }, 400);
 
         if (string.IsNullOrWhiteSpace(rejectionReason))
-            return (false, new { message = "Red sebebi zorunludur" }, 400);
+            return (false, new { message = "Validation.RejectionReasonRequired" }, 400);
 
         company.StatusId = CompanyStatuses.Ids.Rejected;
         company.ReviewedAt = DateTime.UtcNow;
@@ -63,20 +63,20 @@ public class CompanyApprovalFactory : ICompanyApprovalFactory
 
         await _unitOfWork.SaveChangesAsync();
 
-        return (true, new { message = "Firma basvurusu reddedildi", company }, 200);
+        return (true, new { message = "Success.CompanyRejected", company }, 200);
     }
 
     public async Task<(bool success, object? result, int statusCode)> SuspendCompanyAsync(int id, int? reviewedById, string reason)
     {
         var company = await _companyService.GetByIdAsync(id);
         if (company == null)
-            return (false, new { message = "Firma bulunamadi" }, 404);
+            return (false, new { message = "Error.CompanyNotFound" }, 404);
 
         if (company.StatusId != CompanyStatuses.Ids.Approved)
-            return (false, new { message = "Sadece onaylanmis firmalar askiya alinabilir" }, 400);
+            return (false, new { message = "Error.OnlyApprovedCanBeSuspended" }, 400);
 
         if (string.IsNullOrWhiteSpace(reason))
-            return (false, new { message = "Askiya alma sebebi zorunludur" }, 400);
+            return (false, new { message = "Validation.SuspensionReasonRequired" }, 400);
 
         company.StatusId = CompanyStatuses.Ids.Suspended;
         company.ReviewedAt = DateTime.UtcNow;
@@ -86,17 +86,17 @@ public class CompanyApprovalFactory : ICompanyApprovalFactory
 
         await _unitOfWork.SaveChangesAsync();
 
-        return (true, new { message = "Firma askiya alindi", company }, 200);
+        return (true, new { message = "Success.CompanySuspended", company }, 200);
     }
 
     public async Task<(bool success, object? result, int statusCode)> ReactivateCompanyAsync(int id, int? reviewedById, string? reviewNotes)
     {
         var company = await _companyService.GetByIdAsync(id);
         if (company == null)
-            return (false, new { message = "Firma bulunamadi" }, 404);
+            return (false, new { message = "Error.CompanyNotFound" }, 404);
 
         if (company.StatusId != CompanyStatuses.Ids.Suspended)
-            return (false, new { message = "Sadece askiya alinmis firmalar tekrar aktiflenebilir" }, 400);
+            return (false, new { message = "Error.OnlySuspendedCanBeReactivated" }, 400);
 
         company.StatusId = CompanyStatuses.Ids.Approved;
         company.ReviewedAt = DateTime.UtcNow;
@@ -106,6 +106,6 @@ public class CompanyApprovalFactory : ICompanyApprovalFactory
 
         await _unitOfWork.SaveChangesAsync();
 
-        return (true, new { message = "Firma tekrar aktiflendi", company }, 200);
+        return (true, new { message = "Success.CompanyReactivated", company }, 200);
     }
 }

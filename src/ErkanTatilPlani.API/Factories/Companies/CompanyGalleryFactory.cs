@@ -30,16 +30,16 @@ public class CompanyGalleryFactory : ICompanyGalleryFactory
     {
         var company = await _companyService.GetByIdAsync(companyId);
         if (company == null)
-            return (false, new { message = "Firma bulunamadi" }, 404);
+            return (false, new { message = "Error.CompanyNotFound" }, 404);
 
         // Maksimum 20 resim
         var imageCount = await _galleryService.GetImageCountAsync(companyId);
         if (imageCount >= 20)
-            return (false, new { message = "Galeriye en fazla 20 resim yuklenebilir" }, 400);
+            return (false, new { message = "Error.GalleryMaxImagesReached" }, 400);
 
         // Dosya kontrolu
         if (fileStream == null || fileStream.Length == 0)
-            return (false, new { message = "Dosya secilmedi" }, 400);
+            return (false, new { message = "Error.NoFileSelected" }, 400);
 
         // Yukleme
         var result = await _fileUploadService.UploadImageWithThumbnailAsync(fileStream, fileName, "galleries");
@@ -75,7 +75,7 @@ public class CompanyGalleryFactory : ICompanyGalleryFactory
 
         return (true, new
         {
-            message = "Resim yuklendi",
+            message = "Success.ImageUploaded",
             image = new
             {
                 galleryImage.Id,
@@ -118,7 +118,7 @@ public class CompanyGalleryFactory : ICompanyGalleryFactory
     {
         var image = await _galleryService.GetByIdAsync(imageId, companyId);
         if (image == null)
-            return (false, new { message = "Resim bulunamadi" }, 404);
+            return (false, new { message = "Error.ImageNotFound" }, 404);
 
         if (title != null) image.Title = title;
         if (description != null) image.Description = description;
@@ -139,14 +139,14 @@ public class CompanyGalleryFactory : ICompanyGalleryFactory
         image.UpdatedAt = DateTime.UtcNow;
         await _unitOfWork.SaveChangesAsync();
 
-        return (true, new { message = "Resim guncellendi" }, 200);
+        return (true, new { message = "Success.ImageUpdated" }, 200);
     }
 
     public async Task<(bool success, object? result, int statusCode)> DeleteGalleryImageAsync(int companyId, int imageId)
     {
         var image = await _galleryService.GetByIdAsync(imageId, companyId);
         if (image == null)
-            return (false, new { message = "Resim bulunamadi" }, 404);
+            return (false, new { message = "Error.ImageNotFound" }, 404);
 
         // Dosyalari sil
         await _fileUploadService.DeleteFileAsync(image.ImageUrl);
@@ -158,13 +158,13 @@ public class CompanyGalleryFactory : ICompanyGalleryFactory
         image.UpdatedAt = DateTime.UtcNow;
         await _unitOfWork.SaveChangesAsync();
 
-        return (true, new { message = "Resim silindi" }, 200);
+        return (true, new { message = "Success.ImageDeleted" }, 200);
     }
 
     public async Task<(bool success, object? result, int statusCode)> ReorderGalleryImagesAsync(int companyId, List<int> imageIds)
     {
         if (imageIds == null || !imageIds.Any())
-            return (false, new { message = "Resim listesi bos olamaz" }, 400);
+            return (false, new { message = "Validation.ImageListEmpty" }, 400);
 
         var images = await _galleryService.GetByIdsAsync(companyId, imageIds);
 
@@ -180,6 +180,6 @@ public class CompanyGalleryFactory : ICompanyGalleryFactory
 
         await _unitOfWork.SaveChangesAsync();
 
-        return (true, new { message = "Siralama guncellendi" }, 200);
+        return (true, new { message = "Success.OrderUpdated" }, 200);
     }
 }

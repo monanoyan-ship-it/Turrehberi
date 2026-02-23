@@ -34,7 +34,7 @@ function SettingsViewModel() {
     self.importLanguage = function() {
         var fileInput = document.getElementById('languageFile');
         if (!fileInput.files || fileInput.files.length === 0) {
-            toastr.warning('Lutfen bir dosya secin');
+            toastr.warning(T('Validation.PleaseSelectFile'));
             return;
         }
 
@@ -54,13 +54,13 @@ function SettingsViewModel() {
             processData: false,
             contentType: false,
             success: function(result) {
-                toastr.success('Dil dosyasi basariyla yuklendi: ' + (result.importedCount || 0) + ' ceviri eklendi');
+                toastr.success(T('Success.LanguageFileUploaded'));
                 self.loadLanguages();
                 fileInput.value = '';
                 self.isImporting(false);
             },
             error: function() {
-                toastr.error('Dil dosyasi yuklenirken hata olustu');
+                toastr.error(T('Error.LanguageFileUploadFailed'));
                 self.isImporting(false);
             }
         });
@@ -72,11 +72,11 @@ function SettingsViewModel() {
     };
 
     self.openAddLanguageModal = function() {
-        toastr.info('Dil ekleme ozelligi yakin zamanda eklenecek');
+        toastr.info(T('Info.FeatureComingSoon'));
     };
 
     self.editLanguage = function(language) {
-        toastr.info('Dil duzenleme ozelligi yakin zamanda eklenecek');
+        toastr.info(T('Info.FeatureComingSoon'));
     };
 
     self.loadLanguages();

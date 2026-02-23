@@ -36,7 +36,7 @@ public class TourDatesController : ControllerBase
     public async Task<ActionResult<object>> ManageTourDates(int tourId)
     {
         var visitorId = GetVisitorId();
-        if (visitorId == null) return Unauthorized(new { message = "Giris yapmaniz gerekiyor" });
+        if (visitorId == null) return Unauthorized(new { message = "Error.LoginRequired" });
 
         var (result, errorMessage, errorCode, statusCode) = await _tourDateFactory.ManageTourDatesAsync(visitorId.Value, tourId);
         if (errorMessage != null)
@@ -52,7 +52,7 @@ public class TourDatesController : ControllerBase
     public async Task<ActionResult<TourDate>> CreateTourDate(int tourId, TourDate tourDate)
     {
         var visitorId = GetVisitorId();
-        if (visitorId == null) return Unauthorized(new { message = "Giris yapmaniz gerekiyor" });
+        if (visitorId == null) return Unauthorized(new { message = "Error.LoginRequired" });
 
         tourDate.TourId = tourId;
         var (created, errorMessage, errorCode, statusCode) = await _tourDateFactory.CreateTourDateAsync(visitorId.Value, tourDate);
@@ -69,7 +69,7 @@ public class TourDatesController : ControllerBase
     public async Task<IActionResult> UpdateTourDate(int id, TourDate tourDate)
     {
         var visitorId = GetVisitorId();
-        if (visitorId == null) return Unauthorized(new { message = "Giris yapmaniz gerekiyor" });
+        if (visitorId == null) return Unauthorized(new { message = "Error.LoginRequired" });
 
         var (success, errorMessage, errorCode, statusCode) = await _tourDateFactory.UpdateTourDateAsync(visitorId.Value, id, tourDate);
         if (!success)
@@ -85,7 +85,7 @@ public class TourDatesController : ControllerBase
     public async Task<IActionResult> DeleteTourDate(int id)
     {
         var visitorId = GetVisitorId();
-        if (visitorId == null) return Unauthorized(new { message = "Giris yapmaniz gerekiyor" });
+        if (visitorId == null) return Unauthorized(new { message = "Error.LoginRequired" });
 
         var (success, notFound, errorMessage, errorCode, statusCode) = await _tourDateFactory.DeleteTourDateAsync(visitorId.Value, id);
         if (notFound) return NotFound();
@@ -102,7 +102,7 @@ public class TourDatesController : ControllerBase
     public async Task<IActionResult> GetCalendarData([FromQuery] int year, [FromQuery] int month, [FromQuery] int? tourId = null)
     {
         var visitorId = GetVisitorId();
-        if (visitorId == null) return Unauthorized(new { message = "Giris yapmaniz gerekiyor" });
+        if (visitorId == null) return Unauthorized(new { message = "Error.LoginRequired" });
 
         var (success, result, statusCode) = await _tourCalendarFactory.GetCalendarDataAsync(visitorId.Value, year, month, tourId);
         return StatusCode(statusCode, result);
@@ -113,7 +113,7 @@ public class TourDatesController : ControllerBase
     public async Task<IActionResult> GetCapacitySummary(int tourId)
     {
         var visitorId = GetVisitorId();
-        if (visitorId == null) return Unauthorized(new { message = "Giris yapmaniz gerekiyor" });
+        if (visitorId == null) return Unauthorized(new { message = "Error.LoginRequired" });
 
         var (success, result, statusCode) = await _tourDateFactory.GetCapacitySummaryAsync(visitorId.Value, tourId);
         return StatusCode(statusCode, result);
@@ -124,7 +124,7 @@ public class TourDatesController : ControllerBase
     public async Task<IActionResult> CreateBatchTourDates(int tourId, [FromBody] BatchTourDateRequest request)
     {
         var visitorId = GetVisitorId();
-        if (visitorId == null) return Unauthorized(new { message = "Giris yapmaniz gerekiyor" });
+        if (visitorId == null) return Unauthorized(new { message = "Error.LoginRequired" });
 
         var (success, result, statusCode) = await _tourDateFactory.CreateBatchTourDatesAsync(visitorId.Value, tourId, request);
         return StatusCode(statusCode, result);
@@ -134,7 +134,7 @@ public class TourDatesController : ControllerBase
     public async Task<ActionResult<IEnumerable<object>>> GetCheapestDates(int tourId, [FromQuery] string month)
     {
         if (string.IsNullOrWhiteSpace(month))
-            return BadRequest(new { message = "month parametresi gerekli (ornek: 2026-03)" });
+            return BadRequest(new { message = "Error.MonthParameterRequired" });
 
         return Ok(await _tourDateFactory.GetCheapestDatesAsync(tourId, month));
     }

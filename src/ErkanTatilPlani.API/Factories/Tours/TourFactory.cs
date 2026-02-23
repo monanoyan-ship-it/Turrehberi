@@ -147,9 +147,9 @@ public class TourFactory : ITourFactory
     {
         var visitor = await _visitorService.GetByIdWithCompanyAsync(visitorId);
         if (visitor == null)
-            return (null, "Kullanici bulunamadi", null, 401);
+            return (null, "Error.UserNotFound", null, 401);
         if (visitor.Company == null)
-            return (null, "Firma sahibi degilsiniz", "NOT_COMPANY_OWNER", 403);
+            return (null, "Error.NotCompanyOwner", "NOT_COMPANY_OWNER", 403);
 
         var tours = await _tourService.GetActiveTours()
             .Where(t => t.CompanyId == visitor.Company.Id)
@@ -179,15 +179,15 @@ public class TourFactory : ITourFactory
     public async Task<(bool success, string? errorMessage, string? errorCode, int? statusCode)> UpdateTourAsync(int visitorId, int id, Tour tour)
     {
         var visitor = await _visitorService.GetByIdWithCompanyAsync(visitorId);
-        if (visitor == null) return (false, "Kullanici bulunamadi", null, 401);
-        if (visitor.Company == null) return (false, "Firma sahibi degilsiniz", "NOT_COMPANY_OWNER", 403);
+        if (visitor == null) return (false, "Error.UserNotFound", null, 401);
+        if (visitor.Company == null) return (false, "Error.NotCompanyOwner", "NOT_COMPANY_OWNER", 403);
         if (visitor.Company.StatusId != CompanyStatuses.Ids.Approved)
-            return (false, "Firma durumu uygun degil", "COMPANY_NOT_APPROVED", 403);
+            return (false, "Error.CompanyStatusInvalid", "COMPANY_NOT_APPROVED", 403);
 
         var existing = await _tourService.GetByIdAsync(id);
-        if (existing == null) return (false, "Tur bulunamadi", null, 404);
+        if (existing == null) return (false, "Error.TourNotFound", null, 404);
         if (existing.CompanyId != visitor.Company.Id)
-            return (false, "Bu tur firmaniza ait degil", "NOT_TOUR_OWNER", 403);
+            return (false, "Error.TourNotOwnedByCompany", "NOT_TOUR_OWNER", 403);
 
         // CompanyOwner IsFeatured degistiremez - sadece Admin degistirebilir
         if (visitor.UserTypeId != UserTypes.Ids.Admin)
@@ -222,10 +222,10 @@ public class TourFactory : ITourFactory
     public async Task<(bool success, bool notFound, string? errorMessage, string? errorCode, int? statusCode)> DeleteTourAsync(int visitorId, int id)
     {
         var visitor = await _visitorService.GetByIdWithCompanyAsync(visitorId);
-        if (visitor == null) return (false, false, "Kullanici bulunamadi", null, 401);
-        if (visitor.Company == null) return (false, false, "Firma sahibi degilsiniz", "NOT_COMPANY_OWNER", 403);
+        if (visitor == null) return (false, false, "Error.UserNotFound", null, 401);
+        if (visitor.Company == null) return (false, false, "Error.NotCompanyOwner", "NOT_COMPANY_OWNER", 403);
         if (visitor.Company.StatusId != CompanyStatuses.Ids.Approved)
-            return (false, false, "Firma durumu uygun degil", "COMPANY_NOT_APPROVED", 403);
+            return (false, false, "Error.CompanyStatusInvalid", "COMPANY_NOT_APPROVED", 403);
 
         var tour = await _tourService.GetByIdAsync(id);
         if (tour == null) return (false, true, null, null, null);
@@ -238,12 +238,12 @@ public class TourFactory : ITourFactory
     public async Task<(bool success, object? result, int statusCode)> UploadCoverPhotoAsync(int visitorId, int tourId, Stream fileStream, string fileName)
     {
         var visitor = await _visitorService.GetByIdWithCompanyAsync(visitorId);
-        if (visitor == null) return (false, new { message = "Kullanici bulunamadi" }, 401);
-        if (visitor.Company == null) return (false, new { message = "Firma sahibi degilsiniz" }, 403);
+        if (visitor == null) return (false, new { message = "Error.UserNotFound" }, 401);
+        if (visitor.Company == null) return (false, new { message = "Error.NotCompanyOwner" }, 403);
 
         var tour = await _tourService.GetByIdAsync(tourId);
-        if (tour == null || !tour.IsActive) return (false, new { message = "Tur bulunamadi" }, 404);
-        if (tour.CompanyId != visitor.Company.Id) return (false, new { message = "Bu tur firmaniza ait degil" }, 403);
+        if (tour == null || !tour.IsActive) return (false, new { message = "Error.TourNotFound" }, 404);
+        if (tour.CompanyId != visitor.Company.Id) return (false, new { message = "Error.TourNotOwnedByCompany" }, 403);
 
         // Eski fotoğrafı sil
         if (!string.IsNullOrEmpty(tour.ImageUrl) && tour.ImageUrl.StartsWith("/uploads/"))
@@ -265,12 +265,12 @@ public class TourFactory : ITourFactory
     public async Task<(bool success, object? result, int statusCode)> DeleteCoverPhotoAsync(int visitorId, int tourId)
     {
         var visitor = await _visitorService.GetByIdWithCompanyAsync(visitorId);
-        if (visitor == null) return (false, new { message = "Kullanici bulunamadi" }, 401);
-        if (visitor.Company == null) return (false, new { message = "Firma sahibi degilsiniz" }, 403);
+        if (visitor == null) return (false, new { message = "Error.UserNotFound" }, 401);
+        if (visitor.Company == null) return (false, new { message = "Error.NotCompanyOwner" }, 403);
 
         var tour = await _tourService.GetByIdAsync(tourId);
-        if (tour == null || !tour.IsActive) return (false, new { message = "Tur bulunamadi" }, 404);
-        if (tour.CompanyId != visitor.Company.Id) return (false, new { message = "Bu tur firmaniza ait degil" }, 403);
+        if (tour == null || !tour.IsActive) return (false, new { message = "Error.TourNotFound" }, 404);
+        if (tour.CompanyId != visitor.Company.Id) return (false, new { message = "Error.TourNotOwnedByCompany" }, 403);
 
         if (!string.IsNullOrEmpty(tour.ImageUrl) && tour.ImageUrl.StartsWith("/uploads/"))
         {
@@ -281,22 +281,22 @@ public class TourFactory : ITourFactory
         tour.UpdatedAt = DateTime.UtcNow;
         await _unitOfWork.SaveChangesAsync();
 
-        return (true, new { message = "Kapak fotografi silindi" }, 200);
+        return (true, new { message = "Success.CoverPhotoDeleted" }, 200);
     }
 
     private async Task<(string? errorMessage, string? errorCode, int? statusCode)> CheckCompanyStatus(int visitorId)
     {
         var visitor = await _visitorService.GetByIdWithCompanyAsync(visitorId);
-        if (visitor == null) return ("Kullanici bulunamadi", null, 401);
-        if (visitor.Company == null) return ("Firma sahibi degilsiniz", "NOT_COMPANY_OWNER", 403);
+        if (visitor == null) return ("Error.UserNotFound", null, 401);
+        if (visitor.Company == null) return ("Error.NotCompanyOwner", "NOT_COMPANY_OWNER", 403);
         if (visitor.Company.StatusId != CompanyStatuses.Ids.Approved)
         {
             var msg = visitor.Company.StatusId switch
             {
-                0 => ("Basvurunuz inceleniyor. Onaylandiktan sonra tur ekleyebilirsiniz.", "COMPANY_PENDING"),
-                2 => ("Basvurunuz reddedildi.", "COMPANY_REJECTED"),
-                3 => ("Firmaniz askiya alindi.", "COMPANY_SUSPENDED"),
-                _ => ("Firma durumu gecersiz.", "COMPANY_INVALID_STATUS")
+                0 => ("Error.CompanyPendingApproval", "COMPANY_PENDING"),
+                2 => ("Error.CompanyRejected", "COMPANY_REJECTED"),
+                3 => ("Error.CompanySuspended", "COMPANY_SUSPENDED"),
+                _ => ("Error.CompanyInvalidStatus", "COMPANY_INVALID_STATUS")
             };
             return (msg.Item1, msg.Item2, 403);
         }

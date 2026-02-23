@@ -31,7 +31,7 @@ public class PromotionCrudFactory : IPromotionCrudFactory
     {
         var visitor = await _visitorService.GetByIdAsync(visitorId);
         if (visitor == null || visitor.CompanyId == null)
-            return (false, new { message = "Firma bulunamadi" }, 403);
+            return (false, new { message = "Error.CompanyNotFound" }, 403);
 
         var query = _promotionService.GetByCompanyId(visitor.CompanyId.Value);
 
@@ -51,14 +51,14 @@ public class PromotionCrudFactory : IPromotionCrudFactory
     {
         var visitor = await _visitorService.GetByIdAsync(visitorId);
         if (visitor == null || visitor.CompanyId == null)
-            return (false, new { message = "Firma bulunamadi" }, 403);
+            return (false, new { message = "Error.CompanyNotFound" }, 403);
 
         var promotion = await _promotionService.GetByIdAsync(promotionId);
         if (promotion == null || !promotion.IsActive)
-            return (false, new { message = "Promosyon bulunamadi" }, 404);
+            return (false, new { message = "Error.PromotionNotFound" }, 404);
 
         if (promotion.CompanyId != visitor.CompanyId.Value)
-            return (false, new { message = "Bu promosyona erisim yetkiniz yok" }, 403);
+            return (false, new { message = "Error.PromotionAccessDenied" }, 403);
 
         return (true, MapPromotionToDto(promotion), 200);
     }
@@ -68,18 +68,18 @@ public class PromotionCrudFactory : IPromotionCrudFactory
     {
         var visitor = await _visitorService.GetByIdAsync(visitorId);
         if (visitor == null || visitor.CompanyId == null)
-            return (false, new { message = "Firma bulunamadi" }, 403);
+            return (false, new { message = "Error.CompanyNotFound" }, 403);
 
         var company = await _companyService.GetByIdAsync(visitor.CompanyId.Value);
         if (company == null || company.StatusId != CompanyStatuses.Ids.Approved)
-            return (false, new { message = "Firmaniz onaylanmamis" }, 403);
+            return (false, new { message = "Error.CompanyNotApproved" }, 403);
 
         // Kupon kodu unique kontrolu
         if (promotion.PromotionTypeId == PromotionTypes.Ids.Coupon && !string.IsNullOrEmpty(promotion.Code))
         {
             var existing = await _promotionService.GetByCodeAsync(visitor.CompanyId.Value, promotion.Code);
             if (existing != null)
-                return (false, new { message = "Bu kupon kodu zaten kullaniliyor" }, 400);
+                return (false, new { message = "Error.CouponCodeAlreadyInUse" }, 400);
         }
 
         promotion.CompanyId = visitor.CompanyId.Value;
@@ -91,7 +91,7 @@ public class PromotionCrudFactory : IPromotionCrudFactory
         _promotionService.Add(promotion);
         await _unitOfWork.SaveChangesAsync();
 
-        return (true, new { message = "Promosyon olusturuldu", id = promotion.Id }, 201);
+        return (true, new { message = "Success.PromotionCreated", id = promotion.Id }, 201);
     }
 
     public async Task<(bool success, object result, int statusCode)> UpdatePromotionAsync(
@@ -99,21 +99,21 @@ public class PromotionCrudFactory : IPromotionCrudFactory
     {
         var visitor = await _visitorService.GetByIdAsync(visitorId);
         if (visitor == null || visitor.CompanyId == null)
-            return (false, new { message = "Firma bulunamadi" }, 403);
+            return (false, new { message = "Error.CompanyNotFound" }, 403);
 
         var promotion = await _promotionService.GetByIdAsync(promotionId);
         if (promotion == null || !promotion.IsActive)
-            return (false, new { message = "Promosyon bulunamadi" }, 404);
+            return (false, new { message = "Error.PromotionNotFound" }, 404);
 
         if (promotion.CompanyId != visitor.CompanyId.Value)
-            return (false, new { message = "Bu promosyona erisim yetkiniz yok" }, 403);
+            return (false, new { message = "Error.PromotionAccessDenied" }, 403);
 
         // Kupon kodu unique kontrolu
         if (updated.PromotionTypeId == PromotionTypes.Ids.Coupon && !string.IsNullOrEmpty(updated.Code))
         {
             var existing = await _promotionService.GetByCodeAsync(visitor.CompanyId.Value, updated.Code);
             if (existing != null && existing.Id != promotionId)
-                return (false, new { message = "Bu kupon kodu zaten kullaniliyor" }, 400);
+                return (false, new { message = "Error.CouponCodeAlreadyInUse" }, 400);
         }
 
         // Guncelle
@@ -147,7 +147,7 @@ public class PromotionCrudFactory : IPromotionCrudFactory
         _promotionService.Update(promotion);
         await _unitOfWork.SaveChangesAsync();
 
-        return (true, new { message = "Promosyon guncellendi" }, 200);
+        return (true, new { message = "Success.PromotionUpdated" }, 200);
     }
 
     public async Task<(bool success, object result, int statusCode)> DeletePromotionAsync(
@@ -155,21 +155,21 @@ public class PromotionCrudFactory : IPromotionCrudFactory
     {
         var visitor = await _visitorService.GetByIdAsync(visitorId);
         if (visitor == null || visitor.CompanyId == null)
-            return (false, new { message = "Firma bulunamadi" }, 403);
+            return (false, new { message = "Error.CompanyNotFound" }, 403);
 
         var promotion = await _promotionService.GetByIdAsync(promotionId);
         if (promotion == null || !promotion.IsActive)
-            return (false, new { message = "Promosyon bulunamadi" }, 404);
+            return (false, new { message = "Error.PromotionNotFound" }, 404);
 
         if (promotion.CompanyId != visitor.CompanyId.Value)
-            return (false, new { message = "Bu promosyona erisim yetkiniz yok" }, 403);
+            return (false, new { message = "Error.PromotionAccessDenied" }, 403);
 
         promotion.IsActive = false;
         promotion.UpdatedAt = DateTime.UtcNow;
         _promotionService.Update(promotion);
         await _unitOfWork.SaveChangesAsync();
 
-        return (true, new { message = "Promosyon silindi" }, 200);
+        return (true, new { message = "Success.PromotionDeleted" }, 200);
     }
 
     public async Task<(bool success, object result, int statusCode)> ToggleStatusAsync(
@@ -177,14 +177,14 @@ public class PromotionCrudFactory : IPromotionCrudFactory
     {
         var visitor = await _visitorService.GetByIdAsync(visitorId);
         if (visitor == null || visitor.CompanyId == null)
-            return (false, new { message = "Firma bulunamadi" }, 403);
+            return (false, new { message = "Error.CompanyNotFound" }, 403);
 
         var promotion = await _promotionService.GetByIdAsync(promotionId);
         if (promotion == null || !promotion.IsActive)
-            return (false, new { message = "Promosyon bulunamadi" }, 404);
+            return (false, new { message = "Error.PromotionNotFound" }, 404);
 
         if (promotion.CompanyId != visitor.CompanyId.Value)
-            return (false, new { message = "Bu promosyona erisim yetkiniz yok" }, 403);
+            return (false, new { message = "Error.PromotionAccessDenied" }, 403);
 
         promotion.StatusId = promotion.StatusId == PromotionStatuses.Ids.Active
             ? PromotionStatuses.Ids.Disabled
@@ -194,7 +194,7 @@ public class PromotionCrudFactory : IPromotionCrudFactory
         await _unitOfWork.SaveChangesAsync();
 
         var statusName = PromotionStatuses.GetById(promotion.StatusId)?.SystemName ?? "Unknown";
-        return (true, new { message = $"Promosyon durumu: {statusName}", statusId = promotion.StatusId }, 200);
+        return (true, new { message = "Success.PromotionStatusChanged", statusId = promotion.StatusId }, 200);
     }
 
     public async Task<(bool success, object result, int statusCode)> GetAllPromotionsAsync(

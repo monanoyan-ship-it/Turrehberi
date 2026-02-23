@@ -71,16 +71,16 @@ public class NotificationFactory : INotificationFactory
     {
         var notification = await _notificationService.GetByIdAsync(notificationId);
         if (notification == null || notification.VisitorId != visitorId)
-            return (false, "Bildirim bulunamadi");
+            return (false, "Error.NotificationNotFound");
 
         if (notification.IsRead)
-            return (true, "Bildirim zaten okunmus");
+            return (true, "Error.NotificationAlreadyRead");
 
         notification.IsRead = true;
         notification.ReadAt = DateTime.UtcNow;
         notification.UpdatedAt = DateTime.UtcNow;
         await _unitOfWork.SaveChangesAsync();
-        return (true, "Bildirim okundu olarak isaretlendi");
+        return (true, "Success.NotificationMarkedAsRead");
     }
 
     public async Task<(bool success, string message)> MarkAllAsReadAsync(int visitorId)
@@ -97,7 +97,7 @@ public class NotificationFactory : INotificationFactory
         }
 
         await _unitOfWork.SaveChangesAsync();
-        return (true, $"{unreadNotifications.Count} bildirim okundu olarak isaretlendi");
+        return (true, "Success.AllNotificationsMarkedAsRead");
     }
 
     public async Task CreateScarcityNotificationsAsync(int tourId, int remainingSlots)

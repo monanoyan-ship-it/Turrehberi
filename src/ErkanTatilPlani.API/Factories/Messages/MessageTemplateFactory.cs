@@ -50,7 +50,7 @@ public class MessageTemplateFactory : IMessageTemplateFactory
         _templateService.Add(template);
         await _unitOfWork.SaveChangesAsync();
 
-        return (true, "Sablon olusturuldu", new { template.Id });
+        return (true, "Success.TemplateCreated", new { template.Id });
     }
 
     public async Task<(bool success, string message)> UpdateAsync(
@@ -58,7 +58,7 @@ public class MessageTemplateFactory : IMessageTemplateFactory
     {
         var template = await _templateService.GetByIdAsync(templateId);
         if (template == null || template.CompanyId != companyId)
-            return (false, "Sablon bulunamadi");
+            return (false, "Error.TemplateNotFound");
 
         template.Title = title;
         template.Content = content;
@@ -66,32 +66,32 @@ public class MessageTemplateFactory : IMessageTemplateFactory
         template.UpdatedAt = DateTime.UtcNow;
         await _unitOfWork.SaveChangesAsync();
 
-        return (true, "Sablon guncellendi");
+        return (true, "Success.TemplateUpdated");
     }
 
     public async Task<(bool success, string message)> DeleteAsync(int companyId, int templateId)
     {
         var template = await _templateService.GetByIdAsync(templateId);
         if (template == null || template.CompanyId != companyId)
-            return (false, "Sablon bulunamadi");
+            return (false, "Error.TemplateNotFound");
 
         template.IsActive = false;
         template.UpdatedAt = DateTime.UtcNow;
         await _unitOfWork.SaveChangesAsync();
 
-        return (true, "Sablon silindi");
+        return (true, "Success.TemplateDeleted");
     }
 
     public async Task<(bool success, string message)> IncrementUsageAsync(int templateId)
     {
         var template = await _templateService.GetByIdAsync(templateId);
         if (template == null)
-            return (false, "Sablon bulunamadi");
+            return (false, "Error.TemplateNotFound");
 
         template.UsageCount++;
         template.UpdatedAt = DateTime.UtcNow;
         await _unitOfWork.SaveChangesAsync();
 
-        return (true, "Kullanim sayisi arttirildi");
+        return (true, "Success.UsageCountIncremented");
     }
 }

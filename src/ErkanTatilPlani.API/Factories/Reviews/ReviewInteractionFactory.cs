@@ -33,11 +33,11 @@ public class ReviewInteractionFactory : IReviewInteractionFactory
     public async Task<(object? result, string? errorMessage, int statusCode)> VoteHelpfulAsync(int reviewId, int visitorId, bool isHelpful, string ipAddress)
     {
         var review = await _reviewService.GetByIdAsync(reviewId);
-        if (review == null) return (null, "Yorum bulunamadi", 404);
+        if (review == null) return (null, "Error.ReviewNotFound", 404);
 
         // Kendi yorumuna oy veremez
         if (review.VisitorId == visitorId)
-            return (null, "Kendi yorumunuza oy veremezsiniz", 400);
+            return (null, "Error.CannotVoteOwnReview", 400);
 
         var existingVote = await _reviewService.GetHelpfulVoteAsync(reviewId, visitorId);
 
@@ -83,7 +83,7 @@ public class ReviewInteractionFactory : IReviewInteractionFactory
 
         var result = new
         {
-            message = isHelpful ? "Yardimci olarak isaretlendi" : "Yardimci degil olarak isaretlendi",
+            message = isHelpful ? "Success.MarkedAsHelpful" : "Success.MarkedAsNotHelpful",
             helpfulCount = review.HelpfulCount,
             notHelpfulCount = review.NotHelpfulCount
         };
@@ -97,10 +97,10 @@ public class ReviewInteractionFactory : IReviewInteractionFactory
         var review = await _reviewService.GetActiveReviews()
             .Include(r => r.Tour)
             .FirstOrDefaultAsync(r => r.Id == reviewId);
-        if (review == null) return (null, "Yorum bulunamadi", 404);
+        if (review == null) return (null, "Error.ReviewNotFound", 404);
 
         var visitor = await _visitorService.GetByIdAsync(visitorId);
-        if (visitor == null) return (null, "Gecersiz kullanici", 400);
+        if (visitor == null) return (null, "Error.InvalidUser", 400);
 
         // Firma sahibi mi kontrol et
         var isFromCompany = visitor.UserTypeId == UserTypes.Ids.CompanyOwner &&
@@ -122,7 +122,7 @@ public class ReviewInteractionFactory : IReviewInteractionFactory
 
         var result = new
         {
-            message = "Yanit eklendi",
+            message = "Success.ReplyAdded",
             reply = new
             {
                 reply.Id,
@@ -144,7 +144,7 @@ public class ReviewInteractionFactory : IReviewInteractionFactory
     public async Task<(object? result, string? errorMessage, int statusCode)> UploadReviewImageAsync(int reviewId, int visitorId, Stream fileStream, string fileName, string? caption)
     {
         var review = await _reviewService.GetByIdAsync(reviewId);
-        if (review == null) return (null, "Yorum bulunamadi", 404);
+        if (review == null) return (null, "Error.ReviewNotFound", 404);
 
         // Sadece yorum sahibi yukleyebilir
         if (review.VisitorId != visitorId)
@@ -153,7 +153,7 @@ public class ReviewInteractionFactory : IReviewInteractionFactory
         // Maksimum 5 resim
         var imageCount = await _reviewService.GetImageCountAsync(reviewId);
         if (imageCount >= 5)
-            return (null, "Bir yoruma en fazla 5 resim yukleyebilirsiniz", 400);
+            return (null, "Error.MaxReviewImagesReached", 400);
 
         // Yukleme
         var uploadResult = await _fileUploadService.UploadImageWithThumbnailAsync(fileStream, fileName, "reviews");
@@ -173,7 +173,7 @@ public class ReviewInteractionFactory : IReviewInteractionFactory
             Width = uploadResult.Width,
             Height = uploadResult.Height,
             MimeType = uploadResult.MimeType ?? "image/jpeg",
-            AltText = caption ?? $"Yorum resmi {imageCount + 1}"
+            AltText = caption ?? $"Review image {imageCount + 1}"
         };
 
         _reviewService.AddImage(reviewImage);
@@ -181,7 +181,7 @@ public class ReviewInteractionFactory : IReviewInteractionFactory
 
         var result = new
         {
-            message = "Resim yuklendi",
+            message = "Success.ImageUploaded",
             image = new
             {
                 reviewImage.Id,
@@ -198,7 +198,7 @@ public class ReviewInteractionFactory : IReviewInteractionFactory
     public async Task<(object? result, string? errorMessage, int statusCode)> GetReviewImagesAsync(int reviewId)
     {
         var review = await _reviewService.GetByIdAsync(reviewId);
-        if (review == null) return (null, "Yorum bulunamadi", 404);
+        if (review == null) return (null, "Error.ReviewNotFound", 404);
 
         var images = await _reviewService.GetActiveImages(reviewId)
             .OrderBy(ri => ri.DisplayOrder)
@@ -220,14 +220,14 @@ public class ReviewInteractionFactory : IReviewInteractionFactory
     public async Task<(object? result, string? errorMessage, int statusCode)> DeleteReviewImageAsync(int reviewId, int imageId, int visitorId)
     {
         var review = await _reviewService.GetByIdAsync(reviewId);
-        if (review == null) return (null, "Yorum bulunamadi", 404);
+        if (review == null) return (null, "Error.ReviewNotFound", 404);
 
         // Sadece yorum sahibi silebilir
         if (review.VisitorId != visitorId)
             return (null, "Forbid", 403);
 
         var image = await _reviewService.GetImageByIdAsync(imageId, reviewId);
-        if (image == null) return (null, "Resim bulunamadi", 404);
+        if (image == null) return (null, "Error.ImageNotFound", 404);
 
         // Dosyayi sil
         await _fileUploadService.DeleteFileAsync(image.ImageUrl);
@@ -239,22 +239,22 @@ public class ReviewInteractionFactory : IReviewInteractionFactory
         image.UpdatedAt = DateTime.UtcNow;
         await _unitOfWork.SaveChangesAsync();
 
-        return (new { message = "Resim silindi" }, null, 200);
+        return (new { message = "Success.ImageDeleted" }, null, 200);
     }
 
     public async Task<(object? result, string? errorMessage, int statusCode)> ReportReviewAsync(int reviewId, int visitorId, int reasonId, string? description, string ipAddress)
     {
         var review = await _reviewService.GetByIdAsync(reviewId);
-        if (review == null) return (null, "Yorum bulunamadi", 404);
+        if (review == null) return (null, "Error.ReviewNotFound", 404);
 
         // Kendi yorumunu sikayet edemez
         if (review.VisitorId == visitorId)
-            return (null, "Kendi yorumunuzu sikayet edemezsiniz", 400);
+            return (null, "Error.CannotReportOwnReview", 400);
 
         // Daha once sikayet etti mi
         var existingReport = await _reviewService.GetReportAsync(reviewId, visitorId);
         if (existingReport != null)
-            return (null, "Bu yorumu zaten sikayet ettiniz", 400);
+            return (null, "Error.AlreadyReportedReview", 400);
 
         var report = new ReviewReport
         {
@@ -270,6 +270,6 @@ public class ReviewInteractionFactory : IReviewInteractionFactory
         _reviewService.Update(review);
         await _unitOfWork.SaveChangesAsync();
 
-        return (new { message = "Sikayet alindi, incelenecektir" }, null, 200);
+        return (new { message = "Success.ReportSubmitted" }, null, 200);
     }
 }

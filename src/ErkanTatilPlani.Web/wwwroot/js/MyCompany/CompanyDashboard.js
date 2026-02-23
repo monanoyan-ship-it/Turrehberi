@@ -85,7 +85,7 @@ function CompanyDashboardViewModel() {
                     self.companyId(user.companyId);
                 }
             } catch (e) {
-                console.error('Kullanici bilgisi okunamadi:', e);
+                console.error('User info read failed:', e);
             }
         }
 
@@ -113,7 +113,7 @@ function CompanyDashboardViewModel() {
                 self.isLoading(false);
             },
             error: function(xhr) {
-                console.error('Dashboard yuklenemedi:', xhr);
+                console.error('Dashboard load failed:', xhr);
                 toastr.error(T('Common.Error'));
                 self.isLoading(false);
             }
@@ -126,7 +126,7 @@ function CompanyDashboardViewModel() {
 
         // Validasyon
         if (settings.depositPercentage < 10 || settings.depositPercentage > 100) {
-            toastr.warning('On odeme yuzdesi 10 ile 100 arasinda olmalidir');
+            toastr.warning(T('Validation.DepositPercentRange'));
             return;
         }
 
@@ -140,12 +140,11 @@ function CompanyDashboardViewModel() {
                 depositPercentage: parseInt(settings.depositPercentage)
             }),
             success: function(response) {
-                toastr.success('Ayarlar kaydedildi');
+                toastr.success(T('Success.SettingsSaved'));
                 self.isSavingSettings(false);
             },
             error: function(xhr) {
-                var msg = xhr.responseJSON ? xhr.responseJSON.message : 'Hata olustu';
-                toastr.error(msg);
+                toastr.error(T(xhr.responseJSON?.message) || T('Common.Error'));
                 self.isSavingSettings(false);
             }
         });
@@ -155,20 +154,6 @@ function CompanyDashboardViewModel() {
     self.loadDashboard();
 }
 
-// Localization helper (eger tanimli degilse)
-if (typeof T === 'undefined') {
-    window.T = function(key, param) {
-        // Fallback - ceviri sistemi yuklenmemisse
-        var fallbacks = {
-            'Status.Pending': 'Beklemede',
-            'Status.Confirmed': 'Onaylandi',
-            'Status.Cancelled': 'Iptal Edildi',
-            'Status.Completed': 'Tamamlandi',
-            'Common.Error': 'Bir hata olustu'
-        };
-        return fallbacks[key] || key;
-    };
-}
 
 $(document).ready(function() {
     ko.applyBindings(new CompanyDashboardViewModel(), document.getElementById('companyDashboardApp'));

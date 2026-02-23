@@ -27,7 +27,7 @@ public class PaymentsController : ControllerBase
     public async Task<ActionResult<object>> InitializePayment(int reservationId)
     {
         var visitorId = GetVisitorId();
-        if (visitorId == null) return Unauthorized(new { message = "Giris yapmaniz gerekiyor" });
+        if (visitorId == null) return Unauthorized(new { message = "Error.LoginRequired" });
 
         var (success, result, statusCode) = await _paymentFactory.InitializePaymentAsync(visitorId.Value, reservationId, Request.Scheme, Request.Host.ToString());
         return StatusCode(statusCode, result);
@@ -38,7 +38,7 @@ public class PaymentsController : ControllerBase
     public async Task<ActionResult<object>> InitializeRemainingPayment(int reservationId)
     {
         var visitorId = GetVisitorId();
-        if (visitorId == null) return Unauthorized(new { message = "Giris yapmaniz gerekiyor" });
+        if (visitorId == null) return Unauthorized(new { message = "Error.LoginRequired" });
 
         var (success, result, statusCode) = await _paymentFactory.InitializeRemainingPaymentAsync(visitorId.Value, reservationId, Request.Scheme, Request.Host.ToString());
         return StatusCode(statusCode, result);
@@ -56,10 +56,10 @@ public class PaymentsController : ControllerBase
     public async Task<ActionResult<object>> GetPaymentStatus(int reservationId)
     {
         var visitorId = GetVisitorId();
-        if (visitorId == null) return Unauthorized(new { message = "Giris yapmaniz gerekiyor" });
+        if (visitorId == null) return Unauthorized(new { message = "Error.LoginRequired" });
 
         var result = await _paymentFactory.GetPaymentStatusAsync(visitorId.Value, reservationId);
-        if (result == null) return NotFound(new { message = "Rezervasyon bulunamadi" });
+        if (result == null) return NotFound(new { message = "Error.ReservationNotFound" });
         return Ok(result);
     }
 
@@ -68,7 +68,7 @@ public class PaymentsController : ControllerBase
     public async Task<ActionResult<object>> GetPendingPayments()
     {
         var visitorId = GetVisitorId();
-        if (visitorId == null) return Unauthorized(new { message = "Giris yapmaniz gerekiyor" });
+        if (visitorId == null) return Unauthorized(new { message = "Error.LoginRequired" });
 
         return Ok(await _paymentFactory.GetPendingPaymentsAsync(visitorId.Value));
     }

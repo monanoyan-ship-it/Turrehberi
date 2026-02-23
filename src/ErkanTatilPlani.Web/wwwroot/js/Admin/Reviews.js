@@ -85,7 +85,7 @@ function AdminReviewsViewModel() {
             self.isLoading(false);
         })
         .fail(function() {
-            toastr.error('Veriler yuklenemedi');
+            toastr.error(T('Error.DataLoadFailed'));
             self.isLoading(false);
         });
     };
@@ -128,19 +128,18 @@ function AdminReviewsViewModel() {
         .done(function(response) {
             approveModal.hide();
             self.loadData();
-            toastr.success(response.message || 'Yorum onaylandi');
+            toastr.success(T(response.message) || T('Success.ReviewApproved'));
             self.isSaving(false);
         })
         .fail(function(xhr) {
-            var msg = xhr.responseJSON ? xhr.responseJSON.message : 'Hata olustu';
-            toastr.error(msg);
+            toastr.error(T(xhr.responseJSON?.message) || T('Common.Error'));
             self.isSaving(false);
         });
     };
 
     self.rejectReview = function() {
         if (!self.rejectionReason()) {
-            toastr.warning('Red sebebi zorunludur');
+            toastr.warning(T('Validation.RejectionReasonRequired'));
             return;
         }
         self.isSaving(true);
@@ -158,12 +157,11 @@ function AdminReviewsViewModel() {
         .done(function(response) {
             rejectModal.hide();
             self.loadData();
-            toastr.success(response.message || 'Yorum reddedildi');
+            toastr.success(T(response.message) || T('Success.ReviewRejected'));
             self.isSaving(false);
         })
         .fail(function(xhr) {
-            var msg = xhr.responseJSON ? xhr.responseJSON.message : 'Hata olustu';
-            toastr.error(msg);
+            toastr.error(T(xhr.responseJSON?.message) || T('Common.Error'));
             self.isSaving(false);
         });
     };
@@ -180,12 +178,11 @@ function AdminReviewsViewModel() {
         .done(function(response) {
             flagModal.hide();
             self.loadData();
-            toastr.success(response.message || 'Yorum incelemeye alindi');
+            toastr.success(T(response.message) || T('Success.ReviewFlagged'));
             self.isSaving(false);
         })
         .fail(function(xhr) {
-            var msg = xhr.responseJSON ? xhr.responseJSON.message : 'Hata olustu';
-            toastr.error(msg);
+            toastr.error(T(xhr.responseJSON?.message) || T('Common.Error'));
             self.isSaving(false);
         });
     };

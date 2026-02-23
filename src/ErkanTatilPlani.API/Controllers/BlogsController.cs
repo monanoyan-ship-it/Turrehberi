@@ -68,7 +68,7 @@ public class BlogsController : ControllerBase
     public async Task<IActionResult> AddComment(int id, [FromBody] AddCommentRequest request)
     {
         var visitorId = GetVisitorId();
-        if (visitorId == null) return Unauthorized(new { message = "Giris yapmaniz gerekiyor" });
+        if (visitorId == null) return Unauthorized(new { message = "Error.LoginRequired" });
 
         var (success, errorMessage, errorCode, statusCode) = await _commentFactory.AddCommentAsync(
             visitorId.Value, id, request.Content, request.ParentCommentId);
@@ -77,7 +77,7 @@ public class BlogsController : ControllerBase
             var error = errorCode != null ? new { message = errorMessage, code = errorCode } : (object)new { message = errorMessage };
             return StatusCode(statusCode ?? 400, error);
         }
-        return Ok(new { message = "Yorum eklendi" });
+        return Ok(new { message = "Success.CommentAdded" });
     }
 
     [HttpDelete("comments/{id}")]
@@ -85,7 +85,7 @@ public class BlogsController : ControllerBase
     public async Task<IActionResult> DeleteComment(int id)
     {
         var visitorId = GetVisitorId();
-        if (visitorId == null) return Unauthorized(new { message = "Giris yapmaniz gerekiyor" });
+        if (visitorId == null) return Unauthorized(new { message = "Error.LoginRequired" });
 
         var (success, notFound, errorMessage, errorCode, statusCode) = await _commentFactory.DeleteCommentAsync(visitorId.Value, id);
         if (notFound) return NotFound();
@@ -102,7 +102,7 @@ public class BlogsController : ControllerBase
     public async Task<ActionResult<object>> GetMyPosts()
     {
         var visitorId = GetVisitorId();
-        if (visitorId == null) return Unauthorized(new { message = "Giris yapmaniz gerekiyor" });
+        if (visitorId == null) return Unauthorized(new { message = "Error.LoginRequired" });
 
         var (result, errorMessage, errorCode, statusCode) = await _blogFactory.GetMyPostsAsync(visitorId.Value);
         if (errorMessage != null)
@@ -118,7 +118,7 @@ public class BlogsController : ControllerBase
     public async Task<ActionResult<BlogPost>> CreatePost(BlogPost post)
     {
         var visitorId = GetVisitorId();
-        if (visitorId == null) return Unauthorized(new { message = "Giris yapmaniz gerekiyor" });
+        if (visitorId == null) return Unauthorized(new { message = "Error.LoginRequired" });
 
         var (created, errorMessage, errorCode, statusCode) = await _blogFactory.CreatePostAsync(visitorId.Value, post);
         if (errorMessage != null)
@@ -134,7 +134,7 @@ public class BlogsController : ControllerBase
     public async Task<IActionResult> UpdatePost(int id, BlogPost post)
     {
         var visitorId = GetVisitorId();
-        if (visitorId == null) return Unauthorized(new { message = "Giris yapmaniz gerekiyor" });
+        if (visitorId == null) return Unauthorized(new { message = "Error.LoginRequired" });
 
         var (success, errorMessage, errorCode, statusCode) = await _blogFactory.UpdatePostAsync(visitorId.Value, id, post);
         if (!success)
@@ -150,7 +150,7 @@ public class BlogsController : ControllerBase
     public async Task<IActionResult> DeletePost(int id)
     {
         var visitorId = GetVisitorId();
-        if (visitorId == null) return Unauthorized(new { message = "Giris yapmaniz gerekiyor" });
+        if (visitorId == null) return Unauthorized(new { message = "Error.LoginRequired" });
 
         var (success, notFound, errorMessage, errorCode, statusCode) = await _blogFactory.DeletePostAsync(visitorId.Value, id);
         if (notFound) return NotFound();
@@ -180,7 +180,7 @@ public class BlogsController : ControllerBase
     public async Task<IActionResult> GetCompanyDraftPosts(int companyId)
     {
         var visitorId = GetVisitorId();
-        if (visitorId == null) return Unauthorized(new { message = "Giris yapmaniz gerekiyor" });
+        if (visitorId == null) return Unauthorized(new { message = "Error.LoginRequired" });
 
         var (result, errorMessage, errorCode, statusCode) = await _blogFactory.GetCompanyDraftPostsAsync(visitorId.Value, companyId);
         if (errorMessage != null)

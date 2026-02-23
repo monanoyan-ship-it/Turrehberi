@@ -76,7 +76,7 @@ function PromotionsViewModel() {
         }).done(function (data) {
             self.promotions(data);
         }).fail(function (xhr) {
-            toastr.error(xhr.responseJSON?.message || 'Promosyonlar yuklenemedi');
+            toastr.error(T(xhr.responseJSON?.message) || T('Common.Error'));
         }).always(function () {
             self.isLoading(false);
         });
@@ -153,12 +153,12 @@ function PromotionsViewModel() {
             contentType: 'application/json',
             data: JSON.stringify(data),
         }).done(function () {
-            toastr.success(self.isEditing() ? 'Promosyon guncellendi' : 'Promosyon olusturuldu');
+            toastr.success(self.isEditing() ? T('Success.PromotionUpdated') : T('Success.PromotionCreated'));
             formModal.hide();
             self.loadData();
             self.loadDynamicRules();
         }).fail(function (xhr) {
-            toastr.error(xhr.responseJSON?.message || 'Islem basarisiz');
+            toastr.error(T(xhr.responseJSON?.message) || T('Common.Error'));
         });
     };
 
@@ -167,25 +167,25 @@ function PromotionsViewModel() {
             url: apiBaseUrl + '/api/promotions/' + promo.id + '/toggle',
             method: 'PUT',
         }).done(function () {
-            toastr.success('Promosyon durumu degistirildi');
+            toastr.success(T('Success.PromotionStatusChanged'));
             self.loadData();
             self.loadDynamicRules();
         }).fail(function (xhr) {
-            toastr.error(xhr.responseJSON?.message || 'Islem basarisiz');
+            toastr.error(T(xhr.responseJSON?.message) || T('Common.Error'));
         });
     };
 
     self.deletePromotion = function (promo) {
-        if (!confirm('Bu promosyonu silmek istediginize emin misiniz?')) return;
+        if (!confirm(T('Confirm.DeletePromotion'))) return;
         $.ajax({
             url: apiBaseUrl + '/api/promotions/' + promo.id,
             method: 'DELETE',
         }).done(function () {
-            toastr.success('Promosyon silindi');
+            toastr.success(T('Success.PromotionDeleted'));
             self.loadData();
             self.loadDynamicRules();
         }).fail(function (xhr) {
-            toastr.error(xhr.responseJSON?.message || 'Islem basarisiz');
+            toastr.error(T(xhr.responseJSON?.message) || T('Common.Error'));
         });
     };
 
@@ -199,7 +199,7 @@ function PromotionsViewModel() {
         }).done(function (data) {
             self.dynamicRules(data);
         }).fail(function (xhr) {
-            toastr.error(xhr.responseJSON?.message || T('Common.Error') || 'Dinamik kurallar yuklenemedi');
+            toastr.error(T(xhr.responseJSON?.message) || T('Common.Error'));
         });
     };
 

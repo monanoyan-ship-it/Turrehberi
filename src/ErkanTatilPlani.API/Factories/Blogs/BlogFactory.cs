@@ -105,10 +105,10 @@ public class BlogFactory : IBlogFactory
     {
         var visitor = await _visitorService.GetByIdAsync(visitorId);
         if (visitor == null)
-            return (null, "Kullanici bulunamadi", null, 401);
+            return (null, "Error.UserNotFound", null, 401);
 
         if (visitor.UserTypeId < UserTypes.Ids.CompanyOwner)
-            return (null, "Blog yazmak icin firma sahibi veya admin olmalisiniz", "NO_PERMISSION", 403);
+            return (null, "Error.BlogWritePermissionRequired", "NO_PERMISSION", 403);
 
         var query = _blogService.GetActivePosts()
             .Where(p => p.AuthorId == visitorId);
@@ -129,9 +129,9 @@ public class BlogFactory : IBlogFactory
     public async Task<(BlogPost? post, string? errorMessage, string? errorCode, int? statusCode)> CreatePostAsync(int visitorId, BlogPost post)
     {
         var visitor = await _visitorService.GetByIdWithCompanyAsync(visitorId);
-        if (visitor == null) return (null, "Kullanici bulunamadi", null, 401);
+        if (visitor == null) return (null, "Error.UserNotFound", null, 401);
         if (visitor.UserTypeId < UserTypes.Ids.CompanyOwner)
-            return (null, "Blog yazmak icin yetkiniz yok", "NO_PERMISSION", 403);
+            return (null, "Error.BlogWritePermissionDenied", "NO_PERMISSION", 403);
 
         post.AuthorId = visitorId;
         post.CompanyId = visitor.CompanyId;
@@ -149,12 +149,12 @@ public class BlogFactory : IBlogFactory
     public async Task<(bool success, string? errorMessage, string? errorCode, int? statusCode)> UpdatePostAsync(int visitorId, int id, BlogPost post)
     {
         var existing = await _blogService.GetByIdAsync(id);
-        if (existing == null) return (false, "Yazi bulunamadi", null, 404);
+        if (existing == null) return (false, "Error.PostNotFound", null, 404);
         if (existing.AuthorId != visitorId)
         {
             var visitor = await _visitorService.GetByIdAsync(visitorId);
             if (visitor == null || visitor.UserTypeId < UserTypes.Ids.Staff)
-                return (false, "Bu yaziyi duzenleme yetkiniz yok", "NO_PERMISSION", 403);
+                return (false, "Error.PostEditPermissionDenied", "NO_PERMISSION", 403);
         }
 
         existing.Title = post.Title;
@@ -190,7 +190,7 @@ public class BlogFactory : IBlogFactory
         {
             var visitor = await _visitorService.GetByIdAsync(visitorId);
             if (visitor == null || visitor.UserTypeId < UserTypes.Ids.Staff)
-                return (false, false, "Bu yaziyi silme yetkiniz yok", "NO_PERMISSION", 403);
+                return (false, false, "Error.PostDeletePermissionDenied", "NO_PERMISSION", 403);
         }
 
         post.IsActive = false;
@@ -236,7 +236,7 @@ public class BlogFactory : IBlogFactory
     public async Task<(bool success, string? errorMessage, string? errorCode, int? statusCode)> UpdatePostStatusAsync(int id, int statusId)
     {
         var post = await _blogService.GetByIdAsync(id);
-        if (post == null) return (false, "Yazi bulunamadi", null, 404);
+        if (post == null) return (false, "Error.PostNotFound", null, 404);
 
         if (statusId == BlogStatuses.Ids.Published && post.StatusId != BlogStatuses.Ids.Published)
             post.PublishedAt = DateTime.UtcNow;
@@ -273,10 +273,10 @@ public class BlogFactory : IBlogFactory
     {
         var visitor = await _visitorService.GetByIdWithCompanyAsync(visitorId);
         if (visitor == null)
-            return (null, "Kullanici bulunamadi", null, 401);
+            return (null, "Error.UserNotFound", null, 401);
 
         if (visitor.UserTypeId < UserTypes.Ids.Staff && visitor.CompanyId != companyId)
-            return (null, "Bu firmaya erisim yetkiniz yok", "NO_PERMISSION", 403);
+            return (null, "Error.CompanyAccessDenied", "NO_PERMISSION", 403);
 
         var posts = await _blogService.GetActivePosts()
             .Where(p => p.CompanyId == companyId)
