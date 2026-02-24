@@ -1301,5 +1301,21 @@
   "TourSchedule.CancelConfirm": "آیا مطمئن هستید که می‌خواهید این تاریخ را لغو کنید؟",
   "TourSchedule.DeleteConfirm": "آیا مطمئن هستید که می‌خواهید این قالب را حذف کنید؟",
   "Validation.DaysOfWeekRequired": "حداقل یک روز باید انتخاب شود",
-  "Validation.ValidDateRangeRequired": "یک بازه تاریخ معتبر باید انتخاب شود"
+  "Validation.ValidDateRangeRequired": "یک بازه تاریخ معتبر باید انتخاب شود",
+  "Payment.TypeTitle": "نوع پرداخت",
+  "Payment.Deposit": "پیش‌پرداخت",
+  "Payment.DepositDesc": "بپردازید تا جایتان رزرو شود",
+  "Payment.FullPayment": "پرداخت کامل",
+  "Payment.FullPaymentDesc": "مبلغ کامل را الان بپردازید",
+  "Payment.MethodTitle": "روش پرداخت",
+  "Payment.CreditCard": "کارت اعتباری/نقدی",
+  "Payment.IyzicoSecure": "پرداخت امن با iyzico",
+  "Payment.BankTransfer": "حواله بانکی",
+  "Payment.Summary": "خلاصه پرداخت",
+  "Payment.Remaining": "باقیمانده (روز تور)",
+  "Payment.Continue": "ادامه به پرداخت",
+  "Payment.Pay": "بپردازید",
+  "Common.ComingSoon": "به زودی",
+  "Reservation.MakeReservation": "رزرو کنید",
+  "Promotion.Discount": "تخفیف"
 }

@@ -1301,5 +1301,21 @@
   "TourSchedule.CancelConfirm": "هل أنت متأكد من إلغاء هذا التاريخ؟",
   "TourSchedule.DeleteConfirm": "هل أنت متأكد من حذف هذا القالب؟",
   "Validation.DaysOfWeekRequired": "يجب اختيار يوم واحد على الأقل",
-  "Validation.ValidDateRangeRequired": "يجب اختيار نطاق تاريخ صالح"
+  "Validation.ValidDateRangeRequired": "يجب اختيار نطاق تاريخ صالح",
+  "Payment.TypeTitle": "نوع الدفع",
+  "Payment.Deposit": "دفعة مقدمة",
+  "Payment.DepositDesc": "ادفع لحجز مكانك",
+  "Payment.FullPayment": "الدفع الكامل",
+  "Payment.FullPaymentDesc": "ادفع المبلغ الكامل الآن",
+  "Payment.MethodTitle": "طريقة الدفع",
+  "Payment.CreditCard": "بطاقة ائتمان/خصم",
+  "Payment.IyzicoSecure": "دفع آمن عبر iyzico",
+  "Payment.BankTransfer": "تحويل بنكي",
+  "Payment.Summary": "ملخص الدفع",
+  "Payment.Remaining": "المتبقي (يوم الجولة)",
+  "Payment.Continue": "متابعة الدفع",
+  "Payment.Pay": "ادفع",
+  "Common.ComingSoon": "قريباً",
+  "Reservation.MakeReservation": "إجراء حجز",
+  "Promotion.Discount": "خصم"
 }

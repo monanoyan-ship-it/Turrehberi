@@ -184,7 +184,8 @@ public class ReservationsController : ControllerBase
             request.StartDate,
             customerIp,
             request.CouponCode,
-            request.DateToken);
+            request.DateToken,
+            request.PayFullAmount);
 
         return StatusCode(statusCode, result);
     }
@@ -253,6 +254,7 @@ public class CreateReservationRequest
     public string? CouponCode { get; set; }
     public string? ParticipantInfo { get; set; }
     public string? DateToken { get; set; }
+    public bool PayFullAmount { get; set; }
 }
 
 public class ChangeDateRequest

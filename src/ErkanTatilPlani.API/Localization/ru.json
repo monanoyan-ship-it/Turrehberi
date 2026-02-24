@@ -1301,5 +1301,21 @@
   "TourSchedule.CancelConfirm": "Вы уверены, что хотите отменить эту дату?",
   "TourSchedule.DeleteConfirm": "Вы уверены, что хотите удалить этот шаблон?",
   "Validation.DaysOfWeekRequired": "Необходимо выбрать хотя бы один день",
-  "Validation.ValidDateRangeRequired": "Необходимо выбрать допустимый диапазон дат"
+  "Validation.ValidDateRangeRequired": "Необходимо выбрать допустимый диапазон дат",
+  "Payment.TypeTitle": "Тип оплаты",
+  "Payment.Deposit": "Задаток",
+  "Payment.DepositDesc": "оплатите, чтобы забронировать место",
+  "Payment.FullPayment": "Полная оплата",
+  "Payment.FullPaymentDesc": "Оплатите полную сумму сейчас",
+  "Payment.MethodTitle": "Способ оплаты",
+  "Payment.CreditCard": "Кредитная/дебетовая карта",
+  "Payment.IyzicoSecure": "Безопасная оплата через iyzico",
+  "Payment.BankTransfer": "Банковский перевод",
+  "Payment.Summary": "Сводка оплаты",
+  "Payment.Remaining": "Остаток (в день тура)",
+  "Payment.Continue": "Перейти к оплате",
+  "Payment.Pay": "Оплатить",
+  "Common.ComingSoon": "Скоро",
+  "Reservation.MakeReservation": "Сделать бронирование",
+  "Promotion.Discount": "Скидка"
 }

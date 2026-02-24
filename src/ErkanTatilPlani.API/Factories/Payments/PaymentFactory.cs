@@ -5,6 +5,7 @@ using ErkanTatilPlani.Core.Factories.Payments;
 using ErkanTatilPlani.Core.Infrastructure;
 using ErkanTatilPlani.Core.Services;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 
 namespace ErkanTatilPlani.API.Factories.Payments;
 
@@ -15,19 +16,22 @@ public class PaymentFactory : IPaymentFactory
     private readonly IEmailService _emailService;
     private readonly IUnitOfWork _unitOfWork;
     private readonly ILogger<PaymentFactory> _logger;
+    private readonly string _webBaseUrl;
 
     public PaymentFactory(
         IReservationEntityService reservationService,
         IPaymentService paymentService,
         IEmailService emailService,
         IUnitOfWork unitOfWork,
-        ILogger<PaymentFactory> logger)
+        ILogger<PaymentFactory> logger,
+        IConfiguration configuration)
     {
         _reservationService = reservationService;
         _paymentService = paymentService;
         _emailService = emailService;
         _unitOfWork = unitOfWork;
         _logger = logger;
+        _webBaseUrl = configuration["WebBaseUrl"] ?? "https://localhost:7080";
     }
 
     public async Task<(bool success, object result, int statusCode)> InitializePaymentAsync(int visitorId, int reservationId, string scheme, string host)
@@ -163,7 +167,7 @@ public class PaymentFactory : IPaymentFactory
                 await _emailService.SendReservationConfirmedEmailAsync(emailModel);
 
                 _logger.LogInformation("Payment successful for reservation {ReservationId}", result.ReservationId);
-                return (true, $"/Account/PaymentResult?status=success&reservationId={result.ReservationId}");
+                return (true, $"{_webBaseUrl}/Account/PaymentResult?status=success&reservationId={result.ReservationId}");
             }
         }
         else
@@ -180,10 +184,10 @@ public class PaymentFactory : IPaymentFactory
             }
 
             _logger.LogWarning("Payment failed for reservation {ReservationId}: {ErrorMessage}", result.ReservationId, result.ErrorMessage);
-            return (false, $"/Account/PaymentResult?status=failed&reservationId={result.ReservationId}&error={Uri.EscapeDataString(result.ErrorMessage ?? "Error.PaymentFailed")}");
+            return (false, $"{_webBaseUrl}/Account/PaymentResult?status=failed&reservationId={result.ReservationId}&error={Uri.EscapeDataString(result.ErrorMessage ?? "Error.PaymentFailed")}");
         }
 
-        return (false, "/Account/Reservations");
+        return (false, $"{_webBaseUrl}/Account/Reservations");
     }
 
     public async Task<object?> GetPaymentStatusAsync(int visitorId, int reservationId)

@@ -1301,5 +1301,21 @@
   "TourSchedule.CancelConfirm": "Sind Sie sicher, dass Sie dieses Datum stornieren möchten?",
   "TourSchedule.DeleteConfirm": "Sind Sie sicher, dass Sie diese Kalendervorlage löschen möchten?",
   "Validation.DaysOfWeekRequired": "Mindestens ein Tag muss ausgewählt werden",
-  "Validation.ValidDateRangeRequired": "Ein gültiger Datumsbereich muss ausgewählt werden"
+  "Validation.ValidDateRangeRequired": "Ein gültiger Datumsbereich muss ausgewählt werden",
+  "Payment.TypeTitle": "Zahlungsart",
+  "Payment.Deposit": "Anzahlung",
+  "Payment.DepositDesc": "zahlen und Platz sichern",
+  "Payment.FullPayment": "Vollzahlung",
+  "Payment.FullPaymentDesc": "Jetzt den vollen Betrag zahlen",
+  "Payment.MethodTitle": "Zahlungsmethode",
+  "Payment.CreditCard": "Kredit-/Debitkarte",
+  "Payment.IyzicoSecure": "Sichere Zahlung mit iyzico",
+  "Payment.BankTransfer": "Banküberweisung",
+  "Payment.Summary": "Zahlungsübersicht",
+  "Payment.Remaining": "Restbetrag (am Tourtag)",
+  "Payment.Continue": "Weiter zur Zahlung",
+  "Payment.Pay": "Zahlen",
+  "Common.ComingSoon": "Demnächst",
+  "Reservation.MakeReservation": "Reservierung machen",
+  "Promotion.Discount": "Rabatt"
 }

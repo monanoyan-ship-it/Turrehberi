@@ -1301,5 +1301,21 @@
   "TourSchedule.CancelConfirm": "¿Está seguro de que desea cancelar esta fecha?",
   "TourSchedule.DeleteConfirm": "¿Está seguro de que desea eliminar esta plantilla?",
   "Validation.DaysOfWeekRequired": "Se debe seleccionar al menos un día",
-  "Validation.ValidDateRangeRequired": "Se debe seleccionar un rango de fechas válido"
+  "Validation.ValidDateRangeRequired": "Se debe seleccionar un rango de fechas válido",
+  "Payment.TypeTitle": "Tipo de pago",
+  "Payment.Deposit": "Anticipo",
+  "Payment.DepositDesc": "pague para reservar su lugar",
+  "Payment.FullPayment": "Pago completo",
+  "Payment.FullPaymentDesc": "Pague el monto total ahora",
+  "Payment.MethodTitle": "Método de pago",
+  "Payment.CreditCard": "Tarjeta de crédito/débito",
+  "Payment.IyzicoSecure": "Pago seguro con iyzico",
+  "Payment.BankTransfer": "Transferencia bancaria",
+  "Payment.Summary": "Resumen de pago",
+  "Payment.Remaining": "Restante (el día del tour)",
+  "Payment.Continue": "Continuar al pago",
+  "Payment.Pay": "Pagar",
+  "Common.ComingSoon": "Próximamente",
+  "Reservation.MakeReservation": "Hacer reserva",
+  "Promotion.Discount": "Descuento"
 }

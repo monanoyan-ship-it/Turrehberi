@@ -1301,5 +1301,21 @@
   "TourSchedule.CancelConfirm": "Bu tarihi iptal etmek istediginizden emin misiniz?",
   "TourSchedule.DeleteConfirm": "Bu takvim sablonunu silmek istediginizden emin misiniz?",
   "Validation.DaysOfWeekRequired": "En az bir gun secilmelidir",
-  "Validation.ValidDateRangeRequired": "Gecerli bir tarih araligi secilmelidir"
+  "Validation.ValidDateRangeRequired": "Gecerli bir tarih araligi secilmelidir",
+  "Payment.TypeTitle": "Odeme Tipi",
+  "Payment.Deposit": "On Odeme",
+  "Payment.DepositDesc": "odeyip yerinizi ayirtin",
+  "Payment.FullPayment": "Tam Odeme",
+  "Payment.FullPaymentDesc": "Tamamini simdi odeyin",
+  "Payment.MethodTitle": "Odeme Yontemi",
+  "Payment.CreditCard": "Kredi/Banka Karti",
+  "Payment.IyzicoSecure": "iyzico ile guvenli odeme",
+  "Payment.BankTransfer": "Banka Havale/EFT",
+  "Payment.Summary": "Odeme Ozeti",
+  "Payment.Remaining": "Kalan (tura katilimda)",
+  "Payment.Continue": "Odemeye Devam Et",
+  "Payment.Pay": "Ode",
+  "Common.ComingSoon": "Yakinda",
+  "Reservation.MakeReservation": "Rezervasyon Yap",
+  "Promotion.Discount": "Indirim"
 }

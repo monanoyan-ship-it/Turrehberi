@@ -65,7 +65,8 @@ public class ReservationPaymentFactory : IReservationPaymentFactory
         DateTime? startDate,
         string customerIp,
         string? couponCode = null,
-        string? dateToken = null)
+        string? dateToken = null,
+        bool payFullAmount = false)
     {
         // Tur kontrolu
         var tour = await _tourService.GetByIdWithCompanyAsync(tourId);
@@ -265,7 +266,7 @@ public class ReservationPaymentFactory : IReservationPaymentFactory
         var paymentRequest = new PaymentRequest
         {
             ReservationId = reservation.Id,
-            Amount = depositAmount,
+            Amount = payFullAmount ? totalPrice : depositAmount,
             CustomerEmail = email,
             CustomerName = nameParts2[0],
             CustomerSurname = nameParts2.Length > 1 ? nameParts2[1] : "",

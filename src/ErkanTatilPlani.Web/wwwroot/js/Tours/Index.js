@@ -463,9 +463,42 @@ function ToursViewModel() {
     // Odeme yontemi secimi
     self.selectedPaymentMethod = ko.observable('iyzico');
 
+    // Odeme tipi: 'deposit' (on odeme) veya 'full' (tam odeme)
+    self.paymentType = ko.observable('deposit');
+
     self.selectPaymentMethod = function(method) {
         self.selectedPaymentMethod(method);
     };
+
+    self.selectPaymentType = function(type) {
+        self.paymentType(type);
+    };
+
+    // Tam odeme tutari (indirimli)
+    self.calculateFinalTotal = ko.computed(function() {
+        var tour = self.selectedTour();
+        var people = self.numberOfPeople() || 1;
+        if (!tour) return '\u20BA0';
+        var total = tour.price * people;
+        var discount = self.totalDiscount() || 0;
+        return (total - discount).toLocaleString('tr-TR', {style: 'currency', currency: 'TRY'});
+    });
+
+    // Simdi odenecek tutar (secime gore)
+    self.calculatePayNow = ko.computed(function() {
+        var tour = self.selectedTour();
+        var people = self.numberOfPeople() || 1;
+        if (!tour) return '\u20BA0';
+        var total = tour.price * people;
+        var discount = self.totalDiscount() || 0;
+        var finalTotal = total - discount;
+        if (self.paymentType() === 'full') {
+            return finalTotal.toLocaleString('tr-TR', {style: 'currency', currency: 'TRY'});
+        }
+        var percentage = self.getDepositPercentage();
+        var deposit = finalTotal * (percentage / 100);
+        return deposit.toLocaleString('tr-TR', {style: 'currency', currency: 'TRY'});
+    });
 
     // Modal referanslari
     var detailsModal, reservationModal, writeReviewModal, replyModal, reportModal, watchModal;
@@ -994,6 +1027,7 @@ function ToursViewModel() {
         self.selectedTour(tour);
         self.numberOfPeople(1); // Kisi sayisini sifirla
         self.showPaymentStep(false); // Odeme adimini sifirla
+        self.paymentType('deposit'); // Odeme tipini sifirla
         self.selectedTourDateId(null);
         self.selectedTourDateObj(null);
         self.selectedDateToken(null);
@@ -1156,7 +1190,8 @@ function ToursViewModel() {
             numberOfPeople: self.numberOfPeople(),
             notes: data.notes || '',
             couponCode: self.couponCode() || null,
-            participantInfo: participantInfo
+            participantInfo: participantInfo,
+            payFullAmount: self.paymentType() === 'full'
         };
 
         $.ajax({
