@@ -1317,5 +1317,7 @@
   "Payment.Pay": "Payer",
   "Common.ComingSoon": "Bientôt",
   "Reservation.MakeReservation": "Faire une réservation",
-  "Promotion.Discount": "Réduction"
+  "Promotion.Discount": "Réduction",
+  "Tour.DurationUnitLocked": "L'unite de duree de ce tour a ete definie dans le premier horaire et ne peut pas etre modifiee",
+  "Schedule.PriceRequired": "Le prix de l'horaire est obligatoire"
 }

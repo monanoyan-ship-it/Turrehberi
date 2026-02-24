@@ -1317,5 +1317,7 @@
   "Payment.Pay": "ادفع",
   "Common.ComingSoon": "قريباً",
   "Reservation.MakeReservation": "إجراء حجز",
-  "Promotion.Discount": "خصم"
+  "Promotion.Discount": "خصم",
+  "Tour.DurationUnitLocked": "تم تحديد وحدة المدة لهذه الجولة في الجدول الاول ولا يمكن تغييرها",
+  "Schedule.PriceRequired": "سعر الجدول مطلوب"
 }

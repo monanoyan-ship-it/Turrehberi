@@ -75,9 +75,24 @@ public class TourScheduleFactory : ITourScheduleFactory
         if (!TimeSpan.TryParse(request.StartTime, out var startTime))
             return (false, new { message = "Validation.InvalidTimeFormat" }, 400);
 
+        if (request.Price <= 0)
+            return (false, new { message = "Schedule.PriceRequired" }, 400);
+
         var durationUnit = DurationUnits.GetBySystemName(request.DurationUnit ?? "Day");
         if (durationUnit == null)
             return (false, new { message = "Validation.InvalidDurationUnit" }, 400);
+
+        // DurationUnitId kilitleme: mevcut aktif schedule varsa ayni birim zorunlu
+        var existingSchedules = await _scheduleService.GetByTourId(tourId)
+            .Where(s => s.IsActive)
+            .ToListAsync();
+
+        if (existingSchedules.Any())
+        {
+            var lockedUnitId = existingSchedules.First().DurationUnitId;
+            if (durationUnit.Id != lockedUnitId)
+                return (false, new { message = "Tour.DurationUnitLocked" }, 400);
+        }
 
         var schedule = new TourSchedule
         {
@@ -94,6 +109,9 @@ public class TourScheduleFactory : ITourScheduleFactory
 
         _scheduleService.Add(schedule);
         await _unitOfWork.SaveChangesAsync();
+
+        // Tour.Price cache'ini guncelle
+        await SyncTourPriceAsync(tourId);
 
         return (true, new
         {
@@ -146,11 +164,28 @@ public class TourScheduleFactory : ITourScheduleFactory
             var unit = DurationUnits.GetBySystemName(request.DurationUnit);
             if (unit == null)
                 return (false, new { message = "Validation.InvalidDurationUnit" }, 400);
+
+            // DurationUnitId kilitleme: diger aktif schedule'larla uyumlu olmali
+            var otherSchedules = await _scheduleService.GetByTourId(schedule.TourId)
+                .Where(s => s.IsActive && s.Id != schedule.Id)
+                .ToListAsync();
+
+            if (otherSchedules.Any())
+            {
+                var lockedUnitId = otherSchedules.First().DurationUnitId;
+                if (unit.Id != lockedUnitId)
+                    return (false, new { message = "Tour.DurationUnitLocked" }, 400);
+            }
+
             schedule.DurationUnitId = unit.Id;
         }
 
         if (request.Price.HasValue)
-            schedule.Price = request.Price;
+        {
+            if (request.Price.Value <= 0)
+                return (false, new { message = "Schedule.PriceRequired" }, 400);
+            schedule.Price = request.Price.Value;
+        }
 
         if (request.MaxCapacity.HasValue)
             schedule.MaxCapacity = request.MaxCapacity;
@@ -166,6 +201,9 @@ public class TourScheduleFactory : ITourScheduleFactory
 
         schedule.UpdatedAt = DateTime.UtcNow;
         await _unitOfWork.SaveChangesAsync();
+
+        // Tour.Price cache'ini guncelle
+        await SyncTourPriceAsync(schedule.TourId);
 
         return (true, new { message = "TourSchedule.Updated" }, 200);
     }
@@ -183,6 +221,9 @@ public class TourScheduleFactory : ITourScheduleFactory
         schedule.IsActive = false;
         schedule.UpdatedAt = DateTime.UtcNow;
         await _unitOfWork.SaveChangesAsync();
+
+        // Tour.Price cache'ini guncelle
+        await SyncTourPriceAsync(schedule.TourId);
 
         return (true, new { message = "TourSchedule.Deleted" }, 200);
     }
@@ -281,7 +322,7 @@ public class TourScheduleFactory : ITourScheduleFactory
                     StartTime = schedule.StartTime,
                     DurationValue = schedule.DurationValue,
                     DurationUnitId = schedule.DurationUnitId,
-                    Price = schedule.Price ?? tour?.Price,
+                    Price = schedule.Price,
                     MaxCapacity = maxCapacity,
                     BookedCount = bookedCount,
                     IsAvailable = isAvailable,
@@ -352,7 +393,7 @@ public class TourScheduleFactory : ITourScheduleFactory
 
         return virtualDates
             .Where(d => d.Date >= today && d.IsAvailable)
-            .OrderBy(d => d.Price ?? decimal.MaxValue)
+            .OrderBy(d => d.Price)
             .ThenBy(d => d.Date)
             .Select(d => new
             {
@@ -438,6 +479,43 @@ public class TourScheduleFactory : ITourScheduleFactory
             tours = companyTours,
             days = dayData
         }, 200);
+    }
+
+    public async Task<(bool success, object result, int statusCode)> GetLockedDurationUnitAsync(int visitorId, int tourId)
+    {
+        var check = await CheckTourOwnership(visitorId, tourId);
+        if (check.errorMessage != null)
+            return (false, new { message = check.errorMessage }, check.statusCode ?? 400);
+
+        var existingSchedule = await _scheduleService.GetByTourId(tourId)
+            .Where(s => s.IsActive)
+            .FirstOrDefaultAsync();
+
+        if (existingSchedule == null)
+            return (true, new { locked = false, durationUnitId = (int?)null, durationUnit = (string?)null }, 200);
+
+        var unit = DurationUnits.GetById(existingSchedule.DurationUnitId);
+        return (true, new
+        {
+            locked = true,
+            durationUnitId = existingSchedule.DurationUnitId,
+            durationUnit = unit?.SystemName
+        }, 200);
+    }
+
+    private async Task SyncTourPriceAsync(int tourId)
+    {
+        var tour = await _tourService.GetByIdAsync(tourId);
+        if (tour == null) return;
+
+        var minPrice = await _scheduleService.GetByTourId(tourId)
+            .Where(s => s.IsActive)
+            .Select(s => (decimal?)s.Price)
+            .MinAsync();
+
+        tour.Price = minPrice ?? 0;
+        tour.UpdatedAt = DateTime.UtcNow;
+        await _unitOfWork.SaveChangesAsync();
     }
 
     private static List<int> ParseDaysOfWeek(string json)

@@ -122,6 +122,8 @@ function MyToursViewModel() {
     self.isLoadingSchedules = ko.observable(false);
     self.isSavingSchedule = ko.observable(false);
     self.editingScheduleId = ko.observable(null);
+    self.lockedDurationUnit = ko.observable(null); // kilitli sure tipi (varsa)
+    self.isDurationUnitLocked = ko.observable(false);
     self.scheduleFormData = ko.observable({
         daysOfWeek: [],
         startTime: '09:00',
@@ -146,10 +148,30 @@ function MyToursViewModel() {
                     return s;
                 });
                 self.schedules(items);
+
+                // DurationUnit kilitleme: aktif schedule varsa kilitle
+                if (items.length > 0) {
+                    self.lockedDurationUnit(items[0].durationUnit);
+                    self.isDurationUnitLocked(true);
+                } else {
+                    self.lockedDurationUnit(null);
+                    self.isDurationUnitLocked(false);
+                }
+
+                // Duzenleme modunda degilse formdaki durationUnit'i senkronize et
+                if (!self.editingScheduleId()) {
+                    var fd = self.scheduleFormData();
+                    fd.durationUnit = self.isDurationUnitLocked() ? self.lockedDurationUnit() : 'Day';
+                    self.scheduleFormData(fd);
+                    self.scheduleFormData.valueHasMutated();
+                }
+
                 self.isLoadingSchedules(false);
             },
             error: function() {
                 self.schedules([]);
+                self.lockedDurationUnit(null);
+                self.isDurationUnitLocked(false);
                 self.isLoadingSchedules(false);
             }
         });
@@ -162,7 +184,7 @@ function MyToursViewModel() {
             daysOfWeek: [],
             startTime: '09:00',
             durationValue: 1,
-            durationUnit: 'Day',
+            durationUnit: self.isDurationUnitLocked() ? self.lockedDurationUnit() : 'Day',
             price: '',
             maxCapacity: '',
             validFrom: '',
@@ -193,6 +215,18 @@ function MyToursViewModel() {
             toastr.warning(T('Validation.DaysOfWeekRequired'));
             return;
         }
+        if (!fd.startTime) {
+            toastr.warning(T('Validation.StartTimeRequired'));
+            return;
+        }
+        if (!fd.durationValue || parseInt(fd.durationValue) < 1) {
+            toastr.warning(T('Validation.DurationRequired'));
+            return;
+        }
+        if (!fd.price || parseFloat(fd.price) <= 0) {
+            toastr.warning(T('Schedule.PriceRequired'));
+            return;
+        }
         if (!fd.validFrom || !fd.validTo) {
             toastr.warning(T('Validation.ValidDateRangeRequired'));
             return;
@@ -204,8 +238,8 @@ function MyToursViewModel() {
             daysOfWeek: selectedDays,
             startTime: fd.startTime || '09:00',
             durationValue: parseInt(fd.durationValue) || 1,
-            durationUnit: fd.durationUnit || 'Day',
-            price: fd.price ? parseFloat(fd.price) : null,
+            durationUnit: self.isDurationUnitLocked() ? self.lockedDurationUnit() : (fd.durationUnit || 'Day'),
+            price: parseFloat(fd.price),
             maxCapacity: fd.maxCapacity ? parseInt(fd.maxCapacity) : null,
             validFrom: fd.validFrom,
             validTo: fd.validTo

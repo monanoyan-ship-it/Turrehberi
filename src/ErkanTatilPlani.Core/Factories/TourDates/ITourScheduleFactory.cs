@@ -27,6 +27,11 @@ public interface ITourScheduleFactory
     /// Firma: Takvim verisini getir
     /// </summary>
     Task<(bool success, object result, int statusCode)> GetCalendarDataAsync(int visitorId, int year, int month, int? tourId);
+
+    /// <summary>
+    /// Turun mevcut schedule'larindan kilitli DurationUnitId'yi dondur (yoksa null)
+    /// </summary>
+    Task<(bool success, object result, int statusCode)> GetLockedDurationUnitAsync(int visitorId, int tourId);
 }
 
 public class VirtualTourDateDto
@@ -36,7 +41,7 @@ public class VirtualTourDateDto
     public TimeSpan StartTime { get; set; }
     public int DurationValue { get; set; }
     public int DurationUnitId { get; set; }
-    public decimal? Price { get; set; }
+    public decimal Price { get; set; }
     public int? MaxCapacity { get; set; }
     public int BookedCount { get; set; }
     public bool IsAvailable { get; set; }
@@ -52,7 +57,7 @@ public class CreateScheduleRequest
     public string StartTime { get; set; } = "09:00";
     public int DurationValue { get; set; } = 1;
     public string DurationUnit { get; set; } = "Day";
-    public decimal? Price { get; set; }
+    public decimal Price { get; set; }
     public int? MaxCapacity { get; set; }
     public DateTime ValidFrom { get; set; }
     public DateTime ValidTo { get; set; }

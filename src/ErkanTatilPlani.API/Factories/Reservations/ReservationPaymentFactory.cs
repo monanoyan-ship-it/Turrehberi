@@ -160,7 +160,7 @@ public class ReservationPaymentFactory : IReservationPaymentFactory
             resolvedStartTime = schedule.StartTime;
             resolvedDurationValue = schedule.DurationValue;
             resolvedDurationUnitId = schedule.DurationUnitId;
-            resolvedUnitPrice = schedule.Price ?? tour.Price;
+            resolvedUnitPrice = schedule.Price;
             resolvedScheduleId = scheduleId;
         }
         else

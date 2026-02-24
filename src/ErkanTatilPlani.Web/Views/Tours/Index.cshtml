@@ -922,7 +922,7 @@
                                             </div>
                                             <div class="text-end">
                                                 <!-- ko if: price -->
-                                                <span class="fw-bold text-primary" data-bind="text: price.toLocaleString('tr-TR', {style:'currency', currency:'TRY'})"></span>
+                                                <span class="fw-bold" data-bind="text: price.toLocaleString('tr-TR', {style:'currency', currency:'TRY'}), css: { 'text-primary': $parent.selectedDateToken() !== (token || 'd:' + id) }"></span>
                                                 <!-- /ko -->
                                                 <small class="text-muted ms-1" data-bind="text: bookedCount + '/' + (maxCapacity || '∞')"></small>
                                             </div>

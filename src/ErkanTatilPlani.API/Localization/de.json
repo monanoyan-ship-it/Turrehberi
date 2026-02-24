@@ -1317,5 +1317,7 @@
   "Payment.Pay": "Zahlen",
   "Common.ComingSoon": "Demnächst",
   "Reservation.MakeReservation": "Reservierung machen",
-  "Promotion.Discount": "Rabatt"
+  "Promotion.Discount": "Rabatt",
+  "Tour.DurationUnitLocked": "Die Dauereinheit fur diese Tour wurde im ersten Zeitplan festgelegt und kann nicht geandert werden",
+  "Schedule.PriceRequired": "Zeitplanpreis ist erforderlich"
 }

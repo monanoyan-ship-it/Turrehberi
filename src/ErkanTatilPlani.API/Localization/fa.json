@@ -1317,5 +1317,7 @@
   "Payment.Pay": "بپردازید",
   "Common.ComingSoon": "به زودی",
   "Reservation.MakeReservation": "رزرو کنید",
-  "Promotion.Discount": "تخفیف"
+  "Promotion.Discount": "تخفیف",
+  "Tour.DurationUnitLocked": "واحد مدت زمانی این تور در اولین برنامه تعیین شده و قابل تغییر نیست",
+  "Schedule.PriceRequired": "قیمت برنامه الزامی است"
 }

@@ -1317,5 +1317,7 @@
   "Payment.Pay": "Ode",
   "Common.ComingSoon": "Yakinda",
   "Reservation.MakeReservation": "Rezervasyon Yap",
-  "Promotion.Discount": "Indirim"
+  "Promotion.Discount": "Indirim",
+  "Tour.DurationUnitLocked": "Bu turun sure tipi ilk sablonda belirlendi, degistirilemez",
+  "Schedule.PriceRequired": "Sablon fiyati zorunludur"
 }

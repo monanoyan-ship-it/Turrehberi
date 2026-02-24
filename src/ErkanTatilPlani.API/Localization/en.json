@@ -1317,5 +1317,7 @@
   "Payment.Pay": "Pay",
   "Common.ComingSoon": "Coming Soon",
   "Reservation.MakeReservation": "Make Reservation",
-  "Promotion.Discount": "Discount"
+  "Promotion.Discount": "Discount",
+  "Tour.DurationUnitLocked": "The duration unit for this tour was set in the first schedule and cannot be changed",
+  "Schedule.PriceRequired": "Schedule price is required"
 }

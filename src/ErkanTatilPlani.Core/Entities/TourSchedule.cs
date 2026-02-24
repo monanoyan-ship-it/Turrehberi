@@ -31,9 +31,9 @@ public class TourSchedule : BaseEntity
     public int DurationUnitId { get; set; } = 2;
 
     /// <summary>
-    /// Bu schedule icin ozel fiyat (null ise turun varsayilan fiyati kullanilir)
+    /// Bu schedule icin fiyat (zorunlu)
     /// </summary>
-    public decimal? Price { get; set; }
+    public decimal Price { get; set; }
 
     /// <summary>
     /// Bu schedule icin ozel kapasite (null ise turun varsayilan kapasitesi kullanilir)

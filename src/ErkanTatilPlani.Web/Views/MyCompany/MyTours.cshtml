@@ -289,7 +289,7 @@
                             <!-- Schedule Formu -->
                             <div class="row g-2 mb-3">
                                 <div class="col-12">
-                                    <label class="form-label small" data-t="TourSchedule.DaysOfWeek">Gunler</label>
+                                    <label class="form-label small" data-t="TourSchedule.DaysOfWeek">Gunler <span class="text-danger">*</span></label>
                                     <div class="d-flex flex-wrap gap-1">
                                         <!-- ko foreach: weekDays -->
                                         <input type="checkbox" class="btn-check" autocomplete="off" data-bind="attr: { id: 'schedDayBtn' + value }, checked: $parent.scheduleSelectedDays, checkedValue: String(value)">
@@ -298,32 +298,35 @@
                                     </div>
                                 </div>
                                 <div class="col-md-2">
-                                    <label class="form-label small" data-t="TourSchedule.StartTime">Saat</label>
-                                    <input type="time" class="form-control form-control-sm" data-bind="value: scheduleFormData().startTime">
+                                    <label class="form-label small" data-t="TourSchedule.StartTime">Saat <span class="text-danger">*</span></label>
+                                    <input type="time" class="form-control form-control-sm" data-bind="value: scheduleFormData().startTime" required>
                                 </div>
                                 <div class="col-md-2">
-                                    <label class="form-label small" data-t="TourSchedule.Duration">Sure</label>
-                                    <input type="number" class="form-control form-control-sm" data-bind="value: scheduleFormData().durationValue" min="1">
+                                    <label class="form-label small" data-t="TourSchedule.Duration">Sure <span class="text-danger">*</span></label>
+                                    <input type="number" class="form-control form-control-sm" data-bind="value: scheduleFormData().durationValue" min="1" required>
                                 </div>
                                 <div class="col-md-2">
                                     <label class="form-label small">&nbsp;</label>
-                                    <select class="form-select form-select-sm" data-bind="options: durationUnits, optionsText: 'label', optionsValue: 'value', value: scheduleFormData().durationUnit"></select>
+                                    <select class="form-select form-select-sm" data-bind="options: durationUnits, optionsText: 'label', optionsValue: 'value', value: scheduleFormData().durationUnit, disable: isDurationUnitLocked()"></select>
+                                    <!-- ko if: isDurationUnitLocked() -->
+                                    <small class="text-muted" data-t="Tour.DurationUnitLocked"><i class="bi bi-lock-fill"></i></small>
+                                    <!-- /ko -->
                                 </div>
                                 <div class="col-md-3">
-                                    <label class="form-label small" data-t="TourDate.Price">Fiyat</label>
-                                    <input type="number" class="form-control form-control-sm" data-bind="value: scheduleFormData().price" min="0" step="0.01">
+                                    <label class="form-label small" data-t="TourDate.Price">Fiyat (TL) <span class="text-danger">*</span></label>
+                                    <input type="number" class="form-control form-control-sm" data-bind="value: scheduleFormData().price" min="0.01" step="0.01" required>
                                 </div>
                                 <div class="col-md-3">
                                     <label class="form-label small" data-t="TourDate.Capacity">Kapasite</label>
                                     <input type="number" class="form-control form-control-sm" data-bind="value: scheduleFormData().maxCapacity" min="1">
                                 </div>
                                 <div class="col-md-3">
-                                    <label class="form-label small" data-t="TourSchedule.ValidFrom">Gecerli Baslangic</label>
-                                    <input type="date" class="form-control form-control-sm" data-bind="value: scheduleFormData().validFrom">
+                                    <label class="form-label small" data-t="TourSchedule.ValidFrom">Gecerli Baslangic <span class="text-danger">*</span></label>
+                                    <input type="date" class="form-control form-control-sm" data-bind="value: scheduleFormData().validFrom" required>
                                 </div>
                                 <div class="col-md-3">
-                                    <label class="form-label small" data-t="TourSchedule.ValidTo">Gecerli Bitis</label>
-                                    <input type="date" class="form-control form-control-sm" data-bind="value: scheduleFormData().validTo">
+                                    <label class="form-label small" data-t="TourSchedule.ValidTo">Gecerli Bitis <span class="text-danger">*</span></label>
+                                    <input type="date" class="form-control form-control-sm" data-bind="value: scheduleFormData().validTo" required>
                                 </div>
                                 <div class="col-md-6 d-flex align-items-end gap-2">
                                     <button class="btn btn-primary btn-sm" data-bind="click: saveSchedule, enable: !isSavingSchedule()">

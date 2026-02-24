@@ -1317,5 +1317,7 @@
   "Payment.Pay": "Оплатить",
   "Common.ComingSoon": "Скоро",
   "Reservation.MakeReservation": "Сделать бронирование",
-  "Promotion.Discount": "Скидка"
+  "Promotion.Discount": "Скидка",
+  "Tour.DurationUnitLocked": "Единица продолжительности этого тура была установлена в первом расписании и не может быть изменена",
+  "Schedule.PriceRequired": "Цена расписания обязательна"
 }

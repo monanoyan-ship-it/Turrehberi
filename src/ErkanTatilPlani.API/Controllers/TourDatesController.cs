@@ -104,6 +104,17 @@ public class TourDatesController : ControllerBase
         return StatusCode(statusCode, result);
     }
 
+    [HttpGet("tourdates/tours/{tourId}/locked-duration-unit")]
+    [Authorize(Roles = "CompanyOwner,Staff,Admin")]
+    public async Task<IActionResult> GetLockedDurationUnit(int tourId)
+    {
+        var visitorId = GetVisitorId();
+        if (visitorId == null) return Unauthorized(new { message = "Error.LoginRequired" });
+
+        var (success, result, statusCode) = await _scheduleFactory.GetLockedDurationUnitAsync(visitorId.Value, tourId);
+        return StatusCode(statusCode, result);
+    }
+
     [HttpPost("tours/{tourId}/dates/cancel")]
     [Authorize(Roles = "CompanyOwner,Staff,Admin")]
     public async Task<IActionResult> CancelDate(int tourId, [FromBody] CancelDateRequest request)
