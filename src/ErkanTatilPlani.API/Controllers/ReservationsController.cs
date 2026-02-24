@@ -183,7 +183,8 @@ public class ReservationsController : ControllerBase
             request.TourDateId,
             request.StartDate,
             customerIp,
-            request.CouponCode);
+            request.CouponCode,
+            request.DateToken);
 
         return StatusCode(statusCode, result);
     }
@@ -252,6 +253,7 @@ public class CreateReservationRequest
     public DateTime? StartDate { get; set; }
     public string? CouponCode { get; set; }
     public string? ParticipantInfo { get; set; }
+    public string? DateToken { get; set; }
 }
 
 public class ChangeDateRequest

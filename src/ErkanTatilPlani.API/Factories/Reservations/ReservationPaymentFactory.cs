@@ -4,6 +4,7 @@ using ErkanTatilPlani.Core.Enums;
 using ErkanTatilPlani.Core.Factories.Notifications;
 using ErkanTatilPlani.Core.Factories.Promotions;
 using ErkanTatilPlani.Core.Factories.Reservations;
+using ErkanTatilPlani.Core.Factories.TourDates;
 using ErkanTatilPlani.Core.Infrastructure;
 using ErkanTatilPlani.Core.Services;
 using Microsoft.EntityFrameworkCore;
@@ -25,6 +26,7 @@ public class ReservationPaymentFactory : IReservationPaymentFactory
     private readonly IPromotionCalculationFactory _promotionCalculation;
     private readonly IPromotionEntityService _promotionService;
     private readonly INotificationFactory _notificationFactory;
+    private readonly ITourScheduleFactory _scheduleFactory;
 
     public ReservationPaymentFactory(
         ITourEntityService tourService,
@@ -37,7 +39,8 @@ public class ReservationPaymentFactory : IReservationPaymentFactory
         IConfiguration configuration,
         IPromotionCalculationFactory promotionCalculation,
         IPromotionEntityService promotionService,
-        INotificationFactory notificationFactory)
+        INotificationFactory notificationFactory,
+        ITourScheduleFactory scheduleFactory)
     {
         _tourService = tourService;
         _tourDateService = tourDateService;
@@ -50,6 +53,7 @@ public class ReservationPaymentFactory : IReservationPaymentFactory
         _promotionCalculation = promotionCalculation;
         _promotionService = promotionService;
         _notificationFactory = notificationFactory;
+        _scheduleFactory = scheduleFactory;
     }
 
     public async Task<(bool success, object result, int statusCode)> CreatePublicReservationAsync(
@@ -64,7 +68,8 @@ public class ReservationPaymentFactory : IReservationPaymentFactory
         int? tourDateId,
         DateTime? startDate,
         string customerIp,
-        string? couponCode = null)
+        string? couponCode = null,
+        string? dateToken = null)
     {
         // Tur kontrolu
         var tour = await _tourService.GetByIdWithCompanyAsync(tourId);
@@ -115,9 +120,19 @@ public class ReservationPaymentFactory : IReservationPaymentFactory
         DateTime endDate;
         TourDate? selectedTourDate = null;
 
+        // dateToken destegi - lazy materialization
+        if (!string.IsNullOrEmpty(dateToken) && !tourDateId.HasValue)
+        {
+            selectedTourDate = await _scheduleFactory.MaterializeDateAsync(dateToken);
+            if (selectedTourDate != null)
+            {
+                tourDateId = selectedTourDate.Id;
+            }
+        }
+
         if (tourDateId.HasValue)
         {
-            selectedTourDate = await _tourDateService.GetByIdAsync(tourDateId.Value);
+            selectedTourDate ??= await _tourDateService.GetByIdAsync(tourDateId.Value);
             if (selectedTourDate == null)
                 return (false, new { message = "Error.SelectedSessionNotFound" }, 404);
             if (selectedTourDate.TourId != tourId)

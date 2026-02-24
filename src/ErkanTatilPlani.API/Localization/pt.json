@@ -1265,5 +1265,21 @@
   "Payment.Waiting": "Aguardando",
   "Payment.Partial": "Pagamento parcial",
   "Payment.Full": "Pagamento completo",
-  "Payment.Refund": "Reembolso"
+  "Payment.Refund": "Reembolso",
+  "TourSchedule.Title": "Modelos de calendário",
+  "TourSchedule.Created": "Modelo de calendário criado",
+  "TourSchedule.Updated": "Modelo de calendário atualizado",
+  "TourSchedule.Deleted": "Modelo de calendário excluído",
+  "TourSchedule.DaysOfWeek": "Dias",
+  "TourSchedule.StartTime": "Horário",
+  "TourSchedule.Duration": "Duração",
+  "TourSchedule.ValidFrom": "Válido a partir de",
+  "TourSchedule.ValidTo": "Válido até",
+  "TourSchedule.NoSchedules": "Nenhum modelo de calendário adicionado ainda",
+  "TourSchedule.DateCancelled": "Data cancelada",
+  "TourSchedule.CancelDate": "Cancelar data",
+  "TourSchedule.CancelConfirm": "Tem certeza de que deseja cancelar esta data?",
+  "TourSchedule.DeleteConfirm": "Tem certeza de que deseja excluir este modelo?",
+  "Validation.DaysOfWeekRequired": "Pelo menos um dia deve ser selecionado",
+  "Validation.ValidDateRangeRequired": "Um intervalo de datas válido deve ser selecionado"
 }

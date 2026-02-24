@@ -1265,5 +1265,21 @@
   "Payment.Waiting": "Wartend",
   "Payment.Partial": "Teilzahlung",
   "Payment.Full": "Vollstandige Zahlung",
-  "Payment.Refund": "Ruckerstattung"
+  "Payment.Refund": "Ruckerstattung",
+  "TourSchedule.Title": "Kalendervorlagen",
+  "TourSchedule.Created": "Kalendervorlage erstellt",
+  "TourSchedule.Updated": "Kalendervorlage aktualisiert",
+  "TourSchedule.Deleted": "Kalendervorlage gelöscht",
+  "TourSchedule.DaysOfWeek": "Tage",
+  "TourSchedule.StartTime": "Uhrzeit",
+  "TourSchedule.Duration": "Dauer",
+  "TourSchedule.ValidFrom": "Gültig ab",
+  "TourSchedule.ValidTo": "Gültig bis",
+  "TourSchedule.NoSchedules": "Noch keine Kalendervorlagen hinzugefügt",
+  "TourSchedule.DateCancelled": "Datum storniert",
+  "TourSchedule.CancelDate": "Datum stornieren",
+  "TourSchedule.CancelConfirm": "Sind Sie sicher, dass Sie dieses Datum stornieren möchten?",
+  "TourSchedule.DeleteConfirm": "Sind Sie sicher, dass Sie diese Kalendervorlage löschen möchten?",
+  "Validation.DaysOfWeekRequired": "Mindestens ein Tag muss ausgewählt werden",
+  "Validation.ValidDateRangeRequired": "Ein gültiger Datumsbereich muss ausgewählt werden"
 }

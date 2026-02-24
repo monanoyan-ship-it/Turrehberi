@@ -42,6 +42,9 @@ public class AppDbContext : DbContext
     // Tour Dates (Musaitlik Takvimi)
     public DbSet<TourDate> TourDates => Set<TourDate>();
 
+    // Tour Schedules (Takvim Sablonlari)
+    public DbSet<TourSchedule> TourSchedules => Set<TourSchedule>();
+
     // Promotions
     public DbSet<Promotion> Promotions => Set<Promotion>();
     public DbSet<PromotionUsage> PromotionUsages => Set<PromotionUsage>();
@@ -107,6 +110,18 @@ public class AppDbContext : DbContext
                   .HasForeignKey(e => e.CompanyId);
         });
 
+        modelBuilder.Entity<TourSchedule>(entity =>
+        {
+            entity.HasKey(e => e.Id);
+            entity.Property(e => e.Price).HasPrecision(18, 2);
+            entity.Property(e => e.DaysOfWeekJson).HasMaxLength(50);
+
+            entity.HasOne(e => e.Tour)
+                  .WithMany(t => t.Schedules)
+                  .HasForeignKey(e => e.TourId)
+                  .OnDelete(DeleteBehavior.Cascade);
+        });
+
         modelBuilder.Entity<TourDate>(entity =>
         {
             entity.HasKey(e => e.Id);
@@ -116,6 +131,12 @@ public class AppDbContext : DbContext
                   .WithMany(t => t.TourDates)
                   .HasForeignKey(e => e.TourId)
                   .OnDelete(DeleteBehavior.Cascade);
+
+            entity.HasOne(e => e.Schedule)
+                  .WithMany(s => s.MaterializedDates)
+                  .HasForeignKey(e => e.ScheduleId)
+                  .IsRequired(false)
+                  .OnDelete(DeleteBehavior.SetNull);
         });
 
         modelBuilder.Entity<Visitor>(entity =>

@@ -1265,5 +1265,21 @@
   "Payment.Waiting": "في الانتظار",
   "Payment.Partial": "دفعة جزئية",
   "Payment.Full": "الدفع الكامل",
-  "Payment.Refund": "استرداد"
+  "Payment.Refund": "استرداد",
+  "TourSchedule.Title": "قوالب التقويم",
+  "TourSchedule.Created": "تم إنشاء قالب التقويم",
+  "TourSchedule.Updated": "تم تحديث قالب التقويم",
+  "TourSchedule.Deleted": "تم حذف قالب التقويم",
+  "TourSchedule.DaysOfWeek": "الأيام",
+  "TourSchedule.StartTime": "الوقت",
+  "TourSchedule.Duration": "المدة",
+  "TourSchedule.ValidFrom": "صالح من",
+  "TourSchedule.ValidTo": "صالح حتى",
+  "TourSchedule.NoSchedules": "لم تتم إضافة قوالب تقويم بعد",
+  "TourSchedule.DateCancelled": "تم إلغاء التاريخ",
+  "TourSchedule.CancelDate": "إلغاء التاريخ",
+  "TourSchedule.CancelConfirm": "هل أنت متأكد من إلغاء هذا التاريخ؟",
+  "TourSchedule.DeleteConfirm": "هل أنت متأكد من حذف هذا القالب؟",
+  "Validation.DaysOfWeekRequired": "يجب اختيار يوم واحد على الأقل",
+  "Validation.ValidDateRangeRequired": "يجب اختيار نطاق تاريخ صالح"
 }

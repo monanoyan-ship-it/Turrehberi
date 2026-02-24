@@ -1265,5 +1265,21 @@
   "Payment.Waiting": "Ожидание",
   "Payment.Partial": "Частичная оплата",
   "Payment.Full": "Полная оплата",
-  "Payment.Refund": "Возврат"
+  "Payment.Refund": "Возврат",
+  "TourSchedule.Title": "Шаблоны календаря",
+  "TourSchedule.Created": "Шаблон календаря создан",
+  "TourSchedule.Updated": "Шаблон календаря обновлен",
+  "TourSchedule.Deleted": "Шаблон календаря удален",
+  "TourSchedule.DaysOfWeek": "Дни",
+  "TourSchedule.StartTime": "Время",
+  "TourSchedule.Duration": "Продолжительность",
+  "TourSchedule.ValidFrom": "Действителен с",
+  "TourSchedule.ValidTo": "Действителен до",
+  "TourSchedule.NoSchedules": "Шаблоны календаря еще не добавлены",
+  "TourSchedule.DateCancelled": "Дата отменена",
+  "TourSchedule.CancelDate": "Отменить дату",
+  "TourSchedule.CancelConfirm": "Вы уверены, что хотите отменить эту дату?",
+  "TourSchedule.DeleteConfirm": "Вы уверены, что хотите удалить этот шаблон?",
+  "Validation.DaysOfWeekRequired": "Необходимо выбрать хотя бы один день",
+  "Validation.ValidDateRangeRequired": "Необходимо выбрать допустимый диапазон дат"
 }

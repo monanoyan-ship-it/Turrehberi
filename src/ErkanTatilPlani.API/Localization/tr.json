@@ -1265,5 +1265,21 @@
   "Payment.Waiting": "Bekliyor",
   "Payment.Partial": "On Odeme",
   "Payment.Full": "Tam Odeme",
-  "Payment.Refund": "Iade"
+  "Payment.Refund": "Iade",
+  "TourSchedule.Title": "Takvim Sablonlari",
+  "TourSchedule.Created": "Takvim sablonu olusturuldu",
+  "TourSchedule.Updated": "Takvim sablonu guncellendi",
+  "TourSchedule.Deleted": "Takvim sablonu silindi",
+  "TourSchedule.DaysOfWeek": "Gunler",
+  "TourSchedule.StartTime": "Saat",
+  "TourSchedule.Duration": "Sure",
+  "TourSchedule.ValidFrom": "Gecerlilik Baslangici",
+  "TourSchedule.ValidTo": "Gecerlilik Bitisi",
+  "TourSchedule.NoSchedules": "Henuz takvim sablonu eklenmemis",
+  "TourSchedule.DateCancelled": "Tarih iptal edildi",
+  "TourSchedule.CancelDate": "Tarihi Iptal Et",
+  "TourSchedule.CancelConfirm": "Bu tarihi iptal etmek istediginizden emin misiniz?",
+  "TourSchedule.DeleteConfirm": "Bu takvim sablonunu silmek istediginizden emin misiniz?",
+  "Validation.DaysOfWeekRequired": "En az bir gun secilmelidir",
+  "Validation.ValidDateRangeRequired": "Gecerli bir tarih araligi secilmelidir"
 }

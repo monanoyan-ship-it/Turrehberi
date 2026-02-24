@@ -478,14 +478,14 @@
                     </div>
                     <div class="row g-2" data-bind="visible: !$parent.isLoadingDates(), foreach: $parent.tourDates">
                         <div class="col-md-4 col-sm-6">
-                            <div class="card h-100" style="cursor: pointer;" data-bind="click: function() { if (isAvailable) $parent.selectTourDate($data); }, css: { 'border-success': isAvailable && $parent.selectedTourDateId() !== id, 'border-primary border-2': $parent.selectedTourDateId() === id, 'border-secondary opacity-50': !isAvailable }">
+                            <div class="card h-100" style="cursor: pointer;" data-bind="click: function() { if (isAvailable) $parent.selectTourDate($data); }, css: { 'border-success': isAvailable && $parent.selectedDateToken() !== (token || 'd:' + id), 'border-primary border-2': $parent.selectedDateToken() === (token || 'd:' + id), 'border-secondary opacity-50': !isAvailable }">
                                 <div class="card-body p-2">
                                     <div class="d-flex justify-content-between align-items-center mb-1">
                                         <small class="fw-semibold" data-bind="text: $parent.formatDateWithTime(startDate) + ' - ' + $parent.formatDateWithTime(endDate)"></small>
-                                        <!-- ko if: $parent.selectedTourDateId() === id -->
+                                        <!-- ko if: $parent.selectedDateToken() === (token || 'd:' + id) -->
                                         <span class="badge bg-primary"><i class="bi bi-check-circle-fill me-1"></i>Secili</span>
                                         <!-- /ko -->
-                                        <!-- ko ifnot: $parent.selectedTourDateId() === id -->
+                                        <!-- ko ifnot: $parent.selectedDateToken() === (token || 'd:' + id) -->
                                         <span class="badge" data-bind="css: isAvailable ? 'bg-success' : 'bg-secondary', text: isAvailable ? (T('TourDate.Available') || 'Musait') : (T('TourDate.NotAvailable') || 'Dolu')"></span>
                                         <!-- /ko -->
                                     </div>
@@ -1407,14 +1407,18 @@ function ToursViewModel() {
     self.isLoadingDates = ko.observable(false);
     self.selectedTourDateId = ko.observable(null);
     self.selectedTourDateObj = ko.observable(null);
+    self.selectedDateToken = ko.observable(null);
 
     self.selectTourDate = function(tourDate) {
-        if (self.selectedTourDateId() === tourDate.id) {
+        var tokenOrId = tourDate.token || ('d:' + tourDate.id);
+        if (self.selectedDateToken() === tokenOrId) {
             self.selectedTourDateId(null);
             self.selectedTourDateObj(null);
+            self.selectedDateToken(null);
         } else {
-            self.selectedTourDateId(tourDate.id);
+            self.selectedTourDateId(tourDate.id || null);
             self.selectedTourDateObj(tourDate);
+            self.selectedDateToken(tokenOrId);
         }
     };
 
@@ -2234,6 +2238,7 @@ function ToursViewModel() {
         var requestData = {
             tourId: tour.id,
             tourDateId: self.selectedTourDateId() || null,
+            dateToken: self.selectedDateToken() || null,
             fullName: data.fullName,
             email: data.email,
             phone: data.phone,

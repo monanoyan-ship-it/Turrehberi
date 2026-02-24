@@ -1265,5 +1265,21 @@
   "Payment.Waiting": "Waiting",
   "Payment.Partial": "Partial Payment",
   "Payment.Full": "Full Payment",
-  "Payment.Refund": "Refund"
+  "Payment.Refund": "Refund",
+  "TourSchedule.Title": "Calendar Templates",
+  "TourSchedule.Created": "Calendar template created",
+  "TourSchedule.Updated": "Calendar template updated",
+  "TourSchedule.Deleted": "Calendar template deleted",
+  "TourSchedule.DaysOfWeek": "Days",
+  "TourSchedule.StartTime": "Time",
+  "TourSchedule.Duration": "Duration",
+  "TourSchedule.ValidFrom": "Valid From",
+  "TourSchedule.ValidTo": "Valid To",
+  "TourSchedule.NoSchedules": "No calendar templates added yet",
+  "TourSchedule.DateCancelled": "Date cancelled",
+  "TourSchedule.CancelDate": "Cancel Date",
+  "TourSchedule.CancelConfirm": "Are you sure you want to cancel this date?",
+  "TourSchedule.DeleteConfirm": "Are you sure you want to delete this calendar template?",
+  "Validation.DaysOfWeekRequired": "At least one day must be selected",
+  "Validation.ValidDateRangeRequired": "A valid date range must be selected"
 }

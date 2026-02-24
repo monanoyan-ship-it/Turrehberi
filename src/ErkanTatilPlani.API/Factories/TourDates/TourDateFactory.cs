@@ -13,29 +13,46 @@ public class TourDateFactory : ITourDateFactory
     private readonly ITourEntityService _tourService;
     private readonly IVisitorEntityService _visitorService;
     private readonly IUnitOfWork _unitOfWork;
+    private readonly ITourScheduleFactory _scheduleFactory;
 
     public TourDateFactory(
         ITourDateEntityService tourDateService,
         ITourEntityService tourService,
         IVisitorEntityService visitorService,
-        IUnitOfWork unitOfWork)
+        IUnitOfWork unitOfWork,
+        ITourScheduleFactory scheduleFactory)
     {
         _tourDateService = tourDateService;
         _tourService = tourService;
         _visitorService = visitorService;
         _unitOfWork = unitOfWork;
+        _scheduleFactory = scheduleFactory;
     }
 
     public async Task<IEnumerable<object>> GetTourDatesAsync(int tourId)
     {
-        return await _tourDateService.GetAvailableDates(tourId)
-            .OrderBy(td => td.StartDate)
-            .Select(td => new
+        // Schedule-aware: onumuzdeki 3 ayin sanal tarihlerini uret
+        var now = DateTime.UtcNow;
+        var allDates = new List<VirtualTourDateDto>();
+
+        for (var i = 0; i < 3; i++)
+        {
+            var targetDate = now.AddMonths(i);
+            var virtualDates = await _scheduleFactory.GenerateVirtualDatesAsync(
+                tourId, targetDate.Year, targetDate.Month);
+            allDates.AddRange(virtualDates);
+        }
+
+        // Sadece gelecek ve musait olanlari filtrele
+        return allDates
+            .Where(d => d.StartDate >= now && d.IsAvailable)
+            .OrderBy(d => d.StartDate)
+            .Select(d => new
             {
-                td.Id, td.TourId, td.StartDate, td.EndDate,
-                td.Price, td.MaxCapacity, td.BookedCount, td.IsAvailable
-            })
-            .ToListAsync();
+                d.Id, d.TourId, d.StartDate, d.EndDate,
+                d.Price, d.MaxCapacity, d.BookedCount, d.IsAvailable,
+                d.IsCancelled, d.Token, d.ScheduleId, d.IsVirtual
+            });
     }
 
     public async Task<(object? result, string? errorMessage, string? errorCode, int? statusCode)> ManageTourDatesAsync(int visitorId, int tourId)
@@ -109,18 +126,22 @@ public class TourDateFactory : ITourDateFactory
             return Array.Empty<object>();
 
         monthStart = DateTime.SpecifyKind(monthStart, DateTimeKind.Utc);
-        var monthEnd = monthStart.AddMonths(1);
+        var now = DateTime.UtcNow;
 
-        return await _tourDateService.GetAvailableDates(tourId)
-            .Where(td => td.StartDate >= monthStart && td.StartDate < monthEnd)
-            .OrderBy(td => td.Price ?? decimal.MaxValue)
-            .ThenBy(td => td.StartDate)
-            .Select(td => new
+        // Schedule-aware: sanal + mevcut tarihleri birlestir
+        var virtualDates = await _scheduleFactory.GenerateVirtualDatesAsync(
+            tourId, monthStart.Year, monthStart.Month);
+
+        return virtualDates
+            .Where(d => d.StartDate >= now && d.IsAvailable)
+            .OrderBy(d => d.Price ?? decimal.MaxValue)
+            .ThenBy(d => d.StartDate)
+            .Select(d => new
             {
-                td.Id, td.TourId, td.StartDate, td.EndDate,
-                td.Price, td.MaxCapacity, td.BookedCount, td.IsAvailable
-            })
-            .ToListAsync();
+                d.Id, d.TourId, d.StartDate, d.EndDate,
+                d.Price, d.MaxCapacity, d.BookedCount, d.IsAvailable,
+                d.Token, d.IsVirtual
+            });
     }
 
     public async Task<(bool success, object result, int statusCode)> GetCapacitySummaryAsync(int visitorId, int tourId)

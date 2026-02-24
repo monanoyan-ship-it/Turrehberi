@@ -100,6 +100,157 @@ function MyToursViewModel() {
         self.batchTimeSlots.remove(slot);
     };
 
+    // ===============================================
+    // SCHEDULE (TAKVIM SABLONU) YONETIMI
+    // ===============================================
+    self.schedules = ko.observableArray([]);
+    self.isLoadingSchedules = ko.observable(false);
+    self.isSavingSchedule = ko.observable(false);
+    self.editingScheduleId = ko.observable(null);
+    self.scheduleFormData = ko.observable({
+        daysOfWeek: [],
+        startTime: '09:00',
+        durationValue: 1,
+        durationUnit: 'Day',
+        price: '',
+        maxCapacity: '',
+        validFrom: '',
+        validTo: ''
+    });
+    self.scheduleSelectedDays = ko.observableArray([]);
+
+    self.loadSchedules = function(tourId) {
+        self.isLoadingSchedules(true);
+        $.ajax({
+            url: apiBaseUrl + '/api/tours/' + tourId + '/schedules',
+            method: 'GET',
+            success: function(data) {
+                // Her schedule icin gunleri parse et
+                var items = (data || []).map(function(s) {
+                    s.daysOfWeekParsed = JSON.parse(s.daysOfWeekJson || '[]');
+                    return s;
+                });
+                self.schedules(items);
+                self.isLoadingSchedules(false);
+            },
+            error: function() {
+                self.schedules([]);
+                self.isLoadingSchedules(false);
+            }
+        });
+    };
+
+    self.resetScheduleForm = function() {
+        self.editingScheduleId(null);
+        self.scheduleSelectedDays([]);
+        self.scheduleFormData({
+            daysOfWeek: [],
+            startTime: '09:00',
+            durationValue: 1,
+            durationUnit: 'Day',
+            price: '',
+            maxCapacity: '',
+            validFrom: '',
+            validTo: ''
+        });
+    };
+
+    self.editSchedule = function(schedule) {
+        self.editingScheduleId(schedule.id);
+        self.scheduleSelectedDays(schedule.daysOfWeekParsed.map(String));
+        self.scheduleFormData({
+            daysOfWeek: schedule.daysOfWeekParsed,
+            startTime: schedule.startTime || '09:00',
+            durationValue: schedule.durationValue || 1,
+            durationUnit: schedule.durationUnit || 'Day',
+            price: schedule.price || '',
+            maxCapacity: schedule.maxCapacity || '',
+            validFrom: schedule.validFrom ? schedule.validFrom.substring(0, 10) : '',
+            validTo: schedule.validTo ? schedule.validTo.substring(0, 10) : ''
+        });
+    };
+
+    self.saveSchedule = function() {
+        var fd = self.scheduleFormData();
+        var selectedDays = self.scheduleSelectedDays().map(function(d) { return parseInt(d); });
+
+        if (selectedDays.length === 0) {
+            toastr.warning(T('Validation.DaysOfWeekRequired'));
+            return;
+        }
+        if (!fd.validFrom || !fd.validTo) {
+            toastr.warning(T('Validation.ValidDateRangeRequired'));
+            return;
+        }
+
+        self.isSavingSchedule(true);
+
+        var requestData = {
+            daysOfWeek: selectedDays,
+            startTime: fd.startTime || '09:00',
+            durationValue: parseInt(fd.durationValue) || 1,
+            durationUnit: fd.durationUnit || 'Day',
+            price: fd.price ? parseFloat(fd.price) : null,
+            maxCapacity: fd.maxCapacity ? parseInt(fd.maxCapacity) : null,
+            validFrom: fd.validFrom,
+            validTo: fd.validTo
+        };
+
+        var isEdit = !!self.editingScheduleId();
+        var url = isEdit
+            ? apiBaseUrl + '/api/tour-schedules/' + self.editingScheduleId()
+            : apiBaseUrl + '/api/tours/' + self.managingTourId() + '/schedules';
+        var method = isEdit ? 'PUT' : 'POST';
+
+        $.ajax({
+            url: url,
+            method: method,
+            contentType: 'application/json',
+            data: JSON.stringify(requestData),
+            success: function(response) {
+                toastr.success(T(response.message) || T('Common.Save'));
+                self.resetScheduleForm();
+                self.loadSchedules(self.managingTourId());
+                self.isSavingSchedule(false);
+            },
+            error: function(xhr) {
+                toastr.error(T(xhr.responseJSON?.message) || T('Common.Error'));
+                self.isSavingSchedule(false);
+            }
+        });
+    };
+
+    self.deleteSchedule = function(schedule) {
+        if (!confirm(T('TourSchedule.DeleteConfirm'))) return;
+
+        $.ajax({
+            url: apiBaseUrl + '/api/tour-schedules/' + schedule.id,
+            method: 'DELETE',
+            success: function(response) {
+                toastr.success(T(response.message) || T('Common.Delete'));
+                self.loadSchedules(self.managingTourId());
+            },
+            error: function(xhr) {
+                toastr.error(T(xhr.responseJSON?.message) || T('Common.Error'));
+            }
+        });
+    };
+
+    self.formatDaysOfWeek = function(daysArray) {
+        var dayLabels = {
+            0: T('WeekDay.Sun'), 1: T('WeekDay.Mon'), 2: T('WeekDay.Tue'),
+            3: T('WeekDay.Wed'), 4: T('WeekDay.Thu'), 5: T('WeekDay.Fri'), 6: T('WeekDay.Sat')
+        };
+        return (daysArray || []).map(function(d) { return dayLabels[d] || d; }).join(', ');
+    };
+
+    self.formatScheduleTime = function(schedule) {
+        var start = schedule.startTime || '09:00';
+        var dv = schedule.durationValue || 1;
+        var du = schedule.durationUnit || 'Day';
+        return start + ' (' + dv + ' ' + T('TourDate.Duration' + du) + ')';
+    };
+
     // Cover photo
     self.isUploadingCover = ko.observable(false);
 
@@ -366,7 +517,9 @@ function MyToursViewModel() {
         self.managingTourId(tour.id);
         self.managingTourName(tour.name);
         self.dateFormData({ startDate: '', endDate: '', price: '', maxCapacity: '' });
+        self.resetScheduleForm();
         self.loadManagedDates(tour.id);
+        self.loadSchedules(tour.id);
         dateManageModal.show();
     };
 

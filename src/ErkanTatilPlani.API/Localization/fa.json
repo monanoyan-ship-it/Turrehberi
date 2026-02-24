@@ -1265,5 +1265,21 @@
   "Payment.Waiting": "در انتظار",
   "Payment.Partial": "پرداخت جزئی",
   "Payment.Full": "پرداخت کامل",
-  "Payment.Refund": "بازپرداخت"
+  "Payment.Refund": "بازپرداخت",
+  "TourSchedule.Title": "قالب‌های تقویم",
+  "TourSchedule.Created": "قالب تقویم ایجاد شد",
+  "TourSchedule.Updated": "قالب تقویم به‌روزرسانی شد",
+  "TourSchedule.Deleted": "قالب تقویم حذف شد",
+  "TourSchedule.DaysOfWeek": "روزها",
+  "TourSchedule.StartTime": "ساعت",
+  "TourSchedule.Duration": "مدت",
+  "TourSchedule.ValidFrom": "معتبر از",
+  "TourSchedule.ValidTo": "معتبر تا",
+  "TourSchedule.NoSchedules": "هنوز قالب تقویمی اضافه نشده",
+  "TourSchedule.DateCancelled": "تاریخ لغو شد",
+  "TourSchedule.CancelDate": "لغو تاریخ",
+  "TourSchedule.CancelConfirm": "آیا مطمئن هستید که می‌خواهید این تاریخ را لغو کنید؟",
+  "TourSchedule.DeleteConfirm": "آیا مطمئن هستید که می‌خواهید این قالب را حذف کنید؟",
+  "Validation.DaysOfWeekRequired": "حداقل یک روز باید انتخاب شود",
+  "Validation.ValidDateRangeRequired": "یک بازه تاریخ معتبر باید انتخاب شود"
 }

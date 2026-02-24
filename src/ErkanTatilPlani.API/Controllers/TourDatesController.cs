@@ -12,11 +12,16 @@ public class TourDatesController : ControllerBase
 {
     private readonly ITourDateFactory _tourDateFactory;
     private readonly ITourCalendarFactory _tourCalendarFactory;
+    private readonly ITourScheduleFactory _scheduleFactory;
 
-    public TourDatesController(ITourDateFactory tourDateFactory, ITourCalendarFactory tourCalendarFactory)
+    public TourDatesController(
+        ITourDateFactory tourDateFactory,
+        ITourCalendarFactory tourCalendarFactory,
+        ITourScheduleFactory scheduleFactory)
     {
         _tourDateFactory = tourDateFactory;
         _tourCalendarFactory = tourCalendarFactory;
+        _scheduleFactory = scheduleFactory;
     }
 
     private int? GetVisitorId()
@@ -137,5 +142,64 @@ public class TourDatesController : ControllerBase
             return BadRequest(new { message = "Error.MonthParameterRequired" });
 
         return Ok(await _tourDateFactory.GetCheapestDatesAsync(tourId, month));
+    }
+
+    // ===============================================
+    // SCHEDULE (TAKVIM SABLONU) ENDPOINT'LERI
+    // ===============================================
+
+    [HttpGet("tours/{tourId}/schedules")]
+    [Authorize(Roles = "CompanyOwner,Staff,Admin")]
+    public async Task<IActionResult> GetSchedules(int tourId)
+    {
+        var visitorId = GetVisitorId();
+        if (visitorId == null) return Unauthorized(new { message = "Error.LoginRequired" });
+
+        var (success, result, statusCode) = await _scheduleFactory.GetSchedulesAsync(visitorId.Value, tourId);
+        return StatusCode(statusCode, result);
+    }
+
+    [HttpPost("tours/{tourId}/schedules")]
+    [Authorize(Roles = "CompanyOwner,Staff,Admin")]
+    public async Task<IActionResult> CreateSchedule(int tourId, [FromBody] CreateScheduleRequest request)
+    {
+        var visitorId = GetVisitorId();
+        if (visitorId == null) return Unauthorized(new { message = "Error.LoginRequired" });
+
+        var (success, result, statusCode) = await _scheduleFactory.CreateScheduleAsync(visitorId.Value, tourId, request);
+        return StatusCode(statusCode, result);
+    }
+
+    [HttpPut("tour-schedules/{id}")]
+    [Authorize(Roles = "CompanyOwner,Staff,Admin")]
+    public async Task<IActionResult> UpdateSchedule(int id, [FromBody] UpdateScheduleRequest request)
+    {
+        var visitorId = GetVisitorId();
+        if (visitorId == null) return Unauthorized(new { message = "Error.LoginRequired" });
+
+        var (success, result, statusCode) = await _scheduleFactory.UpdateScheduleAsync(visitorId.Value, id, request);
+        return StatusCode(statusCode, result);
+    }
+
+    [HttpDelete("tour-schedules/{id}")]
+    [Authorize(Roles = "CompanyOwner,Staff,Admin")]
+    public async Task<IActionResult> DeleteSchedule(int id)
+    {
+        var visitorId = GetVisitorId();
+        if (visitorId == null) return Unauthorized(new { message = "Error.LoginRequired" });
+
+        var (success, result, statusCode) = await _scheduleFactory.DeleteScheduleAsync(visitorId.Value, id);
+        return StatusCode(statusCode, result);
+    }
+
+    [HttpPost("tours/{tourId}/dates/cancel")]
+    [Authorize(Roles = "CompanyOwner,Staff,Admin")]
+    public async Task<IActionResult> CancelDate(int tourId, [FromBody] CancelDateRequest request)
+    {
+        var visitorId = GetVisitorId();
+        if (visitorId == null) return Unauthorized(new { message = "Error.LoginRequired" });
+
+        var (success, result, statusCode) = await _scheduleFactory.CancelDateAsync(visitorId.Value, tourId, request);
+        return StatusCode(statusCode, result);
     }
 }

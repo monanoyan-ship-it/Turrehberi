@@ -38,5 +38,17 @@ public class TourDate : BaseEntity
     /// </summary>
     public bool IsAvailable { get; set; } = true;
 
+    /// <summary>
+    /// Hangi schedule'dan uretildi (null = legacy/manual)
+    /// </summary>
+    public int? ScheduleId { get; set; }
+
+    /// <summary>
+    /// Bu tarih iptal mi (schedule aktif olsa bile)
+    /// </summary>
+    public bool IsCancelled { get; set; }
+
+    public virtual TourSchedule? Schedule { get; set; }
+
     public virtual ICollection<TourGuideAssignment> GuideAssignments { get; set; } = new List<TourGuideAssignment>();
 }
