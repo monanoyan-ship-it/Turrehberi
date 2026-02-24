@@ -373,6 +373,39 @@
                         </div>
                     </div>
 
+                    <!-- Tarih Filtresi -->
+                    <div class="mb-2">
+                        <div class="d-flex flex-wrap gap-1 mb-2">
+                            <!-- ko foreach: dateShortcuts -->
+                            <button type="button" class="btn btn-outline-secondary btn-sm"
+                                    data-bind="text: label, click: $parent.applyDateShortcut,
+                                               css: { 'btn-secondary text-white': $parent.activeDateShortcut() === key, 'btn-outline-secondary': $parent.activeDateShortcut() !== key }">
+                            </button>
+                            <!-- /ko -->
+                        </div>
+                        <div class="row g-2 align-items-end">
+                            <div class="col-auto">
+                                <label class="form-label form-label-sm mb-1" data-t="Common.From">Baslangic</label>
+                                <input type="date" class="form-control form-control-sm" data-bind="value: dateFilterFrom">
+                            </div>
+                            <div class="col-auto">
+                                <label class="form-label form-label-sm mb-1" data-t="Common.To">Bitis</label>
+                                <input type="date" class="form-control form-control-sm" data-bind="value: dateFilterTo">
+                            </div>
+                            <div class="col-auto">
+                                <div class="form-check form-check-sm mt-2">
+                                    <input class="form-check-input" type="checkbox" id="chkOnlyReserved" data-bind="checked: dateFilterOnlyReserved">
+                                    <label class="form-check-label small" for="chkOnlyReserved" data-t="TourDate.OnlyWithReservations">Sadece rezervasyonlu</label>
+                                </div>
+                            </div>
+                            <div class="col-auto">
+                                <button type="button" class="btn btn-sm btn-primary" data-bind="click: filterManagedDates">
+                                    <i class="bi bi-search"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
                     <!-- Sanal Tarih Onizlemesi (Schedule'lardan uretilir) -->
                     <div data-bind="visible: isLoadingDates()" class="text-center py-3">
                         <div class="spinner-border spinner-border-sm text-primary"></div>
@@ -396,7 +429,7 @@
                                 <tr>
                                     <td><small data-bind="text: date"></small></td>
                                     <td><small data-bind="text: startTime || '-'"></small></td>
-                                    <td><small data-bind="text: durationValue + ' ' + (durationUnit || '')"></small></td>
+                                    <td><small data-bind="text: durationValue + ' ' + $parent.localizeDurationUnit(durationUnit)"></small></td>
                                     <td data-bind="text: price ? price.toLocaleString('tr-TR', {style:'currency', currency:'TRY'}) : '-'"></td>
                                     <td>
                                         <!-- ko if: maxCapacity -->
@@ -546,5 +579,5 @@
 </div>
 
 @section Scripts {
-<script src="~/js/MyCompany/MyTours.js"></script>
+<script src="~/js/MyCompany/MyTours.js" asp-append-version="true"></script>
 }

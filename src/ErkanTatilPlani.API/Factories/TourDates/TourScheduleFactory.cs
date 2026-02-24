@@ -296,21 +296,39 @@ public class TourScheduleFactory : ITourScheduleFactory
         return result.OrderBy(r => r.Date).ThenBy(r => r.StartTime).ToList();
     }
 
-    public async Task<IEnumerable<object>> GetTourDatesAsync(int tourId)
+    public async Task<IEnumerable<object>> GetTourDatesAsync(int tourId, DateOnly? from = null, DateOnly? to = null, bool onlyWithReservations = false)
     {
         var now = DateTime.UtcNow;
-        var allDates = new List<VirtualTourDateDto>();
+        var today = DateOnly.FromDateTime(now);
 
-        for (var i = 0; i < 3; i++)
+        // Default: bugunden 3 ay ileri
+        var startDate = from ?? today;
+        var endDate = to ?? DateOnly.FromDateTime(now.AddMonths(3));
+
+        // Ay bazinda GenerateVirtualDatesAsync cagir
+        var allDates = new List<VirtualTourDateDto>();
+        var current = new DateOnly(startDate.Year, startDate.Month, 1);
+        var lastMonth = new DateOnly(endDate.Year, endDate.Month, 1);
+
+        while (current <= lastMonth)
         {
-            var targetDate = now.AddMonths(i);
-            var virtualDates = await GenerateVirtualDatesAsync(tourId, targetDate.Year, targetDate.Month);
+            var virtualDates = await GenerateVirtualDatesAsync(tourId, current.Year, current.Month);
             allDates.AddRange(virtualDates);
+            current = current.AddMonths(1);
         }
 
-        var today = DateOnly.FromDateTime(now);
-        return allDates
-            .Where(d => (d.Date > today || (d.Date == today && d.StartTime > now.TimeOfDay)) && d.IsAvailable)
+        // Tarih araligina filtrele
+        var filtered = allDates.Where(d => d.Date >= startDate && d.Date <= endDate);
+
+        // from belirtilmemisse (public kullanim) sadece gelecek + musait
+        if (!from.HasValue)
+            filtered = filtered.Where(d => (d.Date > today || (d.Date == today && d.StartTime > now.TimeOfDay)) && d.IsAvailable);
+
+        // Sadece rezervasyonu olanlar
+        if (onlyWithReservations)
+            filtered = filtered.Where(d => d.BookedCount > 0);
+
+        return filtered
             .OrderBy(d => d.Date).ThenBy(d => d.StartTime)
             .Select(d => new
             {

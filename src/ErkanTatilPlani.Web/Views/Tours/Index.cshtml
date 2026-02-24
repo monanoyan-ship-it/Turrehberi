@@ -896,16 +896,12 @@
                                 <div data-bind="visible: !isLoadingDates() && availableDates().length === 0" class="text-muted small py-2">
                                     <i class="bi bi-calendar-x me-1"></i> <span data-bind="text: T('TourDate.NoDates') || 'Musait tarih bulunamadi'"></span>
                                 </div>
-                                <div data-bind="visible: !isLoadingDates() && availableDates().length > 0" style="max-height: 150px; overflow-y: auto;">
-                                    <div class="d-flex flex-wrap gap-1">
-                                        <!-- ko foreach: availableDates -->
-                                        <button type="button" class="btn btn-sm"
-                                                data-bind="click: $parent.selectReservationDate,
-                                                           css: $parent.selectedReservationDate() === dateKey ? 'btn-primary' : 'btn-outline-secondary',
-                                                           text: $parent.formatDate(dateKey + 'T00:00:00Z')">
-                                        </button>
-                                        <!-- /ko -->
-                                    </div>
+                                <div data-bind="visible: !isLoadingDates() && availableDates().length > 0">
+                                    <input type="date" class="form-control"
+                                           data-bind="value: selectedReservationDate,
+                                                      attr: { min: datePickerMin(), max: datePickerMax() },
+                                                      event: { change: onDatePickerChange }">
+                                    <small class="text-danger" data-bind="visible: datePickerError(), text: datePickerError()"></small>
                                 </div>
                             </div>
                             <!-- Adim 2: Seans Sec -->
@@ -1451,12 +1447,12 @@ function ToursViewModel() {
     self.selectedDateToken = ko.observable(null);
     self.selectedReservationDate = ko.observable(null); // Secilen gun (yyyy-MM-dd)
 
-    // Benzersiz musait tarihler (gun bazinda gruplama)
+    // Benzersiz musait tarihler (gun bazinda gruplama - seans filtreleme icin)
     self.availableDates = ko.computed(function() {
         var dates = self.tourDates();
         var dateMap = {};
         dates.forEach(function(d) {
-            var key = d.date; // "2026-03-15" format
+            var key = d.date;
             if (!dateMap[key]) {
                 dateMap[key] = { dateKey: key, count: 0, hasAvailable: false };
             }
@@ -1466,6 +1462,30 @@ function ToursViewModel() {
         return Object.values(dateMap).filter(function(d) { return d.hasAvailable; }).sort(function(a, b) { return a.dateKey.localeCompare(b.dateKey); });
     });
 
+    // Date picker min/max
+    self.datePickerMin = ko.computed(function() {
+        var dates = self.availableDates();
+        return dates.length > 0 ? dates[0].dateKey : '';
+    });
+    self.datePickerMax = ko.computed(function() {
+        var dates = self.availableDates();
+        return dates.length > 0 ? dates[dates.length - 1].dateKey : '';
+    });
+    self.datePickerError = ko.observable('');
+
+    self.onDatePickerChange = function() {
+        var dateKey = self.selectedReservationDate();
+        self.datePickerError('');
+        self.selectedTourDateId(null);
+        self.selectedTourDateObj(null);
+        self.selectedDateToken(null);
+        if (!dateKey) return;
+        var hasSession = self.availableDates().some(function(d) { return d.dateKey === dateKey; });
+        if (!hasSession) {
+            self.datePickerError(T('TourDate.NoSessions') || 'Bu tarihte musait seans yok');
+        }
+    };
+
     // Secilen gundeki seanslar
     self.sessionsForDate = ko.computed(function() {
         var dateKey = self.selectedReservationDate();
@@ -1474,14 +1494,6 @@ function ToursViewModel() {
             return d.isAvailable && d.date === dateKey;
         }).sort(function(a, b) { return (a.startTime || '').localeCompare(b.startTime || ''); });
     });
-
-    self.selectReservationDate = function(dateObj) {
-        self.selectedReservationDate(dateObj.dateKey);
-        // Tarih degistiginde seans secimini sifirla
-        self.selectedTourDateId(null);
-        self.selectedTourDateObj(null);
-        self.selectedDateToken(null);
-    };
 
     self.selectTourDate = function(tourDate) {
         var tokenOrId = tourDate.token || ('d:' + tourDate.id);

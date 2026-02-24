@@ -1,6 +1,10 @@
 function TourCalendarViewModel() {
     var self = this;
 
+    self.localizeDurationUnit = function(unit) {
+        return TypeDefinitions.DurationUnits.localize(unit);
+    };
+
     // Observables
     self.isLoading = ko.observable(true);
     self.currentYear = ko.observable(new Date().getFullYear());

@@ -83,7 +83,7 @@
                                     </div>
                                     <div>
                                         <small class="text-muted d-block" data-t="Reservation.Date">Tarih</small>
-                                        <span class="fw-semibold" data-bind="text: $data.date"></span>
+                                        <span class="fw-semibold" data-bind="text: $parent.formatDate($data.date)"></span>
                                     </div>
                                 </div>
                             </div>
@@ -94,7 +94,7 @@
                                     </div>
                                     <div>
                                         <small class="text-muted d-block" data-t="Reservation.StartTime">Saat</small>
-                                        <span class="fw-semibold" data-bind="text: ($data.startTime || '-') + ' (' + $data.durationValue + ' ' + ($data.durationUnit || '') + ')'"></span>
+                                        <span class="fw-semibold" data-bind="text: $data.startTime || '-'"></span>
                                     </div>
                                 </div>
                             </div>
@@ -105,18 +105,18 @@
                                     </div>
                                     <div>
                                         <small class="text-muted d-block" data-t="Reservation.People">Kisi Sayisi</small>
-                                        <span class="fw-semibold" data-bind="text: $data.numberOfPeople + ' Kisi'"></span>
+                                        <span class="fw-semibold" data-bind="text: $data.numberOfPeople + ' ' + T('Common.Person')"></span>
                                     </div>
                                 </div>
                             </div>
                             <div class="col-sm-6">
                                 <div class="d-flex align-items-center">
                                     <div class="bg-primary bg-opacity-10 rounded p-2 me-3">
-                                        <i class="bi bi-clock text-primary fs-5"></i>
+                                        <i class="bi bi-hourglass-split text-primary fs-5"></i>
                                     </div>
                                     <div>
-                                        <small class="text-muted d-block" data-t="Tour.Duration">Tur Suresi</small>
-                                        <span class="fw-semibold" data-bind="text: $data.tourDurationDays + ' Gun'"></span>
+                                        <small class="text-muted d-block" data-t="Reservation.Duration">Sure</small>
+                                        <span class="fw-semibold" data-bind="text: $data.durationValue + ' ' + $parent.localizeDurationUnit($data.durationUnit)"></span>
                                     </div>
                                 </div>
                             </div>
@@ -170,7 +170,7 @@
                     <div class="card-body">
                         <div class="d-flex justify-content-between mb-2">
                             <span data-t="ReservationDetail.UnitPrice">Birim Fiyat</span>
-                            <span data-bind="text: $data.tourPrice.toLocaleString('tr-TR', {style: 'currency', currency: 'TRY'})"></span>
+                            <span data-bind="text: ($data.unitPrice || $data.tourPrice || 0).toLocaleString('tr-TR', {style: 'currency', currency: 'TRY'})"></span>
                         </div>
                         <div class="d-flex justify-content-between mb-2">
                             <span data-t="Reservation.People">Kisi Sayisi</span>
@@ -418,6 +418,16 @@ function ReservationDetailViewModel() {
     self.isPaymentLoading = ko.observable(false);
 
     var reservationId = @(ViewBag.ReservationId ?? 0);
+
+    self.formatDate = function(dateStr) {
+        if (!dateStr) return '-';
+        var d = new Date(dateStr + 'T00:00:00');
+        return d.toLocaleDateString('tr-TR', { day: 'numeric', month: 'long', year: 'numeric' });
+    };
+
+    self.localizeDurationUnit = function(unit) {
+        return TypeDefinitions.DurationUnits.localize(unit);
+    };
 
     self.getStatusText = function(status) {
         var statusMap = {

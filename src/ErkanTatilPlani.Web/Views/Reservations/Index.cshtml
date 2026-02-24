@@ -117,7 +117,7 @@
                     <dt class="col-sm-3">Tarih</dt>
                     <dd class="col-sm-9">
                         <span data-bind="text: date + ' ' + (startTime ? startTime.toString().substring(0,5) : '')"></span>
-                        <small class="text-muted" data-bind="text: '(' + durationValue + ' ' + (durationUnit || '') + ')'"></small>
+                        <small class="text-muted" data-bind="text: '(' + durationValue + ' ' + $parent.localizeDurationUnit(durationUnit) + ')'"></small>
                     </dd>
                     <dt class="col-sm-3">Kisi Sayisi</dt>
                     <dd class="col-sm-9" data-bind="text: numberOfPeople"></dd>
@@ -161,6 +161,10 @@ function ReservationsViewModel() {
     self.selectedReservation = ko.observable(null);
 
     var detailsModal;
+
+    self.localizeDurationUnit = function(unit) {
+        return TypeDefinitions.DurationUnits.localize(unit);
+    };
 
     self.getStatusText = function(status) {
         return ['Beklemede', 'Onaylandi', 'Iptal', 'Tamamlandi'][status] || 'Bilinmiyor';

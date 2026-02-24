@@ -39,6 +39,59 @@ function MyToursViewModel() {
     self.managingTourName = ko.observable('');
     self.managedDates = ko.observableArray([]);
     self.isLoadingDates = ko.observable(false);
+    self.dateFilterFrom = ko.observable('');
+    self.dateFilterTo = ko.observable('');
+    self.dateFilterOnlyReserved = ko.observable(false);
+    self.activeDateShortcut = ko.observable('thisMonth');
+
+    // Tarih yardimci fonksiyonlari
+    function fmtDate(d) { return d.toISOString().substring(0, 10); }
+    function addDays(d, n) { var r = new Date(d); r.setDate(r.getDate() + n); return r; }
+    function monthStart(d) { return new Date(d.getFullYear(), d.getMonth(), 1); }
+    function monthEnd(d) { return new Date(d.getFullYear(), d.getMonth() + 1, 0); }
+
+    self.dateShortcuts = [
+        { key: 'today', label: T('DateShortcut.Today') || 'Bugun' },
+        { key: 'tomorrow', label: T('DateShortcut.Tomorrow') || 'Yarin' },
+        { key: 'thisWeek', label: T('DateShortcut.ThisWeek') || 'Bu hafta' },
+        { key: 'nextWeek', label: T('DateShortcut.NextWeek') || 'Gelecek hafta' },
+        { key: 'thisMonth', label: T('DateShortcut.ThisMonth') || 'Bu ay' },
+        { key: 'nextMonth', label: T('DateShortcut.NextMonth') || 'Gelecek ay' },
+        { key: 'next3Months', label: T('DateShortcut.Next3Months') || '3 ay' },
+    ];
+
+    self.applyDateShortcut = function(shortcut) {
+        var today = new Date();
+        today.setHours(0, 0, 0, 0);
+        var from, to;
+        var dow = today.getDay() || 7; // Pazartesi=1
+        switch (shortcut.key) {
+            case 'today':
+                from = to = today; break;
+            case 'tomorrow':
+                from = to = addDays(today, 1); break;
+            case 'thisWeek':
+                from = addDays(today, 1 - dow);
+                to = addDays(from, 6); break;
+            case 'nextWeek':
+                from = addDays(today, 8 - dow);
+                to = addDays(from, 6); break;
+            case 'thisMonth':
+                from = monthStart(today);
+                to = monthEnd(today); break;
+            case 'nextMonth':
+                var nm = new Date(today.getFullYear(), today.getMonth() + 1, 1);
+                from = nm;
+                to = monthEnd(nm); break;
+            case 'next3Months':
+                from = today;
+                to = monthEnd(new Date(today.getFullYear(), today.getMonth() + 2, 1)); break;
+        }
+        self.dateFilterFrom(fmtDate(from));
+        self.dateFilterTo(fmtDate(to));
+        self.activeDateShortcut(shortcut.key);
+        self.filterManagedDates();
+    };
     // DurationUnits TypeDefinition (SystemName degerlerini kullanir)
     self.getDurationUnits = function() {
         return [
@@ -235,6 +288,10 @@ function MyToursViewModel() {
     self.formatCurrency = function(value) {
         if (!value) return '0 TL';
         return new Intl.NumberFormat('tr-TR', { style: 'decimal' }).format(value) + ' TL';
+    };
+
+    self.localizeDurationUnit = function(unit) {
+        return TypeDefinitions.DurationUnits.localize(unit);
     };
 
     // Capacity helpers
@@ -478,6 +535,12 @@ function MyToursViewModel() {
     self.openDateManageModal = function(tour) {
         self.managingTourId(tour.id);
         self.managingTourName(tour.name);
+        self.dateFilterOnlyReserved(false);
+        // Default: bu ay
+        var today = new Date();
+        self.dateFilterFrom(fmtDate(monthStart(today)));
+        self.dateFilterTo(fmtDate(monthEnd(today)));
+        self.activeDateShortcut('thisMonth');
         self.resetScheduleForm();
         self.loadManagedDates(tour.id);
         self.loadSchedules(tour.id);
@@ -487,9 +550,14 @@ function MyToursViewModel() {
     // Sanal tarihleri yukle (schedule'lardan uretilir)
     self.loadManagedDates = function(tourId) {
         self.isLoadingDates(true);
+        var params = {};
+        if (self.dateFilterFrom()) params.from = self.dateFilterFrom();
+        if (self.dateFilterTo()) params.to = self.dateFilterTo();
+        if (self.dateFilterOnlyReserved()) params.onlyWithReservations = true;
         $.ajax({
             url: apiBaseUrl + '/api/tours/' + tourId + '/dates',
             method: 'GET',
+            data: params,
             success: function(data) {
                 self.managedDates(data || []);
                 self.isLoadingDates(false);
@@ -499,6 +567,12 @@ function MyToursViewModel() {
                 self.isLoadingDates(false);
             }
         });
+    };
+
+    self.filterManagedDates = function() {
+        self.activeDateShortcut(null);
+        var tourId = self.managingTourId();
+        if (tourId) self.loadManagedDates(tourId);
     };
 
     // ===============================================

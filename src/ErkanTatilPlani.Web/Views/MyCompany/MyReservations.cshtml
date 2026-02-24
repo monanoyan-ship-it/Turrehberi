@@ -130,7 +130,7 @@
                                 </td>
                                 <td>
                                     <div data-bind="text: date"></div>
-                                    <small class="text-muted" data-bind="text: (startTime || '') + (durationValue ? ' (' + durationValue + ' ' + (durationUnit || '') + ')' : '')"></small>
+                                    <small class="text-muted" data-bind="text: (startTime || '') + (durationValue ? ' (' + durationValue + ' ' + $parent.localizeDurationUnit(durationUnit) + ')' : '')"></small>
                                 </td>
                                 <td class="text-center">
                                     <span class="badge bg-secondary" data-bind="text: numberOfPeople"></span>
@@ -205,7 +205,7 @@
                         </div>
                         <div class="col-6">
                             <label class="form-label text-muted small" data-t="Reservation.StartTime">Saat</label>
-                            <div data-bind="text: (startTime || '-') + (durationValue ? ' (' + durationValue + ' ' + (durationUnit || '') + ')' : '')"></div>
+                            <div data-bind="text: (startTime || '-') + (durationValue ? ' (' + durationValue + ' ' + $parent.localizeDurationUnit(durationUnit) + ')' : '')"></div>
                         </div>
                     </div>
                     <div class="row mb-3">
@@ -238,5 +238,5 @@
 </div>
 
 @section Scripts {
-<script src="~/js/MyCompany/MyReservations.js"></script>
+<script src="~/js/MyCompany/MyReservations.js" asp-append-version="true"></script>
 }

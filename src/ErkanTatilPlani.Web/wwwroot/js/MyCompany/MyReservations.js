@@ -12,6 +12,10 @@ function MyReservationsViewModel() {
     var detailModal = null;
 
     // Helper functions
+    self.localizeDurationUnit = function(unit) {
+        return TypeDefinitions.DurationUnits.localize(unit);
+    };
+
     self.formatCurrency = function(value) {
         if (!value) return '0 TL';
         return new Intl.NumberFormat('tr-TR', { style: 'decimal' }).format(value) + ' TL';

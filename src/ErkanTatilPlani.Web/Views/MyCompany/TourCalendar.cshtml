@@ -132,7 +132,7 @@
                             <div class="card text-center">
                                 <div class="card-body py-2">
                                     <small class="text-muted" data-t="Reservation.StartTime">Saat</small>
-                                    <div class="fw-bold" data-bind="text: (selectedDateDetail().startTime || '-') + ' (' + selectedDateDetail().durationValue + ' ' + (selectedDateDetail().durationUnit || '') + ')'"></div>
+                                    <div class="fw-bold" data-bind="text: (selectedDateDetail().startTime || '-') + ' (' + selectedDateDetail().durationValue + ' ' + localizeDurationUnit(selectedDateDetail().durationUnit) + ')'"></div>
                                 </div>
                             </div>
                         </div>
@@ -171,5 +171,5 @@
 </div>
 
 @section Scripts {
-<script src="~/js/MyCompany/TourCalendar.js"></script>
+<script src="~/js/MyCompany/TourCalendar.js" asp-append-version="true"></script>
 }

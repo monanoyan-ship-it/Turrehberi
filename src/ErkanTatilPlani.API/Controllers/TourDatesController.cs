@@ -27,9 +27,9 @@ public class TourDatesController : ControllerBase
     // ===============================================
 
     [HttpGet("tours/{tourId}/dates")]
-    public async Task<ActionResult<IEnumerable<object>>> GetTourDates(int tourId)
+    public async Task<ActionResult<IEnumerable<object>>> GetTourDates(int tourId, [FromQuery] DateOnly? from = null, [FromQuery] DateOnly? to = null, [FromQuery] bool onlyWithReservations = false)
     {
-        return Ok(await _scheduleFactory.GetTourDatesAsync(tourId));
+        return Ok(await _scheduleFactory.GetTourDatesAsync(tourId, from, to, onlyWithReservations));
     }
 
     [HttpGet("tours/{tourId}/dates/cheapest")]

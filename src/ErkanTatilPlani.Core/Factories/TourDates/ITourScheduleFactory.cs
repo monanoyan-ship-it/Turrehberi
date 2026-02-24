@@ -14,9 +14,9 @@ public interface ITourScheduleFactory
     Task<List<VirtualTourDateDto>> GenerateVirtualDatesAsync(int tourId, int year, int month);
 
     /// <summary>
-    /// Public: Tur icin onumuzdeki 3 ayin musait tarihlerini getir
+    /// Public: Tur icin tarih araligindaki musait tarihleri getir
     /// </summary>
-    Task<IEnumerable<object>> GetTourDatesAsync(int tourId);
+    Task<IEnumerable<object>> GetTourDatesAsync(int tourId, DateOnly? from = null, DateOnly? to = null, bool onlyWithReservations = false);
 
     /// <summary>
     /// Public: En ucuz tarihleri getir
