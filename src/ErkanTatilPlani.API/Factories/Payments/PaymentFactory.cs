@@ -152,8 +152,10 @@ public class PaymentFactory : IPaymentFactory
                     TourName = reservation.Tour.Name,
                     CompanyName = reservation.Tour.Company.Name,
                     Destination = reservation.Tour.Destination,
-                    StartDate = reservation.StartDate,
-                    EndDate = reservation.EndDate,
+                    Date = reservation.Date,
+                    StartTime = reservation.StartTime,
+                    DurationValue = reservation.DurationValue,
+                    DurationUnitId = reservation.DurationUnitId,
                     NumberOfPeople = reservation.NumberOfPeople,
                     TotalPrice = reservation.TotalPrice,
                     PreferredLanguage = reservation.Visitor.PreferredLanguage ?? "tr"
@@ -210,7 +212,8 @@ public class PaymentFactory : IPaymentFactory
                 r.Id,
                 TourName = r.Tour.Name,
                 r.TotalPrice,
-                r.StartDate,
+                r.Date,
+                StartTime = r.StartTime.ToString(@"hh\:mm"),
                 r.CreatedAt
             })
             .ToListAsync();

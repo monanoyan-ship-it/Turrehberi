@@ -293,7 +293,7 @@ public static class EmailTemplates
                 </tr>
                 <tr>
                     <td style=""padding: 8px 0; color: {GrayColor}; font-size: 14px;"">{dateLabel}:</td>
-                    <td style=""padding: 8px 0; color: #1f2937; font-size: 14px; text-align: right;"">{model.StartDate:dd.MM.yyyy} - {model.EndDate:dd.MM.yyyy}</td>
+                    <td style=""padding: 8px 0; color: #1f2937; font-size: 14px; text-align: right;"">{model.Date:dd.MM.yyyy} {model.StartTime:hh\:mm}</td>
                 </tr>
                 <tr>
                     <td style=""padding: 8px 0; color: {GrayColor}; font-size: 14px;"">{peopleLabel}:</td>

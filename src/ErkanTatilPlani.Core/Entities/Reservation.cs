@@ -6,9 +6,12 @@ public class Reservation : BaseEntity
 {
     public int TourId { get; set; }
     public int VisitorId { get; set; }
-    public int? TourDateId { get; set; }
-    public DateTime StartDate { get; set; }
-    public DateTime EndDate { get; set; }
+    public DateOnly Date { get; set; }
+    public TimeSpan StartTime { get; set; }
+    public int DurationValue { get; set; }
+    public int DurationUnitId { get; set; }
+    public decimal UnitPrice { get; set; }
+    public int? ScheduleId { get; set; }
     public int NumberOfPeople { get; set; }
     public decimal TotalPrice { get; set; }
     public int Status { get; set; } = ReservationStatuses.Ids.Pending;
@@ -36,6 +39,6 @@ public class Reservation : BaseEntity
 
     public virtual Tour Tour { get; set; } = null!;
     public virtual Visitor Visitor { get; set; } = null!;
-    public virtual TourDate? TourDate { get; set; }
+    public virtual TourSchedule? Schedule { get; set; }
     public virtual Promotion? Promotion { get; set; }
 }

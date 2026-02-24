@@ -45,8 +45,11 @@ public class VisitorReservationFactory : IVisitorReservationFactory
                 TourImageUrl = r.Tour.ImageUrl,
                 CompanyName = r.Tour.Company.Name,
                 CompanySlug = r.Tour.Company.Slug,
-                r.StartDate,
-                r.EndDate,
+                r.Date,
+                StartTime = r.StartTime.ToString(@"hh\:mm"),
+                r.DurationValue,
+                DurationUnit = DurationUnits.GetById(r.DurationUnitId) != null
+                    ? DurationUnits.GetById(r.DurationUnitId)!.SystemName : "Day",
                 r.NumberOfPeople,
                 r.TotalPrice,
                 Status = r.Status == ReservationStatuses.Ids.Pending ? "Pending" : r.Status == ReservationStatuses.Ids.Confirmed ? "Confirmed" : r.Status == ReservationStatuses.Ids.Cancelled ? "Cancelled" : r.Status == ReservationStatuses.Ids.Completed ? "Completed" : "Unknown",
@@ -81,8 +84,12 @@ public class VisitorReservationFactory : IVisitorReservationFactory
                 CompanySlug = r.Tour.Company.Slug,
                 CompanyPhone = r.Tour.Company.Phone,
                 CompanyEmail = r.Tour.Company.Email,
-                r.StartDate,
-                r.EndDate,
+                r.Date,
+                StartTime = r.StartTime.ToString(@"hh\:mm"),
+                r.DurationValue,
+                DurationUnit = DurationUnits.GetById(r.DurationUnitId) != null
+                    ? DurationUnits.GetById(r.DurationUnitId)!.SystemName : "Day",
+                r.UnitPrice,
                 r.NumberOfPeople,
                 r.TotalPrice,
                 Status = r.Status == ReservationStatuses.Ids.Pending ? "Pending" : r.Status == ReservationStatuses.Ids.Confirmed ? "Confirmed" : r.Status == ReservationStatuses.Ids.Cancelled ? "Cancelled" : r.Status == ReservationStatuses.Ids.Completed ? "Completed" : "Unknown",
@@ -91,7 +98,6 @@ public class VisitorReservationFactory : IVisitorReservationFactory
                 r.CreatedAt,
                 r.UpdatedAt,
                 CanCancel = r.Status == ReservationStatuses.Ids.Pending || r.Status == ReservationStatuses.Ids.Confirmed,
-                // Odeme bilgileri - DepositAmount 0 ise firma yuzdesinden hesapla
                 DepositAmount = r.DepositAmount > 0
                     ? r.DepositAmount
                     : r.TotalPrice * r.Tour.Company.DepositPercentage / 100,
@@ -117,7 +123,6 @@ public class VisitorReservationFactory : IVisitorReservationFactory
         if (reservation == null)
             return (false, new { message = "Error.ReservationNotFound" }, 404);
 
-        // Sadece Pending veya Confirmed durumundaki rezervasyonlar iptal edilebilir
         if (reservation.Status != ReservationStatuses.Ids.Pending && reservation.Status != ReservationStatuses.Ids.Confirmed)
             return (false, new { message = "Error.ReservationCannotBeCancelled" }, 400);
 
@@ -125,7 +130,6 @@ public class VisitorReservationFactory : IVisitorReservationFactory
         reservation.UpdatedAt = DateTime.UtcNow;
         await _unitOfWork.SaveChangesAsync();
 
-        // Email bildirimi gonder
         var emailModel = new ReservationEmailModel
         {
             ToEmail = reservation.Visitor.Email,
@@ -133,8 +137,10 @@ public class VisitorReservationFactory : IVisitorReservationFactory
             TourName = reservation.Tour.Name,
             CompanyName = reservation.Tour.Company.Name,
             Destination = reservation.Tour.Destination,
-            StartDate = reservation.StartDate,
-            EndDate = reservation.EndDate,
+            Date = reservation.Date,
+            StartTime = reservation.StartTime,
+            DurationValue = reservation.DurationValue,
+            DurationUnitId = reservation.DurationUnitId,
             NumberOfPeople = reservation.NumberOfPeople,
             TotalPrice = reservation.TotalPrice,
             PreferredLanguage = reservation.Visitor.PreferredLanguage ?? "tr"
@@ -152,7 +158,6 @@ public class VisitorReservationFactory : IVisitorReservationFactory
         if (visitor.Company == null)
             return (null, "Error.NotCompanyOwner", "NOT_COMPANY_OWNER", 403);
 
-        // Firmanin turlarinin ID'leri
         var companyTours = await _tourService.GetByCompanyIdAsync(visitor.Company.Id);
         var companyTourIds = companyTours.Select(t => t.Id).ToList();
 
@@ -160,7 +165,6 @@ public class VisitorReservationFactory : IVisitorReservationFactory
             .Include(r => r.Tour)
             .Include(r => r.Visitor);
 
-        // Durum filtresi
         IQueryable<Reservation> filteredQuery = query;
         if (!string.IsNullOrEmpty(status) && status != "all")
         {
@@ -182,8 +186,11 @@ public class VisitorReservationFactory : IVisitorReservationFactory
                 VisitorName = r.Visitor.FirstName + " " + r.Visitor.LastName,
                 VisitorEmail = r.Visitor.Email,
                 VisitorPhone = r.Visitor.Phone,
-                r.StartDate,
-                r.EndDate,
+                r.Date,
+                StartTime = r.StartTime.ToString(@"hh\:mm"),
+                r.DurationValue,
+                DurationUnit = DurationUnits.GetById(r.DurationUnitId) != null
+                    ? DurationUnits.GetById(r.DurationUnitId)!.SystemName : "Day",
                 r.NumberOfPeople,
                 r.TotalPrice,
                 Status = r.Status == ReservationStatuses.Ids.Pending ? "Pending" : r.Status == ReservationStatuses.Ids.Confirmed ? "Confirmed" : r.Status == ReservationStatuses.Ids.Cancelled ? "Cancelled" : r.Status == ReservationStatuses.Ids.Completed ? "Completed" : "Unknown",
@@ -193,7 +200,6 @@ public class VisitorReservationFactory : IVisitorReservationFactory
             })
             .ToListAsync();
 
-        // Istatistikler
         var allReservations = await _reservationService.GetByTourIds(companyTourIds).ToListAsync();
 
         var stats = new
@@ -220,7 +226,6 @@ public class VisitorReservationFactory : IVisitorReservationFactory
         if (reservation == null)
             return (false, new { message = "Error.ReservationNotFound" }, 404);
 
-        // Rezervasyonun firmaya ait oldugunu kontrol et
         if (reservation.Tour.CompanyId != visitor.Company.Id)
             return (false, new { message = "Error.ReservationAccessDenied" }, 403);
 
@@ -232,7 +237,6 @@ public class VisitorReservationFactory : IVisitorReservationFactory
         reservation.UpdatedAt = DateTime.UtcNow;
         await _unitOfWork.SaveChangesAsync();
 
-        // Email bildirimi gonder
         if (oldStatus != newStatusItem!.Id)
         {
             var emailModel = new ReservationEmailModel
@@ -242,8 +246,10 @@ public class VisitorReservationFactory : IVisitorReservationFactory
                 TourName = reservation.Tour.Name,
                 CompanyName = reservation.Tour.Company.Name,
                 Destination = reservation.Tour.Destination,
-                StartDate = reservation.StartDate,
-                EndDate = reservation.EndDate,
+                Date = reservation.Date,
+                StartTime = reservation.StartTime,
+                DurationValue = reservation.DurationValue,
+                DurationUnitId = reservation.DurationUnitId,
                 NumberOfPeople = reservation.NumberOfPeople,
                 TotalPrice = reservation.TotalPrice,
                 Notes = reservation.Notes,
@@ -252,13 +258,9 @@ public class VisitorReservationFactory : IVisitorReservationFactory
             };
 
             if (newStatusItem!.Id == ReservationStatuses.Ids.Confirmed)
-            {
                 await _emailService.SendReservationConfirmedEmailAsync(emailModel);
-            }
             else if (newStatusItem!.Id == ReservationStatuses.Ids.Cancelled)
-            {
                 await _emailService.SendReservationCancelledEmailAsync(emailModel);
-            }
         }
 
         return (true, new { message = "Success.ReservationStatusUpdated", status = newStatusItem!.SystemName }, 200);
@@ -273,12 +275,7 @@ public class VisitorReservationFactory : IVisitorReservationFactory
         if (reservation.Status != ReservationStatuses.Ids.Confirmed)
             return (false, "Error.OnlyConfirmedReservationsCanChangeDate");
 
-        var tour = await _tourService.GetByIdAsync(reservation.TourId);
-        if (tour == null)
-            return (false, "Error.TourNotFound");
-
-        reservation.StartDate = DateTime.SpecifyKind(newStartDate, DateTimeKind.Utc);
-        reservation.EndDate = DateTime.SpecifyKind(newStartDate.AddDays(tour.DurationDays - 1), DateTimeKind.Utc);
+        reservation.Date = DateOnly.FromDateTime(newStartDate);
         reservation.UpdatedAt = DateTime.UtcNow;
 
         await _unitOfWork.SaveChangesAsync();

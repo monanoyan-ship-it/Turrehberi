@@ -239,8 +239,8 @@
 
                 <div class="d-flex justify-content-between mb-2">
                     <div>
-                        <small class="text-muted" data-t="Reservation.StartDate">Baslangic:</small>
-                        <div class="fw-semibold" data-bind="text: (function(){ var d = new Date(startDate); var t = d.toLocaleDateString('tr-TR'); var h = d.getUTCHours(); var m = d.getUTCMinutes(); return (h || m) ? t + ' ' + String(h).padStart(2,'0') + ':' + String(m).padStart(2,'0') : t; })()"></div>
+                        <small class="text-muted" data-t="Reservation.Date">Tarih:</small>
+                        <div class="fw-semibold" data-bind="text: date + ' ' + (startTime || '')"></div>
                     </div>
                     <div class="text-end">
                         <small class="text-muted" data-t="Reservation.People">Kisi:</small>
@@ -285,10 +285,10 @@ function ReservationsViewModel() {
         today.setHours(0, 0, 0, 0);
         return self.reservations().filter(function(r) {
             if (r.statusId !== 0 && r.statusId !== 1) return false;
-            var startDate = new Date(r.startDate);
-            startDate.setHours(0, 0, 0, 0);
+            var rDate = new Date(r.date + 'T00:00:00');
+            rDate.setHours(0, 0, 0, 0);
             var isPaid = r.paymentStatusId === 1 || r.paymentStatusId === 2;
-            return startDate >= today && !isPaid;
+            return rDate >= today && !isPaid;
         });
     });
 
@@ -314,10 +314,10 @@ function ReservationsViewModel() {
         today.setHours(0, 0, 0, 0);
         return self.reservations().filter(function(r) {
             if (r.statusId !== 0 && r.statusId !== 1) return false;
-            var startDate = new Date(r.startDate);
-            startDate.setHours(0, 0, 0, 0);
+            var rDate = new Date(r.date + 'T00:00:00');
+            rDate.setHours(0, 0, 0, 0);
             var isPaid = r.paymentStatusId === 1 || r.paymentStatusId === 2;
-            return startDate < today && !isPaid;
+            return rDate < today && !isPaid;
         });
     });
 

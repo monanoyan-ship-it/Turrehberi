@@ -62,7 +62,7 @@
                                 <small class="text-muted" data-bind="text: visitor ? visitor.email : ''"></small>
                             </td>
                             <td data-bind="text: tour ? tour.name : '-'"></td>
-                            <td data-bind="text: (function(){ var d=new Date(startDate); var t=d.toLocaleDateString('tr-TR'); var h=d.getUTCHours(); var m=d.getUTCMinutes(); return (h||m) ? t+' '+String(h).padStart(2,'0')+':'+String(m).padStart(2,'0') : t; })()"></td>
+                            <td data-bind="text: date + ' ' + (startTime ? startTime.toString().substring(0,5) : '')"></td>
                             <td data-bind="text: numberOfPeople"></td>
                             <td data-bind="text: totalPrice.toLocaleString('tr-TR', {style: 'currency', currency: 'TRY'})"></td>
                             <td>
@@ -110,7 +110,7 @@
                         <dt class="col-sm-4">Tur</dt>
                         <dd class="col-sm-8" data-bind="text: tour ? tour.name : '-'"></dd>
                         <dt class="col-sm-4">Tarih</dt>
-                        <dd class="col-sm-8" data-bind="text: (function(){ var d=new Date(startDate); var t=d.toLocaleDateString('tr-TR'); var h=d.getUTCHours(); var m=d.getUTCMinutes(); return (h||m) ? t+' '+String(h).padStart(2,'0')+':'+String(m).padStart(2,'0') : t; })()"></dd>
+                        <dd class="col-sm-8" data-bind="text: date + ' ' + (startTime ? startTime.toString().substring(0,5) : '')"></dd>
                         <dt class="col-sm-4">Kisi Sayisi</dt>
                         <dd class="col-sm-8" data-bind="text: numberOfPeople"></dd>
                         <dt class="col-sm-4">Toplam Fiyat</dt>

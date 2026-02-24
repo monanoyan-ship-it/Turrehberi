@@ -23,8 +23,8 @@ public class GuideEntityService : IGuideEntityService
     public async Task<Guide?> GetByIdWithAssignmentsAsync(int id)
         => await _context.Guides
             .Include(g => g.Assignments.Where(a => a.IsActive))
-                .ThenInclude(a => a.TourDate)
-                    .ThenInclude(td => td.Tour)
+                .ThenInclude(a => a.Schedule)
+                    .ThenInclude(s => s.Tour)
             .FirstOrDefaultAsync(g => g.Id == id);
 
     public void Add(Guide guide) => _context.Guides.Add(guide);
@@ -33,18 +33,18 @@ public class GuideEntityService : IGuideEntityService
 
     public IQueryable<TourGuideAssignment> GetAssignmentsByGuideId(int guideId)
         => _context.TourGuideAssignments
-            .Include(a => a.TourDate).ThenInclude(td => td.Tour)
+            .Include(a => a.Schedule).ThenInclude(s => s.Tour)
             .Where(a => a.GuideId == guideId && a.IsActive);
 
-    public IQueryable<TourGuideAssignment> GetAssignmentsByTourDateId(int tourDateId)
+    public IQueryable<TourGuideAssignment> GetAssignmentsByScheduleId(int scheduleId)
         => _context.TourGuideAssignments
             .Include(a => a.Guide)
-            .Where(a => a.TourDateId == tourDateId && a.IsActive);
+            .Where(a => a.ScheduleId == scheduleId && a.IsActive);
 
     public async Task<TourGuideAssignment?> GetAssignmentByIdAsync(int id)
         => await _context.TourGuideAssignments
             .Include(a => a.Guide)
-            .Include(a => a.TourDate)
+            .Include(a => a.Schedule)
             .FirstOrDefaultAsync(a => a.Id == id);
 
     public void AddAssignment(TourGuideAssignment assignment)

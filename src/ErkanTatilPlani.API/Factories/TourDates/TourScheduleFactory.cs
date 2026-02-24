@@ -11,20 +11,20 @@ namespace ErkanTatilPlani.API.Factories.TourDates;
 public class TourScheduleFactory : ITourScheduleFactory
 {
     private readonly ITourScheduleEntityService _scheduleService;
-    private readonly ITourDateEntityService _tourDateService;
+    private readonly IReservationEntityService _reservationService;
     private readonly ITourEntityService _tourService;
     private readonly IVisitorEntityService _visitorService;
     private readonly IUnitOfWork _unitOfWork;
 
     public TourScheduleFactory(
         ITourScheduleEntityService scheduleService,
-        ITourDateEntityService tourDateService,
+        IReservationEntityService reservationService,
         ITourEntityService tourService,
         IVisitorEntityService visitorService,
         IUnitOfWork unitOfWork)
     {
         _scheduleService = scheduleService;
-        _tourDateService = tourDateService;
+        _reservationService = reservationService;
         _tourService = tourService;
         _visitorService = visitorService;
         _unitOfWork = unitOfWork;
@@ -66,7 +66,6 @@ public class TourScheduleFactory : ITourScheduleFactory
         if (check.errorMessage != null)
             return (false, new { message = check.errorMessage }, check.statusCode ?? 400);
 
-        // Validasyon
         if (request.DaysOfWeek == null || !request.DaysOfWeek.Any())
             return (false, new { message = "Validation.DaysOfWeekRequired" }, 400);
 
@@ -197,17 +196,25 @@ public class TourScheduleFactory : ITourScheduleFactory
         if (string.IsNullOrEmpty(request.DateToken))
             return (false, new { message = "Validation.DateTokenRequired" }, 400);
 
-        // Materialize edip iptal et
-        var tourDate = await MaterializeDateAsync(request.DateToken);
-        if (tourDate == null)
-            return (false, new { message = "Error.DateNotFound" }, 404);
+        // Token parse: "s:42:2026-03-15"
+        if (!request.DateToken.StartsWith("s:"))
+            return (false, new { message = "Error.InvalidDateToken" }, 400);
 
-        if (tourDate.TourId != tourId)
+        var parts = request.DateToken.Split(':');
+        if (parts.Length != 3 || !int.TryParse(parts[1], out var scheduleId) || !DateTime.TryParse(parts[2], out _))
+            return (false, new { message = "Error.InvalidDateToken" }, 400);
+
+        var schedule = await _scheduleService.GetByIdAsync(scheduleId);
+        if (schedule == null || !schedule.IsActive)
+            return (false, new { message = "Error.ScheduleNotFound" }, 404);
+
+        if (schedule.TourId != tourId)
             return (false, new { message = "Error.SessionNotBelongToTour" }, 400);
 
-        tourDate.IsCancelled = true;
-        tourDate.IsAvailable = false;
-        tourDate.UpdatedAt = DateTime.UtcNow;
+        // TODO: Tarih iptal mekanizmasi icin ayri bir CancelledDate tablosu veya
+        // schedule'a cancelled_dates JSON alani eklenebilir. Simdilik schedule'i deaktive et.
+        schedule.IsActive = false;
+        schedule.UpdatedAt = DateTime.UtcNow;
         await _unitOfWork.SaveChangesAsync();
 
         return (true, new { message = "TourSchedule.DateCancelled" }, 200);
@@ -224,15 +231,15 @@ public class TourScheduleFactory : ITourScheduleFactory
             .Where(s => s.ValidFrom < monthEnd && s.ValidTo >= monthStart)
             .ToListAsync();
 
-        // 2. Ayda mevcut materialized TourDate'leri al
-        var materializedDates = await _tourDateService.GetByTourId(tourId)
-            .Where(td => td.StartDate >= monthStart && td.StartDate < monthEnd)
-            .Select(td => new MaterializedDateInfo
-            {
-                Id = td.Id, TourId = td.TourId, StartDate = td.StartDate, EndDate = td.EndDate,
-                Price = td.Price, MaxCapacity = td.MaxCapacity, BookedCount = td.BookedCount,
-                IsAvailable = td.IsAvailable, ScheduleId = td.ScheduleId, IsCancelled = td.IsCancelled
-            })
+        // 2. Bu ay icin mevcut rezervasyonlari al (doluluk hesabi icin)
+        var monthStartDate = new DateOnly(year, month, 1);
+        var monthEndDate = monthStartDate.AddMonths(1);
+
+        var reservations = await _reservationService.GetActiveReservations()
+            .Where(r => r.TourId == tourId &&
+                        r.Date >= monthStartDate && r.Date < monthEndDate &&
+                        r.Status != ReservationStatuses.Ids.Cancelled)
+            .Select(r => new { r.ScheduleId, r.Date, r.NumberOfPeople })
             .ToListAsync();
 
         // Tour bilgisi (fallback fiyat/kapasite icin)
@@ -244,6 +251,7 @@ public class TourScheduleFactory : ITourScheduleFactory
         for (var day = 1; day <= daysInMonth; day++)
         {
             var date = new DateTime(year, month, day, 0, 0, 0, DateTimeKind.Utc);
+            var dateOnly = new DateOnly(year, month, day);
             var dayOfWeek = (int)date.DayOfWeek;
 
             foreach (var schedule in schedules)
@@ -257,144 +265,161 @@ public class TourScheduleFactory : ITourScheduleFactory
                 if (!daysOfWeek.Contains(dayOfWeek))
                     continue;
 
-                var startDate = date.Add(schedule.StartTime);
-                var endDate = CalculateEndDate(startDate, schedule.DurationValue, schedule.DurationUnitId);
+                // Bu schedule + tarih icin doluluk hesapla
+                var bookedCount = reservations
+                    .Where(r => r.ScheduleId == schedule.Id && r.Date == dateOnly)
+                    .Sum(r => r.NumberOfPeople);
 
-                // Materialized mi?
-                var materialized = materializedDates.FirstOrDefault(td =>
-                    td.ScheduleId == schedule.Id &&
-                    td.StartDate.Date == date.Date);
+                var maxCapacity = schedule.MaxCapacity ?? tour?.MaxCapacity;
+                var isAvailable = date.Add(schedule.StartTime) > DateTime.UtcNow &&
+                    (!maxCapacity.HasValue || bookedCount < maxCapacity.Value);
 
-                if (materialized != null)
+                result.Add(new VirtualTourDateDto
                 {
-                    result.Add(new VirtualTourDateDto
-                    {
-                        Id = materialized.Id,
-                        TourId = tourId,
-                        StartDate = materialized.StartDate,
-                        EndDate = materialized.EndDate,
-                        Price = materialized.Price ?? schedule.Price ?? tour?.Price,
-                        MaxCapacity = materialized.MaxCapacity ?? schedule.MaxCapacity ?? tour?.MaxCapacity,
-                        BookedCount = materialized.BookedCount,
-                        IsAvailable = materialized.IsAvailable && !materialized.IsCancelled,
-                        IsCancelled = materialized.IsCancelled,
-                        Token = $"d:{materialized.Id}",
-                        ScheduleId = schedule.Id,
-                        IsVirtual = false
-                    });
-                }
-                else
-                {
-                    result.Add(new VirtualTourDateDto
-                    {
-                        Id = 0,
-                        TourId = tourId,
-                        StartDate = startDate,
-                        EndDate = endDate,
-                        Price = schedule.Price ?? tour?.Price,
-                        MaxCapacity = schedule.MaxCapacity ?? tour?.MaxCapacity,
-                        BookedCount = 0,
-                        IsAvailable = startDate > DateTime.UtcNow,
-                        IsCancelled = false,
-                        Token = $"s:{schedule.Id}:{date:yyyy-MM-dd}",
-                        ScheduleId = schedule.Id,
-                        IsVirtual = true
-                    });
-                }
+                    TourId = tourId,
+                    Date = dateOnly,
+                    StartTime = schedule.StartTime,
+                    DurationValue = schedule.DurationValue,
+                    DurationUnitId = schedule.DurationUnitId,
+                    Price = schedule.Price ?? tour?.Price,
+                    MaxCapacity = maxCapacity,
+                    BookedCount = bookedCount,
+                    IsAvailable = isAvailable,
+                    IsCancelled = false,
+                    Token = $"s:{schedule.Id}:{dateOnly:yyyy-MM-dd}",
+                    ScheduleId = schedule.Id,
+                    IsVirtual = true
+                });
             }
         }
 
-        // 4. Legacy TourDate'leri ekle (ScheduleId = null)
-        var legacyDates = materializedDates.Where(td => td.ScheduleId == null);
-        foreach (var td in legacyDates)
-        {
-            result.Add(new VirtualTourDateDto
-            {
-                Id = td.Id,
-                TourId = tourId,
-                StartDate = td.StartDate,
-                EndDate = td.EndDate,
-                Price = td.Price ?? tour?.Price,
-                MaxCapacity = td.MaxCapacity ?? tour?.MaxCapacity,
-                BookedCount = td.BookedCount,
-                IsAvailable = td.IsAvailable && !td.IsCancelled,
-                IsCancelled = td.IsCancelled,
-                Token = $"d:{td.Id}",
-                ScheduleId = null,
-                IsVirtual = false
-            });
-        }
-
-        return result.OrderBy(r => r.StartDate).ToList();
+        return result.OrderBy(r => r.Date).ThenBy(r => r.StartTime).ToList();
     }
 
-    public async Task<TourDate?> MaterializeDateAsync(string dateToken)
+    public async Task<IEnumerable<object>> GetTourDatesAsync(int tourId)
     {
-        if (string.IsNullOrEmpty(dateToken))
-            return null;
+        var now = DateTime.UtcNow;
+        var allDates = new List<VirtualTourDateDto>();
 
-        // "d:123" - mevcut TourDate
-        if (dateToken.StartsWith("d:"))
+        for (var i = 0; i < 3; i++)
         {
-            if (int.TryParse(dateToken[2..], out var tourDateId))
-                return await _tourDateService.GetByIdAsync(tourDateId);
-            return null;
+            var targetDate = now.AddMonths(i);
+            var virtualDates = await GenerateVirtualDatesAsync(tourId, targetDate.Year, targetDate.Month);
+            allDates.AddRange(virtualDates);
         }
 
-        // "s:42:2026-03-15" - schedule'dan materialize et
-        if (dateToken.StartsWith("s:"))
-        {
-            var parts = dateToken.Split(':');
-            if (parts.Length != 3) return null;
-            if (!int.TryParse(parts[1], out var scheduleId)) return null;
-            if (!DateTime.TryParse(parts[2], out var dateValue)) return null;
-
-            dateValue = DateTime.SpecifyKind(dateValue.Date, DateTimeKind.Utc);
-
-            var schedule = await _scheduleService.GetByIdAsync(scheduleId);
-            if (schedule == null || !schedule.IsActive) return null;
-
-            // Gecerlilik kontrolu
-            if (dateValue < schedule.ValidFrom.Date || dateValue > schedule.ValidTo.Date)
-                return null;
-
-            // Gun eslesmesi kontrolu
-            var daysOfWeek = ParseDaysOfWeek(schedule.DaysOfWeekJson);
-            if (!daysOfWeek.Contains((int)dateValue.DayOfWeek))
-                return null;
-
-            // Zaten materialized mi? (race condition koruması)
-            var existing = await _tourDateService.GetByTourId(schedule.TourId)
-                .FirstOrDefaultAsync(td =>
-                    td.ScheduleId == scheduleId &&
-                    td.StartDate.Date == dateValue.Date);
-
-            if (existing != null)
-                return existing;
-
-            // Yeni TourDate olustur
-            var startDate = dateValue.Add(schedule.StartTime);
-            var endDate = CalculateEndDate(startDate, schedule.DurationValue, schedule.DurationUnitId);
-
-            var tourDate = new TourDate
+        var today = DateOnly.FromDateTime(now);
+        return allDates
+            .Where(d => (d.Date > today || (d.Date == today && d.StartTime > now.TimeOfDay)) && d.IsAvailable)
+            .OrderBy(d => d.Date).ThenBy(d => d.StartTime)
+            .Select(d => new
             {
-                TourId = schedule.TourId,
-                ScheduleId = scheduleId,
-                StartDate = startDate,
-                EndDate = endDate,
-                Price = schedule.Price,
-                MaxCapacity = schedule.MaxCapacity,
-                IsAvailable = true,
-                BookedCount = 0
-            };
+                d.TourId,
+                d.Date,
+                StartTime = d.StartTime.ToString(@"hh\:mm"),
+                d.DurationValue,
+                DurationUnit = DurationUnits.GetById(d.DurationUnitId)?.SystemName ?? "Day",
+                d.Price, d.MaxCapacity, d.BookedCount, d.IsAvailable,
+                d.IsCancelled, d.Token, d.ScheduleId, d.IsVirtual
+            });
+    }
 
-            _tourDateService.Add(tourDate);
-            await _unitOfWork.SaveChangesAsync();
+    public async Task<IEnumerable<object>> GetCheapestDatesAsync(int tourId, string month)
+    {
+        if (!DateTime.TryParseExact(month + "-01", "yyyy-MM-dd", null, System.Globalization.DateTimeStyles.AssumeUniversal, out var monthStart))
+            return Array.Empty<object>();
 
-            return tourDate;
+        var virtualDates = await GenerateVirtualDatesAsync(tourId, monthStart.Year, monthStart.Month);
+        var today = DateOnly.FromDateTime(DateTime.UtcNow);
+
+        return virtualDates
+            .Where(d => d.Date >= today && d.IsAvailable)
+            .OrderBy(d => d.Price ?? decimal.MaxValue)
+            .ThenBy(d => d.Date)
+            .Select(d => new
+            {
+                d.TourId,
+                d.Date,
+                StartTime = d.StartTime.ToString(@"hh\:mm"),
+                d.DurationValue,
+                DurationUnit = DurationUnits.GetById(d.DurationUnitId)?.SystemName ?? "Day",
+                d.Price, d.MaxCapacity, d.BookedCount, d.IsAvailable,
+                d.Token, d.IsVirtual
+            });
+    }
+
+    public async Task<(bool success, object result, int statusCode)> GetCalendarDataAsync(int visitorId, int year, int month, int? tourId)
+    {
+        var visitor = await _visitorService.GetByIdWithCompanyAsync(visitorId);
+        if (visitor == null) return (false, new { message = "Error.UserNotFound" }, 401);
+        if (visitor.Company == null) return (false, new { message = "Error.NotCompanyOwner" }, 403);
+        if (visitor.Company.StatusId != CompanyStatuses.Ids.Approved)
+            return (false, new { message = "Error.CompanyStatusInvalid" }, 403);
+
+        var companyId = visitor.Company.Id;
+        var monthStart = new DateTime(year, month, 1, 0, 0, 0, DateTimeKind.Utc);
+        var daysInMonth = DateTime.DaysInMonth(year, month);
+
+        var companyTours = await _tourService.GetByCompanyId(companyId)
+            .Where(t => t.IsActive)
+            .Select(t => new { t.Id, t.Name })
+            .ToListAsync();
+
+        var tourIds = tourId.HasValue
+            ? companyTours.Where(t => t.Id == tourId.Value).Select(t => t.Id).ToList()
+            : companyTours.Select(t => t.Id).ToList();
+
+        var allVirtualDates = new List<(VirtualTourDateDto dto, string tourName)>();
+        foreach (var tid in tourIds)
+        {
+            var tourName = companyTours.First(t => t.Id == tid).Name;
+            var virtualDates = await GenerateVirtualDatesAsync(tid, year, month);
+            foreach (var vd in virtualDates)
+                allVirtualDates.Add((vd, tourName));
         }
 
-        return null;
+        var dayData = Enumerable.Range(1, daysInMonth).Select(day =>
+        {
+            var dayDate = new DateOnly(year, month, day);
+            var dayDates = allVirtualDates
+                .Where(x => x.dto.Date == dayDate)
+                .OrderBy(x => x.dto.StartTime)
+                .Select(x => new
+                {
+                    x.dto.TourId,
+                    TourName = x.tourName,
+                    x.dto.Date,
+                    StartTime = x.dto.StartTime.ToString(@"hh\:mm"),
+                    x.dto.DurationValue,
+                    DurationUnit = DurationUnits.GetById(x.dto.DurationUnitId)?.SystemName ?? "Day",
+                    x.dto.Price,
+                    x.dto.MaxCapacity,
+                    x.dto.BookedCount,
+                    x.dto.IsAvailable,
+                    x.dto.IsCancelled,
+                    x.dto.Token,
+                    x.dto.IsVirtual,
+                    Remaining = x.dto.MaxCapacity.HasValue ? x.dto.MaxCapacity.Value - x.dto.BookedCount : (int?)null,
+                    OccupancyPercent = x.dto.MaxCapacity.HasValue && x.dto.MaxCapacity.Value > 0
+                        ? Math.Round((decimal)x.dto.BookedCount / x.dto.MaxCapacity.Value * 100, 1) : 0
+                })
+                .ToList();
+            return new
+            {
+                Day = day,
+                Date = dayDate,
+                IsPast = dayDate < DateOnly.FromDateTime(DateTime.UtcNow),
+                Tours = (object)dayDates
+            };
+        }).ToList();
+
+        return (true, new
+        {
+            year, month, daysInMonth,
+            firstDayOfWeek = (int)monthStart.DayOfWeek,
+            tours = companyTours,
+            days = dayData
+        }, 200);
     }
 
     private static List<int> ParseDaysOfWeek(string json)
@@ -407,31 +432,6 @@ public class TourScheduleFactory : ITourScheduleFactory
         {
             return new List<int>();
         }
-    }
-
-    private static DateTime CalculateEndDate(DateTime start, int durationValue, int durationUnitId)
-    {
-        return durationUnitId switch
-        {
-            DurationUnits.Ids.Hour => start.AddHours(durationValue),
-            DurationUnits.Ids.Week => start.AddDays(durationValue * 7),
-            DurationUnits.Ids.Month => start.AddMonths(durationValue),
-            _ => start.AddDays(durationValue) // Day (default)
-        };
-    }
-
-    private class MaterializedDateInfo
-    {
-        public int Id { get; set; }
-        public int TourId { get; set; }
-        public DateTime StartDate { get; set; }
-        public DateTime EndDate { get; set; }
-        public decimal? Price { get; set; }
-        public int? MaxCapacity { get; set; }
-        public int BookedCount { get; set; }
-        public bool IsAvailable { get; set; }
-        public int? ScheduleId { get; set; }
-        public bool IsCancelled { get; set; }
     }
 
     private async Task<(string? errorMessage, string? errorCode, int? statusCode)> CheckTourOwnership(int visitorId, int tourId)

@@ -64,8 +64,8 @@
                                 <!-- ko foreach: tours.slice(0, 3) -->
                                 <div class="mb-1" data-bind="click: $parents[1].showTourDatePopover" style="cursor: pointer;">
                                     <span class="badge w-100 text-start" style="font-size: 0.7em; max-width: 100%; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;"
-                                          data-bind="css: $parents[1].getBadgeClass($data), attr: { title: tourName + (startDate ? ' ' + (function(){ var d=new Date(startDate); var h=d.getUTCHours(); var m=d.getUTCMinutes(); return (h||m) ? String(h).padStart(2,'0')+':'+String(m).padStart(2,'0') : ''; })() : '') + ' (' + bookedCount + '/' + (maxCapacity || '∞') + ')' }">
-                                        <span data-bind="text: tourName + (startDate ? (function(){ var d=new Date(startDate); var h=d.getUTCHours(); var m=d.getUTCMinutes(); return (h||m) ? ' '+String(h).padStart(2,'0')+':'+String(m).padStart(2,'0') : ''; })() : '')"></span>
+                                          data-bind="css: $parents[1].getBadgeClass($data), attr: { title: tourName + (startTime ? ' ' + startTime : '') + ' (' + bookedCount + '/' + (maxCapacity || '∞') + ')' }">
+                                        <span data-bind="text: tourName + (startTime ? ' ' + startTime : '')"></span>
                                         <span class="float-end" data-bind="text: bookedCount + '/' + (maxCapacity || '∞')"></span>
                                     </span>
                                 </div>
@@ -95,7 +95,7 @@
                         <!-- ko foreach: tours -->
                         <div class="d-flex justify-content-between align-items-center mb-1" data-bind="click: $parents[2].showTourDatePopover" style="cursor: pointer;">
                             <span class="badge" style="font-size: 0.8em;"
-                                  data-bind="css: $parents[2].getBadgeClass($data), text: tourName + (startDate ? (function(){ var d=new Date(startDate); var h=d.getUTCHours(); var m=d.getUTCMinutes(); return (h||m) ? ' '+String(h).padStart(2,'0')+':'+String(m).padStart(2,'0') : ''; })() : '')"></span>
+                                  data-bind="css: $parents[2].getBadgeClass($data), text: tourName + (startTime ? ' ' + startTime : '')"></span>
                             <small class="text-muted" data-bind="text: bookedCount + '/' + (maxCapacity || '∞')"></small>
                         </div>
                         <!-- /ko -->
@@ -123,16 +123,16 @@
                         <div class="col-6">
                             <div class="card text-center">
                                 <div class="card-body py-2">
-                                    <small class="text-muted" data-t="TourDate.StartDate">Baslangic</small>
-                                    <div class="fw-bold" data-bind="text: (function(){ var d=new Date(selectedDateDetail().startDate); var t=d.toLocaleDateString('tr-TR'); var h=d.getUTCHours(); var m=d.getUTCMinutes(); return (h||m) ? t+' '+String(h).padStart(2,'0')+':'+String(m).padStart(2,'0') : t; })()"></div>
+                                    <small class="text-muted" data-t="Reservation.Date">Tarih</small>
+                                    <div class="fw-bold" data-bind="text: selectedDateDetail().date"></div>
                                 </div>
                             </div>
                         </div>
                         <div class="col-6">
                             <div class="card text-center">
                                 <div class="card-body py-2">
-                                    <small class="text-muted" data-t="TourDate.EndDate">Bitis</small>
-                                    <div class="fw-bold" data-bind="text: (function(){ var d=new Date(selectedDateDetail().endDate); var t=d.toLocaleDateString('tr-TR'); var h=d.getUTCHours(); var m=d.getUTCMinutes(); return (h||m) ? t+' '+String(h).padStart(2,'0')+':'+String(m).padStart(2,'0') : t; })()"></div>
+                                    <small class="text-muted" data-t="Reservation.StartTime">Saat</small>
+                                    <div class="fw-bold" data-bind="text: (selectedDateDetail().startTime || '-') + ' (' + selectedDateDetail().durationValue + ' ' + (selectedDateDetail().durationUnit || '') + ')'"></div>
                                 </div>
                             </div>
                         </div>

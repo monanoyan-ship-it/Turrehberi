@@ -12,20 +12,20 @@ public class GuideFactory : IGuideFactory
 {
     private readonly IGuideEntityService _guideService;
     private readonly IVisitorEntityService _visitorService;
-    private readonly ITourDateEntityService _tourDateService;
+    private readonly ITourScheduleEntityService _scheduleService;
     private readonly IFileUploadService _fileUploadService;
     private readonly IUnitOfWork _unitOfWork;
 
     public GuideFactory(
         IGuideEntityService guideService,
         IVisitorEntityService visitorService,
-        ITourDateEntityService tourDateService,
+        ITourScheduleEntityService scheduleService,
         IFileUploadService fileUploadService,
         IUnitOfWork unitOfWork)
     {
         _guideService = guideService;
         _visitorService = visitorService;
-        _tourDateService = tourDateService;
+        _scheduleService = scheduleService;
         _fileUploadService = fileUploadService;
         _unitOfWork = unitOfWork;
     }
@@ -42,7 +42,7 @@ public class GuideFactory : IGuideFactory
                 g.Id, g.FirstName, g.LastName, g.Phone, g.Email, g.PhotoUrl,
                 g.Languages, g.Bio, g.ExperienceYears,
                 g.TotalToursCompleted, g.AverageRating,
-                ActiveAssignments = g.Assignments.Count(a => a.IsActive && a.TourDate.StartDate >= DateTime.UtcNow)
+                ActiveAssignments = g.Assignments.Count(a => a.IsActive)
             })
             .ToListAsync();
 
@@ -59,15 +59,17 @@ public class GuideFactory : IGuideFactory
         if (guide.CompanyId != check.companyId) return (false, new { message = "Error.GuideNotOwnedByCompany" }, 403);
 
         var assignments = guide.Assignments
-            .OrderByDescending(a => a.TourDate.StartDate)
+            .OrderByDescending(a => a.Schedule.ValidFrom)
             .Select(a => new
             {
-                a.Id, a.TourDateId, a.StatusId,
+                a.Id, a.ScheduleId, a.StatusId,
                 StatusName = GuideAssignmentStatuses.GetById(a.StatusId)?.SystemName,
                 StatusCss = GuideAssignmentStatuses.GetById(a.StatusId)?.CssClass,
                 a.Notes,
-                TourName = a.TourDate.Tour.Name,
-                a.TourDate.StartDate, a.TourDate.EndDate
+                TourName = a.Schedule.Tour.Name,
+                StartTime = a.Schedule.StartTime.ToString(@"hh\:mm"),
+                a.Schedule.ValidFrom,
+                a.Schedule.ValidTo
             });
 
         return (true, new
@@ -139,17 +141,18 @@ public class GuideFactory : IGuideFactory
         if (guide == null || !guide.IsActive) return (false, new { message = "Error.GuideNotFound" }, 404);
         if (guide.CompanyId != check.companyId) return (false, new { message = "Error.GuideNotOwnedByCompany" }, 403);
 
-        var tourDate = await _tourDateService.GetByIdAsync(tourDateId);
-        if (tourDate == null || !tourDate.IsActive) return (false, new { message = "Error.TourDateNotFound" }, 404);
+        // tourDateId artik scheduleId olarak kullaniliyor
+        var schedule = await _scheduleService.GetByIdAsync(tourDateId);
+        if (schedule == null || !schedule.IsActive) return (false, new { message = "Error.ScheduleNotFound" }, 404);
 
         var existing = await _guideService.GetAssignmentsByGuideId(guideId)
-            .FirstOrDefaultAsync(a => a.TourDateId == tourDateId);
+            .FirstOrDefaultAsync(a => a.ScheduleId == tourDateId);
         if (existing != null) return (false, new { message = "Error.GuideAlreadyAssigned" }, 400);
 
         var assignment = new TourGuideAssignment
         {
             GuideId = guideId,
-            TourDateId = tourDateId,
+            ScheduleId = tourDateId,
             StatusId = GuideAssignmentStatuses.Ids.Confirmed,
             Notes = notes
         };
@@ -184,18 +187,15 @@ public class GuideFactory : IGuideFactory
         if (guide == null || !guide.IsActive) return (false, new { message = "Error.GuideNotFound" }, 404);
         if (guide.CompanyId != check.companyId) return (false, new { message = "Error.GuideNotOwnedByCompany" }, 403);
 
-        var monthStart = new DateTime(year, month, 1, 0, 0, 0, DateTimeKind.Utc);
-        var monthEnd = monthStart.AddMonths(1);
-
         var assignments = await _guideService.GetAssignmentsByGuideId(guideId)
-            .Where(a => a.TourDate.StartDate >= monthStart && a.TourDate.StartDate < monthEnd)
             .Select(a => new
             {
-                a.Id, a.TourDateId, a.StatusId,
-                TourName = a.TourDate.Tour.Name,
-                a.TourDate.StartDate, a.TourDate.EndDate
+                a.Id, a.ScheduleId, a.StatusId,
+                TourName = a.Schedule.Tour.Name,
+                StartTime = a.Schedule.StartTime.ToString(@"hh\:mm"),
+                a.Schedule.ValidFrom,
+                a.Schedule.ValidTo
             })
-            .OrderBy(a => a.StartDate)
             .ToListAsync();
 
         return (true, new { guideId, year, month, assignments }, 200);
@@ -211,19 +211,13 @@ public class GuideFactory : IGuideFactory
         if (guide.CompanyId != check.companyId) return (false, new { message = "Error.GuideNotOwnedByCompany" }, 403);
 
         var totalAssignments = await _guideService.GetAssignmentsByGuideId(guideId).CountAsync();
-        var completedAssignments = await _guideService.GetAssignmentsByGuideId(guideId)
-            .CountAsync(a => a.TourDate.EndDate < DateTime.UtcNow);
-        var upcomingAssignments = await _guideService.GetAssignmentsByGuideId(guideId)
-            .CountAsync(a => a.TourDate.StartDate >= DateTime.UtcNow);
 
         return (true, new
         {
             guideId,
             guide.TotalToursCompleted,
             guide.AverageRating,
-            totalAssignments,
-            completedAssignments,
-            upcomingAssignments
+            totalAssignments
         }, 200);
     }
 
@@ -239,11 +233,8 @@ public class GuideFactory : IGuideFactory
         if (fileStream == null || fileStream.Length == 0)
             return (false, new { message = "Error.NoFileSelected" }, 400);
 
-        // Eski fotoyu sil
         if (!string.IsNullOrEmpty(guide.PhotoUrl) && guide.PhotoUrl.StartsWith("/uploads/"))
-        {
             await _fileUploadService.DeleteFileAsync(guide.PhotoUrl);
-        }
 
         var result = await _fileUploadService.UploadImageAsync(fileStream, fileName, "guides", 400);
         if (!result.Success)
@@ -266,9 +257,7 @@ public class GuideFactory : IGuideFactory
         if (guide.CompanyId != check.companyId) return (false, new { message = "Error.GuideNotOwnedByCompany" }, 403);
 
         if (!string.IsNullOrEmpty(guide.PhotoUrl) && guide.PhotoUrl.StartsWith("/uploads/"))
-        {
             await _fileUploadService.DeleteFileAsync(guide.PhotoUrl);
-        }
 
         guide.PhotoUrl = null;
         guide.UpdatedAt = DateTime.UtcNow;

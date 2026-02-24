@@ -1,5 +1,3 @@
-using ErkanTatilPlani.Core.Entities;
-
 namespace ErkanTatilPlani.Core.Factories.TourDates;
 
 public interface ITourScheduleFactory
@@ -11,23 +9,33 @@ public interface ITourScheduleFactory
     Task<(bool success, object result, int statusCode)> CancelDateAsync(int visitorId, int tourId, CancelDateRequest request);
 
     /// <summary>
-    /// Schedule'lardan sanal tarih uret + mevcut TourDate'lerle birlestir
+    /// Schedule'lardan sanal tarih uret (reservation count ile doluluk hesabi)
     /// </summary>
     Task<List<VirtualTourDateDto>> GenerateVirtualDatesAsync(int tourId, int year, int month);
 
     /// <summary>
-    /// Token'dan TourDate olustur (lazy materialization)
-    /// Token formatlari: "s:42:2026-03-15" (schedule) veya "d:123" (mevcut TourDate)
+    /// Public: Tur icin onumuzdeki 3 ayin musait tarihlerini getir
     /// </summary>
-    Task<TourDate?> MaterializeDateAsync(string dateToken);
+    Task<IEnumerable<object>> GetTourDatesAsync(int tourId);
+
+    /// <summary>
+    /// Public: En ucuz tarihleri getir
+    /// </summary>
+    Task<IEnumerable<object>> GetCheapestDatesAsync(int tourId, string month);
+
+    /// <summary>
+    /// Firma: Takvim verisini getir
+    /// </summary>
+    Task<(bool success, object result, int statusCode)> GetCalendarDataAsync(int visitorId, int year, int month, int? tourId);
 }
 
 public class VirtualTourDateDto
 {
-    public int Id { get; set; }
     public int TourId { get; set; }
-    public DateTime StartDate { get; set; }
-    public DateTime EndDate { get; set; }
+    public DateOnly Date { get; set; }
+    public TimeSpan StartTime { get; set; }
+    public int DurationValue { get; set; }
+    public int DurationUnitId { get; set; }
     public decimal? Price { get; set; }
     public int? MaxCapacity { get; set; }
     public int BookedCount { get; set; }

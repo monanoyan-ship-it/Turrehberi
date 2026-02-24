@@ -31,8 +31,10 @@ public class ReservationEmailModel
     public string TourName { get; set; } = string.Empty;
     public string CompanyName { get; set; } = string.Empty;
     public string Destination { get; set; } = string.Empty;
-    public DateTime StartDate { get; set; }
-    public DateTime EndDate { get; set; }
+    public DateOnly Date { get; set; }
+    public TimeSpan StartTime { get; set; }
+    public int DurationValue { get; set; }
+    public int DurationUnitId { get; set; }
     public int NumberOfPeople { get; set; }
     public decimal TotalPrice { get; set; }
     public string? Notes { get; set; }

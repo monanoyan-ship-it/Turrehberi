@@ -45,7 +45,7 @@
                             <br>
                             <small class="text-muted" data-bind="text: tour && tour.company ? tour.company.name : ''"></small>
                         </td>
-                        <td data-bind="text: new Date(startDate).toLocaleDateString('tr-TR')"></td>
+                        <td data-bind="text: date + ' ' + (startTime ? startTime.toString().substring(0,5) : '')"></td>
                         <td data-bind="text: numberOfPeople"></td>
                         <td data-bind="text: totalPrice.toLocaleString('tr-TR', {style: 'currency', currency: 'TRY'})"></td>
                         <td>
@@ -114,10 +114,10 @@
                 </div>
                 <hr>
                 <dl class="row">
-                    <dt class="col-sm-3">Tarih Araligi</dt>
+                    <dt class="col-sm-3">Tarih</dt>
                     <dd class="col-sm-9">
-                        <span data-bind="text: new Date(startDate).toLocaleDateString('tr-TR')"></span> -
-                        <span data-bind="text: new Date(endDate).toLocaleDateString('tr-TR')"></span>
+                        <span data-bind="text: date + ' ' + (startTime ? startTime.toString().substring(0,5) : '')"></span>
+                        <small class="text-muted" data-bind="text: '(' + durationValue + ' ' + (durationUnit || '') + ')'"></small>
                     </dd>
                     <dt class="col-sm-3">Kisi Sayisi</dt>
                     <dd class="col-sm-9" data-bind="text: numberOfPeople"></dd>
@@ -211,8 +211,10 @@ function ReservationsViewModel() {
                 id: reservation.id,
                 visitorId: reservation.visitorId,
                 tourId: reservation.tourId,
-                startDate: reservation.startDate,
-                endDate: reservation.endDate,
+                date: reservation.date,
+                startTime: reservation.startTime,
+                durationValue: reservation.durationValue,
+                durationUnitId: reservation.durationUnitId,
                 numberOfPeople: reservation.numberOfPeople,
                 totalPrice: reservation.totalPrice,
                 status: newStatus,

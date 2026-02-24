@@ -2,7 +2,7 @@ namespace ErkanTatilPlani.Core.Entities;
 
 /// <summary>
 /// Takvim sablonu - firma bir schedule tanimlar, sistem tarihleri dinamik uretir.
-/// DB'de sadece rezervasyon yapilan tarihler TourDate olarak olusur (lazy materialization).
+/// Rezervasyon yapildiginda dogrudan Reservation tablosuna yazilir.
 /// </summary>
 public class TourSchedule : BaseEntity
 {
@@ -50,8 +50,6 @@ public class TourSchedule : BaseEntity
     /// </summary>
     public DateTime ValidTo { get; set; }
 
-    /// <summary>
-    /// Bu schedule'dan materialize edilen TourDate'ler
-    /// </summary>
-    public virtual ICollection<TourDate> MaterializedDates { get; set; } = new List<TourDate>();
+    public virtual ICollection<Reservation> Reservations { get; set; } = new List<Reservation>();
+    public virtual ICollection<TourGuideAssignment> GuideAssignments { get; set; } = new List<TourGuideAssignment>();
 }

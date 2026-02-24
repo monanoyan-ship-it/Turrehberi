@@ -13,7 +13,6 @@ public class WeatherAlertFactory : IWeatherAlertFactory
 {
     private readonly IWeatherService _weatherService;
     private readonly ITourEntityService _tourService;
-    private readonly ITourDateEntityService _tourDateService;
     private readonly IReservationEntityService _reservationService;
     private readonly INotificationEntityService _notificationService;
     private readonly IUnitOfWork _unitOfWork;
@@ -21,14 +20,12 @@ public class WeatherAlertFactory : IWeatherAlertFactory
     public WeatherAlertFactory(
         IWeatherService weatherService,
         ITourEntityService tourService,
-        ITourDateEntityService tourDateService,
         IReservationEntityService reservationService,
         INotificationEntityService notificationService,
         IUnitOfWork unitOfWork)
     {
         _weatherService = weatherService;
         _tourService = tourService;
-        _tourDateService = tourDateService;
         _reservationService = reservationService;
         _notificationService = notificationService;
         _unitOfWork = unitOfWork;
@@ -46,25 +43,22 @@ public class WeatherAlertFactory : IWeatherAlertFactory
     public async Task<int> CheckUpcomingToursAndNotifyAsync()
     {
         var tomorrow = DateTime.UtcNow.Date.AddDays(1);
+        var tomorrowDate = DateOnly.FromDateTime(tomorrow);
         var notificationCount = 0;
 
-        // Tum aktif turlarin ID'lerini al
-        var allTourIds = await _tourService.GetActiveTours()
-            .Select(t => t.Id)
+        // Yarin icin onaylanmis rezervasyonlari bul
+        var tomorrowReservations = await _reservationService.GetActiveReservations()
+            .Where(r => r.Date == tomorrowDate &&
+                        r.Status == ReservationStatuses.Ids.Confirmed)
+            .Include(r => r.Tour)
             .ToListAsync();
 
-        if (!allTourIds.Any())
-            return 0;
+        // Turlara gore grupla
+        var tourGroups = tomorrowReservations.GroupBy(r => r.TourId);
 
-        // Yarin olan tur tarihlerini bul
-        var tomorrowDates = await _tourDateService.GetByTourIds(allTourIds)
-            .Where(td => td.StartDate.Date == tomorrow && td.IsActive)
-            .Include(td => td.Tour)
-            .ToListAsync();
-
-        foreach (var tourDate in tomorrowDates)
+        foreach (var group in tourGroups)
         {
-            var tour = tourDate.Tour;
+            var tour = group.First().Tour;
             if (tour == null || !tour.Latitude.HasValue || !tour.Longitude.HasValue)
                 continue;
 
@@ -74,14 +68,6 @@ public class WeatherAlertFactory : IWeatherAlertFactory
             if (forecast == null || !forecast.IsRainy)
                 continue;
 
-            // Bu tur tarihine rezervasyon yapan kisileri bul
-            var reservations = await _reservationService.GetActiveReservations()
-                .Where(r => r.TourId == tour.Id &&
-                           r.StartDate.Date <= tomorrow &&
-                           r.EndDate.Date >= tomorrow &&
-                           r.Status == ReservationStatuses.Ids.Confirmed)
-                .ToListAsync();
-
             var messageParams = JsonSerializer.Serialize(new
             {
                 tourName = tour.Name,
@@ -89,7 +75,7 @@ public class WeatherAlertFactory : IWeatherAlertFactory
                 condition = forecast.Condition
             });
 
-            foreach (var reservation in reservations)
+            foreach (var reservation in group)
             {
                 _notificationService.Add(new Notification
                 {

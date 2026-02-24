@@ -82,19 +82,19 @@
                                         <i class="bi bi-calendar-event text-primary fs-5"></i>
                                     </div>
                                     <div>
-                                        <small class="text-muted d-block" data-t="Reservation.StartDate">Baslangic Tarihi</small>
-                                        <span class="fw-semibold" data-bind="text: (function(){ var d = new Date($data.startDate); var t = d.toLocaleDateString('tr-TR', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' }); var h = d.getUTCHours(); var m = d.getUTCMinutes(); return (h || m) ? t + ' ' + String(h).padStart(2,'0') + ':' + String(m).padStart(2,'0') : t; })()"></span>
+                                        <small class="text-muted d-block" data-t="Reservation.Date">Tarih</small>
+                                        <span class="fw-semibold" data-bind="text: $data.date"></span>
                                     </div>
                                 </div>
                             </div>
                             <div class="col-sm-6">
                                 <div class="d-flex align-items-center">
                                     <div class="bg-primary bg-opacity-10 rounded p-2 me-3">
-                                        <i class="bi bi-calendar-check text-primary fs-5"></i>
+                                        <i class="bi bi-clock text-primary fs-5"></i>
                                     </div>
                                     <div>
-                                        <small class="text-muted d-block" data-t="Reservation.EndDate">Bitis Tarihi</small>
-                                        <span class="fw-semibold" data-bind="text: (function(){ var d = new Date($data.endDate); var t = d.toLocaleDateString('tr-TR', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' }); var h = d.getUTCHours(); var m = d.getUTCMinutes(); return (h || m) ? t + ' ' + String(h).padStart(2,'0') + ':' + String(m).padStart(2,'0') : t; })()"></span>
+                                        <small class="text-muted d-block" data-t="Reservation.StartTime">Saat</small>
+                                        <span class="fw-semibold" data-bind="text: ($data.startTime || '-') + ' (' + $data.durationValue + ' ' + ($data.durationUnit || '') + ')'"></span>
                                     </div>
                                 </div>
                             </div>

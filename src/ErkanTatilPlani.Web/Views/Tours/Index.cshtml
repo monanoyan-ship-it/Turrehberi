@@ -478,14 +478,14 @@
                     </div>
                     <div class="row g-2" data-bind="visible: !$parent.isLoadingDates(), foreach: $parent.tourDates">
                         <div class="col-md-4 col-sm-6">
-                            <div class="card h-100" style="cursor: pointer;" data-bind="click: function() { if (isAvailable) $parent.selectTourDate($data); }, css: { 'border-success': isAvailable && $parent.selectedDateToken() !== (token || 'd:' + id), 'border-primary border-2': $parent.selectedDateToken() === (token || 'd:' + id), 'border-secondary opacity-50': !isAvailable }">
+                            <div class="card h-100" style="cursor: pointer;" data-bind="click: function() { if (isAvailable) $root.selectTourDate($data); }, css: { 'border-success': isAvailable && $root.selectedDateToken() !== (token || 'd:' + id), 'border-primary border-2': $root.selectedDateToken() === (token || 'd:' + id), 'border-secondary opacity-50': !isAvailable }">
                                 <div class="card-body p-2">
                                     <div class="d-flex justify-content-between align-items-center mb-1">
-                                        <small class="fw-semibold" data-bind="text: $parent.formatDateWithTime(startDate) + ' - ' + $parent.formatDateWithTime(endDate)"></small>
-                                        <!-- ko if: $parent.selectedDateToken() === (token || 'd:' + id) -->
+                                        <small class="fw-semibold" data-bind="text: $root.formatDate(date + 'T00:00:00Z') + ' ' + $root.formatSessionDuration($data)"></small>
+                                        <!-- ko if: $root.selectedDateToken() === (token || 'd:' + id) -->
                                         <span class="badge bg-primary"><i class="bi bi-check-circle-fill me-1"></i>Secili</span>
                                         <!-- /ko -->
-                                        <!-- ko ifnot: $parent.selectedDateToken() === (token || 'd:' + id) -->
+                                        <!-- ko ifnot: $root.selectedDateToken() === (token || 'd:' + id) -->
                                         <span class="badge" data-bind="css: isAvailable ? 'bg-success' : 'bg-secondary', text: isAvailable ? (T('TourDate.Available') || 'Musait') : (T('TourDate.NotAvailable') || 'Dolu')"></span>
                                         <!-- /ko -->
                                     </div>
@@ -887,23 +887,64 @@
                                     <p class="mb-0"><strong data-bind="text: price.toLocaleString('tr-TR', {style: 'currency', currency: 'TRY'})"></strong> / kisi</p>
                                 </div>
                             </div>
-                            <!-- Secili Seans Bilgisi -->
-                            <!-- ko if: selectedTourDateObj() -->
-                            <div class="alert alert-primary py-2 mb-3">
-                                <i class="bi bi-calendar-check me-1"></i>
-                                <strong data-bind="text: T('TourDate.SelectedSession') || 'Secili Seans'"></strong>:
-                                <span data-bind="text: formatDateWithTime(selectedTourDateObj().startDate) + ' - ' + formatDateWithTime(selectedTourDateObj().endDate)"></span>
-                                <!-- ko if: selectedTourDateObj().price -->
-                                | <strong data-bind="text: selectedTourDateObj().price.toLocaleString('tr-TR', {style:'currency', currency:'TRY'})"></strong>/kisi
+                            <!-- Adim 1: Tarih Sec -->
+                            <div class="mb-3">
+                                <label class="form-label fw-semibold"><i class="bi bi-calendar3 me-1"></i> 1. <span data-bind="text: T('TourDate.SelectDate') || 'Tarih Secin'"></span> *</label>
+                                <div data-bind="visible: isLoadingDates" class="text-center py-2">
+                                    <div class="spinner-border spinner-border-sm text-primary"></div>
+                                </div>
+                                <div data-bind="visible: !isLoadingDates() && availableDates().length === 0" class="text-muted small py-2">
+                                    <i class="bi bi-calendar-x me-1"></i> <span data-bind="text: T('TourDate.NoDates') || 'Musait tarih bulunamadi'"></span>
+                                </div>
+                                <div data-bind="visible: !isLoadingDates() && availableDates().length > 0" style="max-height: 150px; overflow-y: auto;">
+                                    <div class="d-flex flex-wrap gap-1">
+                                        <!-- ko foreach: availableDates -->
+                                        <button type="button" class="btn btn-sm"
+                                                data-bind="click: $parent.selectReservationDate,
+                                                           css: $parent.selectedReservationDate() === dateKey ? 'btn-primary' : 'btn-outline-secondary',
+                                                           text: $parent.formatDate(dateKey + 'T00:00:00Z')">
+                                        </button>
+                                        <!-- /ko -->
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- Adim 2: Seans Sec -->
+                            <div class="mb-3" data-bind="visible: selectedReservationDate()">
+                                <label class="form-label fw-semibold"><i class="bi bi-clock me-1"></i> 2. <span data-bind="text: T('TourDate.SelectSession') || 'Seans Secin'"></span> *</label>
+                                <!-- ko if: sessionsForDate().length === 0 -->
+                                <div class="text-muted small py-1"><span data-bind="text: T('TourDate.NoSessions') || 'Bu tarihte musait seans yok'"></span></div>
+                                <!-- /ko -->
+                                <div class="list-group list-group-flush">
+                                    <!-- ko foreach: sessionsForDate -->
+                                    <a href="#" class="list-group-item list-group-item-action py-2 px-3"
+                                       data-bind="click: function() { $parent.selectTourDate($data); return false; },
+                                                  css: { 'active': $parent.selectedDateToken() === (token || 'd:' + id) }">
+                                        <div class="d-flex justify-content-between align-items-center">
+                                            <div>
+                                                <i class="bi bi-clock me-1"></i>
+                                                <span class="fw-semibold" data-bind="text: $parent.formatSessionDuration($data)"></span>
+                                            </div>
+                                            <div class="text-end">
+                                                <!-- ko if: price -->
+                                                <span class="fw-bold text-primary" data-bind="text: price.toLocaleString('tr-TR', {style:'currency', currency:'TRY'})"></span>
+                                                <!-- /ko -->
+                                                <small class="text-muted ms-1" data-bind="text: bookedCount + '/' + (maxCapacity || '∞')"></small>
+                                            </div>
+                                        </div>
+                                    </a>
+                                    <!-- /ko -->
+                                </div>
+                                <!-- ko if: selectedTourDateObj() -->
+                                <div class="alert alert-success py-2 mt-2 mb-0">
+                                    <i class="bi bi-check-circle-fill me-1"></i>
+                                    <span data-bind="text: formatDate(selectedTourDateObj().date + 'T00:00:00Z')"></span>
+                                    <strong data-bind="text: formatSessionDuration(selectedTourDateObj())"></strong>
+                                    <!-- ko if: selectedTourDateObj().price -->
+                                    | <span data-bind="text: selectedTourDateObj().price.toLocaleString('tr-TR', {style:'currency', currency:'TRY'})"></span>/kisi
+                                    <!-- /ko -->
+                                </div>
                                 <!-- /ko -->
                             </div>
-                            <!-- /ko -->
-                            <!-- ko ifnot: selectedTourDateObj() -->
-                            <div class="alert alert-warning py-2 mb-3">
-                                <i class="bi bi-exclamation-triangle me-1"></i>
-                                <span data-bind="text: T('TourDate.NoSessionSelected') || 'Lutfen takvimden bir seans secin'"></span>
-                            </div>
-                            <!-- /ko -->
                             <form id="reservationForm">
                                 <div class="mb-3">
                                     <label class="form-label">Adiniz Soyadiniz *</label>
@@ -1408,6 +1449,39 @@ function ToursViewModel() {
     self.selectedTourDateId = ko.observable(null);
     self.selectedTourDateObj = ko.observable(null);
     self.selectedDateToken = ko.observable(null);
+    self.selectedReservationDate = ko.observable(null); // Secilen gun (yyyy-MM-dd)
+
+    // Benzersiz musait tarihler (gun bazinda gruplama)
+    self.availableDates = ko.computed(function() {
+        var dates = self.tourDates();
+        var dateMap = {};
+        dates.forEach(function(d) {
+            var key = d.date; // "2026-03-15" format
+            if (!dateMap[key]) {
+                dateMap[key] = { dateKey: key, count: 0, hasAvailable: false };
+            }
+            dateMap[key].count++;
+            if (d.isAvailable) dateMap[key].hasAvailable = true;
+        });
+        return Object.values(dateMap).filter(function(d) { return d.hasAvailable; }).sort(function(a, b) { return a.dateKey.localeCompare(b.dateKey); });
+    });
+
+    // Secilen gundeki seanslar
+    self.sessionsForDate = ko.computed(function() {
+        var dateKey = self.selectedReservationDate();
+        if (!dateKey) return [];
+        return self.tourDates().filter(function(d) {
+            return d.isAvailable && d.date === dateKey;
+        }).sort(function(a, b) { return (a.startTime || '').localeCompare(b.startTime || ''); });
+    });
+
+    self.selectReservationDate = function(dateObj) {
+        self.selectedReservationDate(dateObj.dateKey);
+        // Tarih degistiginde seans secimini sifirla
+        self.selectedTourDateId(null);
+        self.selectedTourDateObj(null);
+        self.selectedDateToken(null);
+    };
 
     self.selectTourDate = function(tourDate) {
         var tokenOrId = tourDate.token || ('d:' + tourDate.id);
@@ -1422,6 +1496,16 @@ function ToursViewModel() {
         }
     };
 
+    self.formatDate = function(dateStr) {
+        var d = new Date(dateStr);
+        return d.toLocaleDateString('tr-TR', {weekday:'short', day:'numeric', month:'short'});
+    };
+
+    self.formatTime = function(dateStr) {
+        var d = new Date(dateStr);
+        return String(d.getUTCHours()).padStart(2,'0') + ':' + String(d.getUTCMinutes()).padStart(2,'0');
+    };
+
     self.formatDateWithTime = function(dateStr) {
         var d = new Date(dateStr);
         var dateText = d.toLocaleDateString('tr-TR', {day:'numeric', month:'short'});
@@ -1429,6 +1513,27 @@ function ToursViewModel() {
         var minutes = d.getUTCMinutes();
         if (hours === 0 && minutes === 0) return dateText;
         return dateText + ' ' + String(hours).padStart(2,'0') + ':' + String(minutes).padStart(2,'0');
+    };
+
+    self.isHourlyTour = function(session) {
+        return (session.durationUnit || '').toLowerCase() === 'hour';
+    };
+
+    self.formatSessionDuration = function(session) {
+        var time = session.startTime || '00:00';
+        var val = session.durationValue || 1;
+        var unit = (session.durationUnit || 'Day').toLowerCase();
+        if (unit === 'hour') {
+            // Baslangic + sure ile bitis saatini hesapla
+            var parts = time.split(':');
+            var startH = parseInt(parts[0]); var startM = parseInt(parts[1] || '0');
+            var endH = startH + val; var endM = startM;
+            return String(startH).padStart(2,'0') + ':' + String(startM).padStart(2,'0') + ' - ' + String(endH).padStart(2,'0') + ':' + String(endM).padStart(2,'0');
+        }
+        if (unit === 'day') return val + ' ' + (T('Common.Day') || 'gun');
+        if (unit === 'week') return val + ' ' + (T('Common.Week') || 'hafta');
+        if (unit === 'month') return val + ' ' + (T('Common.Month') || 'ay');
+        return val + ' ' + unit;
     };
     self.calendarMonth = ko.observable(new Date().toISOString().substring(0, 7)); // "2026-02"
     self.calendarMonthLabel = ko.computed(function() {
@@ -2096,6 +2201,14 @@ function ToursViewModel() {
         self.selectedTour(tour);
         self.numberOfPeople(1); // Kisi sayisini sifirla
         self.showPaymentStep(false); // Odeme adimini sifirla
+        self.selectedTourDateId(null);
+        self.selectedTourDateObj(null);
+        self.selectedDateToken(null);
+
+        // Tur tarihlerini yukle (modal icin)
+        if (tour && tour.id) {
+            self.loadTourDates(tour.id);
+        }
 
         // Giris yapilmissa kullanici bilgilerini doldur
         if (user) {
@@ -2192,6 +2305,12 @@ function ToursViewModel() {
 
     // Step 1'den Step 2'ye gec (form validasyonu yapip odeme ekranina)
     self.goToPaymentStep = function() {
+        // Tarih secimi zorunlu
+        if (!self.selectedDateToken()) {
+            toastr.warning(T('TourDate.NoSessionSelected') || 'Lutfen bir tarih ve saat secin');
+            return;
+        }
+
         var form = document.getElementById('reservationForm');
         if (!form.checkValidity()) {
             form.reportValidity();
@@ -2237,7 +2356,6 @@ function ToursViewModel() {
 
         var requestData = {
             tourId: tour.id,
-            tourDateId: self.selectedTourDateId() || null,
             dateToken: self.selectedDateToken() || null,
             fullName: data.fullName,
             email: data.email,

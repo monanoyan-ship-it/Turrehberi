@@ -10,7 +10,7 @@ public interface IGuideEntityService
     void Add(Guide guide);
     void Update(Guide guide);
     IQueryable<TourGuideAssignment> GetAssignmentsByGuideId(int guideId);
-    IQueryable<TourGuideAssignment> GetAssignmentsByTourDateId(int tourDateId);
+    IQueryable<TourGuideAssignment> GetAssignmentsByScheduleId(int scheduleId);
     Task<TourGuideAssignment?> GetAssignmentByIdAsync(int id);
     void AddAssignment(TourGuideAssignment assignment);
     void RemoveAssignment(TourGuideAssignment assignment);

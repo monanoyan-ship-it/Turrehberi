@@ -123,7 +123,7 @@ function GuidesViewModel() {
         });
     };
 
-    // Load tour dates for assignment dropdown
+    // Load tour schedules for assignment dropdown
     self.loadTourDates = function() {
         $.ajax({
             url: apiBaseUrl + '/api/tours/my',
@@ -147,13 +147,10 @@ function GuidesViewModel() {
                     var dates = [];
                     results.forEach(function(r) {
                         (r.dates || []).forEach(function(td) {
-                            if (td.isAvailable && new Date(td.startDate) >= new Date()) {
-                                var startDt = new Date(td.startDate);
-                                var dateStr = startDt.toLocaleDateString('tr-TR');
-                                var timeStr = startDt.toLocaleTimeString('tr-TR', {hour:'2-digit', minute:'2-digit'});
+                            if (td.isAvailable) {
                                 dates.push({
-                                    id: td.id,
-                                    label: r.tour.name + ' - ' + dateStr + ' ' + timeStr
+                                    id: td.scheduleId,
+                                    label: r.tour.name + ' - ' + td.date + ' ' + (td.startTime || '')
                                 });
                             }
                         });
@@ -307,7 +304,7 @@ function GuidesViewModel() {
             method: 'POST',
             contentType: 'application/json',
             data: JSON.stringify({
-                tourDateId: self.selectedTourDateId(),
+                scheduleId: self.selectedTourDateId(),
                 notes: self.assignNotes() || null
             }),
             success: function() {
@@ -417,7 +414,7 @@ function GuidesViewModel() {
             method: 'POST',
             contentType: 'application/json',
             data: JSON.stringify({
-                tourDateId: self.selectedTourDateId(),
+                scheduleId: self.selectedTourDateId(),
                 notes: self.assignNotes() || null
             }),
             success: function() {

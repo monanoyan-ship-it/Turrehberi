@@ -9,18 +9,15 @@ public class CompanyAnalyticsFactory : ICompanyAnalyticsFactory
 {
     private readonly IReservationEntityService _reservationService;
     private readonly ITourEntityService _tourService;
-    private readonly ITourDateEntityService _tourDateService;
     private readonly IVisitorEntityService _visitorService;
 
     public CompanyAnalyticsFactory(
         IReservationEntityService reservationService,
         ITourEntityService tourService,
-        ITourDateEntityService tourDateService,
         IVisitorEntityService visitorService)
     {
         _reservationService = reservationService;
         _tourService = tourService;
-        _tourDateService = tourDateService;
         _visitorService = visitorService;
     }
 
@@ -65,18 +62,28 @@ public class CompanyAnalyticsFactory : ICompanyAnalyticsFactory
         var tourIds = await GetCompanyTourIds(check.companyId!.Value);
         var startDate = DateTime.UtcNow.AddMonths(-months + 1);
         startDate = new DateTime(startDate.Year, startDate.Month, 1, 0, 0, 0, DateTimeKind.Utc);
+        var startDateOnly = DateOnly.FromDateTime(startDate);
 
-        var tourDates = await _tourDateService.GetByTourIds(tourIds)
-            .Where(td => td.StartDate >= startDate)
+        // Doluluk icin rezervasyon verilerini kullan
+        var reservations = await _reservationService.GetByTourIds(tourIds)
+            .Where(r => r.IsActive &&
+                        r.Date >= startDateOnly &&
+                        r.Status != ReservationStatuses.Ids.Cancelled)
+            .ToListAsync();
+
+        // Turlarin kapasitelerini al
+        var tours = await _tourService.GetByCompanyId(check.companyId!.Value)
+            .Select(t => new { t.Id, t.MaxCapacity })
             .ToListAsync();
 
         var chartData = Enumerable.Range(0, months).Select(i =>
         {
             var m = startDate.AddMonths(i);
-            var monthDates = tourDates.Where(td =>
-                td.StartDate.Year == m.Year && td.StartDate.Month == m.Month && td.MaxCapacity.HasValue);
-            var totalCapacity = monthDates.Sum(td => td.MaxCapacity!.Value);
-            var totalBooked = monthDates.Sum(td => td.BookedCount);
+            var monthRes = reservations.Where(r =>
+                r.Date.Year == m.Year && r.Date.Month == m.Month);
+            var totalBooked = monthRes.Sum(r => r.NumberOfPeople);
+            // Toplam kapasite: her turun kapasitesi * o aydaki gun sayisi (basit tahmin)
+            var totalCapacity = tours.Sum(t => t.MaxCapacity) * DateTime.DaysInMonth(m.Year, m.Month);
             return new
             {
                 Label = m.ToString("MMM yyyy"),

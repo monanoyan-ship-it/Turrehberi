@@ -414,14 +414,16 @@ public class EmailService : IEmailService
 
     private Dictionary<string, string> GetReservationPlaceholders(ReservationEmailModel model)
     {
+        var durationUnit = ErkanTatilPlani.Core.Enums.DurationUnits.GetById(model.DurationUnitId);
+        var durationText = $"{model.DurationValue} {durationUnit?.SystemName ?? "Day"}";
         return new Dictionary<string, string>
         {
             { "customerName", model.CustomerName },
             { "tourName", model.TourName },
             { "companyName", model.CompanyName },
             { "destination", model.Destination },
-            { "startDate", model.StartDate.ToString("dd.MM.yyyy") },
-            { "endDate", model.EndDate.ToString("dd.MM.yyyy") },
+            { "startDate", $"{model.Date:dd.MM.yyyy} {model.StartTime:hh\\:mm}" },
+            { "endDate", durationText },
             { "numberOfPeople", model.NumberOfPeople.ToString() },
             { "totalPrice", model.TotalPrice.ToString("N2") }
         };

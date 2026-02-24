@@ -231,7 +231,7 @@
                             <thead class="table-light">
                                 <tr>
                                     <th data-t="Tour.Name">Tur</th>
-                                    <th data-t="TourDate.StartDate">Tarih</th>
+                                    <th data-t="Reservation.Date">Tarih</th>
                                     <th data-t="Common.Status">Durum</th>
                                     <th></th>
                                 </tr>
@@ -240,8 +240,8 @@
                                 <tr>
                                     <td data-bind="text: tourName"></td>
                                     <td>
-                                        <small data-bind="text: new Date(startDate).toLocaleDateString('tr-TR')"></small>
-                                        - <small data-bind="text: new Date(endDate).toLocaleDateString('tr-TR')"></small>
+                                        <small data-bind="text: scheduleDays || '-'"></small>
+                                        <small class="text-muted" data-bind="text: startTime ? ' ' + startTime : ''"></small>
                                     </td>
                                     <td><span class="badge" data-bind="css: statusCss || 'bg-secondary', text: statusName || 'Bilinmiyor'"></span></td>
                                     <td>
@@ -347,8 +347,8 @@
                             <thead class="table-light">
                                 <tr>
                                     <th data-t="Tour.Name">Tur</th>
-                                    <th data-t="TourDate.StartDate">Baslangic</th>
-                                    <th data-t="TourDate.EndDate">Bitis</th>
+                                    <th data-t="Reservation.Date">Gunler</th>
+                                    <th data-t="Reservation.StartTime">Saat</th>
                                     <th data-t="Common.Status">Durum</th>
                                     <th></th>
                                 </tr>
@@ -359,12 +359,10 @@
                                         <strong data-bind="text: tourName"></strong>
                                     </td>
                                     <td>
-                                        <span data-bind="text: new Date(startDate).toLocaleDateString('tr-TR')"></span>
-                                        <small class="text-muted" data-bind="text: new Date(startDate).toLocaleTimeString('tr-TR', {hour:'2-digit', minute:'2-digit'})"></small>
+                                        <span data-bind="text: scheduleDays || '-'"></span>
                                     </td>
                                     <td>
-                                        <span data-bind="text: new Date(endDate).toLocaleDateString('tr-TR')"></span>
-                                        <small class="text-muted" data-bind="text: new Date(endDate).toLocaleTimeString('tr-TR', {hour:'2-digit', minute:'2-digit'})"></small>
+                                        <span data-bind="text: startTime || '-'"></span>
                                     </td>
                                     <td>
                                         <span class="badge" data-bind="css: statusCss || 'bg-secondary', text: statusName || 'Bilinmiyor'"></span>

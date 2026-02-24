@@ -86,7 +86,6 @@ public class Tour : BaseEntity
     public virtual ICollection<Reservation> Reservations { get; set; } = new List<Reservation>();
     public virtual ICollection<TourReview> Reviews { get; set; } = new List<TourReview>();
     public virtual ICollection<FavoriteTour> FavoritedBy { get; set; } = new List<FavoriteTour>();
-    public virtual ICollection<TourDate> TourDates { get; set; } = new List<TourDate>();
     public virtual ICollection<TourSchedule> Schedules { get; set; } = new List<TourSchedule>();
     public virtual ICollection<TourWatch> TourWatches { get; set; } = new List<TourWatch>();
     public virtual ICollection<TourPhoto> Photos { get; set; } = new List<TourPhoto>();

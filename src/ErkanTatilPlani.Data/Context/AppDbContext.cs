@@ -39,9 +39,6 @@ public class AppDbContext : DbContext
     // Company Pages
     public DbSet<CompanyPage> CompanyPages => Set<CompanyPage>();
 
-    // Tour Dates (Musaitlik Takvimi)
-    public DbSet<TourDate> TourDates => Set<TourDate>();
-
     // Tour Schedules (Takvim Sablonlari)
     public DbSet<TourSchedule> TourSchedules => Set<TourSchedule>();
 
@@ -122,23 +119,6 @@ public class AppDbContext : DbContext
                   .OnDelete(DeleteBehavior.Cascade);
         });
 
-        modelBuilder.Entity<TourDate>(entity =>
-        {
-            entity.HasKey(e => e.Id);
-            entity.Property(e => e.Price).HasPrecision(18, 2);
-
-            entity.HasOne(e => e.Tour)
-                  .WithMany(t => t.TourDates)
-                  .HasForeignKey(e => e.TourId)
-                  .OnDelete(DeleteBehavior.Cascade);
-
-            entity.HasOne(e => e.Schedule)
-                  .WithMany(s => s.MaterializedDates)
-                  .HasForeignKey(e => e.ScheduleId)
-                  .IsRequired(false)
-                  .OnDelete(DeleteBehavior.SetNull);
-        });
-
         modelBuilder.Entity<Visitor>(entity =>
         {
             entity.HasKey(e => e.Id);
@@ -155,6 +135,7 @@ public class AppDbContext : DbContext
         {
             entity.HasKey(e => e.Id);
             entity.Property(e => e.TotalPrice).HasPrecision(18, 2);
+            entity.Property(e => e.UnitPrice).HasPrecision(18, 2);
             entity.Property(e => e.DiscountAmount).HasPrecision(18, 2);
             entity.Property(e => e.CouponCode).HasMaxLength(50);
             entity.HasOne(e => e.Tour)
@@ -163,6 +144,11 @@ public class AppDbContext : DbContext
             entity.HasOne(e => e.Visitor)
                   .WithMany(v => v.Reservations)
                   .HasForeignKey(e => e.VisitorId);
+            entity.HasOne(e => e.Schedule)
+                  .WithMany(s => s.Reservations)
+                  .HasForeignKey(e => e.ScheduleId)
+                  .IsRequired(false)
+                  .OnDelete(DeleteBehavior.SetNull);
             entity.HasOne(e => e.Promotion)
                   .WithMany()
                   .HasForeignKey(e => e.PromotionId)
@@ -629,17 +615,17 @@ public class AppDbContext : DbContext
             entity.HasKey(e => e.Id);
             entity.Property(e => e.Notes).HasMaxLength(500);
 
-            // Ayni rehber ayni tarihe bir kez atanabilir
-            entity.HasIndex(e => new { e.GuideId, e.TourDateId }).IsUnique();
+            // Ayni rehber ayni schedule'a bir kez atanabilir
+            entity.HasIndex(e => new { e.GuideId, e.ScheduleId }).IsUnique();
 
             entity.HasOne(e => e.Guide)
                   .WithMany(g => g.Assignments)
                   .HasForeignKey(e => e.GuideId)
                   .OnDelete(DeleteBehavior.Cascade);
 
-            entity.HasOne(e => e.TourDate)
-                  .WithMany(td => td.GuideAssignments)
-                  .HasForeignKey(e => e.TourDateId)
+            entity.HasOne(e => e.Schedule)
+                  .WithMany(s => s.GuideAssignments)
+                  .HasForeignKey(e => e.ScheduleId)
                   .OnDelete(DeleteBehavior.Cascade);
         });
 
@@ -830,12 +816,12 @@ public class AppDbContext : DbContext
         // Rezervasyonlar (Visitor ID'leri guncellendi: 8-12 arasi normal ziyaretciler)
         var reservations = new[]
         {
-            new Reservation { Id = 1, TourId = 1, VisitorId = 8, StartDate = new DateTime(2026, 2, 15, 0, 0, 0, DateTimeKind.Utc), EndDate = new DateTime(2026, 2, 15, 0, 0, 0, DateTimeKind.Utc), NumberOfPeople = 2, TotalPrice = 1500, Status = ReservationStatuses.Ids.Confirmed, Notes = "Ogle yemegi dahil", CreatedAt = now, IsActive = true },
-            new Reservation { Id = 2, TourId = 4, VisitorId = 9, StartDate = new DateTime(2026, 3, 10, 0, 0, 0, DateTimeKind.Utc), EndDate = new DateTime(2026, 3, 12, 0, 0, 0, DateTimeKind.Utc), NumberOfPeople = 4, TotalPrice = 4800, Status = ReservationStatuses.Ids.Pending, Notes = "Aile gezisi", CreatedAt = now, IsActive = true },
-            new Reservation { Id = 3, TourId = 10, VisitorId = 10, StartDate = new DateTime(2026, 4, 5, 0, 0, 0, DateTimeKind.Utc), EndDate = new DateTime(2026, 4, 5, 0, 0, 0, DateTimeKind.Utc), NumberOfPeople = 2, TotalPrice = 7000, Status = ReservationStatuses.Ids.Confirmed, Notes = "Balon ucusu sabah erken", CreatedAt = now, IsActive = true },
-            new Reservation { Id = 4, TourId = 13, VisitorId = 11, StartDate = new DateTime(2026, 2, 20, 0, 0, 0, DateTimeKind.Utc), EndDate = new DateTime(2026, 2, 20, 0, 0, 0, DateTimeKind.Utc), NumberOfPeople = 3, TotalPrice = 1350, Status = ReservationStatuses.Ids.Completed, Notes = "", CreatedAt = now, IsActive = true },
-            new Reservation { Id = 5, TourId = 8, VisitorId = 12, StartDate = new DateTime(2026, 5, 1, 0, 0, 0, DateTimeKind.Utc), EndDate = new DateTime(2026, 5, 2, 0, 0, 0, DateTimeKind.Utc), NumberOfPeople = 2, TotalPrice = 2200, Status = ReservationStatuses.Ids.Confirmed, Notes = "Balikadamla dalis isteniyor", CreatedAt = now, IsActive = true },
-            new Reservation { Id = 6, TourId = 14, VisitorId = 8, StartDate = new DateTime(2026, 3, 25, 0, 0, 0, DateTimeKind.Utc), EndDate = new DateTime(2026, 3, 25, 0, 0, 0, DateTimeKind.Utc), NumberOfPeople = 5, TotalPrice = 1750, Status = ReservationStatuses.Ids.Pending, Notes = "Ozel kutlama", CreatedAt = now, IsActive = true }
+            new Reservation { Id = 1, TourId = 1, VisitorId = 8, Date = new DateOnly(2026, 2, 15), StartTime = new TimeSpan(9, 0, 0), DurationValue = 1, DurationUnitId = DurationUnits.Ids.Day, UnitPrice = 750, NumberOfPeople = 2, TotalPrice = 1500, Status = ReservationStatuses.Ids.Confirmed, Notes = "Ogle yemegi dahil", CreatedAt = now, IsActive = true },
+            new Reservation { Id = 2, TourId = 4, VisitorId = 9, Date = new DateOnly(2026, 3, 10), StartTime = new TimeSpan(8, 0, 0), DurationValue = 3, DurationUnitId = DurationUnits.Ids.Day, UnitPrice = 1200, NumberOfPeople = 4, TotalPrice = 4800, Status = ReservationStatuses.Ids.Pending, Notes = "Aile gezisi", CreatedAt = now, IsActive = true },
+            new Reservation { Id = 3, TourId = 10, VisitorId = 10, Date = new DateOnly(2026, 4, 5), StartTime = new TimeSpan(6, 0, 0), DurationValue = 1, DurationUnitId = DurationUnits.Ids.Day, UnitPrice = 3500, NumberOfPeople = 2, TotalPrice = 7000, Status = ReservationStatuses.Ids.Confirmed, Notes = "Balon ucusu sabah erken", CreatedAt = now, IsActive = true },
+            new Reservation { Id = 4, TourId = 13, VisitorId = 11, Date = new DateOnly(2026, 2, 20), StartTime = new TimeSpan(10, 0, 0), DurationValue = 1, DurationUnitId = DurationUnits.Ids.Day, UnitPrice = 450, NumberOfPeople = 3, TotalPrice = 1350, Status = ReservationStatuses.Ids.Completed, Notes = "", CreatedAt = now, IsActive = true },
+            new Reservation { Id = 5, TourId = 8, VisitorId = 12, Date = new DateOnly(2026, 5, 1), StartTime = new TimeSpan(9, 0, 0), DurationValue = 2, DurationUnitId = DurationUnits.Ids.Day, UnitPrice = 1100, NumberOfPeople = 2, TotalPrice = 2200, Status = ReservationStatuses.Ids.Confirmed, Notes = "Balikadamla dalis isteniyor", CreatedAt = now, IsActive = true },
+            new Reservation { Id = 6, TourId = 14, VisitorId = 8, Date = new DateOnly(2026, 3, 25), StartTime = new TimeSpan(14, 0, 0), DurationValue = 1, DurationUnitId = DurationUnits.Ids.Day, UnitPrice = 350, NumberOfPeople = 5, TotalPrice = 1750, Status = ReservationStatuses.Ids.Pending, Notes = "Ozel kutlama", CreatedAt = now, IsActive = true }
         };
         modelBuilder.Entity<Reservation>().HasData(reservations);
 

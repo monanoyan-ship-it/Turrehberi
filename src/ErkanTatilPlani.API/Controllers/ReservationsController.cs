@@ -180,7 +180,7 @@ public class ReservationsController : ControllerBase
             request.NumberOfPeople,
             request.Notes,
             request.Address,
-            request.TourDateId,
+            null,
             request.StartDate,
             customerIp,
             request.CouponCode,
@@ -249,7 +249,6 @@ public class CreateReservationRequest
     public int NumberOfPeople { get; set; } = 1;
     public string? Notes { get; set; }
     public string? Address { get; set; }
-    public int? TourDateId { get; set; }
     public DateTime? StartDate { get; set; }
     public string? CouponCode { get; set; }
     public string? ParticipantInfo { get; set; }

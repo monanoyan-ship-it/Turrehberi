@@ -4,7 +4,6 @@ using ErkanTatilPlani.Core.Enums;
 using ErkanTatilPlani.Core.Factories.Notifications;
 using ErkanTatilPlani.Core.Factories.Promotions;
 using ErkanTatilPlani.Core.Factories.Reservations;
-using ErkanTatilPlani.Core.Factories.TourDates;
 using ErkanTatilPlani.Core.Infrastructure;
 using ErkanTatilPlani.Core.Services;
 using Microsoft.EntityFrameworkCore;
@@ -16,7 +15,7 @@ namespace ErkanTatilPlani.API.Factories.Reservations;
 public class ReservationPaymentFactory : IReservationPaymentFactory
 {
     private readonly ITourEntityService _tourService;
-    private readonly ITourDateEntityService _tourDateService;
+    private readonly ITourScheduleEntityService _scheduleService;
     private readonly IVisitorEntityService _visitorService;
     private readonly IReservationEntityService _reservationService;
     private readonly IUnitOfWork _unitOfWork;
@@ -26,11 +25,10 @@ public class ReservationPaymentFactory : IReservationPaymentFactory
     private readonly IPromotionCalculationFactory _promotionCalculation;
     private readonly IPromotionEntityService _promotionService;
     private readonly INotificationFactory _notificationFactory;
-    private readonly ITourScheduleFactory _scheduleFactory;
 
     public ReservationPaymentFactory(
         ITourEntityService tourService,
-        ITourDateEntityService tourDateService,
+        ITourScheduleEntityService scheduleService,
         IVisitorEntityService visitorService,
         IReservationEntityService reservationService,
         IUnitOfWork unitOfWork,
@@ -39,11 +37,10 @@ public class ReservationPaymentFactory : IReservationPaymentFactory
         IConfiguration configuration,
         IPromotionCalculationFactory promotionCalculation,
         IPromotionEntityService promotionService,
-        INotificationFactory notificationFactory,
-        ITourScheduleFactory scheduleFactory)
+        INotificationFactory notificationFactory)
     {
         _tourService = tourService;
-        _tourDateService = tourDateService;
+        _scheduleService = scheduleService;
         _visitorService = visitorService;
         _reservationService = reservationService;
         _unitOfWork = unitOfWork;
@@ -53,7 +50,6 @@ public class ReservationPaymentFactory : IReservationPaymentFactory
         _promotionCalculation = promotionCalculation;
         _promotionService = promotionService;
         _notificationFactory = notificationFactory;
-        _scheduleFactory = scheduleFactory;
     }
 
     public async Task<(bool success, object result, int statusCode)> CreatePublicReservationAsync(
@@ -115,47 +111,74 @@ public class ReservationPaymentFactory : IReservationPaymentFactory
             }
         }
 
-        // TourDate bazli tarih cozumleme
-        DateTime resolvedStartDate;
-        DateTime endDate;
-        TourDate? selectedTourDate = null;
+        // dateToken'dan schedule ve tarih bilgisi coz
+        DateOnly resolvedDate;
+        TimeSpan resolvedStartTime;
+        int resolvedDurationValue;
+        int resolvedDurationUnitId;
+        decimal resolvedUnitPrice;
+        int? resolvedScheduleId = null;
 
-        // dateToken destegi - lazy materialization
-        if (!string.IsNullOrEmpty(dateToken) && !tourDateId.HasValue)
+        if (!string.IsNullOrEmpty(dateToken) && dateToken.StartsWith("s:"))
         {
-            selectedTourDate = await _scheduleFactory.MaterializeDateAsync(dateToken);
-            if (selectedTourDate != null)
-            {
-                tourDateId = selectedTourDate.Id;
-            }
-        }
+            // "s:42:2026-03-15" formatindan parse et
+            var parts = dateToken.Split(':');
+            if (parts.Length != 3 || !int.TryParse(parts[1], out var scheduleId) || !DateOnly.TryParse(parts[2], out var parsedDate))
+                return (false, new { message = "Error.InvalidDateToken" }, 400);
 
-        if (tourDateId.HasValue)
-        {
-            selectedTourDate ??= await _tourDateService.GetByIdAsync(tourDateId.Value);
-            if (selectedTourDate == null)
-                return (false, new { message = "Error.SelectedSessionNotFound" }, 404);
-            if (selectedTourDate.TourId != tourId)
+            var schedule = await _scheduleService.GetByIdAsync(scheduleId);
+            if (schedule == null || !schedule.IsActive)
+                return (false, new { message = "Error.ScheduleNotFound" }, 404);
+
+            if (schedule.TourId != tourId)
                 return (false, new { message = "Error.SessionNotBelongToTour" }, 400);
-            if (!selectedTourDate.IsAvailable)
-                return (false, new { message = "Error.SessionFull" }, 400);
-            if (selectedTourDate.MaxCapacity.HasValue &&
-                selectedTourDate.BookedCount + numberOfPeople > selectedTourDate.MaxCapacity.Value)
+
+            // Gecerlilik kontrolu
+            var dateAsDateTime = parsedDate.ToDateTime(TimeOnly.MinValue);
+            dateAsDateTime = DateTime.SpecifyKind(dateAsDateTime, DateTimeKind.Utc);
+            if (dateAsDateTime < schedule.ValidFrom.Date || dateAsDateTime > schedule.ValidTo.Date)
+                return (false, new { message = "Error.DateOutOfRange" }, 400);
+
+            // Gun eslesmesi kontrolu
+            var daysOfWeek = ParseDaysOfWeek(schedule.DaysOfWeekJson);
+            if (!daysOfWeek.Contains((int)dateAsDateTime.DayOfWeek))
+                return (false, new { message = "Error.DateNotMatchSchedule" }, 400);
+
+            // Kapasite kontrolu
+            var maxCapacity = schedule.MaxCapacity ?? tour.MaxCapacity;
+            var currentBooked = await _reservationService.GetActiveReservations()
+                .Where(r => r.ScheduleId == scheduleId &&
+                            r.Date == parsedDate &&
+                            r.Status != ReservationStatuses.Ids.Cancelled)
+                .SumAsync(r => r.NumberOfPeople);
+
+            if (maxCapacity > 0 && currentBooked + numberOfPeople > maxCapacity)
                 return (false, new { message = "Error.InsufficientCapacity" }, 400);
 
-            resolvedStartDate = selectedTourDate.StartDate;
-            endDate = selectedTourDate.EndDate;
+            resolvedDate = parsedDate;
+            resolvedStartTime = schedule.StartTime;
+            resolvedDurationValue = schedule.DurationValue;
+            resolvedDurationUnitId = schedule.DurationUnitId;
+            resolvedUnitPrice = schedule.Price ?? tour.Price;
+            resolvedScheduleId = scheduleId;
         }
         else
         {
             // Legacy fallback
-            resolvedStartDate = startDate ?? DateTime.UtcNow.AddDays(7);
-            endDate = resolvedStartDate.AddDays(tour.DurationDays);
+            var fallbackDate = startDate ?? DateTime.UtcNow.AddDays(7);
+            resolvedDate = DateOnly.FromDateTime(fallbackDate);
+            resolvedStartTime = new TimeSpan(9, 0, 0);
+            resolvedDurationValue = tour.DurationDays;
+            resolvedDurationUnitId = DurationUnits.Ids.Day;
+            resolvedUnitPrice = tour.Price;
         }
 
         // Promosyon destekli fiyat hesaplama
+        var resolvedStartDateTime = resolvedDate.ToDateTime(TimeOnly.FromTimeSpan(resolvedStartTime));
+        resolvedStartDateTime = DateTime.SpecifyKind(resolvedStartDateTime, DateTimeKind.Utc);
+
         var priceResult = await _promotionCalculation.CalculatePriceAsync(
-            tourId, numberOfPeople, resolvedStartDate, couponCode, visitorId);
+            tourId, numberOfPeople, resolvedStartDateTime, couponCode, visitorId);
 
         var totalPrice = priceResult.FinalPrice;
         var depositAmount = priceResult.DepositAmount;
@@ -166,9 +189,12 @@ public class ReservationPaymentFactory : IReservationPaymentFactory
         {
             TourId = tourId,
             VisitorId = visitorId!.Value,
-            TourDateId = tourDateId,
-            StartDate = resolvedStartDate,
-            EndDate = endDate,
+            Date = resolvedDate,
+            StartTime = resolvedStartTime,
+            DurationValue = resolvedDurationValue,
+            DurationUnitId = resolvedDurationUnitId,
+            UnitPrice = resolvedUnitPrice,
+            ScheduleId = resolvedScheduleId,
             NumberOfPeople = numberOfPeople,
             TotalPrice = totalPrice,
             DepositAmount = depositAmount,
@@ -185,18 +211,6 @@ public class ReservationPaymentFactory : IReservationPaymentFactory
             PaymentStatus = PaymentStatuses.Ids.Pending,
             Notes = notes ?? ""
         };
-
-        // TourDate BookedCount guncelle
-        if (selectedTourDate != null)
-        {
-            selectedTourDate.BookedCount += numberOfPeople;
-            if (selectedTourDate.MaxCapacity.HasValue &&
-                selectedTourDate.BookedCount >= selectedTourDate.MaxCapacity.Value)
-            {
-                selectedTourDate.IsAvailable = false;
-            }
-            selectedTourDate.UpdatedAt = DateTime.UtcNow;
-        }
 
         _reservationService.Add(reservation);
         await _unitOfWork.SaveChangesAsync();
@@ -301,51 +315,33 @@ public class ReservationPaymentFactory : IReservationPaymentFactory
 
         Reservation? reservation = null;
 
-        // 1. Oncelikle ConversationId'den gelen reservationId'yi dene
         if (paymentResult.ReservationId > 0)
-        {
             reservation = await _reservationService.GetByIdWithDetailsAsync(paymentResult.ReservationId);
-        }
 
-        // 2. ConversationId'den bulunamadiysa PaymentToken ile ara
         if (reservation == null)
-        {
             reservation = await _reservationService.GetByPaymentTokenAsync(token);
-        }
 
-        // 3. Son cari - form'dan gelen reservationId ile ara
         if (reservation == null && reservationId.HasValue && reservationId.Value > 0)
-        {
             reservation = await _reservationService.GetByIdWithDetailsAsync(reservationId.Value);
-        }
 
         if (reservation == null)
             return (false, new { message = "Error.ReservationNotFound", token = token.Substring(0, Math.Min(20, token.Length)) }, 404);
 
         if (paymentResult.Success)
         {
-            // Odeme basarili - odenen tutari guncelle
             reservation.PaidAmount += paymentResult.PaidAmount ?? 0;
             reservation.PaymentId = paymentResult.PaymentId;
             reservation.PaidAt = DateTime.UtcNow;
             reservation.Status = ReservationStatuses.Ids.Confirmed;
-
-            // QR token olustur
             reservation.QrToken = Guid.NewGuid().ToString("N");
 
-            // Tam odeme mi on odeme mi kontrol et
             if (reservation.PaidAmount >= reservation.TotalPrice)
-            {
                 reservation.PaymentStatus = PaymentStatuses.Ids.FullyPaid;
-            }
             else
-            {
                 reservation.PaymentStatus = PaymentStatuses.Ids.DepositPaid;
-            }
 
             await _unitOfWork.SaveChangesAsync();
 
-            // Rezervasyon onay bildirimi
             try
             {
                 await _notificationFactory.CreateReservationNotificationAsync(
@@ -356,7 +352,6 @@ public class ReservationPaymentFactory : IReservationPaymentFactory
                 Console.WriteLine($"Bildirim hatasi: {ex.Message}");
             }
 
-            // Kitlik bildirimi - kalan yer kontrolu
             try
             {
                 var activeCount = await _reservationService.GetActiveReservations()
@@ -365,16 +360,13 @@ public class ReservationPaymentFactory : IReservationPaymentFactory
                 var tour = reservation.Tour;
                 var remaining = tour.MaxCapacity - activeCount;
                 if (remaining > 0 && remaining <= 5)
-                {
                     await _notificationFactory.CreateScarcityNotificationsAsync(tour.Id, remaining);
-                }
             }
             catch (Exception ex)
             {
                 Console.WriteLine($"Kitlik bildirimi hatasi: {ex.Message}");
             }
 
-            // Onay emaili gonder
             try
             {
                 var emailModel = new ReservationEmailModel
@@ -384,8 +376,10 @@ public class ReservationPaymentFactory : IReservationPaymentFactory
                     TourName = reservation.Tour.Name,
                     CompanyName = reservation.Tour.Company.Name,
                     Destination = reservation.Tour.Destination,
-                    StartDate = reservation.StartDate,
-                    EndDate = reservation.EndDate,
+                    Date = reservation.Date,
+                    StartTime = reservation.StartTime,
+                    DurationValue = reservation.DurationValue,
+                    DurationUnitId = reservation.DurationUnitId,
                     NumberOfPeople = reservation.NumberOfPeople,
                     TotalPrice = reservation.TotalPrice,
                     Notes = reservation.Notes,
@@ -395,7 +389,6 @@ public class ReservationPaymentFactory : IReservationPaymentFactory
             }
             catch (Exception ex)
             {
-                // Email hatasi rezervasyonu etkilemesin
                 Console.WriteLine($"Email gonderme hatasi: {ex.Message}");
             }
 
@@ -410,7 +403,6 @@ public class ReservationPaymentFactory : IReservationPaymentFactory
         }
         else
         {
-            // Odeme basarisiz
             reservation.PaymentStatus = PaymentStatuses.Ids.Failed;
             await _unitOfWork.SaveChangesAsync();
 
@@ -441,5 +433,11 @@ public class ReservationPaymentFactory : IReservationPaymentFactory
             paidAt = reservation.PaidAt,
             tourName = reservation.Tour.Name
         };
+    }
+
+    private static List<int> ParseDaysOfWeek(string json)
+    {
+        try { return JsonSerializer.Deserialize<List<int>>(json) ?? new List<int>(); }
+        catch { return new List<int>(); }
     }
 }

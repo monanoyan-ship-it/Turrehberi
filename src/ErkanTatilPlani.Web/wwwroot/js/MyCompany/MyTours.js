@@ -34,26 +34,11 @@ function MyToursViewModel() {
     // Delete
     self.deletingTour = ko.observable(null);
 
-    // Date management
+    // Date management (virtual dates from schedules)
     self.managingTourId = ko.observable(null);
     self.managingTourName = ko.observable('');
     self.managedDates = ko.observableArray([]);
     self.isLoadingDates = ko.observable(false);
-    self.isSavingDate = ko.observable(false);
-    self.dateFormData = ko.observable({
-        startDate: '',
-        endDate: '',
-        price: '',
-        maxCapacity: ''
-    });
-
-    // Batch date
-    self.isSavingBatch = ko.observable(false);
-    self.batchPeriodStart = ko.observable('');
-    self.batchPeriodEnd = ko.observable('');
-    self.batchPrice = ko.observable('');
-    self.batchMaxCapacity = ko.observable('');
-    self.batchSelectedDays = ko.observableArray([]);
     // DurationUnits TypeDefinition (SystemName degerlerini kullanir)
     self.getDurationUnits = function() {
         return [
@@ -64,13 +49,6 @@ function MyToursViewModel() {
         ];
     };
     self.durationUnits = ko.observableArray(self.getDurationUnits());
-    self.batchTimeSlots = ko.observableArray([
-        { startTime: ko.observable('09:00'), durationValue: ko.observable(1), durationUnit: ko.observable('Day') }
-    ]);
-    self.batchPreview = ko.observableArray([]);
-    self.batchPreviewTotal = ko.observable(0);
-    self.batchPreviewDayCount = ko.observable(0);
-    self.batchPreviewMore = ko.observable(0);
     self.getWeekDays = function() {
         return [
             { value: 1, label: T('WeekDay.Mon') },
@@ -83,22 +61,6 @@ function MyToursViewModel() {
         ];
     };
     self.weekDays = ko.observableArray(self.getWeekDays());
-
-    self.addTimeSlot = function() {
-        self.batchTimeSlots.push({
-            startTime: ko.observable('09:00'),
-            durationValue: ko.observable(1),
-            durationUnit: ko.observable('Day')
-        });
-    };
-
-    self.removeTimeSlot = function(slot) {
-        if (self.batchTimeSlots().length <= 1) {
-            toastr.warning(T('TourDate.MinOneSlot'));
-            return;
-        }
-        self.batchTimeSlots.remove(slot);
-    };
 
     // ===============================================
     // SCHEDULE (TAKVIM SABLONU) YONETIMI
@@ -516,212 +478,25 @@ function MyToursViewModel() {
     self.openDateManageModal = function(tour) {
         self.managingTourId(tour.id);
         self.managingTourName(tour.name);
-        self.dateFormData({ startDate: '', endDate: '', price: '', maxCapacity: '' });
         self.resetScheduleForm();
         self.loadManagedDates(tour.id);
         self.loadSchedules(tour.id);
         dateManageModal.show();
     };
 
-    // Yonetim tarihlerini yukle
+    // Sanal tarihleri yukle (schedule'lardan uretilir)
     self.loadManagedDates = function(tourId) {
         self.isLoadingDates(true);
         $.ajax({
-            url: apiBaseUrl + '/api/tours/' + tourId + '/dates/manage',
+            url: apiBaseUrl + '/api/tours/' + tourId + '/dates',
             method: 'GET',
             success: function(data) {
-                self.managedDates(data);
+                self.managedDates(data || []);
                 self.isLoadingDates(false);
             },
             error: function() {
                 self.managedDates([]);
                 self.isLoadingDates(false);
-            }
-        });
-    };
-
-    // Yeni tarih kaydet
-    self.saveTourDate = function() {
-        var data = self.dateFormData();
-        if (!data.startDate || !data.endDate) {
-            toastr.warning(T('Common.Required'));
-            return;
-        }
-        self.isSavingDate(true);
-        $.ajax({
-            url: apiBaseUrl + '/api/tours/' + self.managingTourId() + '/dates',
-            method: 'POST',
-            contentType: 'application/json',
-            data: JSON.stringify({
-                startDate: data.startDate,
-                endDate: data.endDate,
-                price: data.price ? parseFloat(data.price) : null,
-                maxCapacity: data.maxCapacity ? parseInt(data.maxCapacity) : null,
-                isAvailable: true
-            }),
-            success: function() {
-                toastr.success(T('TourDate.AddDate'));
-                self.dateFormData({ startDate: '', endDate: '', price: '', maxCapacity: '' });
-                self.loadManagedDates(self.managingTourId());
-                self.isSavingDate(false);
-            },
-            error: function(xhr) {
-                toastr.error(T(xhr.responseJSON?.message) || T('Common.Error'));
-                self.isSavingDate(false);
-            }
-        });
-    };
-
-    // Tarih sil
-    self.deleteTourDate = function(dateItem) {
-        $.ajax({
-            url: apiBaseUrl + '/api/tour-dates/' + dateItem.id,
-            method: 'DELETE',
-            success: function() {
-                toastr.success(T('Common.Delete'));
-                self.loadManagedDates(self.managingTourId());
-            },
-            error: function(xhr) {
-                toastr.error(T(xhr.responseJSON?.message) || T('Common.Error'));
-            }
-        });
-    };
-
-    // ===============================================
-    // TOPLU TARIH OLUSTURMA
-    // ===============================================
-
-    self.previewBatchDates = function() {
-        var periodStart = self.batchPeriodStart();
-        var periodEnd = self.batchPeriodEnd();
-        if (!periodStart || !periodEnd) {
-            toastr.warning(T('Common.Required'));
-            return;
-        }
-
-        var start = new Date(periodStart);
-        var end = new Date(periodEnd);
-        if (start >= end) {
-            toastr.warning(T('TourDate.EndAfterStart'));
-            return;
-        }
-
-        var selectedDays = self.batchSelectedDays().map(function(d) { return parseInt(d); });
-        var slots = self.batchTimeSlots();
-        var dayNames = [T('WeekDay.Sun'), T('WeekDay.Mon'), T('WeekDay.Tue'), T('WeekDay.Wed'), T('WeekDay.Thu'), T('WeekDay.Fri'), T('WeekDay.Sat')];
-        var grouped = {};
-        var totalCount = 0;
-        var current = new Date(start);
-
-        function calculateEndTime(startTime, durationValue, durationUnit) {
-            var parts = startTime.split(':');
-            var h = parseInt(parts[0]); var m = parseInt(parts[1] || '0');
-            var totalMinutes = h * 60 + m;
-            switch (durationUnit) {
-                case 'Hour': totalMinutes += durationValue * 60; break;
-                case 'Day': totalMinutes += durationValue * 24 * 60; break;
-                case 'Week': totalMinutes += durationValue * 7 * 24 * 60; break;
-                case 'Month': totalMinutes += durationValue * 30 * 24 * 60; break;
-                default: totalMinutes += durationValue * 24 * 60;
-            }
-            var endH = Math.floor(totalMinutes / 60) % 24;
-            var endM = totalMinutes % 60;
-            return (endH < 10 ? '0' : '') + endH + ':' + (endM < 10 ? '0' : '') + endM;
-        }
-
-        while (current <= end) {
-            var dayMatch = selectedDays.length === 0 || selectedDays.indexOf(current.getDay()) !== -1;
-            if (dayMatch) {
-                var dayKey = current.toLocaleDateString('tr-TR');
-                var dayLabel = current.getDate() + ' ' + current.toLocaleDateString('tr-TR', { month: 'short' }) + ' ' + dayNames[current.getDay()];
-                var slotList = [];
-                for (var i = 0; i < slots.length; i++) {
-                    var st = slots[i].startTime();
-                    var dv = parseInt(slots[i].durationValue()) || 1;
-                    var du = slots[i].durationUnit();
-                    var et = calculateEndTime(st, dv, du);
-                    slotList.push({ start: st, end: et });
-                    totalCount++;
-                }
-                grouped[dayKey] = { label: dayLabel, slotList: slotList, dayOfWeek: current.getDay() };
-            }
-            if (selectedDays.length === 0) {
-                current.setDate(current.getDate() + 7);
-            } else {
-                current.setDate(current.getDate() + 1);
-            }
-        }
-
-        var previewItems = [];
-        var keys = Object.keys(grouped);
-        var displayKeys = keys.slice(0, 30);
-        for (var k = 0; k < displayKeys.length; k++) {
-            var g = grouped[displayKeys[k]];
-            previewItems.push({ dayLabel: g.label, slots: g.slotList, dayOfWeek: g.dayOfWeek });
-        }
-
-        self.batchPreviewTotal(totalCount);
-        self.batchPreviewDayCount(keys.length);
-        self.batchPreviewMore(keys.length > 30 ? keys.length - 30 : 0);
-        self.batchPreview(previewItems);
-    };
-
-    self.createBatchDates = function() {
-        var periodStart = self.batchPeriodStart();
-        var periodEnd = self.batchPeriodEnd();
-        if (!periodStart || !periodEnd) {
-            toastr.warning(T('Common.Required'));
-            return;
-        }
-
-        self.isSavingBatch(true);
-
-        var timeSlotsData = self.batchTimeSlots().map(function(slot) {
-            return {
-                startTime: slot.startTime(),
-                durationValue: parseInt(slot.durationValue()) || 1,
-                durationUnit: slot.durationUnit()
-            };
-        });
-
-        var requestData = {
-            periodStartDate: periodStart,
-            periodEndDate: periodEnd,
-            timeSlots: timeSlotsData,
-            price: self.batchPrice() ? parseFloat(self.batchPrice()) : null,
-            maxCapacity: self.batchMaxCapacity() ? parseInt(self.batchMaxCapacity()) : null
-        };
-
-        var selectedDays = self.batchSelectedDays().map(function(d) { return parseInt(d); });
-        if (selectedDays.length > 0) {
-            requestData.daysOfWeek = selectedDays;
-        } else {
-            requestData.repeatEveryDays = 7;
-        }
-
-        $.ajax({
-            url: apiBaseUrl + '/api/tours/' + self.managingTourId() + '/dates/batch',
-            method: 'POST',
-            contentType: 'application/json',
-            data: JSON.stringify(requestData),
-            success: function(response) {
-                toastr.success(T(response.message) || T('TourDate.BatchSuccess'));
-                self.batchPeriodStart('');
-                self.batchPeriodEnd('');
-                self.batchPrice('');
-                self.batchMaxCapacity('');
-                self.batchSelectedDays([]);
-                self.batchTimeSlots([{ startTime: ko.observable('09:00'), durationValue: ko.observable(1), durationUnit: ko.observable('Day') }]);
-                self.batchPreview([]);
-                self.batchPreviewTotal(0);
-                self.batchPreviewDayCount(0);
-                self.batchPreviewMore(0);
-                self.loadManagedDates(self.managingTourId());
-                self.isSavingBatch(false);
-            },
-            error: function(xhr) {
-                toastr.error(T(xhr.responseJSON?.message) || T('Common.Error'));
-                self.isSavingBatch(false);
             }
         });
     };

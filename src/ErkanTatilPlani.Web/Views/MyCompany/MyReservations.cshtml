@@ -111,7 +111,7 @@
                             <tr>
                                 <th data-t="Tour.Name">Tur</th>
                                 <th data-t="MyReservations.Customer">Musteri</th>
-                                <th data-t="Reservation.StartDate">Tarih</th>
+                                <th data-t="Reservation.Date">Tarih</th>
                                 <th class="text-center" data-t="Reservation.People">Kisi</th>
                                 <th class="text-end" data-t="Reservation.TotalPrice">Tutar</th>
                                 <th class="text-center" data-t="Reservation.Status">Durum</th>
@@ -129,8 +129,8 @@
                                     <small class="text-muted" data-bind="text: visitorEmail"></small>
                                 </td>
                                 <td>
-                                    <div data-bind="text: $parent.formatDate(startDate)"></div>
-                                    <small class="text-muted" data-bind="text: '- ' + $parent.formatDate(endDate)"></small>
+                                    <div data-bind="text: date"></div>
+                                    <small class="text-muted" data-bind="text: (startTime || '') + (durationValue ? ' (' + durationValue + ' ' + (durationUnit || '') + ')' : '')"></small>
                                 </td>
                                 <td class="text-center">
                                     <span class="badge bg-secondary" data-bind="text: numberOfPeople"></span>
@@ -200,12 +200,12 @@
                     <hr>
                     <div class="row mb-3">
                         <div class="col-6">
-                            <label class="form-label text-muted small" data-t="Reservation.StartDate">Baslangic</label>
-                            <div data-bind="text: $parent.formatDate(startDate)"></div>
+                            <label class="form-label text-muted small" data-t="Reservation.Date">Tarih</label>
+                            <div data-bind="text: date"></div>
                         </div>
                         <div class="col-6">
-                            <label class="form-label text-muted small" data-t="Reservation.EndDate">Bitis</label>
-                            <div data-bind="text: $parent.formatDate(endDate)"></div>
+                            <label class="form-label text-muted small" data-t="Reservation.StartTime">Saat</label>
+                            <div data-bind="text: (startTime || '-') + (durationValue ? ' (' + durationValue + ' ' + (durationUnit || '') + ')' : '')"></div>
                         </div>
                     </div>
                     <div class="row mb-3">
