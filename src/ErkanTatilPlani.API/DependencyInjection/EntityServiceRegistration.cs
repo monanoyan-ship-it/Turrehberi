@@ -32,6 +32,9 @@ public static class EntityServiceRegistration
         services.AddScoped<IReferralEntityService, ReferralEntityService>();
         services.AddScoped<IScheduledEmailEntityService, ScheduledEmailEntityService>();
         services.AddScoped<IAbandonedCartEntityService, AbandonedCartEntityService>();
+        services.AddScoped<ITravelerFollowEntityService, TravelerFollowEntityService>();
+        services.AddScoped<ITripStoryEntityService, TripStoryEntityService>();
+        services.AddScoped<ITripStoryPhotoEntityService, TripStoryPhotoEntityService>();
         return services;
     }
 }

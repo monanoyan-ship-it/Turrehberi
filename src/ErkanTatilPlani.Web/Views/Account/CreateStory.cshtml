@@ -1,0 +1,127 @@
+@{
+    ViewData["Title"] = "Hikaye Paylas";
+}
+
+<div class="container py-4" id="createStoryApp">
+    <!-- Loading State -->
+    <div data-bind="visible: isLoading" class="text-center py-5">
+        <div class="spinner-border text-primary" role="status">
+            <span class="visually-hidden">Yukleniyor...</span>
+        </div>
+    </div>
+
+    <!-- Not Logged In -->
+    <div data-bind="visible: !isLoading() && !isLoggedIn()" class="text-center py-5">
+        <i class="bi bi-person-x text-muted" style="font-size: 4rem;"></i>
+        <h4 class="mt-3" data-t="Profile.LoginRequired">Giris yapmaniz gerekiyor</h4>
+        <a href="/Account/Login" class="btn btn-primary mt-3">
+            <i class="bi bi-box-arrow-in-right me-1"></i>
+            <span data-t="Menu.Login">Giris Yap</span>
+        </a>
+    </div>
+
+    <!-- Create Story Form -->
+    <div data-bind="visible: !isLoading() && isLoggedIn()">
+        <div class="row">
+            <div class="col-lg-8 mx-auto">
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <h3>
+                        <i class="bi bi-pencil-square me-2"></i>
+                        <span data-t="TripStory.Create">Hikaye Paylas</span>
+                    </h3>
+                    <a href="/Account/TravelerClub" class="btn btn-outline-secondary btn-sm">
+                        <i class="bi bi-arrow-left me-1"></i>
+                        <span data-t="Common.Back">Geri</span>
+                    </a>
+                </div>
+
+                <div class="card shadow-sm border-0">
+                    <div class="card-body p-4">
+                        <!-- Title -->
+                        <div class="mb-3">
+                            <label class="form-label" data-t="TripStory.Title">Baslik</label>
+                            <input type="text" class="form-control" data-bind="value: title" maxlength="200"
+                                   data-t-placeholder="TripStory.TitlePlaceholder" placeholder="Gezi hikayenizin basligi" />
+                        </div>
+
+                        <!-- Content -->
+                        <div class="mb-3">
+                            <label class="form-label" data-t="TripStory.Content">Icerik</label>
+                            <textarea class="form-control" rows="8" data-bind="value: content, event: { input: updateCharCount }" maxlength="5000"
+                                      data-t-placeholder="TripStory.ContentPlaceholder" placeholder="Gezi deneyiminizi paylasın..."></textarea>
+                            <small class="text-muted">
+                                <span data-bind="text: charCount()"></span>/5000
+                            </small>
+                        </div>
+
+                        <!-- Tour Selection -->
+                        <div class="mb-3">
+                            <label class="form-label" data-t="TripStory.SelectTour">Tur Secimi (Opsiyonel)</label>
+                            <select class="form-select" data-bind="value: selectedTourId, options: completedTours, optionsText: 'name', optionsValue: 'id', optionsCaption: '-- Tur secin --'"></select>
+                        </div>
+
+                        <div class="row">
+                            <!-- Destination -->
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label" data-t="TripStory.Destination">Destinasyon</label>
+                                <input type="text" class="form-control" data-bind="value: destination" maxlength="200"
+                                       data-t-placeholder="TripStory.DestinationPlaceholder" placeholder="Ornek: Kapadokya" />
+                            </div>
+
+                            <!-- Travel Date -->
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label" data-t="TripStory.TravelDate">Seyahat Tarihi</label>
+                                <input type="date" class="form-control" data-bind="value: travelDate" />
+                            </div>
+                        </div>
+
+                        <!-- Rating -->
+                        <div class="mb-3">
+                            <label class="form-label" data-t="TripStory.Rating">Genel Puan</label>
+                            <div class="d-flex gap-1">
+                                <!-- ko foreach: [1, 2, 3, 4, 5] -->
+                                <button type="button" class="btn btn-sm"
+                                        data-bind="click: function() { $root.setRating($data); }, css: $data <= ($root.rating() || 0) ? 'btn-warning' : 'btn-outline-secondary'">
+                                    <i class="bi bi-star-fill"></i>
+                                </button>
+                                <!-- /ko -->
+                                <button type="button" class="btn btn-sm btn-outline-secondary ms-2" data-bind="click: function() { rating(null); }, visible: rating()">
+                                    <i class="bi bi-x-lg"></i>
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Visibility -->
+                        <div class="mb-4">
+                            <div class="form-check form-switch">
+                                <input class="form-check-input" type="checkbox" id="isPublic" data-bind="checked: isPublic" />
+                                <label class="form-check-label" for="isPublic">
+                                    <i class="bi bi-globe me-1"></i>
+                                    <span data-t="TravelerProfile.PublicProfile">Herkese Acik</span>
+                                </label>
+                            </div>
+                        </div>
+
+                        <!-- Photos (will upload after create) -->
+                        <div class="mb-4">
+                            <label class="form-label" data-t="TripStory.Photos">Fotograflar</label>
+                            <input type="file" class="form-control" id="photoInput" multiple accept="image/*" />
+                            <small class="text-muted" data-t="TripStory.PhotoHint">Hikaye olusturulduktan sonra fotograflar yuklenecek (max 10 foto, 5MB)</small>
+                        </div>
+
+                        <!-- Submit -->
+                        <button class="btn btn-primary btn-lg w-100" data-bind="click: createStory, disable: isCreating">
+                            <span class="spinner-border spinner-border-sm me-2" data-bind="visible: isCreating"></span>
+                            <i class="bi bi-send me-1" data-bind="visible: !isCreating()"></i>
+                            <span data-t="TripStory.Publish">Paylas</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="~/js/Account/CreateStory.js" asp-append-version="true"></script>
+}

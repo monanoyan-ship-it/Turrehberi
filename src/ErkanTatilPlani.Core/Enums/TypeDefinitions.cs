@@ -218,7 +218,19 @@ public static class NotificationTypes
         "Genel sistem bildirimi",
         "bi-bell", "bg-secondary", 5);
 
-    public static IEnumerable<TypeItem> All => new[] { Scarcity, PriceChange, NewDate, Reservation, System };
+    public static readonly TypeItem NewFollower = new(5, "NewFollower", "NotificationType.NewFollower",
+        "Yeni takipci bildirimi",
+        "bi-person-plus", "bg-info", 6);
+
+    public static readonly TypeItem StoryLiked = new(6, "StoryLiked", "NotificationType.StoryLiked",
+        "Hikaye begenildi bildirimi",
+        "bi-heart-fill", "bg-danger", 7);
+
+    public static readonly TypeItem StoryCommented = new(7, "StoryCommented", "NotificationType.StoryCommented",
+        "Hikayeye yorum yapildi bildirimi",
+        "bi-chat-dots", "bg-primary", 8);
+
+    public static IEnumerable<TypeItem> All => new[] { Scarcity, PriceChange, NewDate, Reservation, System, NewFollower, StoryLiked, StoryCommented };
     public static TypeItem? GetById(int id) => All.FirstOrDefault(x => x.Id == id);
     public static TypeItem? GetBySystemName(string systemName) => All.FirstOrDefault(x => x.SystemName == systemName);
 
@@ -229,6 +241,9 @@ public static class NotificationTypes
         public const int NewDate = 2;
         public const int Reservation = 3;
         public const int System = 4;
+        public const int NewFollower = 5;
+        public const int StoryLiked = 6;
+        public const int StoryCommented = 7;
     }
 }
 

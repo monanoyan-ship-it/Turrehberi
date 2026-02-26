@@ -38,6 +38,8 @@ public class VisitorEntityService : IVisitorEntityService
     public async Task<Visitor?> GetByReferralCodeAsync(string referralCode)
         => await _context.Visitors.FirstOrDefaultAsync(v => v.ReferralCode == referralCode && v.IsActive);
 
+    public IQueryable<Visitor> GetAll() => _context.Visitors.Where(v => v.IsActive);
+
     public void Add(Visitor visitor) => _context.Visitors.Add(visitor);
 
     public void Update(Visitor visitor) => _context.Entry(visitor).State = EntityState.Modified;

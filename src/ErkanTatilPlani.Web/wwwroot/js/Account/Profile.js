@@ -37,6 +37,13 @@ function ProfileViewModel() {
     self.loyaltyTierCss = ko.observable('bg-secondary');
     self.loyaltyCreditBalance = ko.observable(0);
 
+    // Social
+    self.bio = ko.observable('');
+    self.isProfilePublic = ko.observable(true);
+    self.followerCount = ko.observable(0);
+    self.followingCount = ko.observable(0);
+    self.tripStoryCount = ko.observable(0);
+
     // Computed
     self.fullName = ko.computed(function() {
         return self.firstName() + ' ' + self.lastName();
@@ -107,6 +114,13 @@ function ProfileViewModel() {
                     } catch(e) {}
                 }
 
+                // Social data
+                self.bio(user.bio || '');
+                self.isProfilePublic(user.isProfilePublic !== false);
+                self.followerCount(user.followerCount || 0);
+                self.followingCount(user.followingCount || 0);
+                self.tripStoryCount(user.tripStoryCount || 0);
+
                 self.isLoggedIn(true);
                 self.isLoading(false);
                 self.loadLoyalty();
@@ -153,7 +167,8 @@ function ProfileViewModel() {
             lastName: self.lastName().trim(),
             phone: self.phone() ? self.phone().trim() : null,
             address: self.address() ? self.address().trim() : null,
-            birthDate: self.birthDate()
+            birthDate: self.birthDate(),
+            bio: self.bio() ? self.bio().trim() : null
         };
 
         $.ajax({
@@ -408,6 +423,21 @@ function ProfileViewModel() {
                 toastr.error(msg);
                 self.isDeletingAvatar(false);
             }
+        });
+    };
+
+    // Toggle profile visibility
+    self.toggleProfileVisibility = function () {
+        $.ajax({
+            url: apiBaseUrl + '/api/travelers/visibility',
+            method: 'PUT',
+            headers: { 'Authorization': 'Bearer ' + localStorage.getItem('token') }
+        }).done(function (data) {
+            toastr.success(T(data.message) || 'Profil gorunurlugu guncellendi');
+        }).fail(function (xhr) {
+            toastr.error(xhr.responseJSON?.error || T('Common.Error'));
+            // Revert
+            self.isProfilePublic(!self.isProfilePublic());
         });
     };
 

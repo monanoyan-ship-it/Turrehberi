@@ -5,7 +5,7 @@ public interface IProfileFactory
     Task<(bool success, object? result, int statusCode)> GetCurrentUserAsync();
 
     Task<(bool success, object? result, int statusCode)> UpdateProfileAsync(
-        string firstName, string lastName, string? phone, string? address, DateTime? birthDate);
+        string firstName, string lastName, string? phone, string? address, DateTime? birthDate, string? bio);
 
     Task<(bool success, object result, int statusCode)> ChangePasswordAsync(string currentPassword, string newPassword);
 

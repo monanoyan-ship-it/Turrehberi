@@ -31,6 +31,13 @@ internal static class AuthUserInfoHelper
             info.AvatarUrl = visitor.AvatarUrl;
             info.EmailVerified = visitor.EmailVerified;
             info.NotificationPreference = visitor.NotificationPreference;
+
+            // Gezgin Kulubu - Sosyal Profil
+            info.Bio = visitor.Bio;
+            info.IsProfilePublic = visitor.IsProfilePublic;
+            info.FollowerCount = visitor.FollowerCount;
+            info.FollowingCount = visitor.FollowingCount;
+            info.TripStoryCount = visitor.TripStoryCount;
         }
 
         return info;

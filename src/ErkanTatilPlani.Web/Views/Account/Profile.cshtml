@@ -80,10 +80,28 @@
                             <small class="text-muted d-block" data-t="Credit.Balance">Kredi Bakiyesi</small>
                             <span class="fw-semibold text-success" data-bind="text: loyaltyCreditBalance().toFixed(2) + ' ₺'"></span>
                             <div class="mt-2">
-                                <a href="/Account/Loyalty" class="btn btn-outline-primary btn-sm">
-                                    <i class="bi bi-award me-1"></i>
-                                    <span data-t="Loyalty.Dashboard">Sadakat Paneli</span>
+                                <a href="/Account/TravelerClub" class="btn btn-outline-primary btn-sm">
+                                    <i class="bi bi-people me-1"></i>
+                                    <span data-t="Loyalty.Dashboard">Gezgin Kulubu</span>
                                 </a>
+                            </div>
+                        </div>
+
+                        <!-- Social Stats -->
+                        <div class="mt-3 pt-3 border-top">
+                            <div class="row text-center">
+                                <div class="col-4">
+                                    <h6 data-bind="text: followerCount()"></h6>
+                                    <small class="text-muted" data-t="TravelerProfile.Followers">Takipci</small>
+                                </div>
+                                <div class="col-4">
+                                    <h6 data-bind="text: followingCount()"></h6>
+                                    <small class="text-muted" data-t="TravelerProfile.Following">Takip</small>
+                                </div>
+                                <div class="col-4">
+                                    <h6 data-bind="text: tripStoryCount()"></h6>
+                                    <small class="text-muted" data-t="TripStory.Stories">Hikaye</small>
+                                </div>
                             </div>
                         </div>
 
@@ -136,6 +154,26 @@
                         </select>
                     </div>
                 </div>
+                <!-- Profile Visibility Card -->
+                <div class="card shadow-sm border-0 mt-4">
+                    <div class="card-header bg-white border-0 py-3">
+                        <h6 class="mb-0">
+                            <i class="bi bi-eye me-2 text-primary"></i>
+                            <span data-t="TravelerProfile.ProfileVisibility">Profil Gorunurlugu</span>
+                        </h6>
+                    </div>
+                    <div class="card-body">
+                        <div class="form-check form-switch mb-2">
+                            <input class="form-check-input" type="checkbox" id="isProfilePublic" data-bind="checked: isProfilePublic, event: { change: toggleProfileVisibility }" />
+                            <label class="form-check-label" for="isProfilePublic">
+                                <i class="bi bi-globe me-1"></i>
+                                <span data-t="TravelerProfile.PublicProfile">Herkese Acik Profil</span>
+                            </label>
+                        </div>
+                        <small class="text-muted" data-t="TravelerProfile.VisibilityHint">Gizli profiller sadece sizin tarafinizdan gorulebilir</small>
+                    </div>
+                </div>
+
                 <!-- Notification Preferences Card -->
                 <div class="card shadow-sm border-0 mt-4">
                     <div class="card-header bg-white border-0 py-3">
@@ -213,6 +251,15 @@
                         <div class="mb-3">
                             <label class="form-label" data-t="Profile.BirthDate">Dogum Tarihi</label>
                             <input type="date" class="form-control" data-bind="value: birthDateFormatted" />
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label" data-t="TravelerProfile.Bio">Biyografi</label>
+                            <textarea class="form-control" rows="3" data-bind="value: bio" maxlength="500"
+                                      data-t-placeholder="TravelerProfile.BioPlaceholder" placeholder="Kendinizi kısaca tanıtın..."></textarea>
+                            <small class="text-muted">
+                                <span data-bind="text: (bio() || '').length"></span>/500
+                            </small>
                         </div>
 
                         <button class="btn btn-primary" data-bind="click: saveProfile, disable: isSavingProfile">

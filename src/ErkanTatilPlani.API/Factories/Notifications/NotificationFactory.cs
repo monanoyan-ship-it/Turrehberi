@@ -13,17 +13,20 @@ public class NotificationFactory : INotificationFactory
     private readonly INotificationEntityService _notificationService;
     private readonly ITourWatchEntityService _watchService;
     private readonly ITourEntityService _tourService;
+    private readonly IVisitorEntityService _visitorService;
     private readonly IUnitOfWork _unitOfWork;
 
     public NotificationFactory(
         INotificationEntityService notificationService,
         ITourWatchEntityService watchService,
         ITourEntityService tourService,
+        IVisitorEntityService visitorService,
         IUnitOfWork unitOfWork)
     {
         _notificationService = notificationService;
         _watchService = watchService;
         _tourService = tourService;
+        _visitorService = visitorService;
         _unitOfWork = unitOfWork;
     }
 
@@ -191,6 +194,27 @@ public class NotificationFactory : INotificationFactory
             NotificationTypeId = NotificationTypes.Ids.Reservation,
             RelatedEntityType = "Reservation",
             RelatedEntityId = reservationId,
+            CreatedAt = DateTime.UtcNow,
+            IsActive = true
+        });
+
+        await _unitOfWork.SaveChangesAsync();
+    }
+
+    public async Task CreateSocialNotificationAsync(int targetVisitorId, int actorVisitorId, int notificationTypeId, string titleKey, string messageKey, string relatedEntityType, int relatedEntityId)
+    {
+        var actor = await _visitorService.GetByIdAsync(actorVisitorId);
+        var actorName = actor != null ? $"{actor.FirstName} {actor.LastName}" : "?";
+
+        _notificationService.Add(new Notification
+        {
+            VisitorId = targetVisitorId,
+            TitleKey = titleKey,
+            MessageKey = messageKey,
+            MessageParams = JsonSerializer.Serialize(new { actorName, actorId = actorVisitorId }),
+            NotificationTypeId = notificationTypeId,
+            RelatedEntityType = relatedEntityType,
+            RelatedEntityId = relatedEntityId,
             CreatedAt = DateTime.UtcNow,
             IsActive = true
         });

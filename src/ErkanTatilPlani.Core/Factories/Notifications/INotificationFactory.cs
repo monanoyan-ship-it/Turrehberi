@@ -9,4 +9,5 @@ public interface INotificationFactory
     Task CreateScarcityNotificationsAsync(int tourId, int remainingSlots);
     Task CreatePriceChangeNotificationAsync(int tourId, decimal oldPrice, decimal newPrice);
     Task CreateReservationNotificationAsync(int visitorId, int reservationId, string type);
+    Task CreateSocialNotificationAsync(int targetVisitorId, int actorVisitorId, int notificationTypeId, string titleKey, string messageKey, string relatedEntityType, int relatedEntityId);
 }

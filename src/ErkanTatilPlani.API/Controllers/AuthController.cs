@@ -68,7 +68,7 @@ public class AuthController : ControllerBase
     public async Task<IActionResult> UpdateProfile([FromBody] UpdateProfileRequest request)
     {
         var (success, result, statusCode) = await _profileFactory.UpdateProfileAsync(
-            request.FirstName, request.LastName, request.Phone, request.Address, request.BirthDate);
+            request.FirstName, request.LastName, request.Phone, request.Address, request.BirthDate, request.Bio);
         if (!success && statusCode == 401)
             return Unauthorized();
         return StatusCode(statusCode, result);
@@ -268,6 +268,13 @@ public class UserInfo
     public string? CompanyStatusName { get; set; }
     public string PreferredLanguage { get; set; } = "tr";
     public string? NotificationPreference { get; set; }
+
+    // Gezgin Kulubu - Sosyal Profil
+    public string? Bio { get; set; }
+    public bool IsProfilePublic { get; set; }
+    public int FollowerCount { get; set; }
+    public int FollowingCount { get; set; }
+    public int TripStoryCount { get; set; }
 }
 
 public class UpdateLanguageRequest
@@ -282,6 +289,7 @@ public class UpdateProfileRequest
     public string? Phone { get; set; }
     public string? Address { get; set; }
     public DateTime? BirthDate { get; set; }
+    public string? Bio { get; set; }
 }
 
 public class ChangePasswordRequest

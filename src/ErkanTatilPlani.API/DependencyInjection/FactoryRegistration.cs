@@ -21,6 +21,8 @@ using ErkanTatilPlani.API.Factories.Loyalty;
 using ErkanTatilPlani.API.Factories.Recommendations;
 using ErkanTatilPlani.API.Factories.Referrals;
 using ErkanTatilPlani.API.Factories.ScheduledEmails;
+using ErkanTatilPlani.API.Factories.Travelers;
+using ErkanTatilPlani.API.Factories.TripStories;
 using ErkanTatilPlani.API.Factories.Weather;
 using ErkanTatilPlani.Core.Factories.AbandonedCarts;
 using ErkanTatilPlani.Core.Factories.Auth;
@@ -44,6 +46,8 @@ using ErkanTatilPlani.Core.Factories.Loyalty;
 using ErkanTatilPlani.Core.Factories.Recommendations;
 using ErkanTatilPlani.Core.Factories.Referrals;
 using ErkanTatilPlani.Core.Factories.ScheduledEmails;
+using ErkanTatilPlani.Core.Factories.Travelers;
+using ErkanTatilPlani.Core.Factories.TripStories;
 using ErkanTatilPlani.Core.Factories.Visitors;
 using ErkanTatilPlani.Core.Factories.Weather;
 
@@ -132,6 +136,10 @@ public static class FactoryRegistration
         services.AddScoped<IScheduledEmailFactory, ScheduledEmailFactory>();
         services.AddScoped<IAbandonedCartFactory, AbandonedCartFactory>();
         services.AddScoped<ITourRecommendationFactory, TourRecommendationFactory>();
+
+        // Gezgin Kulubu - Social factories (2)
+        services.AddScoped<ITravelerProfileFactory, TravelerProfileFactory>();
+        services.AddScoped<ITripStoryFactory, TripStoryFactory>();
 
         return services;
     }

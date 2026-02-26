@@ -77,6 +77,13 @@ public class AppDbContext : DbContext
     public DbSet<ScheduledEmail> ScheduledEmails => Set<ScheduledEmail>();
     public DbSet<AbandonedCart> AbandonedCarts => Set<AbandonedCart>();
 
+    // Gezgin Kulubu - Social
+    public DbSet<TravelerFollow> TravelerFollows => Set<TravelerFollow>();
+    public DbSet<TripStory> TripStories => Set<TripStory>();
+    public DbSet<TripStoryPhoto> TripStoryPhotos => Set<TripStoryPhoto>();
+    public DbSet<TripStoryLike> TripStoryLikes => Set<TripStoryLike>();
+    public DbSet<TripStoryComment> TripStoryComments => Set<TripStoryComment>();
+
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         base.OnModelCreating(modelBuilder);
@@ -135,6 +142,7 @@ public class AppDbContext : DbContext
             entity.Property(e => e.CreditBalance).HasPrecision(18, 2);
             entity.Property(e => e.ReferralCode).HasMaxLength(20);
             entity.HasIndex(e => e.ReferralCode).IsUnique().HasFilter("\"ReferralCode\" IS NOT NULL");
+            entity.Property(e => e.Bio).HasMaxLength(500);
             entity.HasOne(e => e.Company)
                   .WithMany()
                   .HasForeignKey(e => e.CompanyId)
@@ -838,6 +846,89 @@ public class AppDbContext : DbContext
                   .HasForeignKey(e => e.ReservationId)
                   .IsRequired(false)
                   .OnDelete(DeleteBehavior.SetNull);
+        });
+
+        // ============================================================
+        // GEZGIN KULUBU - Social
+        // ============================================================
+
+        modelBuilder.Entity<TravelerFollow>(entity =>
+        {
+            entity.HasKey(e => e.Id);
+            entity.HasIndex(e => new { e.FollowerId, e.FollowedId }).IsUnique();
+            entity.HasOne(e => e.Follower)
+                  .WithMany(v => v.Following)
+                  .HasForeignKey(e => e.FollowerId)
+                  .OnDelete(DeleteBehavior.Restrict);
+            entity.HasOne(e => e.Followed)
+                  .WithMany(v => v.Followers)
+                  .HasForeignKey(e => e.FollowedId)
+                  .OnDelete(DeleteBehavior.Restrict);
+        });
+
+        modelBuilder.Entity<TripStory>(entity =>
+        {
+            entity.HasKey(e => e.Id);
+            entity.Property(e => e.Title).IsRequired().HasMaxLength(200);
+            entity.Property(e => e.Content).IsRequired().HasMaxLength(5000);
+            entity.Property(e => e.Destination).HasMaxLength(200);
+            entity.HasOne(e => e.Visitor)
+                  .WithMany(v => v.TripStories)
+                  .HasForeignKey(e => e.VisitorId);
+            entity.HasOne(e => e.Reservation)
+                  .WithMany()
+                  .HasForeignKey(e => e.ReservationId)
+                  .IsRequired(false)
+                  .OnDelete(DeleteBehavior.SetNull);
+            entity.HasOne(e => e.Tour)
+                  .WithMany()
+                  .HasForeignKey(e => e.TourId)
+                  .IsRequired(false)
+                  .OnDelete(DeleteBehavior.SetNull);
+            entity.HasIndex(e => e.VisitorId);
+            entity.HasIndex(e => e.CreatedAt);
+        });
+
+        modelBuilder.Entity<TripStoryPhoto>(entity =>
+        {
+            entity.HasKey(e => e.Id);
+            entity.Property(e => e.PhotoUrl).IsRequired();
+            entity.Property(e => e.Caption).HasMaxLength(500);
+            entity.HasOne(e => e.TripStory)
+                  .WithMany(s => s.Photos)
+                  .HasForeignKey(e => e.TripStoryId);
+        });
+
+        modelBuilder.Entity<TripStoryLike>(entity =>
+        {
+            entity.HasKey(e => e.Id);
+            entity.HasIndex(e => new { e.TripStoryId, e.VisitorId }).IsUnique();
+            entity.HasOne(e => e.TripStory)
+                  .WithMany(s => s.Likes)
+                  .HasForeignKey(e => e.TripStoryId);
+            entity.HasOne(e => e.Visitor)
+                  .WithMany(v => v.TripStoryLikes)
+                  .HasForeignKey(e => e.VisitorId)
+                  .OnDelete(DeleteBehavior.Restrict);
+        });
+
+        modelBuilder.Entity<TripStoryComment>(entity =>
+        {
+            entity.HasKey(e => e.Id);
+            entity.Property(e => e.Content).IsRequired().HasMaxLength(1000);
+            entity.HasOne(e => e.TripStory)
+                  .WithMany(s => s.Comments)
+                  .HasForeignKey(e => e.TripStoryId);
+            entity.HasOne(e => e.Visitor)
+                  .WithMany(v => v.TripStoryComments)
+                  .HasForeignKey(e => e.VisitorId)
+                  .OnDelete(DeleteBehavior.Restrict);
+            entity.HasOne(e => e.ParentComment)
+                  .WithMany(c => c.Replies)
+                  .HasForeignKey(e => e.ParentCommentId)
+                  .IsRequired(false)
+                  .OnDelete(DeleteBehavior.Restrict);
+            entity.HasIndex(e => e.TripStoryId);
         });
 
         // Seed Data

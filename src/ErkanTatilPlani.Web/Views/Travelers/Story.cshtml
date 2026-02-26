@@ -1,0 +1,164 @@
+@{
+    ViewData["Title"] = "Gezi Hikayesi";
+}
+
+<div class="container py-4" id="storyApp">
+    <!-- Loading State -->
+    <div data-bind="visible: isLoading" class="text-center py-5">
+        <div class="spinner-border text-primary" role="status">
+            <span class="visually-hidden">Yukleniyor...</span>
+        </div>
+    </div>
+
+    <!-- Story Content -->
+    <div data-bind="visible: !isLoading() && !notFound()">
+        <div class="row">
+            <div class="col-lg-8 mx-auto">
+                <!-- Story -->
+                <article class="card shadow-sm border-0 mb-4">
+                    <div class="card-body p-4">
+                        <!-- Author -->
+                        <div class="d-flex align-items-center mb-4">
+                            <a data-bind="attr: { href: '/Travelers/Profile/' + authorId() }">
+                                <img data-bind="attr: { src: authorAvatarUrl() || 'https://ui-avatars.com/api/?name=U&size=48&background=0d6efd&color=fff' }"
+                                     class="rounded-circle me-3" style="width: 48px; height: 48px; object-fit: cover;" />
+                            </a>
+                            <div>
+                                <a data-bind="attr: { href: '/Travelers/Profile/' + authorId() }, text: authorName()"
+                                   class="fw-semibold text-decoration-none text-dark"></a>
+                                <span class="badge ms-1" data-bind="text: T(authorTierNameKey()), css: authorTierCssClass()"></span>
+                                <br />
+                                <small class="text-muted" data-bind="text: createdAtFormatted()"></small>
+                            </div>
+                        </div>
+
+                        <h2 data-bind="text: title()"></h2>
+
+                        <!-- Meta -->
+                        <div class="mb-3">
+                            <!-- ko if: tourName() -->
+                            <span class="badge bg-primary me-1">
+                                <i class="bi bi-geo-alt me-1"></i><span data-bind="text: tourName()"></span>
+                            </span>
+                            <!-- /ko -->
+                            <!-- ko if: destination() -->
+                            <span class="badge bg-info me-1">
+                                <i class="bi bi-pin-map me-1"></i><span data-bind="text: destination()"></span>
+                            </span>
+                            <!-- /ko -->
+                            <!-- ko if: rating() -->
+                            <span class="badge bg-warning text-dark me-1">
+                                <i class="bi bi-star-fill me-1"></i><span data-bind="text: rating()"></span>/5
+                            </span>
+                            <!-- /ko -->
+                            <!-- ko if: travelDate() -->
+                            <span class="badge bg-light text-dark border me-1">
+                                <i class="bi bi-calendar me-1"></i><span data-bind="text: new Date(travelDate()).toLocaleDateString()"></span>
+                            </span>
+                            <!-- /ko -->
+                        </div>
+
+                        <!-- Content -->
+                        <div class="story-content mb-4" data-bind="text: content()" style="white-space: pre-wrap;"></div>
+
+                        <!-- Photos -->
+                        <div data-bind="visible: photos().length > 0" class="mb-4">
+                            <div class="row g-2" data-bind="foreach: photos">
+                                <div class="col-md-6 col-lg-4">
+                                    <img data-bind="attr: { src: photoUrl, alt: caption || '' }" class="img-fluid rounded" style="object-fit: cover; height: 200px; width: 100%;" />
+                                    <!-- ko if: caption -->
+                                    <small class="text-muted d-block mt-1" data-bind="text: caption"></small>
+                                    <!-- /ko -->
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Actions -->
+                        <div class="d-flex align-items-center gap-3 pt-3 border-top">
+                            <button class="btn btn-sm" data-bind="click: toggleLike, css: isLiked() ? 'btn-danger' : 'btn-outline-danger'">
+                                <i data-bind="attr: { class: isLiked() ? 'bi bi-heart-fill me-1' : 'bi bi-heart me-1' }"></i>
+                                <span data-bind="text: likeCount()"></span>
+                            </button>
+                            <span class="text-muted">
+                                <i class="bi bi-chat me-1"></i>
+                                <span data-bind="text: commentCount()"></span> <span data-t="TripStory.Comments">yorum</span>
+                            </span>
+                        </div>
+                    </div>
+                </article>
+
+                <!-- Comments -->
+                <div class="card shadow-sm border-0 mb-4">
+                    <div class="card-body">
+                        <h5 class="mb-3">
+                            <i class="bi bi-chat-dots me-2"></i>
+                            <span data-t="TripStory.Comments">Yorumlar</span>
+                        </h5>
+
+                        <!-- Add Comment -->
+                        <div data-bind="visible: isLoggedIn()" class="mb-4">
+                            <div class="d-flex gap-2">
+                                <textarea class="form-control" rows="2" data-bind="value: newComment"
+                                          data-t-placeholder="TripStory.WriteComment" placeholder="Yorum yaz..."></textarea>
+                                <button class="btn btn-primary align-self-end" data-bind="click: addComment, disable: isAddingComment">
+                                    <span class="spinner-border spinner-border-sm" data-bind="visible: isAddingComment"></span>
+                                    <i class="bi bi-send" data-bind="visible: !isAddingComment()"></i>
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Comments List -->
+                        <div data-bind="foreach: comments">
+                            <div class="d-flex mb-3">
+                                <a data-bind="attr: { href: '/Travelers/Profile/' + visitor.id }">
+                                    <img data-bind="attr: { src: visitor.avatarUrl || 'https://ui-avatars.com/api/?name=' + encodeURIComponent(visitor.firstName + '+' + visitor.lastName) + '&size=32&background=6c757d&color=fff' }"
+                                         class="rounded-circle me-2" style="width: 32px; height: 32px; object-fit: cover;" />
+                                </a>
+                                <div class="flex-grow-1">
+                                    <div class="bg-light rounded p-2">
+                                        <a data-bind="attr: { href: '/Travelers/Profile/' + visitor.id }, text: visitor.firstName + ' ' + visitor.lastName"
+                                           class="fw-semibold small text-decoration-none text-dark"></a>
+                                        <p class="mb-0 small" data-bind="text: content"></p>
+                                    </div>
+                                    <small class="text-muted" data-bind="text: new Date(createdAt).toLocaleDateString()"></small>
+
+                                    <!-- Replies -->
+                                    <!-- ko if: replies && replies.length > 0 -->
+                                    <div class="ms-4 mt-2" data-bind="foreach: replies">
+                                        <div class="d-flex mb-2">
+                                            <img data-bind="attr: { src: visitor.avatarUrl || 'https://ui-avatars.com/api/?name=' + encodeURIComponent(visitor.firstName + '+' + visitor.lastName) + '&size=24&background=6c757d&color=fff' }"
+                                                 class="rounded-circle me-2" style="width: 24px; height: 24px; object-fit: cover;" />
+                                            <div>
+                                                <div class="bg-light rounded p-2">
+                                                    <span class="fw-semibold small" data-bind="text: visitor.firstName + ' ' + visitor.lastName"></span>
+                                                    <p class="mb-0 small" data-bind="text: content"></p>
+                                                </div>
+                                                <small class="text-muted" data-bind="text: new Date(createdAt).toLocaleDateString()"></small>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <!-- /ko -->
+                                </div>
+                            </div>
+                        </div>
+
+                        <div data-bind="visible: comments().length === 0" class="text-center py-3">
+                            <p class="text-muted small" data-t="TripStory.NoComments">Henuz yorum yapilmamis</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Not Found -->
+    <div data-bind="visible: !isLoading() && notFound()" class="text-center py-5">
+        <i class="bi bi-journal-x text-muted" style="font-size: 4rem;"></i>
+        <h4 class="mt-3" data-t="Error.StoryNotFound">Hikaye bulunamadi</h4>
+    </div>
+</div>
+
+@section Scripts {
+    <script>var storyId = @(ViewBag.StoryId ?? 0);</script>
+    <script src="~/js/Travelers/Story.js" asp-append-version="true"></script>
+}

@@ -31,7 +31,7 @@ public class ProfileFactory : IProfileFactory
     }
 
     public async Task<(bool success, object? result, int statusCode)> UpdateProfileAsync(
-        string firstName, string lastName, string? phone, string? address, DateTime? birthDate)
+        string firstName, string lastName, string? phone, string? address, DateTime? birthDate, string? bio)
     {
         var visitor = await _currentUserService.GetCurrentVisitorWithCompanyAsync();
         if (visitor == null)
@@ -49,6 +49,7 @@ public class ProfileFactory : IProfileFactory
         visitor.BirthDate = birthDate.HasValue
             ? DateTime.SpecifyKind(birthDate.Value, DateTimeKind.Utc)
             : null;
+        visitor.Bio = bio?.Trim();
         visitor.UpdatedAt = DateTime.UtcNow;
 
         await _unitOfWork.SaveChangesAsync();

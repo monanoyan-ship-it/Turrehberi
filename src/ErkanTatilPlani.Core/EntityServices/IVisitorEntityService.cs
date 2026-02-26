@@ -12,6 +12,7 @@ public interface IVisitorEntityService
     Task<Visitor?> GetActiveByIdAsync(int id);
     Task<bool> EmailExistsAsync(string email);
     Task<Visitor?> GetByReferralCodeAsync(string referralCode);
+    IQueryable<Visitor> GetAll();
     void Add(Visitor visitor);
     void Update(Visitor visitor);
 }

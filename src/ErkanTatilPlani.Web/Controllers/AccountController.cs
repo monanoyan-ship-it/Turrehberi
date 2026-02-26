@@ -84,6 +84,16 @@ public class AccountController : Controller
         return View();
     }
 
+    public IActionResult TravelerClub()
+    {
+        return View();
+    }
+
+    public IActionResult CreateStory()
+    {
+        return View();
+    }
+
     // GET - Normal gosterim veya redirect sonrasi
     [HttpGet]
     public IActionResult PaymentResult(string? status, int? reservationId, string? error)

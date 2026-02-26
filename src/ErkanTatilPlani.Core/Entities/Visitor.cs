@@ -72,6 +72,13 @@ public class Visitor : BaseEntity
     public decimal CreditBalance { get; set; }
     public string? ReferralCode { get; set; }
 
+    // Gezgin Kulubu - Sosyal Profil
+    public string? Bio { get; set; }
+    public bool IsProfilePublic { get; set; } = true;
+    public int FollowerCount { get; set; }
+    public int FollowingCount { get; set; }
+    public int TripStoryCount { get; set; }
+
     // Firma sahibi ise iliskili firma
     public int? CompanyId { get; set; }
     public virtual Company? Company { get; set; }
@@ -93,4 +100,9 @@ public class Visitor : BaseEntity
     public virtual ICollection<LoyaltyTierHistory> LoyaltyTierHistories { get; set; } = new List<LoyaltyTierHistory>();
     public virtual ICollection<Referral> ReferralsMade { get; set; } = new List<Referral>();
     public virtual ICollection<Referral> ReferralsReceived { get; set; } = new List<Referral>();
+    public virtual ICollection<TravelerFollow> Followers { get; set; } = new List<TravelerFollow>();
+    public virtual ICollection<TravelerFollow> Following { get; set; } = new List<TravelerFollow>();
+    public virtual ICollection<TripStory> TripStories { get; set; } = new List<TripStory>();
+    public virtual ICollection<TripStoryLike> TripStoryLikes { get; set; } = new List<TripStoryLike>();
+    public virtual ICollection<TripStoryComment> TripStoryComments { get; set; } = new List<TripStoryComment>();
 }
