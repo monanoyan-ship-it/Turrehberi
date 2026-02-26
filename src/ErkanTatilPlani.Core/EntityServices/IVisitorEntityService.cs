@@ -11,6 +11,7 @@ public interface IVisitorEntityService
     Task<Visitor?> GetActiveByEmailAsync(string email);
     Task<Visitor?> GetActiveByIdAsync(int id);
     Task<bool> EmailExistsAsync(string email);
+    Task<Visitor?> GetByReferralCodeAsync(string referralCode);
     void Add(Visitor visitor);
     void Update(Visitor visitor);
 }

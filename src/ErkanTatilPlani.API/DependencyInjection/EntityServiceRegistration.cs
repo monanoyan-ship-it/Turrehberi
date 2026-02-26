@@ -28,6 +28,10 @@ public static class EntityServiceRegistration
         services.AddScoped<IMessageEntityService, MessageEntityService>();
         services.AddScoped<IMessageTemplateEntityService, MessageTemplateEntityService>();
         services.AddScoped<IPushSubscriptionEntityService, PushSubscriptionEntityService>();
+        services.AddScoped<ILoyaltyEntityService, LoyaltyEntityService>();
+        services.AddScoped<IReferralEntityService, ReferralEntityService>();
+        services.AddScoped<IScheduledEmailEntityService, ScheduledEmailEntityService>();
+        services.AddScoped<IAbandonedCartEntityService, AbandonedCartEntityService>();
         return services;
     }
 }

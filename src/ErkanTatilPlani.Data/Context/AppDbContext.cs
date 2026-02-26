@@ -70,6 +70,13 @@ public class AppDbContext : DbContext
     public DbSet<Message> Messages => Set<Message>();
     public DbSet<MessageTemplate> MessageTemplates => Set<MessageTemplate>();
 
+    // Loyalty & Marketing
+    public DbSet<TourCredit> TourCredits => Set<TourCredit>();
+    public DbSet<LoyaltyTierHistory> LoyaltyTierHistories => Set<LoyaltyTierHistory>();
+    public DbSet<Referral> Referrals => Set<Referral>();
+    public DbSet<ScheduledEmail> ScheduledEmails => Set<ScheduledEmail>();
+    public DbSet<AbandonedCart> AbandonedCarts => Set<AbandonedCart>();
+
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         base.OnModelCreating(modelBuilder);
@@ -125,6 +132,9 @@ public class AppDbContext : DbContext
             entity.Property(e => e.Email).IsRequired().HasMaxLength(100);
             entity.HasIndex(e => e.Email).IsUnique();
             entity.Property(e => e.NotificationPreference).HasMaxLength(500);
+            entity.Property(e => e.CreditBalance).HasPrecision(18, 2);
+            entity.Property(e => e.ReferralCode).HasMaxLength(20);
+            entity.HasIndex(e => e.ReferralCode).IsUnique().HasFilter("\"ReferralCode\" IS NOT NULL");
             entity.HasOne(e => e.Company)
                   .WithMany()
                   .HasForeignKey(e => e.CompanyId)
@@ -137,6 +147,7 @@ public class AppDbContext : DbContext
             entity.Property(e => e.TotalPrice).HasPrecision(18, 2);
             entity.Property(e => e.UnitPrice).HasPrecision(18, 2);
             entity.Property(e => e.DiscountAmount).HasPrecision(18, 2);
+            entity.Property(e => e.CreditUsed).HasPrecision(18, 2);
             entity.Property(e => e.CouponCode).HasMaxLength(50);
             entity.HasOne(e => e.Tour)
                   .WithMany(t => t.Reservations)
@@ -737,6 +748,96 @@ public class AppDbContext : DbContext
         modelBuilder.Entity<Tour>(entity =>
         {
             entity.Property(e => e.MeetingPointAddress).HasMaxLength(500);
+        });
+
+        // Loyalty & Marketing
+        modelBuilder.Entity<TourCredit>(entity =>
+        {
+            entity.HasKey(e => e.Id);
+            entity.Property(e => e.Amount).HasPrecision(18, 2);
+            entity.Property(e => e.BalanceAfter).HasPrecision(18, 2);
+            entity.Property(e => e.Description).HasMaxLength(500);
+            entity.HasOne(e => e.Visitor)
+                  .WithMany(v => v.TourCredits)
+                  .HasForeignKey(e => e.VisitorId);
+            entity.HasOne(e => e.Reservation)
+                  .WithMany()
+                  .HasForeignKey(e => e.ReservationId)
+                  .IsRequired(false)
+                  .OnDelete(DeleteBehavior.SetNull);
+        });
+
+        modelBuilder.Entity<LoyaltyTierHistory>(entity =>
+        {
+            entity.HasKey(e => e.Id);
+            entity.Property(e => e.Reason).HasMaxLength(500);
+            entity.HasOne(e => e.Visitor)
+                  .WithMany(v => v.LoyaltyTierHistories)
+                  .HasForeignKey(e => e.VisitorId);
+        });
+
+        modelBuilder.Entity<Referral>(entity =>
+        {
+            entity.HasKey(e => e.Id);
+            entity.Property(e => e.ReferralCode).IsRequired().HasMaxLength(20);
+            entity.Property(e => e.BonusAmount).HasPrecision(18, 2);
+            entity.HasIndex(e => new { e.ReferrerVisitorId, e.ReferredVisitorId }).IsUnique();
+            entity.HasOne(e => e.ReferrerVisitor)
+                  .WithMany(v => v.ReferralsMade)
+                  .HasForeignKey(e => e.ReferrerVisitorId)
+                  .OnDelete(DeleteBehavior.Restrict);
+            entity.HasOne(e => e.ReferredVisitor)
+                  .WithMany(v => v.ReferralsReceived)
+                  .HasForeignKey(e => e.ReferredVisitorId)
+                  .OnDelete(DeleteBehavior.Restrict);
+            entity.HasOne(e => e.Reservation)
+                  .WithMany()
+                  .HasForeignKey(e => e.ReservationId)
+                  .IsRequired(false)
+                  .OnDelete(DeleteBehavior.SetNull);
+        });
+
+        modelBuilder.Entity<ScheduledEmail>(entity =>
+        {
+            entity.HasKey(e => e.Id);
+            entity.Property(e => e.EmailTo).IsRequired().HasMaxLength(200);
+            entity.Property(e => e.TemplateKey).HasMaxLength(100);
+            entity.HasIndex(e => new { e.StatusId, e.ScheduledAt });
+            entity.HasOne(e => e.Visitor)
+                  .WithMany()
+                  .HasForeignKey(e => e.VisitorId);
+            entity.HasOne(e => e.Reservation)
+                  .WithMany()
+                  .HasForeignKey(e => e.ReservationId)
+                  .IsRequired(false)
+                  .OnDelete(DeleteBehavior.SetNull);
+        });
+
+        modelBuilder.Entity<AbandonedCart>(entity =>
+        {
+            entity.HasKey(e => e.Id);
+            entity.Property(e => e.Email).IsRequired().HasMaxLength(200);
+            entity.Property(e => e.Price).HasPrecision(18, 2);
+            entity.Property(e => e.DateToken).HasMaxLength(100);
+            entity.HasIndex(e => new { e.Email, e.TourId });
+            entity.HasOne(e => e.Visitor)
+                  .WithMany()
+                  .HasForeignKey(e => e.VisitorId)
+                  .IsRequired(false)
+                  .OnDelete(DeleteBehavior.SetNull);
+            entity.HasOne(e => e.Tour)
+                  .WithMany()
+                  .HasForeignKey(e => e.TourId);
+            entity.HasOne(e => e.Schedule)
+                  .WithMany()
+                  .HasForeignKey(e => e.ScheduleId)
+                  .IsRequired(false)
+                  .OnDelete(DeleteBehavior.SetNull);
+            entity.HasOne(e => e.Reservation)
+                  .WithMany()
+                  .HasForeignKey(e => e.ReservationId)
+                  .IsRequired(false)
+                  .OnDelete(DeleteBehavior.SetNull);
         });
 
         // Seed Data

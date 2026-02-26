@@ -71,6 +71,22 @@
 
                         <span class="badge bg-primary" data-bind="text: userTypeName"></span>
 
+                        <!-- Loyalty Badge -->
+                        <div class="mt-3 pt-3 border-top">
+                            <div class="d-flex align-items-center justify-content-center gap-2 mb-2">
+                                <i data-bind="attr: { class: 'bi ' + (loyaltyTierIcon() || 'bi-compass') }" style="font-size: 1.5rem;"></i>
+                                <span class="badge" data-bind="text: loyaltyTierName(), css: loyaltyTierCss()"></span>
+                            </div>
+                            <small class="text-muted d-block" data-t="Credit.Balance">Kredi Bakiyesi</small>
+                            <span class="fw-semibold text-success" data-bind="text: loyaltyCreditBalance().toFixed(2) + ' ₺'"></span>
+                            <div class="mt-2">
+                                <a href="/Account/Loyalty" class="btn btn-outline-primary btn-sm">
+                                    <i class="bi bi-award me-1"></i>
+                                    <span data-t="Loyalty.Dashboard">Sadakat Paneli</span>
+                                </a>
+                            </div>
+                        </div>
+
                         <!-- Company Info -->
                         <div data-bind="visible: companyName" class="mt-3 pt-3 border-top">
                             <small class="text-muted d-block" data-t="Tour.Company">Firma</small>

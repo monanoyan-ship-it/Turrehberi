@@ -397,6 +397,203 @@ public static class GuideAssignmentStatuses
 }
 
 // ============================================================
+// LOYALTY TIERS (Sadakat Kademeleri)
+// ============================================================
+public static class LoyaltyTiers
+{
+    public static readonly TypeItem Explorer = new(0, "Explorer", "LoyaltyTier.Explorer",
+        "Kasif - Baslangic kademesi, %5 indirim",
+        "bi-compass", "bg-secondary", 1, isDefault: true);
+
+    public static readonly TypeItem Traveler = new(1, "Traveler", "LoyaltyTier.Traveler",
+        "Gezgin - Orta kademe, %10 indirim",
+        "bi-backpack2", "bg-info", 2);
+
+    public static readonly TypeItem WorldTraveler = new(2, "WorldTraveler", "LoyaltyTier.WorldTraveler",
+        "Dunya Gezgini - En ust kademe, %15 indirim",
+        "bi-globe-americas", "bg-warning text-dark", 3);
+
+    public static IEnumerable<TypeItem> All => new[] { Explorer, Traveler, WorldTraveler };
+    public static TypeItem Default => All.First(x => x.IsDefault);
+    public static TypeItem? GetById(int id) => All.FirstOrDefault(x => x.Id == id);
+    public static TypeItem? GetBySystemName(string systemName) => All.FirstOrDefault(x => x.SystemName == systemName);
+
+    public static int GetDiscountPercent(int tierId) => tierId switch
+    {
+        Ids.Explorer => 5,
+        Ids.Traveler => 10,
+        Ids.WorldTraveler => 15,
+        _ => 0
+    };
+
+    public static int GetCreditEarnPercent(int tierId) => tierId switch
+    {
+        Ids.Explorer => 2,
+        Ids.Traveler => 3,
+        Ids.WorldTraveler => 5,
+        _ => 0
+    };
+
+    public static int GetMinCompletedTours(int tierId) => tierId switch
+    {
+        Ids.Explorer => 0,
+        Ids.Traveler => 3,
+        Ids.WorldTraveler => 10,
+        _ => 0
+    };
+
+    public static class Ids
+    {
+        public const int Explorer = 0;
+        public const int Traveler = 1;
+        public const int WorldTraveler = 2;
+    }
+}
+
+// ============================================================
+// CREDIT TRANSACTION TYPES (Kredi Islem Tipleri)
+// ============================================================
+public static class CreditTransactionTypes
+{
+    public static readonly TypeItem Earn = new(0, "Earn", "CreditTransactionType.Earn",
+        "Kredi kazanma",
+        "bi-plus-circle", "bg-success", 1);
+
+    public static readonly TypeItem Spend = new(1, "Spend", "CreditTransactionType.Spend",
+        "Kredi harcama",
+        "bi-dash-circle", "bg-danger", 2);
+
+    public static readonly TypeItem Expire = new(2, "Expire", "CreditTransactionType.Expire",
+        "Kredi suresi doldu",
+        "bi-clock-history", "bg-warning text-dark", 3);
+
+    public static readonly TypeItem ReferralBonus = new(3, "ReferralBonus", "CreditTransactionType.ReferralBonus",
+        "Referans bonusu",
+        "bi-gift", "bg-primary", 4);
+
+    public static IEnumerable<TypeItem> All => new[] { Earn, Spend, Expire, ReferralBonus };
+    public static TypeItem? GetById(int id) => All.FirstOrDefault(x => x.Id == id);
+    public static TypeItem? GetBySystemName(string systemName) => All.FirstOrDefault(x => x.SystemName == systemName);
+
+    public static class Ids
+    {
+        public const int Earn = 0;
+        public const int Spend = 1;
+        public const int Expire = 2;
+        public const int ReferralBonus = 3;
+    }
+}
+
+// ============================================================
+// REFERRAL STATUSES (Referans Durumlari)
+// ============================================================
+public static class ReferralStatuses
+{
+    public static readonly TypeItem Pending = new(0, "Pending", "ReferralStatus.Pending",
+        "Beklemede - Kayit yapildi ama henuz rezervasyon yok",
+        "bi-hourglass-split", "bg-warning text-dark", 1, isDefault: true);
+
+    public static readonly TypeItem Completed = new(1, "Completed", "ReferralStatus.Completed",
+        "Tamamlandi - Davet edilen kisi ilk rezervasyonunu yapti",
+        "bi-check-circle", "bg-success", 2);
+
+    public static readonly TypeItem Rewarded = new(2, "Rewarded", "ReferralStatus.Rewarded",
+        "Odullendirildi - Her iki tarafa kredi verildi",
+        "bi-trophy", "bg-primary", 3);
+
+    public static IEnumerable<TypeItem> All => new[] { Pending, Completed, Rewarded };
+    public static TypeItem Default => All.First(x => x.IsDefault);
+    public static TypeItem? GetById(int id) => All.FirstOrDefault(x => x.Id == id);
+    public static TypeItem? GetBySystemName(string systemName) => All.FirstOrDefault(x => x.SystemName == systemName);
+
+    public static class Ids
+    {
+        public const int Pending = 0;
+        public const int Completed = 1;
+        public const int Rewarded = 2;
+    }
+}
+
+// ============================================================
+// SCHEDULED EMAIL TYPES (Zamanlanmis Email Tipleri)
+// ============================================================
+public static class ScheduledEmailTypes
+{
+    public static readonly TypeItem TourDetailsReminder = new(0, "TourDetailsReminder", "ScheduledEmailType.TourDetailsReminder",
+        "Tur detay hatirlatmasi - 3 gun once",
+        "bi-envelope", "bg-info", 1);
+
+    public static readonly TypeItem DayBeforeReminder = new(1, "DayBeforeReminder", "ScheduledEmailType.DayBeforeReminder",
+        "Bir gun oncesi hatirlatmasi",
+        "bi-calendar-event", "bg-primary", 2);
+
+    public static readonly TypeItem TourMorning = new(2, "TourMorning", "ScheduledEmailType.TourMorning",
+        "Tur sabahi bildirimi",
+        "bi-sunrise", "bg-warning text-dark", 3);
+
+    public static readonly TypeItem ThankYou = new(3, "ThankYou", "ScheduledEmailType.ThankYou",
+        "Tesekkur emaili - tur sonrasi",
+        "bi-heart", "bg-success", 4);
+
+    public static readonly TypeItem SimilarTourRecommendation = new(4, "SimilarTourRecommendation", "ScheduledEmailType.SimilarTourRecommendation",
+        "Benzer tur onerisi - 7 gun sonra",
+        "bi-stars", "bg-secondary", 5);
+
+    public static readonly TypeItem AbandonedCart = new(5, "AbandonedCart", "ScheduledEmailType.AbandonedCart",
+        "Terk edilmis sepet hatirlatmasi",
+        "bi-cart-x", "bg-danger", 6);
+
+    public static IEnumerable<TypeItem> All => new[] { TourDetailsReminder, DayBeforeReminder, TourMorning, ThankYou, SimilarTourRecommendation, AbandonedCart };
+    public static TypeItem? GetById(int id) => All.FirstOrDefault(x => x.Id == id);
+    public static TypeItem? GetBySystemName(string systemName) => All.FirstOrDefault(x => x.SystemName == systemName);
+
+    public static class Ids
+    {
+        public const int TourDetailsReminder = 0;
+        public const int DayBeforeReminder = 1;
+        public const int TourMorning = 2;
+        public const int ThankYou = 3;
+        public const int SimilarTourRecommendation = 4;
+        public const int AbandonedCart = 5;
+    }
+}
+
+// ============================================================
+// SCHEDULED EMAIL STATUSES (Zamanlanmis Email Durumlari)
+// ============================================================
+public static class ScheduledEmailStatuses
+{
+    public static readonly TypeItem Pending = new(0, "Pending", "ScheduledEmailStatus.Pending",
+        "Beklemede - Gonderim zamani gelmedi",
+        "bi-hourglass-split", "bg-warning text-dark", 1, isDefault: true);
+
+    public static readonly TypeItem Sent = new(1, "Sent", "ScheduledEmailStatus.Sent",
+        "Gonderildi",
+        "bi-check-circle", "bg-success", 2);
+
+    public static readonly TypeItem Failed = new(2, "Failed", "ScheduledEmailStatus.Failed",
+        "Gonderilemedi",
+        "bi-x-circle", "bg-danger", 3);
+
+    public static readonly TypeItem Cancelled = new(3, "Cancelled", "ScheduledEmailStatus.Cancelled",
+        "Iptal edildi",
+        "bi-slash-circle", "bg-secondary", 4);
+
+    public static IEnumerable<TypeItem> All => new[] { Pending, Sent, Failed, Cancelled };
+    public static TypeItem Default => All.First(x => x.IsDefault);
+    public static TypeItem? GetById(int id) => All.FirstOrDefault(x => x.Id == id);
+    public static TypeItem? GetBySystemName(string systemName) => All.FirstOrDefault(x => x.SystemName == systemName);
+
+    public static class Ids
+    {
+        public const int Pending = 0;
+        public const int Sent = 1;
+        public const int Failed = 2;
+        public const int Cancelled = 3;
+    }
+}
+
+// ============================================================
 // DURATION UNITS (Sure Birimleri)
 // ============================================================
 public static class DurationUnits

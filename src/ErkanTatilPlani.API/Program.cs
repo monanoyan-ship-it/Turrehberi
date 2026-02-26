@@ -207,6 +207,10 @@ builder.Services.AddCors(options =>
     });
 });
 
+// Background Services
+builder.Services.AddHostedService<ErkanTatilPlani.API.BackgroundServices.CreditExpiryBackgroundService>();
+builder.Services.AddHostedService<ErkanTatilPlani.API.BackgroundServices.ScheduledEmailBackgroundService>();
+
 var app = builder.Build();
 
 // Auto-migration on startup

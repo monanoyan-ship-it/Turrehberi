@@ -79,6 +79,11 @@ public class AccountController : Controller
         return View();
     }
 
+    public IActionResult Loyalty()
+    {
+        return View();
+    }
+
     // GET - Normal gosterim veya redirect sonrasi
     [HttpGet]
     public IActionResult PaymentResult(string? status, int? reservationId, string? error)

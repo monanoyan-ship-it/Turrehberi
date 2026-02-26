@@ -163,7 +163,9 @@ public class VisitorReservationFactory : IVisitorReservationFactory
 
         var query = _reservationService.GetByTourIds(companyTourIds)
             .Include(r => r.Tour)
-            .Include(r => r.Visitor);
+            .Include(r => r.Visitor)
+            .Where(r => r.PaymentStatus == PaymentStatuses.Ids.DepositPaid
+                     || r.PaymentStatus == PaymentStatuses.Ids.FullyPaid);
 
         IQueryable<Reservation> filteredQuery = query;
         if (!string.IsNullOrEmpty(status) && status != "all")
@@ -200,7 +202,10 @@ public class VisitorReservationFactory : IVisitorReservationFactory
             })
             .ToListAsync();
 
-        var allReservations = await _reservationService.GetByTourIds(companyTourIds).ToListAsync();
+        var allReservations = await _reservationService.GetByTourIds(companyTourIds)
+            .Where(r => r.PaymentStatus == PaymentStatuses.Ids.DepositPaid
+                     || r.PaymentStatus == PaymentStatuses.Ids.FullyPaid)
+            .ToListAsync();
 
         var stats = new
         {

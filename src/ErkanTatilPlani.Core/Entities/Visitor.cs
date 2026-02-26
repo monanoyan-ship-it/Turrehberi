@@ -67,6 +67,11 @@ public class Visitor : BaseEntity
     /// </summary>
     public string? NotificationPreference { get; set; }
 
+    // Sadakat Sistemi
+    public int LoyaltyTierId { get; set; } = LoyaltyTiers.Ids.Explorer;
+    public decimal CreditBalance { get; set; }
+    public string? ReferralCode { get; set; }
+
     // Firma sahibi ise iliskili firma
     public int? CompanyId { get; set; }
     public virtual Company? Company { get; set; }
@@ -84,4 +89,8 @@ public class Visitor : BaseEntity
     public virtual ICollection<Conversation> Conversations { get; set; } = new List<Conversation>();
     public virtual ICollection<Message> SentMessages { get; set; } = new List<Message>();
     public virtual ICollection<PushSubscription> PushSubscriptions { get; set; } = new List<PushSubscription>();
+    public virtual ICollection<TourCredit> TourCredits { get; set; } = new List<TourCredit>();
+    public virtual ICollection<LoyaltyTierHistory> LoyaltyTierHistories { get; set; } = new List<LoyaltyTierHistory>();
+    public virtual ICollection<Referral> ReferralsMade { get; set; } = new List<Referral>();
+    public virtual ICollection<Referral> ReferralsReceived { get; set; } = new List<Referral>();
 }

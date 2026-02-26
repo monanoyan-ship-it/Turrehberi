@@ -1,9 +1,13 @@
 using ErkanTatilPlani.Core.Entities;
 using ErkanTatilPlani.Core.EntityServices;
 using ErkanTatilPlani.Core.Enums;
+using ErkanTatilPlani.Core.Factories.AbandonedCarts;
+using ErkanTatilPlani.Core.Factories.Loyalty;
 using ErkanTatilPlani.Core.Factories.Notifications;
 using ErkanTatilPlani.Core.Factories.Promotions;
+using ErkanTatilPlani.Core.Factories.Referrals;
 using ErkanTatilPlani.Core.Factories.Reservations;
+using ErkanTatilPlani.Core.Factories.ScheduledEmails;
 using ErkanTatilPlani.Core.Infrastructure;
 using ErkanTatilPlani.Core.Services;
 using Microsoft.EntityFrameworkCore;
@@ -25,6 +29,10 @@ public class ReservationPaymentFactory : IReservationPaymentFactory
     private readonly IPromotionCalculationFactory _promotionCalculation;
     private readonly IPromotionEntityService _promotionService;
     private readonly INotificationFactory _notificationFactory;
+    private readonly ILoyaltyFactory _loyaltyFactory;
+    private readonly IReferralFactory _referralFactory;
+    private readonly IScheduledEmailFactory _scheduledEmailFactory;
+    private readonly IAbandonedCartFactory _abandonedCartFactory;
 
     public ReservationPaymentFactory(
         ITourEntityService tourService,
@@ -37,7 +45,11 @@ public class ReservationPaymentFactory : IReservationPaymentFactory
         IConfiguration configuration,
         IPromotionCalculationFactory promotionCalculation,
         IPromotionEntityService promotionService,
-        INotificationFactory notificationFactory)
+        INotificationFactory notificationFactory,
+        ILoyaltyFactory loyaltyFactory,
+        IReferralFactory referralFactory,
+        IScheduledEmailFactory scheduledEmailFactory,
+        IAbandonedCartFactory abandonedCartFactory)
     {
         _tourService = tourService;
         _scheduleService = scheduleService;
@@ -50,6 +62,10 @@ public class ReservationPaymentFactory : IReservationPaymentFactory
         _promotionCalculation = promotionCalculation;
         _promotionService = promotionService;
         _notificationFactory = notificationFactory;
+        _loyaltyFactory = loyaltyFactory;
+        _referralFactory = referralFactory;
+        _scheduledEmailFactory = scheduledEmailFactory;
+        _abandonedCartFactory = abandonedCartFactory;
     }
 
     public async Task<(bool success, object result, int statusCode)> CreatePublicReservationAsync(
@@ -66,7 +82,8 @@ public class ReservationPaymentFactory : IReservationPaymentFactory
         string customerIp,
         string? couponCode = null,
         string? dateToken = null,
-        bool payFullAmount = false)
+        bool payFullAmount = false,
+        decimal creditAmount = 0)
     {
         // Tur kontrolu
         var tour = await _tourService.GetByIdWithCompanyAsync(tourId);
@@ -185,6 +202,20 @@ public class ReservationPaymentFactory : IReservationPaymentFactory
         var depositAmount = priceResult.DepositAmount;
         var discountAmount = priceResult.TotalDiscount;
 
+        // Kredi kullanimi
+        decimal actualCreditUsed = 0;
+        if (creditAmount > 0 && visitorId.HasValue)
+        {
+            var visitor = await _visitorService.GetByIdAsync(visitorId.Value);
+            if (visitor != null && visitor.CreditBalance >= creditAmount)
+            {
+                actualCreditUsed = Math.Min(creditAmount, totalPrice);
+                totalPrice -= actualCreditUsed;
+                if (totalPrice < 0) totalPrice = 0;
+                depositAmount = totalPrice * priceResult.DepositPercentage / 100;
+            }
+        }
+
         // Rezervasyon olustur
         var reservation = new Reservation
         {
@@ -207,6 +238,7 @@ public class ReservationPaymentFactory : IReservationPaymentFactory
             PromotionId = priceResult.AppliedDiscounts.Count > 0
                 ? priceResult.AppliedDiscounts.First().PromotionId
                 : null,
+            CreditUsed = actualCreditUsed,
             PaidAmount = 0,
             Status = ReservationStatuses.Ids.Pending,
             PaymentStatus = PaymentStatuses.Ids.Pending,
@@ -215,6 +247,12 @@ public class ReservationPaymentFactory : IReservationPaymentFactory
 
         _reservationService.Add(reservation);
         await _unitOfWork.SaveChangesAsync();
+
+        // Kredi harcamasini kaydet
+        if (actualCreditUsed > 0 && visitorId.HasValue)
+        {
+            await _loyaltyFactory.SpendCreditsAsync(visitorId.Value, actualCreditUsed, reservation.Id);
+        }
 
         // Promosyon kullanim kaydlari
         foreach (var applied in priceResult.AppliedDiscounts)
@@ -330,7 +368,13 @@ public class ReservationPaymentFactory : IReservationPaymentFactory
 
         if (paymentResult.Success)
         {
-            reservation.PaidAmount += paymentResult.PaidAmount ?? 0;
+            var paidNow = paymentResult.PaidAmount ?? 0;
+
+            // Iyzico sandbox PaidPrice bos/0 donebilir - fallback: deposit veya toplam tutar
+            if (paidNow <= 0)
+                paidNow = reservation.DepositAmount > 0 ? reservation.DepositAmount : reservation.TotalPrice;
+
+            reservation.PaidAmount += paidNow;
             reservation.PaymentId = paymentResult.PaymentId;
             reservation.PaidAt = DateTime.UtcNow;
             reservation.Status = ReservationStatuses.Ids.Confirmed;
@@ -366,6 +410,47 @@ public class ReservationPaymentFactory : IReservationPaymentFactory
             catch (Exception ex)
             {
                 Console.WriteLine($"Kitlik bildirimi hatasi: {ex.Message}");
+            }
+
+            // Sadakat: Kredi kazan + kademe guncelle
+            try
+            {
+                await _loyaltyFactory.EarnCreditsAsync(reservation.VisitorId, reservation.Id, reservation.TotalPrice);
+                await _loyaltyFactory.RecalculateTierAsync(reservation.VisitorId);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Loyalty processing error: {ex.Message}");
+            }
+
+            // Referans: Ilk rezervasyonda bonus ver
+            try
+            {
+                await _referralFactory.ProcessReferralReservationAsync(reservation.VisitorId, reservation.Id);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Referral processing error: {ex.Message}");
+            }
+
+            // Zamanlanmis emailler kuyruge ekle
+            try
+            {
+                await _scheduledEmailFactory.QueueReservationEmailsAsync(reservation.Id);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Scheduled email queueing error: {ex.Message}");
+            }
+
+            // Terk edilmis sepeti recovered olarak isaretle
+            try
+            {
+                await _abandonedCartFactory.MarkRecoveredAsync(reservation.VisitorId, reservation.TourId, reservation.Id);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Abandoned cart recovery error: {ex.Message}");
             }
 
             try

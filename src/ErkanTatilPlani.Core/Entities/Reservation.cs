@@ -31,6 +31,9 @@ public class Reservation : BaseEntity
     public string? AppliedPromotions { get; set; }
     public string? CouponCode { get; set; }
 
+    // Sadakat Sistemi
+    public decimal CreditUsed { get; set; }
+
     // Katilimci ve Bilet Bilgileri
     public string? ParticipantInfo { get; set; }
     public string? QrCode { get; set; }

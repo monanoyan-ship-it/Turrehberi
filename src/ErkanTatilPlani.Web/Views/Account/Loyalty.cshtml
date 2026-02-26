@@ -1,0 +1,233 @@
+@{
+    ViewData["Title"] = "Sadakat Programı";
+}
+
+<div class="container py-4" id="loyaltyApp">
+    <!-- Loading State -->
+    <div data-bind="visible: isLoading" class="text-center py-5">
+        <div class="spinner-border text-primary" role="status">
+            <span class="visually-hidden">Yukleniyor...</span>
+        </div>
+    </div>
+
+    <!-- Not Logged In -->
+    <div data-bind="visible: !isLoading() && !isLoggedIn()" class="text-center py-5">
+        <i class="bi bi-person-x text-muted" style="font-size: 4rem;"></i>
+        <h4 class="mt-3" data-t="Profile.LoginRequired">Giris yapmaniz gerekiyor</h4>
+        <a href="/Account/Login" class="btn btn-primary mt-3">
+            <i class="bi bi-box-arrow-in-right me-1"></i>
+            <span data-t="Menu.Login">Giris Yap</span>
+        </a>
+    </div>
+
+    <!-- Loyalty Content -->
+    <div data-bind="visible: !isLoading() && isLoggedIn()">
+        <h3 class="mb-4">
+            <i class="bi bi-award me-2"></i>
+            <span data-t="Loyalty.Title">Sadakat Programi</span>
+        </h3>
+
+        <div class="row">
+            <!-- Tier Card -->
+            <div class="col-lg-4 mb-4">
+                <div class="card shadow-sm border-0 h-100">
+                    <div class="card-body text-center p-4">
+                        <div class="mb-3">
+                            <i data-bind="attr: { class: 'bi ' + tierIcon() }" style="font-size: 3rem;"></i>
+                        </div>
+                        <h4 data-bind="text: T(tierNameKey())"></h4>
+                        <span class="badge" data-bind="text: T(tierNameKey()), css: tierCssClass()"></span>
+                        <div class="mt-3">
+                            <p class="mb-1">
+                                <i class="bi bi-percent me-1"></i>
+                                <span data-t="Loyalty.DiscountPercent">Indirim</span>:
+                                <strong data-bind="text: '%' + discountPercent()"></strong>
+                            </p>
+                            <p class="mb-0">
+                                <i class="bi bi-plus-circle me-1"></i>
+                                <span data-t="Loyalty.CreditEarnPercent">Kredi Kazanma</span>:
+                                <strong data-bind="text: '%' + creditEarnPercent()"></strong>
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Credit Balance -->
+            <div class="col-lg-4 mb-4">
+                <div class="card shadow-sm border-0 h-100">
+                    <div class="card-body text-center p-4">
+                        <div class="mb-3">
+                            <i class="bi bi-wallet2" style="font-size: 3rem;"></i>
+                        </div>
+                        <h4 data-t="Credit.Balance">Kredi Bakiyesi</h4>
+                        <h2 class="text-success" data-bind="text: creditBalance().toFixed(2) + ' ₺'"></h2>
+                        <small class="text-muted" data-t="Credit.OneToOne">1 Kredi = 1 ₺</small>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Progress -->
+            <div class="col-lg-4 mb-4">
+                <div class="card shadow-sm border-0 h-100">
+                    <div class="card-body p-4">
+                        <h5 class="text-center mb-3">
+                            <i class="bi bi-graph-up me-1"></i>
+                            <span data-t="Loyalty.Progress">Ilerleme</span>
+                        </h5>
+                        <p class="text-center mb-2">
+                            <span data-t="Loyalty.CompletedTours">Tamamlanan Turlar</span>:
+                            <strong data-bind="text: completedTours()"></strong>
+                        </p>
+                        <!-- ko if: nextTierNameKey() -->
+                        <p class="text-center mb-2">
+                            <span data-t="Loyalty.NextTier">Sonraki Kademe</span>:
+                            <strong data-bind="text: T(nextTierNameKey())"></strong>
+                            (<span data-bind="text: nextTierMinTours()"></span> <span data-t="Loyalty.Tours">tur</span>)
+                        </p>
+                        <div class="progress" style="height: 20px;">
+                            <div class="progress-bar bg-success" role="progressbar"
+                                 data-bind="style: { width: progressPercent() + '%' }, text: progressPercent() + '%'"
+                                 aria-valuemin="0" aria-valuemax="100"></div>
+                        </div>
+                        <!-- /ko -->
+                        <!-- ko ifnot: nextTierNameKey() -->
+                        <p class="text-center text-success">
+                            <i class="bi bi-trophy-fill me-1"></i>
+                            <span data-t="Loyalty.MaxTier">En ust kademedesiniz!</span>
+                        </p>
+                        <!-- /ko -->
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Referral Section -->
+        <div class="card shadow-sm border-0 mb-4">
+            <div class="card-header bg-primary text-white">
+                <h5 class="mb-0">
+                    <i class="bi bi-share me-2"></i>
+                    <span data-t="Referral.Title">Arkadasini Davet Et</span>
+                </h5>
+            </div>
+            <div class="card-body">
+                <div class="row align-items-center">
+                    <div class="col-md-6">
+                        <p data-t="Referral.Description">Arkadasini davet et, ilk rezervasyonunda her ikinize 50 ₺ kredi kazan!</p>
+                        <div class="input-group">
+                            <input type="text" class="form-control" readonly data-bind="value: referralCode" />
+                            <button class="btn btn-outline-primary" data-bind="click: copyReferralCode">
+                                <i class="bi bi-clipboard me-1"></i>
+                                <span data-t="Common.Copy">Kopyala</span>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="row text-center mt-3 mt-md-0">
+                            <div class="col-4">
+                                <h4 data-bind="text: totalReferrals()"></h4>
+                                <small data-t="Referral.Total">Toplam Davet</small>
+                            </div>
+                            <div class="col-4">
+                                <h4 data-bind="text: completedReferrals()"></h4>
+                                <small data-t="Referral.Completed">Tamamlanan</small>
+                            </div>
+                            <div class="col-4">
+                                <h4 class="text-success" data-bind="text: totalEarned().toFixed(2) + ' ₺'"></h4>
+                                <small data-t="Referral.TotalEarned">Kazanilan</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Referral List -->
+                <div data-bind="visible: referrals().length > 0" class="mt-3">
+                    <h6 data-t="Referral.InviteList">Davet Listesi</h6>
+                    <div class="table-responsive">
+                        <table class="table table-sm">
+                            <thead>
+                                <tr>
+                                    <th data-t="Common.Name">Ad</th>
+                                    <th data-t="Common.Status">Durum</th>
+                                    <th data-t="Referral.Bonus">Bonus</th>
+                                    <th data-t="Common.Date">Tarih</th>
+                                </tr>
+                            </thead>
+                            <tbody data-bind="foreach: referrals">
+                                <tr>
+                                    <td data-bind="text: referredName"></td>
+                                    <td>
+                                        <span class="badge" data-bind="text: T(statusNameKey), css: statusId === 2 ? 'bg-success' : statusId === 1 ? 'bg-info' : 'bg-warning text-dark'"></span>
+                                    </td>
+                                    <td data-bind="text: bonusAmount.toFixed(2) + ' ₺'"></td>
+                                    <td data-bind="text: new Date(createdAt).toLocaleDateString()"></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Credit History -->
+        <div class="card shadow-sm border-0">
+            <div class="card-header">
+                <h5 class="mb-0">
+                    <i class="bi bi-clock-history me-2"></i>
+                    <span data-t="Credit.History">Kredi Gecmisi</span>
+                </h5>
+            </div>
+            <div class="card-body">
+                <div data-bind="visible: creditHistory().length === 0" class="text-center py-3">
+                    <p class="text-muted" data-t="Credit.NoHistory">Henuz kredi isleminiz yok</p>
+                </div>
+                <div data-bind="visible: creditHistory().length > 0">
+                    <div class="table-responsive">
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th data-t="Common.Date">Tarih</th>
+                                    <th data-t="Credit.Type">Islem Tipi</th>
+                                    <th data-t="Credit.Amount">Tutar</th>
+                                    <th data-t="Credit.BalanceAfter">Bakiye</th>
+                                    <th data-t="Common.Description">Aciklama</th>
+                                </tr>
+                            </thead>
+                            <tbody data-bind="foreach: creditHistory">
+                                <tr>
+                                    <td data-bind="text: new Date(createdAt).toLocaleDateString()"></td>
+                                    <td>
+                                        <span class="badge" data-bind="text: T(transactionTypeNameKey), css: amount >= 0 ? 'bg-success' : 'bg-danger'"></span>
+                                    </td>
+                                    <td data-bind="text: (amount >= 0 ? '+' : '') + amount.toFixed(2) + ' ₺', css: { 'text-success': amount >= 0, 'text-danger': amount < 0 }"></td>
+                                    <td data-bind="text: balanceAfter.toFixed(2) + ' ₺'"></td>
+                                    <td data-bind="text: description"></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <!-- Pagination -->
+                    <nav data-bind="visible: totalPages() > 1">
+                        <ul class="pagination justify-content-center">
+                            <li class="page-item" data-bind="css: { disabled: currentPage() <= 1 }">
+                                <a class="page-link" href="#" data-bind="click: function() { loadCredits(currentPage() - 1); }">«</a>
+                            </li>
+                            <!-- ko foreach: Array.from({length: totalPages()}, (_, i) => i + 1) -->
+                            <li class="page-item" data-bind="css: { active: $data === $parent.currentPage() }">
+                                <a class="page-link" href="#" data-bind="text: $data, click: function() { $parent.loadCredits($data); }"></a>
+                            </li>
+                            <!-- /ko -->
+                            <li class="page-item" data-bind="css: { disabled: currentPage() >= totalPages() }">
+                                <a class="page-link" href="#" data-bind="click: function() { loadCredits(currentPage() + 1); }">»</a>
+                            </li>
+                        </ul>
+                    </nav>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="~/js/Account/Loyalty.js"></script>
+}

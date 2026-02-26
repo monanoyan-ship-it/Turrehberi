@@ -16,7 +16,13 @@ using ErkanTatilPlani.API.Factories.Tours;
 using ErkanTatilPlani.API.Factories.TourWatches;
 using ErkanTatilPlani.API.Factories.Promotions;
 using ErkanTatilPlani.API.Factories.Visitors;
+using ErkanTatilPlani.API.Factories.AbandonedCarts;
+using ErkanTatilPlani.API.Factories.Loyalty;
+using ErkanTatilPlani.API.Factories.Recommendations;
+using ErkanTatilPlani.API.Factories.Referrals;
+using ErkanTatilPlani.API.Factories.ScheduledEmails;
 using ErkanTatilPlani.API.Factories.Weather;
+using ErkanTatilPlani.Core.Factories.AbandonedCarts;
 using ErkanTatilPlani.Core.Factories.Auth;
 using ErkanTatilPlani.Core.Factories.Blogs;
 using ErkanTatilPlani.Core.Factories.Companies;
@@ -34,6 +40,10 @@ using ErkanTatilPlani.Core.Factories.Reviews;
 using ErkanTatilPlani.Core.Factories.TourDates;
 using ErkanTatilPlani.Core.Factories.Tours;
 using ErkanTatilPlani.Core.Factories.TourWatches;
+using ErkanTatilPlani.Core.Factories.Loyalty;
+using ErkanTatilPlani.Core.Factories.Recommendations;
+using ErkanTatilPlani.Core.Factories.Referrals;
+using ErkanTatilPlani.Core.Factories.ScheduledEmails;
 using ErkanTatilPlani.Core.Factories.Visitors;
 using ErkanTatilPlani.Core.Factories.Weather;
 
@@ -115,6 +125,13 @@ public static class FactoryRegistration
 
         // Weather factories (1)
         services.AddScoped<IWeatherAlertFactory, WeatherAlertFactory>();
+
+        // Loyalty & Marketing factories (5)
+        services.AddScoped<ILoyaltyFactory, LoyaltyFactory>();
+        services.AddScoped<IReferralFactory, ReferralFactory>();
+        services.AddScoped<IScheduledEmailFactory, ScheduledEmailFactory>();
+        services.AddScoped<IAbandonedCartFactory, AbandonedCartFactory>();
+        services.AddScoped<ITourRecommendationFactory, TourRecommendationFactory>();
 
         return services;
     }

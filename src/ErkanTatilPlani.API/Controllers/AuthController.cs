@@ -37,7 +37,7 @@ public class AuthController : ControllerBase
     {
         var (success, result, statusCode) = await _authFactory.RegisterAsync(
             request.FirstName, request.LastName, request.Email, request.Password,
-            request.Phone, request.IdentityNumber);
+            request.Phone, request.IdentityNumber, request.ReferralCode);
         return StatusCode(statusCode, result);
     }
 
@@ -219,6 +219,7 @@ public class RegisterRequest
     public string Password { get; set; } = string.Empty;
     public string? Phone { get; set; }
     public string? IdentityNumber { get; set; }
+    public string? ReferralCode { get; set; }
 }
 
 public class RegisterCompanyRequest

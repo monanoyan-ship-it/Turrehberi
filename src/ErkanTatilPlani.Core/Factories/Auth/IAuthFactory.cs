@@ -6,7 +6,7 @@ public interface IAuthFactory
 
     Task<(bool success, object result, int statusCode)> RegisterAsync(
         string firstName, string lastName, string email, string password,
-        string? phone, string? identityNumber);
+        string? phone, string? identityNumber, string? referralCode = null);
 
     Task<(bool success, object result, int statusCode)> RegisterCompanyAsync(
         string firstName, string lastName, string email, string password, string? phone,

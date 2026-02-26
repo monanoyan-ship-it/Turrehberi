@@ -35,6 +35,9 @@ public class VisitorEntityService : IVisitorEntityService
     public async Task<bool> EmailExistsAsync(string email)
         => await _context.Visitors.AnyAsync(v => v.Email == email);
 
+    public async Task<Visitor?> GetByReferralCodeAsync(string referralCode)
+        => await _context.Visitors.FirstOrDefaultAsync(v => v.ReferralCode == referralCode && v.IsActive);
+
     public void Add(Visitor visitor) => _context.Visitors.Add(visitor);
 
     public void Update(Visitor visitor) => _context.Entry(visitor).State = EntityState.Modified;

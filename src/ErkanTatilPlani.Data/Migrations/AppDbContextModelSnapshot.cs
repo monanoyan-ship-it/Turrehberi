@@ -22,6 +22,75 @@ namespace ErkanTatilPlani.Data.Migrations
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
 
+            modelBuilder.Entity("ErkanTatilPlani.Core.Entities.AbandonedCart", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("DateToken")
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<string>("Email")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)");
+
+                    b.Property<bool>("EmailSent")
+                        .HasColumnType("boolean");
+
+                    b.Property<DateTime?>("EmailSentAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("boolean");
+
+                    b.Property<int>("NumberOfPeople")
+                        .HasColumnType("integer");
+
+                    b.Property<decimal>("Price")
+                        .HasPrecision(18, 2)
+                        .HasColumnType("numeric(18,2)");
+
+                    b.Property<bool>("Recovered")
+                        .HasColumnType("boolean");
+
+                    b.Property<int?>("ReservationId")
+                        .HasColumnType("integer");
+
+                    b.Property<int?>("ScheduleId")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("TourId")
+                        .HasColumnType("integer");
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<int?>("VisitorId")
+                        .HasColumnType("integer");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ReservationId");
+
+                    b.HasIndex("ScheduleId");
+
+                    b.HasIndex("TourId");
+
+                    b.HasIndex("VisitorId");
+
+                    b.HasIndex("Email", "TourId");
+
+                    b.ToTable("AbandonedCarts");
+                });
+
             modelBuilder.Entity("ErkanTatilPlani.Core.Entities.AppLog", b =>
                 {
                     b.Property<long>("Id")
@@ -1483,6 +1552,46 @@ namespace ErkanTatilPlani.Data.Migrations
                         });
                 });
 
+            modelBuilder.Entity("ErkanTatilPlani.Core.Entities.LoyaltyTierHistory", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("CompletedTourCount")
+                        .HasColumnType("integer");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("boolean");
+
+                    b.Property<int>("NewTierId")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("PreviousTierId")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("Reason")
+                        .HasMaxLength(500)
+                        .HasColumnType("character varying(500)");
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<int>("VisitorId")
+                        .HasColumnType("integer");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("VisitorId");
+
+                    b.ToTable("LoyaltyTierHistories");
+                });
+
             modelBuilder.Entity("ErkanTatilPlani.Core.Entities.Message", b =>
                 {
                     b.Property<int>("Id")
@@ -1850,6 +1959,62 @@ namespace ErkanTatilPlani.Data.Migrations
                     b.ToTable("PushSubscriptions");
                 });
 
+            modelBuilder.Entity("ErkanTatilPlani.Core.Entities.Referral", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<decimal>("BonusAmount")
+                        .HasPrecision(18, 2)
+                        .HasColumnType("numeric(18,2)");
+
+                    b.Property<DateTime?>("CompletedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("boolean");
+
+                    b.Property<string>("ReferralCode")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("character varying(20)");
+
+                    b.Property<int>("ReferredVisitorId")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("ReferrerVisitorId")
+                        .HasColumnType("integer");
+
+                    b.Property<int?>("ReservationId")
+                        .HasColumnType("integer");
+
+                    b.Property<DateTime?>("RewardedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<int>("StatusId")
+                        .HasColumnType("integer");
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ReferredVisitorId");
+
+                    b.HasIndex("ReservationId");
+
+                    b.HasIndex("ReferrerVisitorId", "ReferredVisitorId")
+                        .IsUnique();
+
+                    b.ToTable("Referrals");
+                });
+
             modelBuilder.Entity("ErkanTatilPlani.Core.Entities.Reservation", b =>
                 {
                     b.Property<int>("Id")
@@ -1867,6 +2032,10 @@ namespace ErkanTatilPlani.Data.Migrations
 
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("timestamp with time zone");
+
+                    b.Property<decimal>("CreditUsed")
+                        .HasPrecision(18, 2)
+                        .HasColumnType("numeric(18,2)");
 
                     b.Property<DateOnly>("Date")
                         .HasColumnType("date");
@@ -1970,6 +2139,7 @@ namespace ErkanTatilPlani.Data.Migrations
                         {
                             Id = 1,
                             CreatedAt = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
+                            CreditUsed = 0m,
                             Date = new DateOnly(2026, 2, 15),
                             DepositAmount = 0m,
                             DiscountAmount = 0m,
@@ -1991,6 +2161,7 @@ namespace ErkanTatilPlani.Data.Migrations
                         {
                             Id = 2,
                             CreatedAt = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
+                            CreditUsed = 0m,
                             Date = new DateOnly(2026, 3, 10),
                             DepositAmount = 0m,
                             DiscountAmount = 0m,
@@ -2012,6 +2183,7 @@ namespace ErkanTatilPlani.Data.Migrations
                         {
                             Id = 3,
                             CreatedAt = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
+                            CreditUsed = 0m,
                             Date = new DateOnly(2026, 4, 5),
                             DepositAmount = 0m,
                             DiscountAmount = 0m,
@@ -2033,6 +2205,7 @@ namespace ErkanTatilPlani.Data.Migrations
                         {
                             Id = 4,
                             CreatedAt = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
+                            CreditUsed = 0m,
                             Date = new DateOnly(2026, 2, 20),
                             DepositAmount = 0m,
                             DiscountAmount = 0m,
@@ -2054,6 +2227,7 @@ namespace ErkanTatilPlani.Data.Migrations
                         {
                             Id = 5,
                             CreatedAt = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
+                            CreditUsed = 0m,
                             Date = new DateOnly(2026, 5, 1),
                             DepositAmount = 0m,
                             DiscountAmount = 0m,
@@ -2075,6 +2249,7 @@ namespace ErkanTatilPlani.Data.Migrations
                         {
                             Id = 6,
                             CreatedAt = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
+                            CreditUsed = 0m,
                             Date = new DateOnly(2026, 3, 25),
                             DepositAmount = 0m,
                             DiscountAmount = 0m,
@@ -2333,6 +2508,70 @@ namespace ErkanTatilPlani.Data.Migrations
                     b.HasIndex("VisitorId");
 
                     b.ToTable("ReviewReports");
+                });
+
+            modelBuilder.Entity("ErkanTatilPlani.Core.Entities.ScheduledEmail", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("EmailTo")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)");
+
+                    b.Property<int>("EmailTypeId")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("ErrorMessage")
+                        .HasColumnType("text");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("boolean");
+
+                    b.Property<int?>("ReservationId")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("RetryCount")
+                        .HasColumnType("integer");
+
+                    b.Property<DateTime>("ScheduledAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<DateTime?>("SentAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<int>("StatusId")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("TemplateData")
+                        .HasColumnType("text");
+
+                    b.Property<string>("TemplateKey")
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<int>("VisitorId")
+                        .HasColumnType("integer");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ReservationId");
+
+                    b.HasIndex("VisitorId");
+
+                    b.HasIndex("StatusId", "ScheduledAt");
+
+                    b.ToTable("ScheduledEmails");
                 });
 
             modelBuilder.Entity("ErkanTatilPlani.Core.Entities.Tour", b =>
@@ -2717,6 +2956,56 @@ namespace ErkanTatilPlani.Data.Migrations
                         });
                 });
 
+            modelBuilder.Entity("ErkanTatilPlani.Core.Entities.TourCredit", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<decimal>("Amount")
+                        .HasPrecision(18, 2)
+                        .HasColumnType("numeric(18,2)");
+
+                    b.Property<decimal>("BalanceAfter")
+                        .HasPrecision(18, 2)
+                        .HasColumnType("numeric(18,2)");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("Description")
+                        .HasMaxLength(500)
+                        .HasColumnType("character varying(500)");
+
+                    b.Property<DateTime?>("ExpiresAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("boolean");
+
+                    b.Property<int?>("ReservationId")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("TransactionTypeId")
+                        .HasColumnType("integer");
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<int>("VisitorId")
+                        .HasColumnType("integer");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ReservationId");
+
+                    b.HasIndex("VisitorId");
+
+                    b.ToTable("TourCredits");
+                });
+
             modelBuilder.Entity("ErkanTatilPlani.Core.Entities.TourGuideAssignment", b =>
                 {
                     b.Property<int>("Id")
@@ -3070,6 +3359,10 @@ namespace ErkanTatilPlani.Data.Migrations
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("timestamp with time zone");
 
+                    b.Property<decimal>("CreditBalance")
+                        .HasPrecision(18, 2)
+                        .HasColumnType("numeric(18,2)");
+
                     b.Property<string>("Email")
                         .IsRequired()
                         .HasMaxLength(100)
@@ -3099,6 +3392,9 @@ namespace ErkanTatilPlani.Data.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
+                    b.Property<int>("LoyaltyTierId")
+                        .HasColumnType("integer");
+
                     b.Property<string>("NotificationPreference")
                         .HasMaxLength(500)
                         .HasColumnType("character varying(500)");
@@ -3121,6 +3417,10 @@ namespace ErkanTatilPlani.Data.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
+                    b.Property<string>("ReferralCode")
+                        .HasMaxLength(20)
+                        .HasColumnType("character varying(20)");
+
                     b.Property<DateTime?>("UpdatedAt")
                         .HasColumnType("timestamp with time zone");
 
@@ -3134,6 +3434,10 @@ namespace ErkanTatilPlani.Data.Migrations
                     b.HasIndex("Email")
                         .IsUnique();
 
+                    b.HasIndex("ReferralCode")
+                        .IsUnique()
+                        .HasFilter("\"ReferralCode\" IS NOT NULL");
+
                     b.ToTable("Visitors");
 
                     b.HasData(
@@ -3141,12 +3445,14 @@ namespace ErkanTatilPlani.Data.Migrations
                         {
                             Id = 1,
                             CreatedAt = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
+                            CreditBalance = 0m,
                             Email = "admin@erkantatilplani.com",
                             EmailVerified = false,
                             FirstName = "Sistem",
                             IdentityNumber = "11111111111",
                             IsActive = true,
                             LastName = "Admin",
+                            LoyaltyTierId = 0,
                             PasswordHash = "jZae727K08KaOmKSgOaGzww/XVqGr/PKEgIMkjrcbJI=",
                             Phone = "0532 111 1111",
                             PreferredLanguage = "tr",
@@ -3156,12 +3462,14 @@ namespace ErkanTatilPlani.Data.Migrations
                         {
                             Id = 2,
                             CreatedAt = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
+                            CreditBalance = 0m,
                             Email = "staff@erkantatilplani.com",
                             EmailVerified = false,
                             FirstName = "Personel",
                             IdentityNumber = "22222222222",
                             IsActive = true,
                             LastName = "Kullanici",
+                            LoyaltyTierId = 0,
                             PasswordHash = "jZae727K08KaOmKSgOaGzww/XVqGr/PKEgIMkjrcbJI=",
                             Phone = "0533 222 2222",
                             PreferredLanguage = "tr",
@@ -3172,12 +3480,14 @@ namespace ErkanTatilPlani.Data.Migrations
                             Id = 3,
                             CompanyId = 1,
                             CreatedAt = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
+                            CreditBalance = 0m,
                             Email = "ahmet@egetur.com",
                             EmailVerified = false,
                             FirstName = "Ahmet",
                             IdentityNumber = "33333333333",
                             IsActive = true,
                             LastName = "Yilmaz",
+                            LoyaltyTierId = 0,
                             PasswordHash = "jZae727K08KaOmKSgOaGzww/XVqGr/PKEgIMkjrcbJI=",
                             Phone = "0534 333 3333",
                             PreferredLanguage = "tr",
@@ -3188,12 +3498,14 @@ namespace ErkanTatilPlani.Data.Migrations
                             Id = 4,
                             CompanyId = 2,
                             CreatedAt = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
+                            CreditBalance = 0m,
                             Email = "mehmet@karadenizgezileri.com",
                             EmailVerified = false,
                             FirstName = "Mehmet",
                             IdentityNumber = "44444444444",
                             IsActive = true,
                             LastName = "Kaya",
+                            LoyaltyTierId = 0,
                             PasswordHash = "jZae727K08KaOmKSgOaGzww/XVqGr/PKEgIMkjrcbJI=",
                             Phone = "0535 444 4444",
                             PreferredLanguage = "tr",
@@ -3204,12 +3516,14 @@ namespace ErkanTatilPlani.Data.Migrations
                             Id = 5,
                             CompanyId = 3,
                             CreatedAt = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
+                            CreditBalance = 0m,
                             Email = "fatma@akdenizturizm.com",
                             EmailVerified = false,
                             FirstName = "Fatma",
                             IdentityNumber = "55555555555",
                             IsActive = true,
                             LastName = "Demir",
+                            LoyaltyTierId = 0,
                             PasswordHash = "jZae727K08KaOmKSgOaGzww/XVqGr/PKEgIMkjrcbJI=",
                             Phone = "0536 555 5555",
                             PreferredLanguage = "tr",
@@ -3220,12 +3534,14 @@ namespace ErkanTatilPlani.Data.Migrations
                             Id = 6,
                             CompanyId = 4,
                             CreatedAt = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
+                            CreditBalance = 0m,
                             Email = "ali@kapadokyabalonlari.com",
                             EmailVerified = false,
                             FirstName = "Ali",
                             IdentityNumber = "66666666666",
                             IsActive = true,
                             LastName = "Celik",
+                            LoyaltyTierId = 0,
                             PasswordHash = "jZae727K08KaOmKSgOaGzww/XVqGr/PKEgIMkjrcbJI=",
                             Phone = "0537 666 6666",
                             PreferredLanguage = "tr",
@@ -3236,12 +3552,14 @@ namespace ErkanTatilPlani.Data.Migrations
                             Id = 7,
                             CompanyId = 5,
                             CreatedAt = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
+                            CreditBalance = 0m,
                             Email = "ayse@istanbulturlari.com",
                             EmailVerified = false,
                             FirstName = "Ayse",
                             IdentityNumber = "77777777777",
                             IsActive = true,
                             LastName = "Ozturk",
+                            LoyaltyTierId = 0,
                             PasswordHash = "jZae727K08KaOmKSgOaGzww/XVqGr/PKEgIMkjrcbJI=",
                             Phone = "0538 777 7777",
                             PreferredLanguage = "tr",
@@ -3251,12 +3569,14 @@ namespace ErkanTatilPlani.Data.Migrations
                         {
                             Id = 8,
                             CreatedAt = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
+                            CreditBalance = 0m,
                             Email = "zeynep@gmail.com",
                             EmailVerified = false,
                             FirstName = "Zeynep",
                             IdentityNumber = "88888888888",
                             IsActive = true,
                             LastName = "Arslan",
+                            LoyaltyTierId = 0,
                             PasswordHash = "jZae727K08KaOmKSgOaGzww/XVqGr/PKEgIMkjrcbJI=",
                             Phone = "0539 888 8888",
                             PreferredLanguage = "tr",
@@ -3266,12 +3586,14 @@ namespace ErkanTatilPlani.Data.Migrations
                         {
                             Id = 9,
                             CreatedAt = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
+                            CreditBalance = 0m,
                             Email = "mustafa@gmail.com",
                             EmailVerified = false,
                             FirstName = "Mustafa",
                             IdentityNumber = "99999999999",
                             IsActive = true,
                             LastName = "Sahin",
+                            LoyaltyTierId = 0,
                             PasswordHash = "jZae727K08KaOmKSgOaGzww/XVqGr/PKEgIMkjrcbJI=",
                             Phone = "0530 999 9999",
                             PreferredLanguage = "tr",
@@ -3281,12 +3603,14 @@ namespace ErkanTatilPlani.Data.Migrations
                         {
                             Id = 10,
                             CreatedAt = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
+                            CreditBalance = 0m,
                             Email = "elif@gmail.com",
                             EmailVerified = false,
                             FirstName = "Elif",
                             IdentityNumber = "10101010101",
                             IsActive = true,
                             LastName = "Yildiz",
+                            LoyaltyTierId = 0,
                             PasswordHash = "jZae727K08KaOmKSgOaGzww/XVqGr/PKEgIMkjrcbJI=",
                             Phone = "0531 000 0000",
                             PreferredLanguage = "tr",
@@ -3296,12 +3620,14 @@ namespace ErkanTatilPlani.Data.Migrations
                         {
                             Id = 11,
                             CreatedAt = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
+                            CreditBalance = 0m,
                             Email = "emre@gmail.com",
                             EmailVerified = false,
                             FirstName = "Emre",
                             IdentityNumber = "12121212121",
                             IsActive = true,
                             LastName = "Koc",
+                            LoyaltyTierId = 0,
                             PasswordHash = "jZae727K08KaOmKSgOaGzww/XVqGr/PKEgIMkjrcbJI=",
                             Phone = "0541 111 1111",
                             PreferredLanguage = "tr",
@@ -3311,17 +3637,51 @@ namespace ErkanTatilPlani.Data.Migrations
                         {
                             Id = 12,
                             CreatedAt = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
+                            CreditBalance = 0m,
                             Email = "selin@gmail.com",
                             EmailVerified = false,
                             FirstName = "Selin",
                             IdentityNumber = "13131313131",
                             IsActive = true,
                             LastName = "Aydin",
+                            LoyaltyTierId = 0,
                             PasswordHash = "jZae727K08KaOmKSgOaGzww/XVqGr/PKEgIMkjrcbJI=",
                             Phone = "0542 222 2222",
                             PreferredLanguage = "tr",
                             UserTypeId = 0
                         });
+                });
+
+            modelBuilder.Entity("ErkanTatilPlani.Core.Entities.AbandonedCart", b =>
+                {
+                    b.HasOne("ErkanTatilPlani.Core.Entities.Reservation", "Reservation")
+                        .WithMany()
+                        .HasForeignKey("ReservationId")
+                        .OnDelete(DeleteBehavior.SetNull);
+
+                    b.HasOne("ErkanTatilPlani.Core.Entities.TourSchedule", "Schedule")
+                        .WithMany()
+                        .HasForeignKey("ScheduleId")
+                        .OnDelete(DeleteBehavior.SetNull);
+
+                    b.HasOne("ErkanTatilPlani.Core.Entities.Tour", "Tour")
+                        .WithMany()
+                        .HasForeignKey("TourId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("ErkanTatilPlani.Core.Entities.Visitor", "Visitor")
+                        .WithMany()
+                        .HasForeignKey("VisitorId")
+                        .OnDelete(DeleteBehavior.SetNull);
+
+                    b.Navigation("Reservation");
+
+                    b.Navigation("Schedule");
+
+                    b.Navigation("Tour");
+
+                    b.Navigation("Visitor");
                 });
 
             modelBuilder.Entity("ErkanTatilPlani.Core.Entities.BlogComment", b =>
@@ -3477,6 +3837,17 @@ namespace ErkanTatilPlani.Data.Migrations
                     b.Navigation("Company");
                 });
 
+            modelBuilder.Entity("ErkanTatilPlani.Core.Entities.LoyaltyTierHistory", b =>
+                {
+                    b.HasOne("ErkanTatilPlani.Core.Entities.Visitor", "Visitor")
+                        .WithMany("LoyaltyTierHistories")
+                        .HasForeignKey("VisitorId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Visitor");
+                });
+
             modelBuilder.Entity("ErkanTatilPlani.Core.Entities.Message", b =>
                 {
                     b.HasOne("ErkanTatilPlani.Core.Entities.Conversation", "Conversation")
@@ -3572,6 +3943,32 @@ namespace ErkanTatilPlani.Data.Migrations
                         .IsRequired();
 
                     b.Navigation("Visitor");
+                });
+
+            modelBuilder.Entity("ErkanTatilPlani.Core.Entities.Referral", b =>
+                {
+                    b.HasOne("ErkanTatilPlani.Core.Entities.Visitor", "ReferredVisitor")
+                        .WithMany("ReferralsReceived")
+                        .HasForeignKey("ReferredVisitorId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("ErkanTatilPlani.Core.Entities.Visitor", "ReferrerVisitor")
+                        .WithMany("ReferralsMade")
+                        .HasForeignKey("ReferrerVisitorId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("ErkanTatilPlani.Core.Entities.Reservation", "Reservation")
+                        .WithMany()
+                        .HasForeignKey("ReservationId")
+                        .OnDelete(DeleteBehavior.SetNull);
+
+                    b.Navigation("ReferredVisitor");
+
+                    b.Navigation("ReferrerVisitor");
+
+                    b.Navigation("Reservation");
                 });
 
             modelBuilder.Entity("ErkanTatilPlani.Core.Entities.Reservation", b =>
@@ -3702,6 +4099,24 @@ namespace ErkanTatilPlani.Data.Migrations
                     b.Navigation("Visitor");
                 });
 
+            modelBuilder.Entity("ErkanTatilPlani.Core.Entities.ScheduledEmail", b =>
+                {
+                    b.HasOne("ErkanTatilPlani.Core.Entities.Reservation", "Reservation")
+                        .WithMany()
+                        .HasForeignKey("ReservationId")
+                        .OnDelete(DeleteBehavior.SetNull);
+
+                    b.HasOne("ErkanTatilPlani.Core.Entities.Visitor", "Visitor")
+                        .WithMany()
+                        .HasForeignKey("VisitorId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Reservation");
+
+                    b.Navigation("Visitor");
+                });
+
             modelBuilder.Entity("ErkanTatilPlani.Core.Entities.Tour", b =>
                 {
                     b.HasOne("ErkanTatilPlani.Core.Entities.Company", "Company")
@@ -3711,6 +4126,24 @@ namespace ErkanTatilPlani.Data.Migrations
                         .IsRequired();
 
                     b.Navigation("Company");
+                });
+
+            modelBuilder.Entity("ErkanTatilPlani.Core.Entities.TourCredit", b =>
+                {
+                    b.HasOne("ErkanTatilPlani.Core.Entities.Reservation", "Reservation")
+                        .WithMany()
+                        .HasForeignKey("ReservationId")
+                        .OnDelete(DeleteBehavior.SetNull);
+
+                    b.HasOne("ErkanTatilPlani.Core.Entities.Visitor", "Visitor")
+                        .WithMany("TourCredits")
+                        .HasForeignKey("VisitorId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Reservation");
+
+                    b.Navigation("Visitor");
                 });
 
             modelBuilder.Entity("ErkanTatilPlani.Core.Entities.TourGuideAssignment", b =>
@@ -3913,9 +4346,15 @@ namespace ErkanTatilPlani.Data.Migrations
 
                     b.Navigation("HelpfulVotes");
 
+                    b.Navigation("LoyaltyTierHistories");
+
                     b.Navigation("Notifications");
 
                     b.Navigation("PushSubscriptions");
+
+                    b.Navigation("ReferralsMade");
+
+                    b.Navigation("ReferralsReceived");
 
                     b.Navigation("Reservations");
 
@@ -3924,6 +4363,8 @@ namespace ErkanTatilPlani.Data.Migrations
                     b.Navigation("Reviews");
 
                     b.Navigation("SentMessages");
+
+                    b.Navigation("TourCredits");
 
                     b.Navigation("TourWatches");
                 });

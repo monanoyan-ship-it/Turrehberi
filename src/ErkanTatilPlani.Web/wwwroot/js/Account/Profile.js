@@ -31,6 +31,12 @@ function ProfileViewModel() {
     self.prefSms = ko.observable(false);
     self.isSavingPrefs = ko.observable(false);
 
+    // Loyalty
+    self.loyaltyTierIcon = ko.observable('bi-compass');
+    self.loyaltyTierName = ko.observable('');
+    self.loyaltyTierCss = ko.observable('bg-secondary');
+    self.loyaltyCreditBalance = ko.observable(0);
+
     // Computed
     self.fullName = ko.computed(function() {
         return self.firstName() + ' ' + self.lastName();
@@ -103,6 +109,7 @@ function ProfileViewModel() {
 
                 self.isLoggedIn(true);
                 self.isLoading(false);
+                self.loadLoyalty();
             },
             error: function() {
                 localStorage.removeItem('token');
@@ -110,6 +117,21 @@ function ProfileViewModel() {
                 self.isLoading(false);
                 self.isLoggedIn(false);
             }
+        });
+    };
+
+    self.loadLoyalty = function() {
+        var token = localStorage.getItem('token');
+        if (!token) return;
+        $.ajax({
+            url: apiBaseUrl + '/api/loyalty/dashboard',
+            method: 'GET',
+            headers: { 'Authorization': 'Bearer ' + token }
+        }).done(function(data) {
+            self.loyaltyTierIcon(data.tierIcon || 'bi-compass');
+            self.loyaltyTierName(T(data.tierNameKey || ''));
+            self.loyaltyTierCss(data.tierCssClass || 'bg-secondary');
+            self.loyaltyCreditBalance(data.creditBalance || 0);
         });
     };
 

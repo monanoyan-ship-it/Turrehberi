@@ -2,6 +2,7 @@ using ErkanTatilPlani.Core.Entities;
 using ErkanTatilPlani.Core.EntityServices;
 using ErkanTatilPlani.Core.Enums;
 using ErkanTatilPlani.Core.Factories.Auth;
+using ErkanTatilPlani.Core.Factories.Referrals;
 using ErkanTatilPlani.Core.Helpers;
 using ErkanTatilPlani.Core.Infrastructure;
 
@@ -13,17 +14,20 @@ public class AuthFactory : IAuthFactory
     private readonly ICompanyEntityService _companyService;
     private readonly IUnitOfWork _unitOfWork;
     private readonly IJwtService _jwtService;
+    private readonly IReferralFactory _referralFactory;
 
     public AuthFactory(
         IVisitorEntityService visitorService,
         ICompanyEntityService companyService,
         IUnitOfWork unitOfWork,
-        IJwtService jwtService)
+        IJwtService jwtService,
+        IReferralFactory referralFactory)
     {
         _visitorService = visitorService;
         _companyService = companyService;
         _unitOfWork = unitOfWork;
         _jwtService = jwtService;
+        _referralFactory = referralFactory;
     }
 
     public async Task<(bool success, object result, int statusCode)> LoginAsync(string email, string password)
@@ -44,7 +48,7 @@ public class AuthFactory : IAuthFactory
 
     public async Task<(bool success, object result, int statusCode)> RegisterAsync(
         string firstName, string lastName, string email, string password,
-        string? phone, string? identityNumber)
+        string? phone, string? identityNumber, string? referralCode = null)
     {
         if (string.IsNullOrEmpty(email) || string.IsNullOrEmpty(password))
             return (false, new { error = "Validation.EmailPasswordRequired" }, 400);
@@ -74,6 +78,15 @@ public class AuthFactory : IAuthFactory
 
         _visitorService.Add(visitor);
         await _unitOfWork.SaveChangesAsync();
+
+        // Referans kodu uret ve referans isle
+        try
+        {
+            await _referralFactory.GetOrCreateReferralCodeAsync(visitor.Id);
+            if (!string.IsNullOrWhiteSpace(referralCode))
+                await _referralFactory.ProcessReferralSignupAsync(visitor.Id, referralCode);
+        }
+        catch { }
 
         var token = _jwtService.GenerateToken(visitor);
         return (true, AuthUserInfoHelper.BuildLoginResponse(token, visitor), 200);

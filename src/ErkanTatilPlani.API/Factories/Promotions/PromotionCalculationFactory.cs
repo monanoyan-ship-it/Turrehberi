@@ -11,14 +11,17 @@ public class PromotionCalculationFactory : IPromotionCalculationFactory
 {
     private readonly IPromotionEntityService _promotionService;
     private readonly ITourEntityService _tourService;
+    private readonly IVisitorEntityService _visitorService;
     private const decimal MaxTotalDiscountPercent = 0.50m; // Max %50 indirim
 
     public PromotionCalculationFactory(
         IPromotionEntityService promotionService,
-        ITourEntityService tourService)
+        ITourEntityService tourService,
+        IVisitorEntityService visitorService)
     {
         _promotionService = promotionService;
         _tourService = tourService;
+        _visitorService = visitorService;
     }
 
     public async Task<PriceCalculationResult> CalculatePriceAsync(
@@ -135,6 +138,35 @@ public class PromotionCalculationFactory : IPromotionCalculationFactory
                     {
                         currentPrice -= discount.DiscountAmount;
                         appliedDiscounts.Add(discount);
+                    }
+                }
+            }
+        }
+
+        // 6. Loyalty Tier Discount
+        if (visitorId.HasValue)
+        {
+            var visitor = await _visitorService.GetByIdAsync(visitorId.Value);
+            if (visitor != null)
+            {
+                var loyaltyDiscountPercent = LoyaltyTiers.GetDiscountPercent(visitor.LoyaltyTierId);
+                if (loyaltyDiscountPercent > 0)
+                {
+                    var loyaltyDiscount = currentPrice * loyaltyDiscountPercent / 100;
+                    if (loyaltyDiscount > 0)
+                    {
+                        var tier = LoyaltyTiers.GetById(visitor.LoyaltyTierId);
+                        currentPrice -= loyaltyDiscount;
+                        appliedDiscounts.Add(new AppliedDiscount
+                        {
+                            PromotionId = 0,
+                            PromotionName = tier?.SystemName ?? "Loyalty",
+                            PromotionType = "LoyaltyTier",
+                            DiscountType = "Percentage",
+                            DiscountValue = loyaltyDiscountPercent,
+                            DiscountAmount = Math.Round(loyaltyDiscount, 2),
+                            Rule = $"LoyaltyTier: {tier?.SystemName} %{loyaltyDiscountPercent}"
+                        });
                     }
                 }
             }

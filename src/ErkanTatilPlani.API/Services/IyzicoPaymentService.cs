@@ -159,7 +159,7 @@ public class IyzicoPaymentService : IPaymentService
                     Success = true,
                     PaymentId = checkoutForm.PaymentId,
                     ConversationId = checkoutForm.ConversationId,
-                    PaidAmount = decimal.TryParse(checkoutForm.PaidPrice, out var paid) ? paid : 0,
+                    PaidAmount = decimal.TryParse(checkoutForm.PaidPrice, System.Globalization.NumberStyles.Any, System.Globalization.CultureInfo.InvariantCulture, out var paid) ? paid : 0,
                     ReservationId = reservationId
                 };
             }
@@ -216,7 +216,7 @@ public class IyzicoPaymentService : IPaymentService
                     Success = true,
                     Status = status,
                     PaymentId = payment.PaymentId,
-                    PaidAmount = decimal.TryParse(payment.PaidPrice, out var paid) ? paid : 0
+                    PaidAmount = decimal.TryParse(payment.PaidPrice, System.Globalization.NumberStyles.Any, System.Globalization.CultureInfo.InvariantCulture, out var paid) ? paid : 0
                 };
             }
             else
