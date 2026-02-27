@@ -1,0 +1,711 @@
+function TourDetailViewModel() {
+    var self = this;
+    // apiBaseUrl is defined globally in _Layout.cshtml
+
+    // Tur verisi
+    self.tour = ko.observable(null);
+    self.isLoading = ko.observable(true);
+    self.isSaving = ko.observable(false);
+
+    // Tarih arama
+    self.searchDate = ko.observable('');
+    self.searchResults = ko.observableArray([]);
+    self.selectedSession = ko.observable(null);
+    self.isLoadingDates = ko.observable(false);
+    self.searchPerformed = ko.observable(false);
+
+    // Rezervasyon modal
+    self.reservationDate = ko.observable('');
+    self.reservationSessions = ko.observableArray([]);
+    self.selectedReservationSession = ko.observable(null);
+    self.showPaymentStep = ko.observable(false);
+    self.selectedPaymentMethod = ko.observable('iyzico');
+    self.paymentType = ko.observable('deposit');
+    self.numberOfPeople = ko.observable(1);
+    self.couponCode = ko.observable('');
+    self.couponDiscount = ko.observable(0);
+    self.totalDiscount = ko.observable(0);
+    self.appliedDiscounts = ko.observableArray([]);
+    self.reservationData = ko.observable({
+        fullName: '',
+        email: '',
+        phone: '',
+        numberOfPeople: 1,
+        notes: ''
+    });
+    self.participants = ko.observableArray([]);
+
+    // Yorumlar
+    self.reviews = ko.observableArray([]);
+    self.isLoadingReviews = ko.observable(false);
+    self.reviewSort = ko.observable('newest');
+    self.reviewRatingFilter = ko.observable('');
+    self.reviewPage = ko.observable(1);
+    self.reviewTotalPages = ko.observable(1);
+    self.reviewFormData = ko.observable({
+        overallRating: 0, serviceRating: '', valueRating: '', locationRating: '',
+        organizationRating: '', guideRating: '', title: '', pros: '', cons: '',
+        comment: '', visitDate: '', travelTypeId: '0', wouldRecommend: true
+    });
+
+    // Yanit ve sikayet
+    self.selectedReviewId = ko.observable(null);
+    self.replyText = ko.observable('');
+    self.reportReasonId = ko.observable('');
+    self.reportDescription = ko.observable('');
+
+    // Favoriler
+    self.favoriteIds = ko.observableArray([]);
+    self.isFavorite = function(tourId) {
+        return self.favoriteIds().indexOf(tourId) !== -1;
+    };
+
+    // Takip
+    self.watchedIds = ko.observableArray([]);
+    self.watchTarget = ko.observable(null);
+    self.watchDays = ko.observable(7);
+    self.isWatching = function(tourId) {
+        return self.watchedIds().indexOf(tourId) !== -1;
+    };
+
+    // Kategoriler
+    self.categories = ko.observableArray([]);
+
+    // Modal referanslari
+    var writeReviewModal, replyModal, reportModal, reservationModal, watchModal;
+
+    // ===== Tur Yukle =====
+    self.loadTour = function(id) {
+        self.isLoading(true);
+        $.ajax({
+            url: apiBaseUrl + '/api/tours/' + id,
+            method: 'GET',
+            success: function(data) {
+                self.tour(data);
+                self.isLoading(false);
+                self.loadReviews(id, false);
+                self.loadWeather(id);
+                self.initShareButtons(data);
+                self.initMap(data);
+            },
+            error: function() {
+                self.tour(null);
+                self.isLoading(false);
+            }
+        });
+    };
+
+    // ===== Tarih Arama =====
+    self.searchDates = function() {
+        var tour = self.tour();
+        var dateStr = self.searchDate();
+        if (!tour || !dateStr) return;
+
+        self.isLoadingDates(true);
+        self.searchPerformed(true);
+        self.selectedSession(null);
+
+        var fromDate = dateStr;
+        var d = new Date(dateStr);
+        d.setDate(d.getDate() + 7);
+        var toDate = d.toISOString().substring(0, 10);
+
+        $.ajax({
+            url: apiBaseUrl + '/api/tours/' + tour.id + '/dates',
+            method: 'GET',
+            data: { from: fromDate, to: toDate },
+            success: function(data) {
+                var available = data.filter(function(d) { return d.isAvailable; });
+                self.searchResults(available);
+                self.isLoadingDates(false);
+            },
+            error: function() {
+                self.searchResults([]);
+                self.isLoadingDates(false);
+            }
+        });
+    };
+
+    self.selectSession = function(session) {
+        var tokenOrId = session.token || ('d:' + session.id);
+        if (self.selectedSession() && self.selectedSession().token === tokenOrId) {
+            self.selectedSession(null);
+        } else {
+            session.token = tokenOrId;
+            self.selectedSession(session);
+        }
+    };
+
+    // ===== Rezervasyon Modal - Tarih Arama =====
+    self.onReservationDateChange = function() {
+        var tour = self.tour();
+        var dateStr = self.reservationDate();
+        if (!tour || !dateStr) {
+            self.reservationSessions([]);
+            return;
+        }
+        self.isLoadingDates(true);
+        self.selectedReservationSession(null);
+        $.ajax({
+            url: apiBaseUrl + '/api/tours/' + tour.id + '/dates',
+            method: 'GET',
+            data: { from: dateStr, to: dateStr },
+            success: function(data) {
+                var available = data.filter(function(d) { return d.isAvailable; });
+                self.reservationSessions(available);
+                self.isLoadingDates(false);
+            },
+            error: function() {
+                self.reservationSessions([]);
+                self.isLoadingDates(false);
+            }
+        });
+    };
+
+    self.selectReservationSession = function(session) {
+        var tokenOrId = session.token || ('d:' + session.id);
+        if (self.selectedReservationSession() && self.selectedReservationSession().token === tokenOrId) {
+            self.selectedReservationSession(null);
+        } else {
+            session.token = tokenOrId;
+            self.selectedReservationSession(session);
+        }
+    };
+
+    // ===== Formatting =====
+    self.formatDate = function(dateStr) {
+        var d = new Date(dateStr);
+        return d.toLocaleDateString('tr-TR', {weekday:'short', day:'numeric', month:'short'});
+    };
+
+    self.formatSessionDuration = function(session) {
+        var time = session.startTime || '00:00';
+        var val = session.durationValue || 1;
+        var unit = (session.durationUnit || 'Day').toLowerCase();
+        if (unit === 'hour') {
+            var parts = time.split(':');
+            var startH = parseInt(parts[0]); var startM = parseInt(parts[1] || '0');
+            var endH = startH + val; var endM = startM;
+            return String(startH).padStart(2,'0') + ':' + String(startM).padStart(2,'0') + ' - ' + String(endH).padStart(2,'0') + ':' + String(endM).padStart(2,'0');
+        }
+        if (unit === 'day') return val + ' ' + (T('Common.Day') || 'gun');
+        if (unit === 'week') return val + ' ' + (T('Common.Week') || 'hafta');
+        if (unit === 'month') return val + ' ' + (T('Common.Month') || 'ay');
+        return val + ' ' + unit;
+    };
+
+    self.renderStars = function(rating) {
+        var html = '';
+        for (var i = 1; i <= 5; i++) {
+            html += '<i class="bi ' + (i <= rating ? 'bi-star-fill text-warning' : 'bi-star text-muted') + '"></i>';
+        }
+        return html;
+    };
+
+    self.canWriteReview = ko.computed(function() {
+        return window.currentUser && window.currentUser.id;
+    });
+
+    self.hasMoreReviews = ko.computed(function() {
+        return self.reviewPage() < self.reviewTotalPages();
+    });
+
+    var travelTypeNames = { 0: 'Yalniz', 1: 'Cift', 2: 'Aile', 3: 'Arkadaslar', 4: 'Is Seyahati' };
+    self.getTravelTypeName = function(id) { return travelTypeNames[id] || ''; };
+
+    // ===== Difficulty / Category =====
+    var difficultyMap = {
+        0: { name: T('TourDifficulty.Easy') || 'Kolay', css: 'bg-success' },
+        1: { name: T('TourDifficulty.Moderate') || 'Orta', css: 'bg-info' },
+        2: { name: T('TourDifficulty.Challenging') || 'Zor', css: 'bg-warning text-dark' },
+        3: { name: T('TourDifficulty.Expert') || 'Uzman', css: 'bg-danger' }
+    };
+    self.getDifficultyName = function(id) { return difficultyMap[id] ? difficultyMap[id].name : ''; };
+    self.getDifficultyBadgeClass = function(id) { return difficultyMap[id] ? difficultyMap[id].css : 'bg-secondary'; };
+    self.getCategoryName = function(id) {
+        var cat = self.categories().find(function(c) { return c.id === id; });
+        return cat ? (T(cat.nameResourceKey) || cat.systemName) : '';
+    };
+
+    // ===== Yorumlar =====
+    self.loadReviews = function(tourId, append) {
+        if (!append) { self.reviewPage(1); self.reviews([]); }
+        self.isLoadingReviews(true);
+        var params = { sort: self.reviewSort(), page: self.reviewPage(), pageSize: 5 };
+        if (self.reviewRatingFilter()) params.rating = self.reviewRatingFilter();
+        $.ajax({
+            url: apiBaseUrl + '/api/tours/' + tourId + '/reviews',
+            method: 'GET',
+            data: params,
+            success: function(data) {
+                if (append) { self.reviews(self.reviews().concat(data.reviews)); }
+                else { self.reviews(data.reviews); }
+                self.reviewTotalPages(data.pagination.totalPages);
+                self.isLoadingReviews(false);
+            },
+            error: function() { toastr.error('Yorumlar yuklenirken hata olustu'); self.isLoadingReviews(false); }
+        });
+    };
+
+    self.loadMoreReviews = function() {
+        self.reviewPage(self.reviewPage() + 1);
+        self.loadReviews(self.tour().id, true);
+    };
+
+    self.reviewSort.subscribe(function() { if (self.tour()) self.loadReviews(self.tour().id, false); });
+    self.reviewRatingFilter.subscribe(function() { if (self.tour()) self.loadReviews(self.tour().id, false); });
+
+    self.openWriteReviewModal = function() {
+        if (!self.canWriteReview()) { toastr.warning('Yorum yapmak icin giris yapmaniz gerekiyor'); return; }
+        self.reviewFormData({
+            overallRating: 0, serviceRating: '', valueRating: '', locationRating: '',
+            organizationRating: '', guideRating: '', title: '', pros: '', cons: '',
+            comment: '', visitDate: '', travelTypeId: '0', wouldRecommend: true
+        });
+        writeReviewModal.show();
+    };
+
+    self.submitReview = function() {
+        var data = self.reviewFormData();
+        if (data.overallRating < 1) { toastr.warning('Lutfen bir puan secin'); return; }
+        self.isSaving(true);
+        $.ajax({
+            url: apiBaseUrl + '/api/tours/' + self.tour().id + '/reviews',
+            method: 'POST',
+            contentType: 'application/json',
+            data: JSON.stringify({
+                visitorId: window.currentUser.id,
+                overallRating: data.overallRating,
+                serviceRating: data.serviceRating ? parseInt(data.serviceRating) : null,
+                valueRating: data.valueRating ? parseInt(data.valueRating) : null,
+                locationRating: data.locationRating ? parseInt(data.locationRating) : null,
+                organizationRating: data.organizationRating ? parseInt(data.organizationRating) : null,
+                guideRating: data.guideRating ? parseInt(data.guideRating) : null,
+                title: data.title, pros: data.pros, cons: data.cons, comment: data.comment,
+                visitDate: data.visitDate || null, travelTypeId: parseInt(data.travelTypeId),
+                wouldRecommend: data.wouldRecommend
+            }),
+            success: function(response) {
+                writeReviewModal.hide();
+                toastr.success(response.message || 'Yorumunuz eklendi');
+                self.loadReviews(self.tour().id, false);
+                self.loadTour(self.tour().id);
+                self.isSaving(false);
+            },
+            error: function(xhr) { toastr.error(xhr.responseJSON ? xhr.responseJSON.message : 'Hata olustu'); self.isSaving(false); }
+        });
+    };
+
+    self.voteHelpful = function(reviewId, isHelpful) {
+        if (!self.canWriteReview()) { toastr.warning('Oy vermek icin giris yapmaniz gerekiyor'); return; }
+        $.ajax({
+            url: apiBaseUrl + '/api/reviews/' + reviewId + '/helpful',
+            method: 'POST',
+            contentType: 'application/json',
+            data: JSON.stringify({ visitorId: window.currentUser.id, isHelpful: isHelpful }),
+            success: function(response) {
+                var review = self.reviews().find(function(r) { return r.id === reviewId; });
+                if (review) { review.helpfulCount = response.helpfulCount; review.notHelpfulCount = response.notHelpfulCount; self.reviews.valueHasMutated(); }
+                toastr.success(response.message);
+            },
+            error: function(xhr) { toastr.error(xhr.responseJSON ? xhr.responseJSON.message : 'Hata olustu'); }
+        });
+    };
+
+    self.openReplyModal = function(reviewId) {
+        if (!self.canWriteReview()) { toastr.warning('Yanit vermek icin giris yapmaniz gerekiyor'); return; }
+        self.selectedReviewId(reviewId);
+        self.replyText('');
+        replyModal.show();
+    };
+
+    self.submitReply = function() {
+        if (!self.replyText()) return;
+        self.isSaving(true);
+        $.ajax({
+            url: apiBaseUrl + '/api/reviews/' + self.selectedReviewId() + '/reply',
+            method: 'POST',
+            contentType: 'application/json',
+            data: JSON.stringify({ visitorId: window.currentUser.id, comment: self.replyText() }),
+            success: function(response) {
+                replyModal.hide();
+                toastr.success(response.message || 'Yanitiniz eklendi');
+                self.loadReviews(self.tour().id, false);
+                self.isSaving(false);
+            },
+            error: function(xhr) { toastr.error(xhr.responseJSON ? xhr.responseJSON.message : 'Hata olustu'); self.isSaving(false); }
+        });
+    };
+
+    self.openReportModal = function(reviewId) {
+        if (!self.canWriteReview()) { toastr.warning('Sikayet etmek icin giris yapmaniz gerekiyor'); return; }
+        self.selectedReviewId(reviewId);
+        self.reportReasonId('');
+        self.reportDescription('');
+        reportModal.show();
+    };
+
+    self.submitReport = function() {
+        if (!self.reportReasonId()) return;
+        self.isSaving(true);
+        $.ajax({
+            url: apiBaseUrl + '/api/reviews/' + self.selectedReviewId() + '/report',
+            method: 'POST',
+            contentType: 'application/json',
+            data: JSON.stringify({ visitorId: window.currentUser.id, reasonId: parseInt(self.reportReasonId()), description: self.reportDescription() }),
+            success: function(response) { reportModal.hide(); toastr.success(response.message || 'Sikayetiniz alindi'); self.isSaving(false); },
+            error: function(xhr) { toastr.error(xhr.responseJSON ? xhr.responseJSON.message : 'Hata olustu'); self.isSaving(false); }
+        });
+    };
+
+    // ===== Favoriler =====
+    self.loadFavorites = function() {
+        if (!window.currentUser || !window.currentUser.id) return;
+        $.ajax({
+            url: apiBaseUrl + '/api/visitors/' + window.currentUser.id + '/favorites',
+            method: 'GET',
+            success: function(data) { self.favoriteIds(data.map(function(f) { return f.tourId; })); }
+        });
+    };
+
+    self.toggleFavorite = function(tourId) {
+        if (!window.currentUser || !window.currentUser.id) { toastr.warning('Giris yapmaniz gerekiyor'); return; }
+        var isFav = self.isFavorite(tourId);
+        $.ajax({
+            url: apiBaseUrl + '/api/tours/' + tourId + '/favorite',
+            method: isFav ? 'DELETE' : 'POST',
+            contentType: 'application/json',
+            data: JSON.stringify({ visitorId: window.currentUser.id }),
+            success: function() {
+                if (isFav) { self.favoriteIds.remove(tourId); }
+                else { self.favoriteIds.push(tourId); }
+                toastr.success(isFav ? 'Favorilerden cikarildi' : 'Favorilere eklendi');
+            },
+            error: function(xhr) { toastr.error(xhr.responseJSON ? xhr.responseJSON.message : 'Hata olustu'); }
+        });
+    };
+
+    // ===== Takip =====
+    self.loadWatches = function() {
+        if (!window.currentUser || !window.currentUser.id) return;
+        $.ajax({
+            url: apiBaseUrl + '/api/visitors/' + window.currentUser.id + '/watches',
+            method: 'GET',
+            success: function(data) { self.watchedIds(data.map(function(w) { return w.tourId; })); }
+        });
+    };
+
+    self.openWatchPopover = function(tour) {
+        if (!window.currentUser || !window.currentUser.id) { toastr.warning('Giris yapmaniz gerekiyor'); return; }
+        if (self.isWatching(tour.id)) {
+            self.removeWatch(tour.id);
+            return;
+        }
+        self.watchTarget(tour);
+        self.watchDays(7);
+        watchModal.show();
+    };
+
+    self.toggleWatch = function() {
+        var tour = self.watchTarget();
+        if (!tour) return;
+        $.ajax({
+            url: apiBaseUrl + '/api/tours/' + tour.id + '/watch',
+            method: 'POST',
+            contentType: 'application/json',
+            data: JSON.stringify({ visitorId: window.currentUser.id, durationDays: self.watchDays() }),
+            success: function() {
+                self.watchedIds.push(tour.id);
+                watchModal.hide();
+                toastr.success('Tur takibe alindi');
+            },
+            error: function(xhr) { toastr.error(xhr.responseJSON ? xhr.responseJSON.message : 'Hata olustu'); }
+        });
+    };
+
+    self.removeWatch = function(tourId) {
+        $.ajax({
+            url: apiBaseUrl + '/api/tours/' + tourId + '/watch',
+            method: 'DELETE',
+            contentType: 'application/json',
+            data: JSON.stringify({ visitorId: window.currentUser.id }),
+            success: function() {
+                self.watchedIds.remove(tourId);
+                toastr.success('Takip kaldirildi');
+            },
+            error: function(xhr) { toastr.error(xhr.responseJSON ? xhr.responseJSON.message : 'Hata olustu'); }
+        });
+    };
+
+    // ===== Hava Durumu =====
+    self.loadWeather = function(tourId) {
+        $('#weatherWidget').hide();
+        $.ajax({
+            url: apiBaseUrl + '/api/weather/tour/' + tourId,
+            method: 'GET'
+        }).done(function(data) {
+            if (data) {
+                var iconUrl = 'https://openweathermap.org/img/wn/' + (data.icon || '01d') + '@2x.png';
+                $('#weatherIcon').attr('src', iconUrl);
+                $('#weatherTemp').text(data.temperature + '\u00B0C');
+                $('#weatherCondition').text(data.condition);
+                $('#weatherHumidity').html('<i class="bi bi-droplet"></i> ' + data.humidity + '%');
+                $('#weatherWind').html('<i class="bi bi-wind"></i> ' + data.windSpeed + ' m/s');
+                var recText = T(data.recommendation) || '';
+                if (recText) {
+                    var alertClass = data.isRainy ? 'text-warning' : 'text-success';
+                    $('#weatherRecommendation').html('<i class="bi bi-info-circle ' + alertClass + '"></i> <span class="' + alertClass + '">' + recText + '</span>');
+                } else {
+                    $('#weatherRecommendation').empty();
+                }
+                $('#weatherWidget').show();
+            }
+        });
+    };
+
+    // ===== Paylas Butonlari =====
+    self.initShareButtons = function(tour) {
+        var shareUrl = window.location.origin + '/Tours/Details/' + tour.id;
+        var shareText = tour.name + ' - ' + tour.destination + ' | Erkan Tatil Plani';
+        $('#tourShareButtons').html(SocialShare.renderButtons({
+            url: shareUrl,
+            text: shareText,
+            size: 'sm',
+            platforms: ['facebook', 'twitter', 'whatsapp', 'telegram', 'copy']
+        }));
+    };
+
+    // ===== Harita =====
+    self.initMap = function(tour) {
+        if (!tour.latitude || !tour.longitude) return;
+        setTimeout(function() {
+            var mapEl = document.getElementById('tourMap');
+            if (!mapEl) return;
+            var map = L.map('tourMap').setView([tour.latitude, tour.longitude], 14);
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                attribution: '&copy; OpenStreetMap'
+            }).addTo(map);
+            L.marker([tour.latitude, tour.longitude]).addTo(map)
+                .bindPopup('<strong>' + tour.name + '</strong>' + (tour.meetingPoint ? '<br>' + tour.meetingPoint : ''))
+                .openPopup();
+        }, 300);
+    };
+
+    // ===== Rezervasyon Modal =====
+    self.openReservationModal = function(tour) {
+        var user = getUser();
+        if (!user) {
+            toastr.warning(T('Error.LoginRequired') || 'Rezervasyon yapmak icin giris yapmaniz gerekiyor');
+            window.location.href = '/Account/Login?returnUrl=' + encodeURIComponent('/Tours/Details/' + tour.id);
+            return;
+        }
+        if (user.userTypeId >= 1) {
+            toastr.warning(T('Error.CompanyCannotReserve'));
+            return;
+        }
+
+        self.numberOfPeople(1);
+        self.showPaymentStep(false);
+        self.paymentType('deposit');
+        self.selectedReservationSession(null);
+        self.couponCode('');
+        self.couponDiscount(0);
+        self.totalDiscount(0);
+        self.appliedDiscounts([]);
+        self.participants([]);
+
+        // Sidebar'dan secilen seans bilgisini reservation modal'a aktar
+        if (self.selectedSession()) {
+            self.reservationDate(self.selectedSession().date);
+            // Secilen tarih icin seanslari yukle
+            self.onReservationDateChange();
+        } else {
+            self.reservationDate('');
+            self.reservationSessions([]);
+        }
+
+        if (user) {
+            self.reservationData({
+                fullName: (user.firstName || '') + ' ' + (user.lastName || ''),
+                email: user.email || '',
+                phone: user.phone || '',
+                numberOfPeople: 1,
+                notes: ''
+            });
+        } else {
+            self.reservationData({ fullName: '', email: '', phone: '', numberOfPeople: 1, notes: '' });
+        }
+        reservationModal.show();
+    };
+
+    // ===== Fiyat Hesaplama =====
+    self.calculateTotal = ko.computed(function() {
+        var tour = self.tour();
+        var people = self.numberOfPeople() || 1;
+        if (!tour) return '\u20BA0';
+        return (tour.price * people).toLocaleString('tr-TR', {style: 'currency', currency: 'TRY'});
+    });
+
+    self.getDepositPercentage = function() {
+        var tour = self.tour();
+        if (tour && tour.company && tour.company.depositPercentage) return tour.company.depositPercentage;
+        return 30;
+    };
+
+    self.calculateDeposit = ko.computed(function() {
+        var tour = self.tour();
+        var people = self.numberOfPeople() || 1;
+        if (!tour) return '\u20BA0';
+        return (tour.price * people * (self.getDepositPercentage() / 100)).toLocaleString('tr-TR', {style: 'currency', currency: 'TRY'});
+    });
+
+    self.calculateRemaining = ko.computed(function() {
+        var tour = self.tour();
+        var people = self.numberOfPeople() || 1;
+        if (!tour) return '\u20BA0';
+        return (tour.price * people * ((100 - self.getDepositPercentage()) / 100)).toLocaleString('tr-TR', {style: 'currency', currency: 'TRY'});
+    });
+
+    self.calculateFinalTotal = ko.computed(function() {
+        var tour = self.tour();
+        var people = self.numberOfPeople() || 1;
+        if (!tour) return '\u20BA0';
+        var total = tour.price * people;
+        var discount = self.totalDiscount() || 0;
+        return (total - discount).toLocaleString('tr-TR', {style: 'currency', currency: 'TRY'});
+    });
+
+    self.calculatePayNow = ko.computed(function() {
+        var tour = self.tour();
+        var people = self.numberOfPeople() || 1;
+        if (!tour) return '\u20BA0';
+        var total = tour.price * people;
+        var discount = self.totalDiscount() || 0;
+        var finalTotal = total - discount;
+        if (self.paymentType() === 'full') return finalTotal.toLocaleString('tr-TR', {style: 'currency', currency: 'TRY'});
+        return (finalTotal * (self.getDepositPercentage() / 100)).toLocaleString('tr-TR', {style: 'currency', currency: 'TRY'});
+    });
+
+    self.selectPaymentType = function(type) { self.paymentType(type); };
+    self.selectPaymentMethod = function(method) { self.selectedPaymentMethod(method); };
+
+    self.applyCoupon = function() {
+        var tour = self.tour();
+        var code = self.couponCode();
+        if (!tour || !code) { toastr.warning('Lutfen bir kupon kodu girin'); return; }
+        $.ajax({
+            url: apiBaseUrl + '/api/tours/' + tour.id + '/calculate-price',
+            method: 'POST',
+            contentType: 'application/json',
+            data: JSON.stringify({ numberOfPeople: self.numberOfPeople() || 1, couponCode: code })
+        }).done(function(result) {
+            if (result.totalDiscount > 0) {
+                self.totalDiscount(result.totalDiscount);
+                self.appliedDiscounts(result.appliedDiscounts || []);
+                var couponDisc = (result.appliedDiscounts || []).filter(function(d) { return d.promotionType === 'Coupon'; });
+                self.couponDiscount(couponDisc.length > 0 ? couponDisc[0].discountAmount : 0);
+                toastr.success('Kupon uyguland\u0131');
+            } else {
+                self.couponDiscount(0); self.totalDiscount(0); self.appliedDiscounts([]);
+                toastr.warning('Bu kupon gecerli degil veya indirim uygulanamadi');
+            }
+        }).fail(function() { toastr.error('Kupon dogrulanamadi'); });
+    };
+
+    // ===== Katilimci =====
+    self.addParticipant = function() {
+        self.participants.push({ name: ko.observable(''), age: ko.observable(''), diet: ko.observable(''), health: ko.observable('') });
+    };
+    self.removeParticipant = function(p) { self.participants.remove(p); };
+
+    // ===== Odeme Adimlari =====
+    self.goToPaymentStep = function() {
+        if (!self.selectedReservationSession()) {
+            toastr.warning(T('TourDate.NoSessionSelected') || 'Lutfen bir tarih ve saat secin');
+            return;
+        }
+        var form = document.getElementById('reservationForm');
+        if (!form.checkValidity()) { form.reportValidity(); return; }
+        var data = self.reservationData();
+        data.numberOfPeople = self.numberOfPeople();
+        self.showPaymentStep(true);
+    };
+
+    self.goBackToForm = function() { self.showPaymentStep(false); };
+
+    self.submitPayment = function() {
+        var tour = self.tour();
+        var data = self.reservationData();
+        if (!tour) { toastr.error('Tur bilgisi bulunamadi'); return; }
+        if (!self.selectedPaymentMethod()) { toastr.warning('Lutfen bir odeme yontemi secin'); return; }
+        self.isSaving(true);
+
+        var participantInfo = null;
+        if (self.participants().length > 0) {
+            participantInfo = JSON.stringify(self.participants().map(function(p) {
+                return { name: p.name(), age: p.age(), diet: p.diet(), health: p.health() };
+            }));
+        }
+
+        var session = self.selectedReservationSession();
+        $.ajax({
+            url: apiBaseUrl + '/api/reservations/public/create',
+            method: 'POST',
+            contentType: 'application/json',
+            data: JSON.stringify({
+                tourId: tour.id,
+                dateToken: session ? session.token : null,
+                fullName: data.fullName,
+                email: data.email,
+                phone: data.phone,
+                numberOfPeople: self.numberOfPeople(),
+                notes: data.notes || '',
+                couponCode: self.couponCode() || null,
+                participantInfo: participantInfo,
+                payFullAmount: self.paymentType() === 'full'
+            }),
+            success: function(response) {
+                if (response.success && response.paymentPageUrl) {
+                    reservationModal.hide();
+                    self.showPaymentStep(false);
+                    toastr.info('Odeme sayfasina yonlendiriliyorsunuz...');
+                    setTimeout(function() { window.location.href = response.paymentPageUrl; }, 500);
+                } else {
+                    toastr.error(response.message || 'Rezervasyon olusturulamadi');
+                    self.isSaving(false);
+                }
+            },
+            error: function(xhr) {
+                var msg = 'Bir hata olustu';
+                if (xhr.responseJSON) msg = xhr.responseJSON.message || xhr.responseJSON.error || msg;
+                toastr.error(msg);
+                self.isSaving(false);
+            }
+        });
+    };
+
+    // ===== Kategorileri yukle =====
+    self.loadCategories = function() {
+        $.ajax({
+            url: apiBaseUrl + '/api/tours/categories',
+            method: 'GET',
+            success: function(data) { self.categories(data); }
+        });
+    };
+
+    // ===== Init =====
+    $(document).ready(function() {
+        writeReviewModal = new bootstrap.Modal(document.getElementById('writeReviewModal'));
+        replyModal = new bootstrap.Modal(document.getElementById('replyModal'));
+        reportModal = new bootstrap.Modal(document.getElementById('reportModal'));
+        reservationModal = new bootstrap.Modal(document.getElementById('reservationModal'));
+        watchModal = new bootstrap.Modal(document.getElementById('watchModal'));
+        self.loadCategories();
+        self.loadFavorites();
+        self.loadWatches();
+        self.loadTour(tourId);
+    });
+}
+
+var detailVM = new TourDetailViewModel();
+ko.applyBindings(detailVM, document.getElementById('tourDetailApp'));

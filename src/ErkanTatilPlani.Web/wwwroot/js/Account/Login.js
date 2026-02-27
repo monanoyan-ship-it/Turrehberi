@@ -32,7 +32,9 @@ function LoginViewModel() {
                 } else if (userTypeId === 1) { // CompanyOwner
                     window.location.href = '/MyCompany';
                 } else {
-                    window.location.href = '/';
+                    var urlParams = new URLSearchParams(window.location.search);
+                    var returnUrl = urlParams.get('returnUrl');
+                    window.location.href = returnUrl || '/';
                 }
             },
             error: function(xhr) {

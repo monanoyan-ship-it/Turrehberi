@@ -328,13 +328,6 @@ function ToursViewModel() {
         if (unit === 'month') return val + ' ' + (T('Common.Month') || 'ay');
         return val + ' ' + unit;
     };
-    self.calendarMonth = ko.observable(new Date().toISOString().substring(0, 7)); // "2026-02"
-    self.calendarMonthLabel = ko.computed(function() {
-        var parts = self.calendarMonth().split('-');
-        var months = ['Ocak','Subat','Mart','Nisan','Mayis','Haziran','Temmuz','Agustos','Eylul','Ekim','Kasim','Aralik'];
-        return months[parseInt(parts[1]) - 1] + ' ' + parts[0];
-    });
-
     self.loadTourDates = function(tourId) {
         self.isLoadingDates(true);
         $.ajax({
@@ -351,62 +344,6 @@ function ToursViewModel() {
         });
     };
 
-    self.changeCalendarMonth = function(delta) {
-        var parts = self.calendarMonth().split('-');
-        var d = new Date(parseInt(parts[0]), parseInt(parts[1]) - 1 + delta, 1);
-        self.calendarMonth(d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0'));
-        if (self.selectedTour()) {
-            self.loadCheapestDates(self.selectedTour().id);
-        }
-    };
-
-    self.loadCheapestDates = function(tourId) {
-        self.isLoadingDates(true);
-        $.ajax({
-            url: apiBaseUrl + '/api/tours/' + tourId + '/dates/cheapest',
-            method: 'GET',
-            data: { month: self.calendarMonth() },
-            success: function(data) {
-                self.tourDates(data);
-                self.isLoadingDates(false);
-            },
-            error: function() {
-                self.tourDates([]);
-                self.isLoadingDates(false);
-            }
-        });
-    };
-
-    // Yorum verileri
-    self.reviews = ko.observableArray([]);
-    self.isLoadingReviews = ko.observable(false);
-    self.reviewSort = ko.observable('newest');
-    self.reviewRatingFilter = ko.observable('');
-    self.reviewPage = ko.observable(1);
-    self.reviewTotalPages = ko.observable(1);
-
-    // Yorum yazma formu
-    self.reviewFormData = ko.observable({
-        overallRating: 0,
-        serviceRating: '',
-        valueRating: '',
-        locationRating: '',
-        organizationRating: '',
-        guideRating: '',
-        title: '',
-        pros: '',
-        cons: '',
-        comment: '',
-        visitDate: '',
-        travelTypeId: '0',
-        wouldRecommend: true
-    });
-
-    // Yanit ve sikayet
-    self.selectedReviewId = ko.observable(null);
-    self.replyText = ko.observable('');
-    self.reportReasonId = ko.observable('');
-    self.reportDescription = ko.observable('');
 
     // Rezervasyon verileri
     self.reservationData = ko.observable({
@@ -501,47 +438,14 @@ function ToursViewModel() {
     });
 
     // Modal referanslari
-    var detailsModal, reservationModal, writeReviewModal, replyModal, reportModal, watchModal;
+    var reservationModal, watchModal;
 
     // Seyahat tipi isimleri
-    var travelTypes = {
-        0: 'Yalniz', 1: 'Cift', 2: 'Aile', 3: 'Arkadaslar', 4: 'Is Seyahati'
-    };
-
-    self.getTravelTypeName = function(id) {
-        return travelTypes[id] || '';
-    };
-
-    // Yildiz render
-    self.renderStars = function(rating) {
-        var html = '';
-        for (var i = 1; i <= 5; i++) {
-            if (i <= rating) {
-                html += '<i class="bi bi-star-fill text-warning"></i>';
-            } else if (i - 0.5 <= rating) {
-                html += '<i class="bi bi-star-half text-warning"></i>';
-            } else {
-                html += '<i class="bi bi-star text-warning"></i>';
-            }
-        }
-        return html;
-    };
-
     // Tarih formatlama
     self.formatDate = function(dateStr) {
         if (!dateStr) return '';
         var date = new Date(dateStr);
         return date.toLocaleDateString('tr-TR');
-    };
-
-    // Giris yapildi mi kontrolu
-    self.canWriteReview = function() {
-        return window.currentUser && window.currentUser.id;
-    };
-
-    // Daha fazla yorum var mi
-    self.hasMoreReviews = function() {
-        return self.reviewPage() < self.reviewTotalPages();
     };
 
     // Turlari yukle
@@ -584,6 +488,16 @@ function ToursViewModel() {
                 }
 
                 self.isLoading(false);
+
+                // URL'den ?tour=ID parametresi varsa detay sayfasina yonlendir
+                if (!self._tourParamHandled) {
+                    self._tourParamHandled = true;
+                    var urlParams = new URLSearchParams(window.location.search);
+                    var tourId = parseInt(urlParams.get('tour'));
+                    if (tourId) {
+                        window.location.href = '/Tours/Details/' + tourId;
+                    }
+                }
             },
             error: function() {
                 toastr.error('Turlar yuklenirken hata olustu');
@@ -693,8 +607,8 @@ function ToursViewModel() {
                 '<span class="badge bg-primary">' + tour.price.toLocaleString('tr-TR', {style: 'currency', currency: 'TRY'}) + '</span> ' +
                 '<small class="text-muted">' + tour.durationDays + ' ' + T('Tour.Days') + '</small><br/>' +
                 (tour.reviewCount > 0 ? '<i class="bi bi-star-fill text-warning"></i> ' + tour.averageRating.toFixed(1) + ' (' + tour.reviewCount + ')' : '') +
-                '<br/><button class="btn btn-sm btn-outline-primary mt-2" onclick="toursVM.showDetails(toursVM.tours().find(function(t){return t.id===' + tour.id + '}))">' +
-                '<i class="bi bi-info-circle"></i> ' + T('Tours.Details') + '</button>' +
+                '<br/><a class="btn btn-sm btn-outline-primary mt-2" href="/Tours/Details/' + tour.id + '">' +
+                '<i class="bi bi-info-circle"></i> ' + T('Tours.Details') + '</a>' +
                 '</div>';
 
             marker.bindPopup(popupContent);
@@ -732,294 +646,22 @@ function ToursViewModel() {
         }, 300);
     });
 
-    // Yorumlari yukle
-    self.loadReviews = function(tourId, append) {
-        if (!append) {
-            self.reviewPage(1);
-            self.reviews([]);
-        }
 
-        self.isLoadingReviews(true);
-        var params = {
-            sort: self.reviewSort(),
-            page: self.reviewPage(),
-            pageSize: 5
-        };
-        if (self.reviewRatingFilter()) {
-            params.rating = self.reviewRatingFilter();
-        }
-
-        $.ajax({
-            url: apiBaseUrl + '/api/tours/' + tourId + '/reviews',
-            method: 'GET',
-            data: params,
-            success: function(data) {
-                if (append) {
-                    self.reviews(self.reviews().concat(data.reviews));
-                } else {
-                    self.reviews(data.reviews);
-                }
-                self.reviewTotalPages(data.pagination.totalPages);
-                self.isLoadingReviews(false);
-            },
-            error: function() {
-                toastr.error('Yorumlar yuklenirken hata olustu');
-                self.isLoadingReviews(false);
-            }
-        });
-    };
-
-    // Daha fazla yorum yukle
-    self.loadMoreReviews = function() {
-        self.reviewPage(self.reviewPage() + 1);
-        self.loadReviews(self.selectedTour().id, true);
-    };
-
-    // Filtre/siralama degistiginde yorumlari yeniden yukle
-    self.reviewSort.subscribe(function() {
-        if (self.selectedTour()) {
-            self.loadReviews(self.selectedTour().id, false);
-        }
-    });
-    self.reviewRatingFilter.subscribe(function() {
-        if (self.selectedTour()) {
-            self.loadReviews(self.selectedTour().id, false);
-        }
-    });
-
-    // Detay goster
+    // Detay sayfasina yonlendir
     self.showDetails = function(tour) {
-        self.selectedTour(tour);
-        self.loadReviews(tour.id, false);
-        self.loadTourDates(tour.id);
-
-        // Render share buttons
-        var shareUrl = window.location.origin + '/Tours?id=' + tour.id;
-        var shareText = tour.name + ' - ' + tour.destination + ' | Erkan Tatil Plani';
-        $('#tourShareButtons').html(SocialShare.renderButtons({
-            url: shareUrl,
-            text: shareText,
-            size: 'sm',
-            platforms: ['facebook', 'twitter', 'whatsapp', 'telegram', 'copy']
-        }));
-
-        // Hava durumu yukle
-        self.loadWeather(tour.id);
-
-        detailsModal.show();
+        window.location.href = '/Tours/Details/' + tour.id;
     };
 
-    // Hava durumu widget'i
-    self.loadWeather = function(tourId) {
-        $('#weatherWidget').hide();
-        $.ajax({
-            url: apiBaseUrl + '/api/weather/tour/' + tourId,
-            method: 'GET'
-        }).done(function(data) {
-            if (data) {
-                var iconUrl = 'https://openweathermap.org/img/wn/' + (data.icon || '01d') + '@2x.png';
-                $('#weatherIcon').attr('src', iconUrl);
-                $('#weatherTemp').text(data.temperature + '\u00B0C');
-                $('#weatherCondition').text(data.condition);
-                $('#weatherHumidity').html('<i class="bi bi-droplet"></i> ' + data.humidity + '%');
-                $('#weatherWind').html('<i class="bi bi-wind"></i> ' + data.windSpeed + ' m/s');
-
-                var recText = T(data.recommendation) || '';
-                if (recText) {
-                    var alertClass = data.isRainy ? 'text-warning' : 'text-success';
-                    $('#weatherRecommendation').html('<i class="bi bi-info-circle ' + alertClass + '"></i> <span class="' + alertClass + '">' + recText + '</span>');
-                } else {
-                    $('#weatherRecommendation').empty();
-                }
-
-                $('#weatherWidget').show();
-            }
-        });
-    };
-
-    // Yorum yazma modali
-    self.openWriteReviewModal = function() {
-        if (!self.canWriteReview()) {
-            toastr.warning('Yorum yapmak icin giris yapmaniz gerekiyor');
-            return;
-        }
-        self.reviewFormData({
-            overallRating: 0,
-            serviceRating: '',
-            valueRating: '',
-            locationRating: '',
-            organizationRating: '',
-            guideRating: '',
-            title: '',
-            pros: '',
-            cons: '',
-            comment: '',
-            visitDate: '',
-            travelTypeId: '0',
-            wouldRecommend: true
-        });
-        writeReviewModal.show();
-    };
-
-    // Yorum gonder
-    self.submitReview = function() {
-        var data = self.reviewFormData();
-        if (data.overallRating < 1) {
-            toastr.warning('Lutfen bir puan secin');
-            return;
-        }
-
-        self.isSaving(true);
-        $.ajax({
-            url: apiBaseUrl + '/api/tours/' + self.selectedTour().id + '/reviews',
-            method: 'POST',
-            contentType: 'application/json',
-            data: JSON.stringify({
-                visitorId: window.currentUser.id,
-                overallRating: data.overallRating,
-                serviceRating: data.serviceRating ? parseInt(data.serviceRating) : null,
-                valueRating: data.valueRating ? parseInt(data.valueRating) : null,
-                locationRating: data.locationRating ? parseInt(data.locationRating) : null,
-                organizationRating: data.organizationRating ? parseInt(data.organizationRating) : null,
-                guideRating: data.guideRating ? parseInt(data.guideRating) : null,
-                title: data.title,
-                pros: data.pros,
-                cons: data.cons,
-                comment: data.comment,
-                visitDate: data.visitDate || null,
-                travelTypeId: parseInt(data.travelTypeId),
-                wouldRecommend: data.wouldRecommend
-            }),
-            success: function(response) {
-                writeReviewModal.hide();
-                toastr.success(response.message || 'Yorumunuz eklendi');
-                self.loadReviews(self.selectedTour().id, false);
-                // Tur listesini de guncelle (puan degismis olabilir)
-                self.loadData();
-                self.isSaving(false);
-            },
-            error: function(xhr) {
-                var msg = xhr.responseJSON ? xhr.responseJSON.message : 'Hata olustu';
-                toastr.error(msg);
-                self.isSaving(false);
-            }
-        });
-    };
-
-    // Yardimci oylama
-    self.voteHelpful = function(reviewId, isHelpful) {
-        if (!self.canWriteReview()) {
-            toastr.warning('Oy vermek icin giris yapmaniz gerekiyor');
-            return;
-        }
-
-        $.ajax({
-            url: apiBaseUrl + '/api/reviews/' + reviewId + '/helpful',
-            method: 'POST',
-            contentType: 'application/json',
-            data: JSON.stringify({
-                visitorId: window.currentUser.id,
-                isHelpful: isHelpful
-            }),
-            success: function(response) {
-                // Yorumu guncelle
-                var review = self.reviews().find(function(r) { return r.id === reviewId; });
-                if (review) {
-                    review.helpfulCount = response.helpfulCount;
-                    review.notHelpfulCount = response.notHelpfulCount;
-                    self.reviews.valueHasMutated();
-                }
-                toastr.success(response.message);
-            },
-            error: function(xhr) {
-                var msg = xhr.responseJSON ? xhr.responseJSON.message : 'Hata olustu';
-                toastr.error(msg);
-            }
-        });
-    };
-
-    // Yanit modali
-    self.openReplyModal = function(reviewId) {
-        if (!self.canWriteReview()) {
-            toastr.warning('Yanit vermek icin giris yapmaniz gerekiyor');
-            return;
-        }
-        self.selectedReviewId(reviewId);
-        self.replyText('');
-        replyModal.show();
-    };
-
-    // Yanit gonder
-    self.submitReply = function() {
-        if (!self.replyText()) return;
-
-        self.isSaving(true);
-        $.ajax({
-            url: apiBaseUrl + '/api/reviews/' + self.selectedReviewId() + '/reply',
-            method: 'POST',
-            contentType: 'application/json',
-            data: JSON.stringify({
-                visitorId: window.currentUser.id,
-                comment: self.replyText()
-            }),
-            success: function(response) {
-                replyModal.hide();
-                toastr.success(response.message || 'Yanitiniz eklendi');
-                self.loadReviews(self.selectedTour().id, false);
-                self.isSaving(false);
-            },
-            error: function(xhr) {
-                var msg = xhr.responseJSON ? xhr.responseJSON.message : 'Hata olustu';
-                toastr.error(msg);
-                self.isSaving(false);
-            }
-        });
-    };
-
-    // Sikayet modali
-    self.openReportModal = function(reviewId) {
-        if (!self.canWriteReview()) {
-            toastr.warning('Sikayet etmek icin giris yapmaniz gerekiyor');
-            return;
-        }
-        self.selectedReviewId(reviewId);
-        self.reportReasonId('');
-        self.reportDescription('');
-        reportModal.show();
-    };
-
-    // Sikayet gonder
-    self.submitReport = function() {
-        if (!self.reportReasonId()) return;
-
-        self.isSaving(true);
-        $.ajax({
-            url: apiBaseUrl + '/api/reviews/' + self.selectedReviewId() + '/report',
-            method: 'POST',
-            contentType: 'application/json',
-            data: JSON.stringify({
-                visitorId: window.currentUser.id,
-                reasonId: parseInt(self.reportReasonId()),
-                description: self.reportDescription()
-            }),
-            success: function(response) {
-                reportModal.hide();
-                toastr.success(response.message || 'Sikayetiniz alindi');
-                self.isSaving(false);
-            },
-            error: function(xhr) {
-                var msg = xhr.responseJSON ? xhr.responseJSON.message : 'Hata olustu';
-                toastr.error(msg);
-                self.isSaving(false);
-            }
-        });
-    };
 
     // Rezervasyon modali
     self.openReservationModal = function(tour) {
-        // Firma hesaplari rezervasyon yapamaz
         var user = getUser();
-        if (user && user.userTypeId >= 1) {
+        if (!user) {
+            toastr.warning(T('Error.LoginRequired') || 'Rezervasyon yapmak icin giris yapmaniz gerekiyor');
+            window.location.href = '/Account/Login?returnUrl=' + encodeURIComponent('/Tours/Details/' + tour.id);
+            return;
+        }
+        if (user.userTypeId >= 1) {
             toastr.warning(T('Error.CompanyCannotReserve'));
             return;
         }
@@ -1267,11 +909,7 @@ function ToursViewModel() {
 
     // Sayfa yuklendiginde
     $(document).ready(function() {
-        detailsModal = new bootstrap.Modal(document.getElementById('detailsModal'));
         reservationModal = new bootstrap.Modal(document.getElementById('reservationModal'));
-        writeReviewModal = new bootstrap.Modal(document.getElementById('writeReviewModal'));
-        replyModal = new bootstrap.Modal(document.getElementById('replyModal'));
-        reportModal = new bootstrap.Modal(document.getElementById('reportModal'));
         watchModal = new bootstrap.Modal(document.getElementById('watchModal'));
         self.loadData();
         self.loadCompanies();

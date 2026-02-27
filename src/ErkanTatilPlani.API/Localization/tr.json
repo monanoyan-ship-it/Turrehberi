@@ -1429,5 +1429,15 @@
   "NotificationType.StoryCommented": "Hikaye Yorumu",
   "Notification.NewFollower": "{0} seni takip etmeye başladı",
   "Notification.StoryLiked": "{0} hikayeni beğendi",
-  "Notification.StoryCommented": "{0} hikayene yorum yaptı"
+  "Notification.StoryCommented": "{0} hikayene yorum yaptı",
+  "TourDetail.SearchDate": "Tarih Ara",
+  "TourDetail.SearchDateHint": "Musait seanslari gormek icin tarih secin",
+  "TourDetail.Search": "Ara",
+  "TourDetail.SessionsFound": "seans bulundu",
+  "TourDetail.NoSessions": "Musait seans bulunamadi",
+  "TourDetail.SelectSession": "Seans Secin",
+  "TourDetail.ViewFullPage": "Tam Sayfa Goruntule",
+  "TourDetail.BookNow": "Rezervasyon Yap",
+  "TourDetail.AboutTour": "Tur Hakkinda",
+  "TourDetail.MeetingPoint": "Bulusma Noktasi"
 }

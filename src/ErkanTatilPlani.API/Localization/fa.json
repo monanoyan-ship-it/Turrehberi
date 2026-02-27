@@ -1429,5 +1429,21 @@
   "NotificationType.StoryCommented": "نظر بر داستان",
   "Notification.NewFollower": "{0} شما را دنبال کرد",
   "Notification.StoryLiked": "{0} داستان شما را پسندید",
-  "Notification.StoryCommented": "{0} بر داستان شما نظر داد"
+  "Notification.StoryCommented": "{0} بر داستان شما نظر داد",
+
+  "Home.ViewTour": "مشاهده",
+  "Home.ViewDetails": "مشاهده و رزرو",
+  "Home.ViewAllTours": "مشاهده همه تورها",
+  "Home.Featured": "ویژه",
+  "Home.Day": "روز",
+  "TourDetail.SearchDate": "جستجوی تاریخ",
+  "TourDetail.SearchDateHint": "تاریخی را برای مشاهده جلسات موجود انتخاب کنید",
+  "TourDetail.Search": "جستجو",
+  "TourDetail.SessionsFound": "جلسه یافت شد",
+  "TourDetail.NoSessions": "جلسه موجودی یافت نشد",
+  "TourDetail.SelectSession": "انتخاب جلسه",
+  "TourDetail.ViewFullPage": "مشاهده صفحه کامل",
+  "TourDetail.BookNow": "رزرو کنید",
+  "TourDetail.AboutTour": "درباره تور",
+  "TourDetail.MeetingPoint": "نقطه ملاقات"
 }

@@ -1429,5 +1429,21 @@
   "NotificationType.StoryCommented": "Story Comment",
   "Notification.NewFollower": "{0} started following you",
   "Notification.StoryLiked": "{0} liked your story",
-  "Notification.StoryCommented": "{0} commented on your story"
+  "Notification.StoryCommented": "{0} commented on your story",
+
+  "Home.ViewTour": "View",
+  "Home.ViewDetails": "View Details & Book",
+  "Home.ViewAllTours": "View All Tours",
+  "Home.Featured": "Featured",
+  "Home.Day": "Day",
+  "TourDetail.SearchDate": "Search Date",
+  "TourDetail.SearchDateHint": "Select a date to see available sessions",
+  "TourDetail.Search": "Search",
+  "TourDetail.SessionsFound": "sessions found",
+  "TourDetail.NoSessions": "No available sessions found",
+  "TourDetail.SelectSession": "Select Session",
+  "TourDetail.ViewFullPage": "View Full Page",
+  "TourDetail.BookNow": "Book Now",
+  "TourDetail.AboutTour": "About Tour",
+  "TourDetail.MeetingPoint": "Meeting Point"
 }

@@ -20,12 +20,12 @@ internal static class AuthUserInfoHelper
             CompanyName = visitor.Company?.Name,
             CompanyStatusId = visitor.Company?.StatusId,
             CompanyStatusName = visitor.Company != null ? CompanyStatuses.GetById(visitor.Company.StatusId)?.SystemName : null,
-            PreferredLanguage = visitor.PreferredLanguage
+            PreferredLanguage = visitor.PreferredLanguage,
+            Phone = visitor.Phone
         };
 
         if (includeProfileFields)
         {
-            info.Phone = visitor.Phone;
             info.Address = visitor.Address;
             info.BirthDate = visitor.BirthDate;
             info.AvatarUrl = visitor.AvatarUrl;

@@ -16,4 +16,11 @@ public class ToursController : Controller
         ViewBag.ApiBaseUrl = _configuration["ApiBaseUrl"];
         return View();
     }
+
+    public IActionResult Details(int id)
+    {
+        ViewBag.ApiBaseUrl = _configuration["ApiBaseUrl"];
+        ViewBag.TourId = id;
+        return View();
+    }
 }

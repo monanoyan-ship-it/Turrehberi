@@ -1429,5 +1429,21 @@
   "NotificationType.StoryCommented": "Comentario en Historia",
   "Notification.NewFollower": "{0} comenzó a seguirte",
   "Notification.StoryLiked": "{0} le gustó tu historia",
-  "Notification.StoryCommented": "{0} comentó en tu historia"
+  "Notification.StoryCommented": "{0} comentó en tu historia",
+
+  "Home.ViewTour": "Ver",
+  "Home.ViewDetails": "Ver Detalles y Reservar",
+  "Home.ViewAllTours": "Ver Todos los Tours",
+  "Home.Featured": "Destacado",
+  "Home.Day": "Día",
+  "TourDetail.SearchDate": "Buscar fecha",
+  "TourDetail.SearchDateHint": "Seleccione una fecha para ver sesiones disponibles",
+  "TourDetail.Search": "Buscar",
+  "TourDetail.SessionsFound": "sesiones encontradas",
+  "TourDetail.NoSessions": "No se encontraron sesiones disponibles",
+  "TourDetail.SelectSession": "Seleccionar sesion",
+  "TourDetail.ViewFullPage": "Ver pagina completa",
+  "TourDetail.BookNow": "Reservar ahora",
+  "TourDetail.AboutTour": "Sobre el tour",
+  "TourDetail.MeetingPoint": "Punto de encuentro"
 }

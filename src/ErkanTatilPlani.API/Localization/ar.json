@@ -1429,5 +1429,21 @@
   "NotificationType.StoryCommented": "تعليق على القصة",
   "Notification.NewFollower": "{0} بدأ بمتابعتك",
   "Notification.StoryLiked": "{0} أعجب بقصتك",
-  "Notification.StoryCommented": "{0} علّق على قصتك"
+  "Notification.StoryCommented": "{0} علّق على قصتك",
+
+  "Home.ViewTour": "عرض",
+  "Home.ViewDetails": "عرض التفاصيل والحجز",
+  "Home.ViewAllTours": "عرض جميع الجولات",
+  "Home.Featured": "مميز",
+  "Home.Day": "يوم",
+  "TourDetail.SearchDate": "بحث عن تاريخ",
+  "TourDetail.SearchDateHint": "اختر تاريخاً لعرض الجلسات المتاحة",
+  "TourDetail.Search": "بحث",
+  "TourDetail.SessionsFound": "جلسات متاحة",
+  "TourDetail.NoSessions": "لم يتم العثور على جلسات متاحة",
+  "TourDetail.SelectSession": "اختر جلسة",
+  "TourDetail.ViewFullPage": "عرض الصفحة الكاملة",
+  "TourDetail.BookNow": "احجز الآن",
+  "TourDetail.AboutTour": "عن الجولة",
+  "TourDetail.MeetingPoint": "نقطة الالتقاء"
 }

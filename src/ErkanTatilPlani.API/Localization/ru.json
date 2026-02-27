@@ -1429,5 +1429,21 @@
   "NotificationType.StoryCommented": "Комментарий к истории",
   "Notification.NewFollower": "{0} подписался на вас",
   "Notification.StoryLiked": "{0} понравилась ваша история",
-  "Notification.StoryCommented": "{0} прокомментировал вашу историю"
+  "Notification.StoryCommented": "{0} прокомментировал вашу историю",
+
+  "Home.ViewTour": "Подробнее",
+  "Home.ViewDetails": "Подробнее и Бронировать",
+  "Home.ViewAllTours": "Все туры",
+  "Home.Featured": "Рекомендуем",
+  "Home.Day": "День",
+  "TourDetail.SearchDate": "Поиск даты",
+  "TourDetail.SearchDateHint": "Выберите дату для просмотра доступных сеансов",
+  "TourDetail.Search": "Искать",
+  "TourDetail.SessionsFound": "сеансов найдено",
+  "TourDetail.NoSessions": "Доступные сеансы не найдены",
+  "TourDetail.SelectSession": "Выберите сеанс",
+  "TourDetail.ViewFullPage": "Открыть полную страницу",
+  "TourDetail.BookNow": "Забронировать",
+  "TourDetail.AboutTour": "О туре",
+  "TourDetail.MeetingPoint": "Место встречи"
 }
