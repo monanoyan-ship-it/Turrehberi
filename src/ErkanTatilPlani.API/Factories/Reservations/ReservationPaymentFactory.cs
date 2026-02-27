@@ -235,9 +235,7 @@ public class ReservationPaymentFactory : IReservationPaymentFactory
             AppliedPromotions = priceResult.AppliedDiscounts.Count > 0
                 ? JsonSerializer.Serialize(priceResult.AppliedDiscounts)
                 : null,
-            PromotionId = priceResult.AppliedDiscounts.Count > 0
-                ? priceResult.AppliedDiscounts.First().PromotionId
-                : null,
+            PromotionId = priceResult.AppliedDiscounts.FirstOrDefault(d => d.PromotionId > 0)?.PromotionId,
             CreditUsed = actualCreditUsed,
             PaidAmount = 0,
             Status = ReservationStatuses.Ids.Pending,
@@ -254,8 +252,8 @@ public class ReservationPaymentFactory : IReservationPaymentFactory
             await _loyaltyFactory.SpendCreditsAsync(visitorId.Value, actualCreditUsed, reservation.Id);
         }
 
-        // Promosyon kullanim kaydlari
-        foreach (var applied in priceResult.AppliedDiscounts)
+        // Promosyon kullanim kaydlari (PromotionId > 0 olanlar - Loyalty gibi sanal indirimler haric)
+        foreach (var applied in priceResult.AppliedDiscounts.Where(d => d.PromotionId > 0))
         {
             _promotionService.AddUsage(new PromotionUsage
             {

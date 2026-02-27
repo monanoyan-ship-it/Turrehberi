@@ -8,7 +8,9 @@ function TourDetailViewModel() {
     self.isSaving = ko.observable(false);
 
     // Rezervasyon modal
-    self.reservationDate = ko.observable('');
+    self.isLoadingDates = ko.observable(false);
+    self.reservationDateFrom = ko.observable('');
+    self.reservationDateTo = ko.observable('');
     self.reservationSessions = ko.observableArray([]);
     self.selectedReservationSession = ko.observable(null);
     self.showPaymentStep = ko.observable(false);
@@ -77,7 +79,7 @@ function TourDetailViewModel() {
                 self.tour(data);
                 self.isLoading(false);
                 self.loadReviews(id, false);
-                self.loadWeather(id);
+                if (data.latitude && data.longitude) self.loadWeather(id);
                 self.initShareButtons(data);
                 self.initMap(data);
             },
@@ -91,17 +93,18 @@ function TourDetailViewModel() {
     // ===== Rezervasyon Modal - Tarih Arama =====
     self.onReservationDateChange = function() {
         var tour = self.tour();
-        var dateStr = self.reservationDate();
-        if (!tour || !dateStr) {
+        var fromStr = self.reservationDateFrom();
+        if (!tour || !fromStr) {
             self.reservationSessions([]);
             return;
         }
+        var toStr = self.reservationDateTo() || fromStr;
         self.isLoadingDates(true);
         self.selectedReservationSession(null);
         $.ajax({
             url: apiBaseUrl + '/api/tours/' + tour.id + '/dates',
             method: 'GET',
-            data: { from: dateStr, to: dateStr },
+            data: { from: fromStr, to: toStr },
             success: function(data) {
                 var available = data.filter(function(d) { return d.isAvailable; });
                 self.reservationSessions(available);
@@ -466,7 +469,8 @@ function TourDetailViewModel() {
         self.appliedDiscounts([]);
         self.participants([]);
 
-        self.reservationDate('');
+        self.reservationDateFrom('');
+        self.reservationDateTo('');
         self.reservationSessions([]);
 
         if (user) {
