@@ -7,13 +7,6 @@ function TourDetailViewModel() {
     self.isLoading = ko.observable(true);
     self.isSaving = ko.observable(false);
 
-    // Tarih arama
-    self.searchDate = ko.observable('');
-    self.searchResults = ko.observableArray([]);
-    self.selectedSession = ko.observable(null);
-    self.isLoadingDates = ko.observable(false);
-    self.searchPerformed = ko.observable(false);
-
     // Rezervasyon modal
     self.reservationDate = ko.observable('');
     self.reservationSessions = ko.observableArray([]);
@@ -93,47 +86,6 @@ function TourDetailViewModel() {
                 self.isLoading(false);
             }
         });
-    };
-
-    // ===== Tarih Arama =====
-    self.searchDates = function() {
-        var tour = self.tour();
-        var dateStr = self.searchDate();
-        if (!tour || !dateStr) return;
-
-        self.isLoadingDates(true);
-        self.searchPerformed(true);
-        self.selectedSession(null);
-
-        var fromDate = dateStr;
-        var d = new Date(dateStr);
-        d.setDate(d.getDate() + 7);
-        var toDate = d.toISOString().substring(0, 10);
-
-        $.ajax({
-            url: apiBaseUrl + '/api/tours/' + tour.id + '/dates',
-            method: 'GET',
-            data: { from: fromDate, to: toDate },
-            success: function(data) {
-                var available = data.filter(function(d) { return d.isAvailable; });
-                self.searchResults(available);
-                self.isLoadingDates(false);
-            },
-            error: function() {
-                self.searchResults([]);
-                self.isLoadingDates(false);
-            }
-        });
-    };
-
-    self.selectSession = function(session) {
-        var tokenOrId = session.token || ('d:' + session.id);
-        if (self.selectedSession() && self.selectedSession().token === tokenOrId) {
-            self.selectedSession(null);
-        } else {
-            session.token = tokenOrId;
-            self.selectedSession(session);
-        }
     };
 
     // ===== Rezervasyon Modal - Tarih Arama =====
@@ -514,15 +466,8 @@ function TourDetailViewModel() {
         self.appliedDiscounts([]);
         self.participants([]);
 
-        // Sidebar'dan secilen seans bilgisini reservation modal'a aktar
-        if (self.selectedSession()) {
-            self.reservationDate(self.selectedSession().date);
-            // Secilen tarih icin seanslari yukle
-            self.onReservationDateChange();
-        } else {
-            self.reservationDate('');
-            self.reservationSessions([]);
-        }
+        self.reservationDate('');
+        self.reservationSessions([]);
 
         if (user) {
             self.reservationData({
