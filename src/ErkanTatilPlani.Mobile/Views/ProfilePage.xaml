@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="ErkanTatilPlani.Mobile.Views.ProfilePage"
+             Title="Profil">
+
+    <ScrollView>
+        <VerticalStackLayout Padding="20" Spacing="20">
+
+            <!-- User Info -->
+            <Frame Padding="20" CornerRadius="15" HasShadow="True">
+                <VerticalStackLayout Spacing="10" HorizontalOptions="Center">
+                    <Frame WidthRequest="80" HeightRequest="80" CornerRadius="40"
+                           BackgroundColor="#1976D2" Padding="0" HasShadow="False">
+                        <Label Text="{Binding UserInitial}"
+                               FontSize="32" TextColor="White" FontAttributes="Bold"
+                               HorizontalOptions="Center" VerticalOptions="Center" />
+                    </Frame>
+                    <Label x:Name="UserNameLabel" FontSize="20" FontAttributes="Bold" HorizontalOptions="Center" />
+                    <Label x:Name="UserEmailLabel" TextColor="Gray" HorizontalOptions="Center" />
+                </VerticalStackLayout>
+            </Frame>
+
+            <!-- Menu Items -->
+            <Frame Padding="0" CornerRadius="10" HasShadow="True">
+                <VerticalStackLayout>
+                    <Grid Padding="15" ColumnDefinitions="Auto,*,Auto">
+                        <Label Text="Rezervasyonlarim" Grid.Column="1" VerticalOptions="Center" />
+                        <Label Text=">" Grid.Column="2" TextColor="Gray" VerticalOptions="Center" />
+                        <Grid.GestureRecognizers>
+                            <TapGestureRecognizer Tapped="OnReservationsClicked" />
+                        </Grid.GestureRecognizers>
+                    </Grid>
+                    <BoxView HeightRequest="1" Color="LightGray" />
+                    <Grid Padding="15" ColumnDefinitions="Auto,*,Auto">
+                        <Label Text="Favori Turlarim" Grid.Column="1" VerticalOptions="Center" />
+                        <Label Text=">" Grid.Column="2" TextColor="Gray" VerticalOptions="Center" />
+                    </Grid>
+                </VerticalStackLayout>
+            </Frame>
+
+            <!-- Logout -->
+            <Button Text="Cikis Yap"
+                    BackgroundColor="#D32F2F"
+                    TextColor="White"
+                    FontAttributes="Bold"
+                    CornerRadius="10"
+                    HeightRequest="50"
+                    Clicked="OnLogoutClicked" />
+
+        </VerticalStackLayout>
+    </ScrollView>
+
+</ContentPage>

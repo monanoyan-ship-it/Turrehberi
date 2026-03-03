@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:viewmodels="clr-namespace:ErkanTatilPlani.Mobile.ViewModels"
+             x:Class="ErkanTatilPlani.Mobile.Views.TourDetailPage"
+             Title="{Binding Title}">
+
+    <ContentPage.BindingContext>
+        <viewmodels:TourDetailViewModel />
+    </ContentPage.BindingContext>
+
+    <ScrollView>
+        <VerticalStackLayout Padding="20" Spacing="15">
+
+            <!-- Loading -->
+            <ActivityIndicator IsRunning="{Binding IsBusy}" IsVisible="{Binding IsBusy}" Color="#1976D2" />
+
+            <!-- Tour Header -->
+            <Frame BackgroundColor="#1976D2" Padding="20" CornerRadius="15"
+                   IsVisible="{Binding IsBusy, Converter={StaticResource InvertedBoolConverter}}">
+                <VerticalStackLayout Spacing="8">
+                    <Label Text="{Binding TourName}" FontSize="22" FontAttributes="Bold" TextColor="White" />
+                    <HorizontalStackLayout Spacing="10">
+                        <Label Text="{Binding Destination}" TextColor="White" />
+                        <Label Text="|" TextColor="White" />
+                        <Label Text="{Binding Duration}" TextColor="White" />
+                    </HorizontalStackLayout>
+                    <HorizontalStackLayout Spacing="15">
+                        <Label Text="{Binding Price}" FontSize="20" FontAttributes="Bold" TextColor="#FFD54F" />
+                        <Label Text="{Binding Rating}" TextColor="White" VerticalOptions="Center" />
+                    </HorizontalStackLayout>
+                </VerticalStackLayout>
+            </Frame>
+
+            <!-- Company -->
+            <Frame Padding="15" CornerRadius="10" HasShadow="True"
+                   IsVisible="{Binding IsBusy, Converter={StaticResource InvertedBoolConverter}}">
+                <HorizontalStackLayout Spacing="10">
+                    <Label Text="Firma:" FontAttributes="Bold" VerticalOptions="Center" />
+                    <Label Text="{Binding CompanyName}" VerticalOptions="Center" />
+                </HorizontalStackLayout>
+            </Frame>
+
+            <!-- Description -->
+            <Frame Padding="15" CornerRadius="10" HasShadow="True"
+                   IsVisible="{Binding IsBusy, Converter={StaticResource InvertedBoolConverter}}">
+                <VerticalStackLayout Spacing="8">
+                    <Label Text="Aciklama" FontSize="16" FontAttributes="Bold" />
+                    <Label Text="{Binding Description}" />
+                </VerticalStackLayout>
+            </Frame>
+
+            <!-- Includes/Excludes -->
+            <Frame Padding="15" CornerRadius="10" HasShadow="True"
+                   IsVisible="{Binding IsBusy, Converter={StaticResource InvertedBoolConverter}}">
+                <VerticalStackLayout Spacing="8">
+                    <Label Text="Dahil Olanlar" FontSize="16" FontAttributes="Bold" TextColor="#388E3C" />
+                    <Label Text="{Binding Includes}" />
+                    <BoxView HeightRequest="1" Color="LightGray" Margin="0,5" />
+                    <Label Text="Dahil Olmayanlar" FontSize="16" FontAttributes="Bold" TextColor="#D32F2F" />
+                    <Label Text="{Binding Excludes}" />
+                </VerticalStackLayout>
+            </Frame>
+
+        </VerticalStackLayout>
+    </ScrollView>
+
+</ContentPage>

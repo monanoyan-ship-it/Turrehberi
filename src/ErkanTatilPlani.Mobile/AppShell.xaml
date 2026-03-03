@@ -5,27 +5,29 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
     xmlns:local="clr-namespace:ErkanTatilPlani.Mobile"
     xmlns:views="clr-namespace:ErkanTatilPlani.Mobile.Views"
-    Title="Erkan Tatil Planı"
+    Title="Erkan Tatil Plani"
     Shell.FlyoutBehavior="Disabled">
 
     <TabBar>
         <ShellContent
             Title="Ana Sayfa"
-            Icon="home.png"
             ContentTemplate="{DataTemplate local:MainPage}"
             Route="MainPage" />
 
         <ShellContent
             Title="Turlar"
-            Icon="tour.png"
             ContentTemplate="{DataTemplate views:ToursPage}"
             Route="ToursPage" />
 
         <ShellContent
             Title="Rezervasyonlar"
-            Icon="calendar.png"
             ContentTemplate="{DataTemplate views:ReservationsPage}"
             Route="ReservationsPage" />
+
+        <ShellContent
+            Title="Profil"
+            ContentTemplate="{DataTemplate views:ProfilePage}"
+            Route="ProfilePage" />
     </TabBar>
 
 </Shell>

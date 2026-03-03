@@ -1,65 +1,198 @@
+using System.Net.Http.Headers;
 using System.Net.Http.Json;
-using ErkanTatilPlani.Core.Entities;
+using System.Text.Json;
 
 namespace ErkanTatilPlani.Mobile.Services;
 
 public class ApiService
 {
     private readonly HttpClient _httpClient;
-    private const string BaseUrl = "https://localhost:7001/api"; // Development URL
+    private static readonly string BaseUrl = DeviceInfo.Platform == DevicePlatform.Android
+        ? "https://10.0.2.2:7078/api"    // Android emulator -> host
+        : "https://localhost:7078/api";    // iOS/Windows
+
+    private static readonly JsonSerializerOptions JsonOptions = new()
+    {
+        PropertyNameCaseInsensitive = true
+    };
 
     public ApiService()
     {
-        _httpClient = new HttpClient();
+        var handler = new HttpClientHandler
+        {
+            ServerCertificateCustomValidationCallback = (_, _, _, _) => true // Dev sertifikasi
+        };
+        _httpClient = new HttpClient(handler);
+        _httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
     }
 
-    // Companies
-    public async Task<List<Company>> GetCompaniesAsync()
+    // === Auth ===
+
+    public string? Token
     {
-        var response = await _httpClient.GetFromJsonAsync<List<Company>>($"{BaseUrl}/companies");
-        return response ?? new List<Company>();
+        get => Preferences.Get("auth_token", null);
+        set
+        {
+            if (value != null)
+                Preferences.Set("auth_token", value);
+            else
+                Preferences.Remove("auth_token");
+        }
     }
 
-    public async Task<Company?> GetCompanyAsync(int id)
+    public string? UserName
     {
-        return await _httpClient.GetFromJsonAsync<Company>($"{BaseUrl}/companies/{id}");
+        get => Preferences.Get("user_name", null);
+        set
+        {
+            if (value != null)
+                Preferences.Set("user_name", value);
+            else
+                Preferences.Remove("user_name");
+        }
     }
 
-    // Tours
-    public async Task<List<Tour>> GetToursAsync()
+    public int UserId
     {
-        var response = await _httpClient.GetFromJsonAsync<List<Tour>>($"{BaseUrl}/tours");
-        return response ?? new List<Tour>();
+        get => Preferences.Get("user_id", 0);
+        set => Preferences.Set("user_id", value);
     }
 
-    public async Task<Tour?> GetTourAsync(int id)
+    public bool IsLoggedIn => !string.IsNullOrEmpty(Token);
+
+    private void SetAuthHeader()
     {
-        return await _httpClient.GetFromJsonAsync<Tour>($"{BaseUrl}/tours/{id}");
+        if (!string.IsNullOrEmpty(Token))
+            _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", Token);
+        else
+            _httpClient.DefaultRequestHeaders.Authorization = null;
     }
 
-    // Visitors
-    public async Task<List<Visitor>> GetVisitorsAsync()
+    public async Task<(bool success, string? error)> LoginAsync(string email, string password)
     {
-        var response = await _httpClient.GetFromJsonAsync<List<Visitor>>($"{BaseUrl}/visitors");
-        return response ?? new List<Visitor>();
+        try
+        {
+            var response = await _httpClient.PostAsJsonAsync($"{BaseUrl}/auth/login",
+                new { email, password });
+
+            if (response.IsSuccessStatusCode)
+            {
+                var result = await response.Content.ReadFromJsonAsync<JsonElement>();
+                Token = result.GetProperty("token").GetString();
+                UserName = result.GetProperty("firstName").GetString();
+                UserId = result.GetProperty("visitorId").GetInt32();
+                return (true, null);
+            }
+
+            var error = await response.Content.ReadFromJsonAsync<JsonElement>();
+            var msg = error.TryGetProperty("message", out var m) ? m.GetString() : "Giris basarisiz";
+            return (false, msg);
+        }
+        catch (Exception ex)
+        {
+            return (false, $"Baglanti hatasi: {ex.Message}");
+        }
     }
 
-    public async Task<bool> CreateVisitorAsync(Visitor visitor)
+    public async Task<(bool success, string? error)> RegisterAsync(string firstName, string lastName, string email, string password, string? phone)
     {
-        var response = await _httpClient.PostAsJsonAsync($"{BaseUrl}/visitors", visitor);
-        return response.IsSuccessStatusCode;
+        try
+        {
+            var response = await _httpClient.PostAsJsonAsync($"{BaseUrl}/auth/register",
+                new { firstName, lastName, email, password, phone });
+
+            if (response.IsSuccessStatusCode)
+            {
+                var result = await response.Content.ReadFromJsonAsync<JsonElement>();
+                Token = result.GetProperty("token").GetString();
+                UserName = result.GetProperty("firstName").GetString();
+                UserId = result.GetProperty("visitorId").GetInt32();
+                return (true, null);
+            }
+
+            var error = await response.Content.ReadFromJsonAsync<JsonElement>();
+            var msg = error.TryGetProperty("message", out var m) ? m.GetString() : "Kayit basarisiz";
+            return (false, msg);
+        }
+        catch (Exception ex)
+        {
+            return (false, $"Baglanti hatasi: {ex.Message}");
+        }
     }
 
-    // Reservations
-    public async Task<List<Reservation>> GetReservationsAsync()
+    public void Logout()
     {
-        var response = await _httpClient.GetFromJsonAsync<List<Reservation>>($"{BaseUrl}/reservations");
-        return response ?? new List<Reservation>();
+        Token = null;
+        UserName = null;
+        UserId = 0;
     }
 
-    public async Task<bool> CreateReservationAsync(Reservation reservation)
+    // === Tours ===
+
+    public async Task<List<JsonElement>> GetToursAsync(string? search = null)
     {
-        var response = await _httpClient.PostAsJsonAsync($"{BaseUrl}/reservations", reservation);
-        return response.IsSuccessStatusCode;
+        SetAuthHeader();
+        var url = $"{BaseUrl}/tours";
+        if (!string.IsNullOrEmpty(search))
+            url += $"?search={Uri.EscapeDataString(search)}";
+
+        var response = await _httpClient.GetFromJsonAsync<List<JsonElement>>(url, JsonOptions);
+        return response ?? new List<JsonElement>();
+    }
+
+    public async Task<JsonElement?> GetTourAsync(int id)
+    {
+        SetAuthHeader();
+        return await _httpClient.GetFromJsonAsync<JsonElement>($"{BaseUrl}/tours/{id}", JsonOptions);
+    }
+
+    // === Reservations ===
+
+    public async Task<List<JsonElement>> GetMyReservationsAsync()
+    {
+        SetAuthHeader();
+        var response = await _httpClient.GetFromJsonAsync<List<JsonElement>>($"{BaseUrl}/reservations/my", JsonOptions);
+        return response ?? new List<JsonElement>();
+    }
+
+    public async Task<(bool success, string? error)> CreateReservationAsync(object reservationData)
+    {
+        try
+        {
+            SetAuthHeader();
+            var response = await _httpClient.PostAsJsonAsync($"{BaseUrl}/reservations", reservationData);
+            if (response.IsSuccessStatusCode)
+                return (true, null);
+
+            var error = await response.Content.ReadFromJsonAsync<JsonElement>();
+            var msg = error.TryGetProperty("message", out var m) ? m.GetString() : "Rezervasyon olusturulamadi";
+            return (false, msg);
+        }
+        catch (Exception ex)
+        {
+            return (false, $"Baglanti hatasi: {ex.Message}");
+        }
+    }
+
+    // === Promotions ===
+
+    public async Task<JsonElement?> GetFlashSalesAsync()
+    {
+        SetAuthHeader();
+        return await _httpClient.GetFromJsonAsync<JsonElement>($"{BaseUrl}/promotions/flash-sales", JsonOptions);
+    }
+
+    public async Task<JsonElement?> GetLastMinuteDealsAsync()
+    {
+        SetAuthHeader();
+        return await _httpClient.GetFromJsonAsync<JsonElement>($"{BaseUrl}/promotions/last-minute", JsonOptions);
+    }
+
+    // === Profile ===
+
+    public async Task<JsonElement?> GetProfileAsync()
+    {
+        SetAuthHeader();
+        return await _httpClient.GetFromJsonAsync<JsonElement>($"{BaseUrl}/auth/me", JsonOptions);
     }
 }

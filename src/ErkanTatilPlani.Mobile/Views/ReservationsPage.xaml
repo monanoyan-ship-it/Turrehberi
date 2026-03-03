@@ -10,23 +10,21 @@
     </ContentPage.BindingContext>
 
     <RefreshView IsRefreshing="{Binding IsBusy}" Command="{Binding RefreshCommand}">
-        <CollectionView ItemsSource="{Binding Reservations}" EmptyView="Rezervasyon bulunamadı">
+        <CollectionView ItemsSource="{Binding Reservations}" EmptyView="Henuz rezervasyonunuz yok">
             <CollectionView.ItemTemplate>
-                <DataTemplate>
-                    <Frame Margin="10" Padding="15" CornerRadius="10" HasShadow="True">
+                <DataTemplate x:DataType="viewmodels:ReservationListItem">
+                    <Frame Margin="10,5" Padding="15" CornerRadius="10" HasShadow="True">
                         <VerticalStackLayout Spacing="5">
-                            <Label Text="{Binding Tour.Name}" FontSize="18" FontAttributes="Bold" />
-                            <Label Text="{Binding Customer.FirstName}" TextColor="Gray" />
+                            <Label Text="{Binding TourName}" FontSize="18" FontAttributes="Bold" />
                             <HorizontalStackLayout Spacing="10">
-                                <Label Text="{Binding StartDate, StringFormat='{0:dd.MM.yyyy}'}" />
-                                <Label Text="-" />
-                                <Label Text="{Binding EndDate, StringFormat='{0:dd.MM.yyyy}'}" />
+                                <Label Text="{Binding Date}" />
+                                <Label Text="|" TextColor="Gray" />
+                                <Label Text="{Binding PeopleDisplay}" />
                             </HorizontalStackLayout>
-                            <HorizontalStackLayout Spacing="10">
-                                <Label Text="{Binding NumberOfPeople, StringFormat='{0} Kişi'}" />
-                                <Label Text="{Binding TotalPrice, StringFormat='{0:C}'}" TextColor="Green" FontAttributes="Bold" />
+                            <HorizontalStackLayout Spacing="15">
+                                <Label Text="{Binding PriceDisplay}" TextColor="#388E3C" FontAttributes="Bold" />
+                                <Label Text="{Binding Status}" TextColor="#1976D2" FontAttributes="Bold" />
                             </HorizontalStackLayout>
-                            <Label Text="{Binding Status}" TextColor="Blue" />
                         </VerticalStackLayout>
                     </Frame>
                 </DataTemplate>

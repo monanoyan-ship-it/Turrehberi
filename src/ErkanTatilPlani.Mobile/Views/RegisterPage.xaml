@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:viewmodels="clr-namespace:ErkanTatilPlani.Mobile.ViewModels"
+             x:Class="ErkanTatilPlani.Mobile.Views.RegisterPage"
+             Title="Kayit Ol">
+
+    <ContentPage.BindingContext>
+        <viewmodels:RegisterViewModel />
+    </ContentPage.BindingContext>
+
+    <ScrollView>
+        <VerticalStackLayout Padding="30" Spacing="15" VerticalOptions="Center">
+
+            <!-- Header -->
+            <Label Text="Yeni Hesap Olustur"
+                   FontSize="24"
+                   FontAttributes="Bold"
+                   HorizontalOptions="Center"
+                   Margin="0,0,0,10" />
+
+            <!-- Error -->
+            <Label Text="{Binding ErrorMessage}"
+                   TextColor="Red"
+                   IsVisible="{Binding ErrorMessage, Converter={StaticResource StringToBoolConverter}}"
+                   HorizontalTextAlignment="Center" />
+
+            <!-- FirstName -->
+            <VerticalStackLayout Spacing="5">
+                <Label Text="Ad" FontAttributes="Bold" />
+                <Entry Text="{Binding FirstName}" Placeholder="Adiniz" />
+            </VerticalStackLayout>
+
+            <!-- LastName -->
+            <VerticalStackLayout Spacing="5">
+                <Label Text="Soyad" FontAttributes="Bold" />
+                <Entry Text="{Binding LastName}" Placeholder="Soyadiniz" />
+            </VerticalStackLayout>
+
+            <!-- Email -->
+            <VerticalStackLayout Spacing="5">
+                <Label Text="Email" FontAttributes="Bold" />
+                <Entry Text="{Binding Email}" Placeholder="ornek@email.com" Keyboard="Email" />
+            </VerticalStackLayout>
+
+            <!-- Phone -->
+            <VerticalStackLayout Spacing="5">
+                <Label Text="Telefon (opsiyonel)" FontAttributes="Bold" />
+                <Entry Text="{Binding Phone}" Placeholder="+90 5XX XXX XX XX" Keyboard="Telephone" />
+            </VerticalStackLayout>
+
+            <!-- Password -->
+            <VerticalStackLayout Spacing="5">
+                <Label Text="Sifre" FontAttributes="Bold" />
+                <Entry Text="{Binding Password}" Placeholder="En az 6 karakter" IsPassword="True" />
+            </VerticalStackLayout>
+
+            <!-- Register Button -->
+            <Button Text="Kayit Ol"
+                    Command="{Binding RegisterCommand}"
+                    BackgroundColor="#388E3C"
+                    TextColor="White"
+                    FontAttributes="Bold"
+                    CornerRadius="10"
+                    HeightRequest="50"
+                    IsEnabled="{Binding IsBusy, Converter={StaticResource InvertedBoolConverter}}" />
+
+            <!-- Loading -->
+            <ActivityIndicator IsRunning="{Binding IsBusy}"
+                               IsVisible="{Binding IsBusy}"
+                               Color="#388E3C" />
+
+            <!-- Login Link -->
+            <HorizontalStackLayout Spacing="5" HorizontalOptions="Center">
+                <Label Text="Zaten hesabiniz var mi?" VerticalOptions="Center" />
+                <Label Text="Giris Yap"
+                       TextColor="#1976D2"
+                       FontAttributes="Bold"
+                       VerticalOptions="Center">
+                    <Label.GestureRecognizers>
+                        <TapGestureRecognizer Command="{Binding GoToLoginCommand}" />
+                    </Label.GestureRecognizers>
+                </Label>
+            </HorizontalStackLayout>
+
+        </VerticalStackLayout>
+    </ScrollView>
+
+</ContentPage>

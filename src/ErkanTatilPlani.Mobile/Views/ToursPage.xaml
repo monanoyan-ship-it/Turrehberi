@@ -9,24 +9,42 @@
         <viewmodels:ToursViewModel />
     </ContentPage.BindingContext>
 
-    <RefreshView IsRefreshing="{Binding IsBusy}" Command="{Binding RefreshCommand}">
-        <CollectionView ItemsSource="{Binding Tours}" EmptyView="Tur bulunamadı">
-            <CollectionView.ItemTemplate>
-                <DataTemplate>
-                    <Frame Margin="10" Padding="15" CornerRadius="10" HasShadow="True">
-                        <VerticalStackLayout Spacing="5">
-                            <Label Text="{Binding Name}" FontSize="18" FontAttributes="Bold" />
-                            <Label Text="{Binding Destination}" TextColor="Gray" />
-                            <HorizontalStackLayout Spacing="10">
-                                <Label Text="{Binding DurationDays, StringFormat='{0} Gün'}" />
-                                <Label Text="{Binding Price, StringFormat='{0:C}'}" TextColor="Green" FontAttributes="Bold" />
-                            </HorizontalStackLayout>
-                            <Label Text="{Binding Description}" MaxLines="2" />
-                        </VerticalStackLayout>
-                    </Frame>
-                </DataTemplate>
-            </CollectionView.ItemTemplate>
-        </CollectionView>
-    </RefreshView>
+    <VerticalStackLayout>
+        <!-- Search Bar -->
+        <SearchBar Placeholder="Tur ara..."
+                   Text="{Binding SearchText}"
+                   SearchCommand="{Binding SearchCommand}"
+                   Margin="10,10,10,0" />
+
+        <RefreshView IsRefreshing="{Binding IsBusy}" Command="{Binding RefreshCommand}">
+            <CollectionView ItemsSource="{Binding Tours}" EmptyView="Tur bulunamadi">
+                <CollectionView.ItemTemplate>
+                    <DataTemplate x:DataType="viewmodels:TourListItem">
+                        <Frame Margin="10,5" Padding="15" CornerRadius="10" HasShadow="True">
+                            <Frame.GestureRecognizers>
+                                <TapGestureRecognizer
+                                    Command="{Binding Source={RelativeSource AncestorType={x:Type viewmodels:ToursViewModel}}, Path=TourTappedCommand}"
+                                    CommandParameter="{Binding .}" />
+                            </Frame.GestureRecognizers>
+                            <VerticalStackLayout Spacing="5">
+                                <Label Text="{Binding Name}" FontSize="18" FontAttributes="Bold" />
+                                <HorizontalStackLayout Spacing="8">
+                                    <Label Text="{Binding Destination}" TextColor="Gray" />
+                                    <Label Text="|" TextColor="Gray" />
+                                    <Label Text="{Binding CompanyName}" TextColor="Gray" />
+                                </HorizontalStackLayout>
+                                <HorizontalStackLayout Spacing="15">
+                                    <Label Text="{Binding DurationDisplay}" />
+                                    <Label Text="{Binding PriceDisplay}" TextColor="#388E3C" FontAttributes="Bold" />
+                                    <Label Text="{Binding RatingDisplay}" TextColor="#FF8F00" />
+                                </HorizontalStackLayout>
+                                <Label Text="{Binding Description}" MaxLines="2" TextColor="Gray" FontSize="13" />
+                            </VerticalStackLayout>
+                        </Frame>
+                    </DataTemplate>
+                </CollectionView.ItemTemplate>
+            </CollectionView>
+        </RefreshView>
+    </VerticalStackLayout>
 
 </ContentPage>
