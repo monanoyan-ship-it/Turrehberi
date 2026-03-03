@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:viewmodels="clr-namespace:ErkanTatilPlani.Mobile.ViewModels"
+             x:Class="ErkanTatilPlani.Mobile.Views.FaqPage"
+             Title="Sikca Sorulan Sorular">
+
+    <ContentPage.BindingContext>
+        <viewmodels:FaqViewModel />
+    </ContentPage.BindingContext>
+
+    <VerticalStackLayout>
+        <ActivityIndicator IsRunning="{Binding IsBusy}" IsVisible="{Binding IsBusy}" Color="#1976D2" />
+
+        <CollectionView ItemsSource="{Binding Faqs}" EmptyView="Soru bulunamadi">
+            <CollectionView.ItemTemplate>
+                <DataTemplate x:DataType="viewmodels:FaqItem">
+                    <Frame Margin="10,5" Padding="15" CornerRadius="10" HasShadow="True">
+                        <Frame.GestureRecognizers>
+                            <TapGestureRecognizer
+                                Command="{Binding Source={RelativeSource AncestorType={x:Type viewmodels:FaqViewModel}}, Path=ToggleCommand}"
+                                CommandParameter="{Binding .}" />
+                        </Frame.GestureRecognizers>
+                        <VerticalStackLayout Spacing="8">
+                            <HorizontalStackLayout Spacing="8">
+                                <Label Text="S:" FontAttributes="Bold" TextColor="#1976D2" VerticalOptions="Start" />
+                                <Label Text="{Binding Question}" FontSize="16" FontAttributes="Bold"
+                                       HorizontalOptions="FillAndExpand" />
+                            </HorizontalStackLayout>
+
+                            <Label Text="{Binding Category}" TextColor="Gray" FontSize="12"
+                                   IsVisible="{Binding Category, Converter={StaticResource StringToBoolConverter}}" />
+
+                            <VerticalStackLayout IsVisible="{Binding IsExpanded}" Spacing="5">
+                                <BoxView HeightRequest="1" Color="LightGray" Margin="0,5" />
+                                <HorizontalStackLayout Spacing="8">
+                                    <Label Text="C:" FontAttributes="Bold" TextColor="#388E3C" VerticalOptions="Start" />
+                                    <Label Text="{Binding Answer}" FontSize="14" />
+                                </HorizontalStackLayout>
+                            </VerticalStackLayout>
+                        </VerticalStackLayout>
+                    </Frame>
+                </DataTemplate>
+            </CollectionView.ItemTemplate>
+        </CollectionView>
+    </VerticalStackLayout>
+
+</ContentPage>

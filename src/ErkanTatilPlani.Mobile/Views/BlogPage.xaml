@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:viewmodels="clr-namespace:ErkanTatilPlani.Mobile.ViewModels"
+             x:Class="ErkanTatilPlani.Mobile.Views.BlogPage"
+             Title="Blog">
+
+    <ContentPage.BindingContext>
+        <viewmodels:BlogViewModel />
+    </ContentPage.BindingContext>
+
+    <RefreshView IsRefreshing="{Binding IsBusy}" Command="{Binding RefreshCommand}">
+        <CollectionView ItemsSource="{Binding Blogs}" EmptyView="Blog yazisi bulunamadi">
+            <CollectionView.ItemTemplate>
+                <DataTemplate x:DataType="viewmodels:BlogListItem">
+                    <Frame Margin="10,5" Padding="15" CornerRadius="10" HasShadow="True">
+                        <Frame.GestureRecognizers>
+                            <TapGestureRecognizer
+                                Command="{Binding Source={RelativeSource AncestorType={x:Type viewmodels:BlogViewModel}}, Path=BlogTappedCommand}"
+                                CommandParameter="{Binding .}" />
+                        </Frame.GestureRecognizers>
+                        <VerticalStackLayout Spacing="5">
+                            <Label Text="{Binding Title}" FontSize="18" FontAttributes="Bold" />
+                            <Label Text="{Binding Summary}" MaxLines="3" TextColor="Gray" FontSize="13" />
+                            <HorizontalStackLayout Spacing="10">
+                                <Label Text="{Binding AuthorName}" TextColor="#1976D2" FontAttributes="Bold" />
+                                <Label Text="{Binding DateDisplay}" TextColor="Gray" />
+                            </HorizontalStackLayout>
+                        </VerticalStackLayout>
+                    </Frame>
+                </DataTemplate>
+            </CollectionView.ItemTemplate>
+        </CollectionView>
+    </RefreshView>
+
+</ContentPage>

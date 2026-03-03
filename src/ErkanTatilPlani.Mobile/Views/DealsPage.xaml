@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:viewmodels="clr-namespace:ErkanTatilPlani.Mobile.ViewModels"
+             x:Class="ErkanTatilPlani.Mobile.Views.DealsPage"
+             Title="Firsatlar">
+
+    <ContentPage.BindingContext>
+        <viewmodels:DealsViewModel />
+    </ContentPage.BindingContext>
+
+    <RefreshView IsRefreshing="{Binding IsBusy}" Command="{Binding RefreshCommand}">
+        <ScrollView>
+            <VerticalStackLayout Padding="10" Spacing="10">
+
+                <!-- Flash Sales Section -->
+                <Frame BackgroundColor="#FF6F00" Padding="15" CornerRadius="10">
+                    <Label Text="Flash Sale" FontSize="20" FontAttributes="Bold" TextColor="White" />
+                </Frame>
+
+                <CollectionView ItemsSource="{Binding FlashSales}" EmptyView="Aktif flash sale bulunmuyor">
+                    <CollectionView.ItemTemplate>
+                        <DataTemplate x:DataType="viewmodels:DealItem">
+                            <Frame Margin="0,3" Padding="15" CornerRadius="10" HasShadow="True" BorderColor="#FF6F00">
+                                <VerticalStackLayout Spacing="5">
+                                    <Label Text="{Binding Name}" FontSize="16" FontAttributes="Bold" />
+                                    <Label Text="{Binding Description}" MaxLines="2" TextColor="Gray" FontSize="13" />
+                                    <HorizontalStackLayout Spacing="15">
+                                        <Label Text="{Binding DiscountDisplay}" TextColor="#D32F2F" FontAttributes="Bold" FontSize="16" />
+                                        <Label Text="{Binding EndDate}" TextColor="Gray" VerticalOptions="Center" />
+                                    </HorizontalStackLayout>
+                                </VerticalStackLayout>
+                            </Frame>
+                        </DataTemplate>
+                    </CollectionView.ItemTemplate>
+                </CollectionView>
+
+                <!-- Last Minute Section -->
+                <Frame BackgroundColor="#1976D2" Padding="15" CornerRadius="10" Margin="0,10,0,0">
+                    <Label Text="Son Dakika Firsatlari" FontSize="20" FontAttributes="Bold" TextColor="White" />
+                </Frame>
+
+                <CollectionView ItemsSource="{Binding LastMinuteDeals}" EmptyView="Son dakika firsati bulunmuyor">
+                    <CollectionView.ItemTemplate>
+                        <DataTemplate x:DataType="viewmodels:DealItem">
+                            <Frame Margin="0,3" Padding="15" CornerRadius="10" HasShadow="True" BorderColor="#1976D2">
+                                <VerticalStackLayout Spacing="5">
+                                    <Label Text="{Binding Name}" FontSize="16" FontAttributes="Bold" />
+                                    <Label Text="{Binding Description}" MaxLines="2" TextColor="Gray" FontSize="13" />
+                                    <HorizontalStackLayout Spacing="15">
+                                        <Label Text="{Binding DiscountDisplay}" TextColor="#D32F2F" FontAttributes="Bold" FontSize="16" />
+                                        <Label Text="{Binding EndDate}" TextColor="Gray" VerticalOptions="Center" />
+                                    </HorizontalStackLayout>
+                                </VerticalStackLayout>
+                            </Frame>
+                        </DataTemplate>
+                    </CollectionView.ItemTemplate>
+                </CollectionView>
+
+            </VerticalStackLayout>
+        </ScrollView>
+    </RefreshView>
+
+</ContentPage>

@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:viewmodels="clr-namespace:ErkanTatilPlani.Mobile.ViewModels"
+             x:Class="ErkanTatilPlani.Mobile.Views.NotificationsPage"
+             Title="Bildirimler">
+
+    <ContentPage.BindingContext>
+        <viewmodels:NotificationsViewModel />
+    </ContentPage.BindingContext>
+
+    <RefreshView IsRefreshing="{Binding IsBusy}" Command="{Binding RefreshCommand}">
+        <CollectionView ItemsSource="{Binding Notifications}" EmptyView="Bildirim bulunmuyor">
+            <CollectionView.ItemTemplate>
+                <DataTemplate x:DataType="viewmodels:NotificationItem">
+                    <Frame Margin="10,5" Padding="15" CornerRadius="10" HasShadow="True"
+                           BackgroundColor="{Binding IsRead, Converter={StaticResource InvertedBoolConverter}, ConverterParameter=Background}">
+                        <Frame.GestureRecognizers>
+                            <TapGestureRecognizer
+                                Command="{Binding Source={RelativeSource AncestorType={x:Type viewmodels:NotificationsViewModel}}, Path=MarkReadCommand}"
+                                CommandParameter="{Binding .}" />
+                        </Frame.GestureRecognizers>
+                        <VerticalStackLayout Spacing="5">
+                            <HorizontalStackLayout Spacing="8">
+                                <Label Text="{Binding Title}" FontSize="16" FontAttributes="Bold"
+                                       HorizontalOptions="FillAndExpand" />
+                                <Label Text="{Binding DateDisplay}" TextColor="Gray" FontSize="12"
+                                       VerticalOptions="Center" />
+                            </HorizontalStackLayout>
+                            <Label Text="{Binding Message}" TextColor="Gray" FontSize="14" />
+                        </VerticalStackLayout>
+                    </Frame>
+                </DataTemplate>
+            </CollectionView.ItemTemplate>
+        </CollectionView>
+    </RefreshView>
+
+</ContentPage>

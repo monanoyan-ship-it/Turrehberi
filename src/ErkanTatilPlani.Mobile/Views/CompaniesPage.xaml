@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:viewmodels="clr-namespace:ErkanTatilPlani.Mobile.ViewModels"
+             x:Class="ErkanTatilPlani.Mobile.Views.CompaniesPage"
+             Title="Firmalar">
+
+    <ContentPage.BindingContext>
+        <viewmodels:CompaniesViewModel />
+    </ContentPage.BindingContext>
+
+    <RefreshView IsRefreshing="{Binding IsBusy}" Command="{Binding RefreshCommand}">
+        <CollectionView ItemsSource="{Binding Companies}" EmptyView="Firma bulunamadi">
+            <CollectionView.ItemTemplate>
+                <DataTemplate x:DataType="viewmodels:CompanyListItem">
+                    <Frame Margin="10,5" Padding="15" CornerRadius="10" HasShadow="True">
+                        <Frame.GestureRecognizers>
+                            <TapGestureRecognizer
+                                Command="{Binding Source={RelativeSource AncestorType={x:Type viewmodels:CompaniesViewModel}}, Path=CompanyTappedCommand}"
+                                CommandParameter="{Binding .}" />
+                        </Frame.GestureRecognizers>
+                        <VerticalStackLayout Spacing="5">
+                            <Label Text="{Binding Name}" FontSize="18" FontAttributes="Bold" />
+                            <Label Text="{Binding Description}" MaxLines="2" TextColor="Gray" FontSize="13" />
+                            <HorizontalStackLayout Spacing="15">
+                                <Label Text="{Binding RatingDisplay}" TextColor="#FF8F00" FontAttributes="Bold" />
+                                <Label Text="{Binding TourCountDisplay}" TextColor="#1976D2" />
+                            </HorizontalStackLayout>
+                        </VerticalStackLayout>
+                    </Frame>
+                </DataTemplate>
+            </CollectionView.ItemTemplate>
+        </CollectionView>
+    </RefreshView>
+
+</ContentPage>

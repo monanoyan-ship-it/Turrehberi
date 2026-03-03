@@ -188,6 +188,140 @@ public class ApiService
         return await _httpClient.GetFromJsonAsync<JsonElement>($"{BaseUrl}/promotions/last-minute", JsonOptions);
     }
 
+    // === Companies ===
+
+    public async Task<List<JsonElement>> GetCompaniesAsync()
+    {
+        SetAuthHeader();
+        var response = await _httpClient.GetFromJsonAsync<List<JsonElement>>($"{BaseUrl}/companies", JsonOptions);
+        return response ?? new List<JsonElement>();
+    }
+
+    public async Task<JsonElement?> GetCompanyAsync(int id)
+    {
+        SetAuthHeader();
+        return await _httpClient.GetFromJsonAsync<JsonElement>($"{BaseUrl}/companies/{id}", JsonOptions);
+    }
+
+    // === Blogs ===
+
+    public async Task<List<JsonElement>> GetBlogsAsync()
+    {
+        SetAuthHeader();
+        var response = await _httpClient.GetFromJsonAsync<List<JsonElement>>($"{BaseUrl}/blogs/public", JsonOptions);
+        return response ?? new List<JsonElement>();
+    }
+
+    public async Task<JsonElement?> GetBlogAsync(int id)
+    {
+        SetAuthHeader();
+        return await _httpClient.GetFromJsonAsync<JsonElement>($"{BaseUrl}/blogs/{id}", JsonOptions);
+    }
+
+    // === FAQs ===
+
+    public async Task<List<JsonElement>> GetFaqsAsync()
+    {
+        SetAuthHeader();
+        var response = await _httpClient.GetFromJsonAsync<List<JsonElement>>($"{BaseUrl}/faqs/public", JsonOptions);
+        return response ?? new List<JsonElement>();
+    }
+
+    // === Favorites ===
+
+    public async Task<List<JsonElement>> GetFavoritesAsync()
+    {
+        SetAuthHeader();
+        var response = await _httpClient.GetFromJsonAsync<List<JsonElement>>($"{BaseUrl}/favorites", JsonOptions);
+        return response ?? new List<JsonElement>();
+    }
+
+    public async Task<(bool success, string? error)> RemoveFavoriteAsync(int favoriteId)
+    {
+        try
+        {
+            SetAuthHeader();
+            var response = await _httpClient.DeleteAsync($"{BaseUrl}/favorites/{favoriteId}");
+            if (response.IsSuccessStatusCode)
+                return (true, null);
+
+            var error = await response.Content.ReadFromJsonAsync<JsonElement>();
+            var msg = error.TryGetProperty("message", out var m) ? m.GetString() : "Favori silinemedi";
+            return (false, msg);
+        }
+        catch (Exception ex)
+        {
+            return (false, $"Baglanti hatasi: {ex.Message}");
+        }
+    }
+
+    // === Notifications ===
+
+    public async Task<List<JsonElement>> GetNotificationsAsync()
+    {
+        SetAuthHeader();
+        var response = await _httpClient.GetFromJsonAsync<List<JsonElement>>($"{BaseUrl}/notifications", JsonOptions);
+        return response ?? new List<JsonElement>();
+    }
+
+    public async Task<(bool success, string? error)> MarkNotificationReadAsync(int notificationId)
+    {
+        try
+        {
+            SetAuthHeader();
+            var response = await _httpClient.PutAsJsonAsync($"{BaseUrl}/notifications/{notificationId}/read", new { });
+            if (response.IsSuccessStatusCode)
+                return (true, null);
+
+            var error = await response.Content.ReadFromJsonAsync<JsonElement>();
+            var msg = error.TryGetProperty("message", out var m) ? m.GetString() : "Bildirim guncellenemedi";
+            return (false, msg);
+        }
+        catch (Exception ex)
+        {
+            return (false, $"Baglanti hatasi: {ex.Message}");
+        }
+    }
+
+    // === Messages ===
+
+    public async Task<List<JsonElement>> GetConversationsAsync()
+    {
+        SetAuthHeader();
+        var response = await _httpClient.GetFromJsonAsync<List<JsonElement>>($"{BaseUrl}/messages/conversations", JsonOptions);
+        return response ?? new List<JsonElement>();
+    }
+
+    // === Support ===
+
+    public async Task<(bool success, string? error)> SendSupportMessageAsync(string name, string email, string? subject, string message)
+    {
+        try
+        {
+            SetAuthHeader();
+            var response = await _httpClient.PostAsJsonAsync($"{BaseUrl}/support",
+                new { name, email, subject, message });
+            if (response.IsSuccessStatusCode)
+                return (true, null);
+
+            var error = await response.Content.ReadFromJsonAsync<JsonElement>();
+            var msg = error.TryGetProperty("message", out var m) ? m.GetString() : "Mesaj gonderilemedi";
+            return (false, msg);
+        }
+        catch (Exception ex)
+        {
+            return (false, $"Baglanti hatasi: {ex.Message}");
+        }
+    }
+
+    // === MyCompany ===
+
+    public async Task<JsonElement?> GetMyCompanyDashboardAsync()
+    {
+        SetAuthHeader();
+        return await _httpClient.GetFromJsonAsync<JsonElement>($"{BaseUrl}/companies/my/dashboard", JsonOptions);
+    }
+
     // === Profile ===
 
     public async Task<JsonElement?> GetProfileAsync()

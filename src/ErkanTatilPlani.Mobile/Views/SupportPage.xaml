@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:viewmodels="clr-namespace:ErkanTatilPlani.Mobile.ViewModels"
+             x:Class="ErkanTatilPlani.Mobile.Views.SupportPage"
+             Title="Destek">
+
+    <ContentPage.BindingContext>
+        <viewmodels:SupportViewModel />
+    </ContentPage.BindingContext>
+
+    <ScrollView>
+        <VerticalStackLayout Padding="20" Spacing="15">
+
+            <Label Text="Bize Ulasin" FontSize="22" FontAttributes="Bold" />
+            <Label Text="Sorulariniz veya onerileriniz icin bize mesaj gonderebilirsiniz." TextColor="Gray" />
+
+            <!-- Success -->
+            <Frame IsVisible="{Binding IsSent}" Padding="15" CornerRadius="10" BackgroundColor="#E8F5E9">
+                <Label Text="{Binding ResultMessage}" TextColor="#2E7D32" HorizontalTextAlignment="Center" />
+            </Frame>
+
+            <!-- Form -->
+            <VerticalStackLayout Spacing="10" IsVisible="{Binding IsSent, Converter={StaticResource InvertedBoolConverter}}">
+                <VerticalStackLayout Spacing="5">
+                    <Label Text="Adiniz" FontAttributes="Bold" />
+                    <Entry Text="{Binding Name}" Placeholder="Adiniz Soyadiniz" />
+                </VerticalStackLayout>
+
+                <VerticalStackLayout Spacing="5">
+                    <Label Text="Email" FontAttributes="Bold" />
+                    <Entry Text="{Binding Email}" Placeholder="email@ornek.com" Keyboard="Email" />
+                </VerticalStackLayout>
+
+                <VerticalStackLayout Spacing="5">
+                    <Label Text="Konu (opsiyonel)" FontAttributes="Bold" />
+                    <Entry Text="{Binding Subject}" Placeholder="Mesaj konusu" />
+                </VerticalStackLayout>
+
+                <VerticalStackLayout Spacing="5">
+                    <Label Text="Mesajiniz" FontAttributes="Bold" />
+                    <Editor Text="{Binding Message}" Placeholder="Mesajinizi yazin..." HeightRequest="120" />
+                </VerticalStackLayout>
+
+                <Label Text="{Binding ResultMessage}" TextColor="Red"
+                       IsVisible="{Binding ResultMessage, Converter={StaticResource StringToBoolConverter}}" />
+
+                <Button Text="Gonder"
+                        Command="{Binding SendCommand}"
+                        BackgroundColor="#1976D2"
+                        TextColor="White"
+                        FontAttributes="Bold"
+                        CornerRadius="10"
+                        HeightRequest="50"
+                        IsEnabled="{Binding IsBusy, Converter={StaticResource InvertedBoolConverter}}" />
+
+                <ActivityIndicator IsRunning="{Binding IsBusy}" IsVisible="{Binding IsBusy}" Color="#1976D2" />
+            </VerticalStackLayout>
+
+        </VerticalStackLayout>
+    </ScrollView>
+
+</ContentPage>

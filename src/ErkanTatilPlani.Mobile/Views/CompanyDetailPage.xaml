@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:viewmodels="clr-namespace:ErkanTatilPlani.Mobile.ViewModels"
+             x:Class="ErkanTatilPlani.Mobile.Views.CompanyDetailPage"
+             Title="{Binding Title}">
+
+    <ContentPage.BindingContext>
+        <viewmodels:CompanyDetailViewModel />
+    </ContentPage.BindingContext>
+
+    <ScrollView>
+        <VerticalStackLayout Padding="20" Spacing="15">
+
+            <!-- Loading -->
+            <ActivityIndicator IsRunning="{Binding IsBusy}" IsVisible="{Binding IsBusy}" Color="#1976D2" />
+
+            <!-- Header -->
+            <Frame BackgroundColor="#1976D2" Padding="20" CornerRadius="15"
+                   IsVisible="{Binding IsBusy, Converter={StaticResource InvertedBoolConverter}}">
+                <VerticalStackLayout Spacing="8">
+                    <Label Text="{Binding CompanyName}" FontSize="22" FontAttributes="Bold" TextColor="White" />
+                    <Label Text="{Binding RatingDisplay}" FontSize="18" TextColor="#FFD54F" FontAttributes="Bold" />
+                </VerticalStackLayout>
+            </Frame>
+
+            <!-- Description -->
+            <Frame Padding="15" CornerRadius="10" HasShadow="True"
+                   IsVisible="{Binding IsBusy, Converter={StaticResource InvertedBoolConverter}}">
+                <VerticalStackLayout Spacing="8">
+                    <Label Text="Hakkinda" FontSize="16" FontAttributes="Bold" />
+                    <Label Text="{Binding Description}" />
+                </VerticalStackLayout>
+            </Frame>
+
+            <!-- Contact Info -->
+            <Frame Padding="15" CornerRadius="10" HasShadow="True"
+                   IsVisible="{Binding IsBusy, Converter={StaticResource InvertedBoolConverter}}">
+                <VerticalStackLayout Spacing="10">
+                    <Label Text="Iletisim Bilgileri" FontSize="16" FontAttributes="Bold" />
+
+                    <HorizontalStackLayout Spacing="10"
+                        IsVisible="{Binding PhoneNumber, Converter={StaticResource StringToBoolConverter}}">
+                        <Label Text="Telefon:" FontAttributes="Bold" VerticalOptions="Center" />
+                        <Label Text="{Binding PhoneNumber}" VerticalOptions="Center" />
+                    </HorizontalStackLayout>
+
+                    <HorizontalStackLayout Spacing="10"
+                        IsVisible="{Binding Email, Converter={StaticResource StringToBoolConverter}}">
+                        <Label Text="E-posta:" FontAttributes="Bold" VerticalOptions="Center" />
+                        <Label Text="{Binding Email}" VerticalOptions="Center" />
+                    </HorizontalStackLayout>
+                </VerticalStackLayout>
+            </Frame>
+
+            <!-- Address -->
+            <Frame Padding="15" CornerRadius="10" HasShadow="True"
+                   IsVisible="{Binding IsBusy, Converter={StaticResource InvertedBoolConverter}}">
+                <VerticalStackLayout Spacing="8">
+                    <Label Text="Adres" FontSize="16" FontAttributes="Bold" />
+                    <Label Text="{Binding Address}" />
+                </VerticalStackLayout>
+            </Frame>
+
+        </VerticalStackLayout>
+    </ScrollView>
+
+</ContentPage>

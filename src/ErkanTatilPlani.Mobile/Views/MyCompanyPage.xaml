@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:viewmodels="clr-namespace:ErkanTatilPlani.Mobile.ViewModels"
+             x:Class="ErkanTatilPlani.Mobile.Views.MyCompanyPage"
+             Title="Firmam">
+
+    <ContentPage.BindingContext>
+        <viewmodels:MyCompanyViewModel />
+    </ContentPage.BindingContext>
+
+    <ScrollView>
+        <VerticalStackLayout Padding="15" Spacing="15">
+
+            <!-- Loading -->
+            <ActivityIndicator IsRunning="{Binding IsBusy}" IsVisible="{Binding IsBusy}" Color="#1976D2" />
+
+            <!-- Company Header -->
+            <Frame BackgroundColor="#1976D2" Padding="20" CornerRadius="15">
+                <VerticalStackLayout Spacing="5">
+                    <Label Text="{Binding CompanyName}" FontSize="22" FontAttributes="Bold" TextColor="White" />
+                    <Label Text="Firma Dashboard" TextColor="White" />
+                </VerticalStackLayout>
+            </Frame>
+
+            <!-- Stats -->
+            <Grid ColumnDefinitions="*,*,*" ColumnSpacing="10">
+                <Frame Padding="10" CornerRadius="10" HasShadow="True">
+                    <VerticalStackLayout HorizontalOptions="Center">
+                        <Label Text="{Binding TotalRevenue}" FontSize="16" FontAttributes="Bold" HorizontalOptions="Center" TextColor="#388E3C" />
+                        <Label Text="Gelir" FontSize="12" TextColor="Gray" HorizontalOptions="Center" />
+                    </VerticalStackLayout>
+                </Frame>
+                <Frame Grid.Column="1" Padding="10" CornerRadius="10" HasShadow="True">
+                    <VerticalStackLayout HorizontalOptions="Center">
+                        <Label Text="{Binding TotalReservations}" FontSize="16" FontAttributes="Bold" HorizontalOptions="Center" TextColor="#1976D2" />
+                        <Label Text="Rez." FontSize="12" TextColor="Gray" HorizontalOptions="Center" />
+                    </VerticalStackLayout>
+                </Frame>
+                <Frame Grid.Column="2" Padding="10" CornerRadius="10" HasShadow="True">
+                    <VerticalStackLayout HorizontalOptions="Center">
+                        <Label Text="{Binding AverageRating}" FontSize="16" FontAttributes="Bold" HorizontalOptions="Center" TextColor="#FF8F00" />
+                        <Label Text="Puan" FontSize="12" TextColor="Gray" HorizontalOptions="Center" />
+                    </VerticalStackLayout>
+                </Frame>
+            </Grid>
+
+            <!-- My Tours -->
+            <Label Text="Turlarim" FontSize="18" FontAttributes="Bold" />
+            <CollectionView ItemsSource="{Binding MyTours}" HeightRequest="200">
+                <CollectionView.ItemTemplate>
+                    <DataTemplate x:DataType="viewmodels:MyTourItem">
+                        <Frame Margin="0,3" Padding="12" CornerRadius="8" HasShadow="True">
+                            <Grid ColumnDefinitions="*,Auto">
+                                <VerticalStackLayout>
+                                    <Label Text="{Binding Name}" FontAttributes="Bold" />
+                                    <Label Text="{Binding PriceDisplay}" TextColor="#388E3C" FontSize="13" />
+                                </VerticalStackLayout>
+                                <Label Grid.Column="1" Text="{Binding StatusName}" TextColor="#1976D2" VerticalOptions="Center" />
+                            </Grid>
+                        </Frame>
+                    </DataTemplate>
+                </CollectionView.ItemTemplate>
+            </CollectionView>
+
+            <!-- Recent Reservations -->
+            <Label Text="Son Rezervasyonlar" FontSize="18" FontAttributes="Bold" />
+            <CollectionView ItemsSource="{Binding RecentReservations}" HeightRequest="250">
+                <CollectionView.ItemTemplate>
+                    <DataTemplate x:DataType="viewmodels:MyReservationItem">
+                        <Frame Margin="0,3" Padding="12" CornerRadius="8" HasShadow="True">
+                            <VerticalStackLayout Spacing="3">
+                                <Label Text="{Binding TourName}" FontAttributes="Bold" />
+                                <HorizontalStackLayout Spacing="8">
+                                    <Label Text="{Binding VisitorName}" TextColor="Gray" FontSize="13" />
+                                    <Label Text="{Binding Date}" TextColor="Gray" FontSize="13" />
+                                </HorizontalStackLayout>
+                                <HorizontalStackLayout Spacing="10">
+                                    <Label Text="{Binding PeopleDisplay}" FontSize="13" />
+                                    <Label Text="{Binding PriceDisplay}" TextColor="#388E3C" FontSize="13" FontAttributes="Bold" />
+                                    <Label Text="{Binding StatusName}" TextColor="#1976D2" FontSize="13" />
+                                </HorizontalStackLayout>
+                            </VerticalStackLayout>
+                        </Frame>
+                    </DataTemplate>
+                </CollectionView.ItemTemplate>
+            </CollectionView>
+
+        </VerticalStackLayout>
+    </ScrollView>
+
+</ContentPage>
