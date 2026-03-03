@@ -80,6 +80,44 @@ public class Tour : BaseEntity
     public decimal AverageRating { get; set; }
 
     // ===============================================
+    // SURDURULEBILIRLIK (Faz 15.4)
+    // ===============================================
+
+    /// <summary>
+    /// Eko-dostu tur mu?
+    /// </summary>
+    public bool IsSustainable { get; set; }
+
+    /// <summary>
+    /// Surdurulebilirlik puani (0-100)
+    /// </summary>
+    public int SustainabilityScore { get; set; }
+
+    /// <summary>
+    /// Surdurulebilirlik detaylari (JSON: karbon ayak izi, eko uygulamalar vb.)
+    /// </summary>
+    public string? SustainabilityInfo { get; set; }
+
+    // ===============================================
+    // ERISILEBILIRLIK (Faz 15.5)
+    // ===============================================
+
+    /// <summary>
+    /// Tekerlekli sandalye erisimi var mi?
+    /// </summary>
+    public bool IsWheelchairAccessible { get; set; }
+
+    /// <summary>
+    /// Mobilite seviyesi (0: Bilgi yok, 1: Kolay, 2: Orta, 3: Zor)
+    /// </summary>
+    public int MobilityLevel { get; set; }
+
+    /// <summary>
+    /// Erisilebilirlik detaylari (JSON: asansor, rampa, engelli tuvaleti vb.)
+    /// </summary>
+    public string? AccessibilityInfo { get; set; }
+
+    // ===============================================
     // ILISKILER
     // ===============================================
 
@@ -89,4 +127,6 @@ public class Tour : BaseEntity
     public virtual ICollection<TourSchedule> Schedules { get; set; } = new List<TourSchedule>();
     public virtual ICollection<TourWatch> TourWatches { get; set; } = new List<TourWatch>();
     public virtual ICollection<TourPhoto> Photos { get; set; } = new List<TourPhoto>();
+    public virtual ICollection<TourPackageItem> PackageItems { get; set; } = new List<TourPackageItem>();
+    public virtual ICollection<TourDigitalContent> DigitalContents { get; set; } = new List<TourDigitalContent>();
 }

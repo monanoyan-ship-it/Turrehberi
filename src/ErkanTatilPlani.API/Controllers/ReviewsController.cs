@@ -11,15 +11,18 @@ public class ReviewsController : ControllerBase
     private readonly ITourReviewFactory _tourReview;
     private readonly IReviewInteractionFactory _reviewInteraction;
     private readonly IAdminReviewFactory _adminReview;
+    private readonly IReviewSummaryFactory _reviewSummary;
 
     public ReviewsController(
         ITourReviewFactory tourReview,
         IReviewInteractionFactory reviewInteraction,
-        IAdminReviewFactory adminReview)
+        IAdminReviewFactory adminReview,
+        IReviewSummaryFactory reviewSummary)
     {
         _tourReview = tourReview;
         _reviewInteraction = reviewInteraction;
         _adminReview = adminReview;
+        _reviewSummary = reviewSummary;
     }
 
     // ===============================================
@@ -39,6 +42,16 @@ public class ReviewsController : ControllerBase
     {
         var (result, errorMessage, statusCode) = await _tourReview.GetTourReviewsAsync(tourId, sort, rating, page, pageSize);
         if (errorMessage != null) return StatusCode(statusCode, new { message = errorMessage });
+        return Ok(result);
+    }
+
+    /// <summary>
+    /// Tur yorum ozeti - AI analiz (Faz 15.2)
+    /// </summary>
+    [HttpGet("tours/{tourId}/reviews/summary")]
+    public async Task<ActionResult<object>> GetReviewSummary(int tourId)
+    {
+        var result = await _reviewSummary.GetTourReviewSummaryAsync(tourId);
         return Ok(result);
     }
 

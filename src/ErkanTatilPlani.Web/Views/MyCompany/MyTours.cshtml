@@ -84,6 +84,8 @@
                                 </td>
                                 <td class="text-center">
                                     <span class="badge" data-bind="css: isActive ? 'bg-success' : 'bg-secondary', text: isActive ? 'Aktif' : 'Pasif'"></span>
+                                    <span class="badge bg-success-subtle text-success ms-1" data-bind="visible: isSustainable" title="Eko-Dostu"><i class="bi bi-leaf"></i></span>
+                                    <span class="badge bg-info-subtle text-info ms-1" data-bind="visible: isWheelchairAccessible" title="Tekerlekli Sandalye"><i class="bi bi-universal-access"></i></span>
                                 </td>
                                 <td class="text-center">
                                     <div class="btn-group btn-group-sm">
@@ -226,6 +228,51 @@
                             <div class="col-md-6">
                                 <label class="form-label" data-t="Tour.Exclusions">Dahil Olmayan</label>
                                 <textarea class="form-control" rows="3" data-bind="value: formData().exclusions" placeholder="Her satira bir madde yazin"></textarea>
+                            </div>
+
+                            <!-- Surdurulebilirlik (Faz 15.4) -->
+                            <div class="col-12">
+                                <hr class="my-2">
+                                <h6 class="text-muted"><i class="bi bi-leaf me-1"></i><span data-t="Tour.Sustainable">Surdurulebilirlik</span></h6>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="form-check form-switch">
+                                    <input class="form-check-input" type="checkbox" data-bind="checked: formData().isSustainable" id="chkSustainable">
+                                    <label class="form-check-label" for="chkSustainable" data-t="Tour.Sustainable">Eko-Dostu Tur</label>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label" data-t="Tour.SustainabilityScore">Surdurulebilirlik Puani (0-100)</label>
+                                <input type="number" class="form-control" data-bind="value: formData().sustainabilityScore" min="0" max="100">
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label" data-t="Tour.SustainabilityInfo">Surdurulebilirlik Detaylari</label>
+                                <input type="text" class="form-control" data-bind="value: formData().sustainabilityInfo" placeholder="Karbon notr, plastik yok...">
+                            </div>
+
+                            <!-- Erisilebilirlik (Faz 15.5) -->
+                            <div class="col-12">
+                                <hr class="my-2">
+                                <h6 class="text-muted"><i class="bi bi-universal-access me-1"></i><span data-t="Tour.AccessibilityInfo">Erisilebilirlik</span></h6>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="form-check form-switch">
+                                    <input class="form-check-input" type="checkbox" data-bind="checked: formData().isWheelchairAccessible" id="chkWheelchair">
+                                    <label class="form-check-label" for="chkWheelchair" data-t="Tour.WheelchairAccessible">Tekerlekli Sandalye Erisimi</label>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label" data-t="Tour.MobilityLevel">Mobilite Seviyesi</label>
+                                <select class="form-select" data-bind="value: formData().mobilityLevel">
+                                    <option value="0" data-t="Mobility.Unknown">Bilgi Yok</option>
+                                    <option value="1" data-t="Mobility.Easy">Kolay</option>
+                                    <option value="2" data-t="Mobility.Moderate">Orta</option>
+                                    <option value="3" data-t="Mobility.Difficult">Zor</option>
+                                </select>
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label" data-t="Tour.AccessibilityInfo">Erisilebilirlik Detaylari</label>
+                                <input type="text" class="form-control" data-bind="value: formData().accessibilityInfo" placeholder="Asansor, rampa, engelli WC...">
                             </div>
 
                             <!-- Bulusma Noktasi -->

@@ -4,7 +4,7 @@ namespace ErkanTatilPlani.Core.Factories.Tours;
 
 public interface ITourFactory
 {
-    Task<object> GetToursAsync(string? search, string? destination, decimal? minPrice, decimal? maxPrice, int? minDays, int? maxDays, int? companyId, bool? featured, string? sort, int? difficulty, int? category, string? guideLanguage);
+    Task<object> GetToursAsync(string? search, string? destination, decimal? minPrice, decimal? maxPrice, int? minDays, int? maxDays, int? companyId, bool? featured, string? sort, int? difficulty, int? category, string? guideLanguage, bool? sustainable = null, bool? wheelchairAccessible = null, int? mobilityLevel = null);
     Task<IEnumerable<Tour>> GetFeaturedToursAsync();
     Task<object> GetTourCompaniesAsync();
     Task<IEnumerable<object>> GetTourCategoriesAsync();

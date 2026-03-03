@@ -33,9 +33,12 @@ public class ToursController : ControllerBase
         [FromQuery] int? companyId = null, [FromQuery] bool? featured = null,
         [FromQuery] string? sort = null,
         [FromQuery] int? difficulty = null, [FromQuery] int? category = null,
-        [FromQuery] string? guideLanguage = null)
+        [FromQuery] string? guideLanguage = null,
+        [FromQuery] bool? sustainable = null,
+        [FromQuery] bool? wheelchairAccessible = null,
+        [FromQuery] int? mobilityLevel = null)
     {
-        return Ok(await _tourFactory.GetToursAsync(search, destination, minPrice, maxPrice, minDays, maxDays, companyId, featured, sort, difficulty, category, guideLanguage));
+        return Ok(await _tourFactory.GetToursAsync(search, destination, minPrice, maxPrice, minDays, maxDays, companyId, featured, sort, difficulty, category, guideLanguage, sustainable, wheelchairAccessible, mobilityLevel));
     }
 
     [HttpGet("categories")]

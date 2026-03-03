@@ -83,6 +83,13 @@ public class AppDbContext : DbContext
     // Support
     public DbSet<SupportTicket> SupportTickets => Set<SupportTicket>();
 
+    // Tour Packages (Faz 15.6)
+    public DbSet<TourPackage> TourPackages => Set<TourPackage>();
+    public DbSet<TourPackageItem> TourPackageItems => Set<TourPackageItem>();
+
+    // Tour Digital Content (Faz 15.7)
+    public DbSet<TourDigitalContent> TourDigitalContents => Set<TourDigitalContent>();
+
     // Gezgin Kulubu - Social
     public DbSet<TravelerFollow> TravelerFollows => Set<TravelerFollow>();
     public DbSet<TripStory> TripStories => Set<TripStory>();
@@ -935,6 +942,42 @@ public class AppDbContext : DbContext
                   .IsRequired(false)
                   .OnDelete(DeleteBehavior.Restrict);
             entity.HasIndex(e => e.TripStoryId);
+        });
+
+        // Tour Package (Faz 15.6)
+        modelBuilder.Entity<TourPackage>(entity =>
+        {
+            entity.HasKey(e => e.Id);
+            entity.Property(e => e.Name).IsRequired().HasMaxLength(200);
+            entity.HasOne(e => e.Visitor)
+                  .WithMany()
+                  .HasForeignKey(e => e.VisitorId)
+                  .OnDelete(DeleteBehavior.Restrict);
+        });
+
+        modelBuilder.Entity<TourPackageItem>(entity =>
+        {
+            entity.HasKey(e => e.Id);
+            entity.HasOne(e => e.TourPackage)
+                  .WithMany(p => p.Items)
+                  .HasForeignKey(e => e.TourPackageId)
+                  .OnDelete(DeleteBehavior.Cascade);
+            entity.HasOne(e => e.Tour)
+                  .WithMany(t => t.PackageItems)
+                  .HasForeignKey(e => e.TourId)
+                  .OnDelete(DeleteBehavior.Restrict);
+        });
+
+        // Tour Digital Content (Faz 15.7)
+        modelBuilder.Entity<TourDigitalContent>(entity =>
+        {
+            entity.HasKey(e => e.Id);
+            entity.Property(e => e.Title).IsRequired().HasMaxLength(200);
+            entity.HasOne(e => e.Tour)
+                  .WithMany(t => t.DigitalContents)
+                  .HasForeignKey(e => e.TourId)
+                  .OnDelete(DeleteBehavior.Cascade);
+            entity.HasIndex(e => e.TourId);
         });
 
         // Seed Data

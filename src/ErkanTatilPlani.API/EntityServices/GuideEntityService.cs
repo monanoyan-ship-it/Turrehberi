@@ -14,6 +14,9 @@ public class GuideEntityService : IGuideEntityService
         _context = context;
     }
 
+    public IQueryable<Guide> GetActiveGuides()
+        => _context.Guides.Where(g => g.IsActive);
+
     public IQueryable<Guide> GetByCompanyId(int companyId)
         => _context.Guides.Where(g => g.CompanyId == companyId && g.IsActive);
 

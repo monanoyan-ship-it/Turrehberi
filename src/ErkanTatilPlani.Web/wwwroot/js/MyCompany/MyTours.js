@@ -26,6 +26,12 @@ function MyToursViewModel() {
         guideLanguages: '',
         inclusions: '',
         exclusions: '',
+        isSustainable: false,
+        sustainabilityScore: 0,
+        sustainabilityInfo: '',
+        isWheelchairAccessible: false,
+        mobilityLevel: '0',
+        accessibilityInfo: '',
         meetingPointLat: '',
         meetingPointLng: '',
         meetingPointAddress: ''
@@ -385,7 +391,13 @@ function MyToursViewModel() {
             categoryId: '0',
             guideLanguages: '',
             inclusions: '',
-            exclusions: ''
+            exclusions: '',
+            isSustainable: false,
+            sustainabilityScore: 0,
+            sustainabilityInfo: '',
+            isWheelchairAccessible: false,
+            mobilityLevel: '0',
+            accessibilityInfo: ''
         });
         tourModal.show();
     };
@@ -408,6 +420,12 @@ function MyToursViewModel() {
             guideLanguages: tour.guideLanguages || '',
             inclusions: tour.inclusions || '',
             exclusions: tour.exclusions || '',
+            isSustainable: tour.isSustainable || false,
+            sustainabilityScore: tour.sustainabilityScore || 0,
+            sustainabilityInfo: tour.sustainabilityInfo || '',
+            isWheelchairAccessible: tour.isWheelchairAccessible || false,
+            mobilityLevel: String(tour.mobilityLevel || 0),
+            accessibilityInfo: tour.accessibilityInfo || '',
             meetingPointLat: tour.meetingPointLat || '',
             meetingPointLng: tour.meetingPointLng || '',
             meetingPointAddress: tour.meetingPointAddress || ''
@@ -439,6 +457,12 @@ function MyToursViewModel() {
         // Yeni alanlari int'e cevir
         data.difficultyId = parseInt(data.difficultyId) || 1;
         data.categoryId = parseInt(data.categoryId) || 0;
+
+        // Surdurulebilirlik ve erisilebilirlik alanlari
+        data.sustainabilityScore = parseInt(data.sustainabilityScore) || 0;
+        data.sustainabilityInfo = data.sustainabilityInfo || null;
+        data.mobilityLevel = parseInt(data.mobilityLevel) || 0;
+        data.accessibilityInfo = data.accessibilityInfo || null;
 
         // Meeting point alanlari
         data.meetingPointLat = data.meetingPointLat ? parseFloat(data.meetingPointLat) : null;

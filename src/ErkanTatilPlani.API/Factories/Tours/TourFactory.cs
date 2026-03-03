@@ -33,7 +33,7 @@ public class TourFactory : ITourFactory
         _fileUploadService = fileUploadService;
     }
 
-    public async Task<object> GetToursAsync(string? search, string? destination, decimal? minPrice, decimal? maxPrice, int? minDays, int? maxDays, int? companyId, bool? featured, string? sort, int? difficulty, int? category, string? guideLanguage)
+    public async Task<object> GetToursAsync(string? search, string? destination, decimal? minPrice, decimal? maxPrice, int? minDays, int? maxDays, int? companyId, bool? featured, string? sort, int? difficulty, int? category, string? guideLanguage, bool? sustainable = null, bool? wheelchairAccessible = null, int? mobilityLevel = null)
     {
         var query = _tourService.GetActiveToursWithCompany()
             .Where(t => t.Company!.StatusId == CompanyStatuses.Ids.Approved);
@@ -65,6 +65,16 @@ public class TourFactory : ITourFactory
             var lang = guideLanguage.ToLower();
             query = query.Where(t => t.GuideLanguages != null && t.GuideLanguages.ToLower().Contains(lang));
         }
+
+        // Faz 15.4 - Surdurulebilirlik filtresi
+        if (sustainable.HasValue && sustainable.Value)
+            query = query.Where(t => t.IsSustainable);
+
+        // Faz 15.5 - Erisilebilirlik filtreleri
+        if (wheelchairAccessible.HasValue && wheelchairAccessible.Value)
+            query = query.Where(t => t.IsWheelchairAccessible);
+        if (mobilityLevel.HasValue)
+            query = query.Where(t => t.MobilityLevel == mobilityLevel.Value);
 
         query = sort?.ToLower() switch
         {
@@ -98,6 +108,8 @@ public class TourFactory : ITourFactory
             t.Tour.CompanyId, Company = t.Tour.Company,
             t.Tour.ReviewCount, t.Tour.AverageRating,
             t.ActiveReservationCount,
+            t.Tour.IsSustainable, t.Tour.SustainabilityScore,
+            t.Tour.IsWheelchairAccessible, t.Tour.MobilityLevel,
             t.Tour.CreatedAt, t.Tour.IsActive
         }).ToList();
 

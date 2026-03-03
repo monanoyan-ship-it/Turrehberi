@@ -151,6 +151,12 @@ public static class FactoryRegistration
         services.AddScoped<ITravelerProfileFactory, TravelerProfileFactory>();
         services.AddScoped<ITripStoryFactory, TripStoryFactory>();
 
+        // Faz 15 - AI ve Yenilikci Ozellikler (4)
+        services.AddScoped<IReviewSummaryFactory, ReviewSummaryFactory>();
+        services.AddScoped<IGuideMarketplaceFactory, GuideMarketplaceFactory>();
+        services.AddScoped<ITourPackageFactory, TourPackageFactory>();
+        services.AddScoped<ITourDigitalContentFactory, TourDigitalContentFactory>();
+
         return services;
     }
 }

@@ -647,3 +647,78 @@ public static class DurationUnits
         public const int Month = 4;
     }
 }
+
+// ============================================================
+// DIGITAL CONTENT TYPES (Dijital Icerik Tipleri - Faz 15.7)
+// ============================================================
+public static class DigitalContentTypes
+{
+    public static readonly TypeItem AudioGuide = new(1, "AudioGuide", "DigitalContent.AudioGuide",
+        "Sesli rehber",
+        "bi-mic", "bg-primary", 1, isDefault: true);
+
+    public static readonly TypeItem RouteMap = new(2, "RouteMap", "DigitalContent.RouteMap",
+        "Rota haritasi",
+        "bi-map", "bg-success", 2);
+
+    public static readonly TypeItem PdfGuide = new(3, "PdfGuide", "DigitalContent.PdfGuide",
+        "PDF rehber",
+        "bi-file-pdf", "bg-danger", 3);
+
+    public static readonly TypeItem Video = new(4, "Video", "DigitalContent.Video",
+        "Video icerik",
+        "bi-camera-video", "bg-info", 4);
+
+    public static readonly TypeItem Gallery = new(5, "Gallery", "DigitalContent.Gallery",
+        "Fotograf galerisi",
+        "bi-images", "bg-warning text-dark", 5);
+
+    public static IEnumerable<TypeItem> All => new[] { AudioGuide, RouteMap, PdfGuide, Video, Gallery };
+    public static TypeItem Default => All.First(x => x.IsDefault);
+    public static TypeItem? GetById(int id) => All.FirstOrDefault(x => x.Id == id);
+    public static TypeItem? GetBySystemName(string systemName) => All.FirstOrDefault(x => x.SystemName == systemName);
+
+    public static class Ids
+    {
+        public const int AudioGuide = 1;
+        public const int RouteMap = 2;
+        public const int PdfGuide = 3;
+        public const int Video = 4;
+        public const int Gallery = 5;
+    }
+}
+
+// ============================================================
+// MOBILITY LEVELS (Mobilite Seviyeleri - Faz 15.5)
+// ============================================================
+public static class MobilityLevels
+{
+    public static readonly TypeItem Unknown = new(0, "Unknown", "Mobility.Unknown",
+        "Bilgi yok",
+        "bi-question-circle", "bg-secondary", 0, isDefault: true);
+
+    public static readonly TypeItem Easy = new(1, "Easy", "Mobility.Easy",
+        "Kolay - Duz zemin, engelsiz",
+        "bi-emoji-smile", "bg-success", 1);
+
+    public static readonly TypeItem Moderate = new(2, "Moderate", "Mobility.Moderate",
+        "Orta - Basamak/hafif egim olabilir",
+        "bi-emoji-neutral", "bg-warning text-dark", 2);
+
+    public static readonly TypeItem Difficult = new(3, "Difficult", "Mobility.Difficult",
+        "Zor - Engebeli arazi, uzun yuruyus",
+        "bi-emoji-frown", "bg-danger", 3);
+
+    public static IEnumerable<TypeItem> All => new[] { Unknown, Easy, Moderate, Difficult };
+    public static TypeItem Default => All.First(x => x.IsDefault);
+    public static TypeItem? GetById(int id) => All.FirstOrDefault(x => x.Id == id);
+    public static TypeItem? GetBySystemName(string systemName) => All.FirstOrDefault(x => x.SystemName == systemName);
+
+    public static class Ids
+    {
+        public const int Unknown = 0;
+        public const int Easy = 1;
+        public const int Moderate = 2;
+        public const int Difficult = 3;
+    }
+}

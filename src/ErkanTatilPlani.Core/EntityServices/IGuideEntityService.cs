@@ -4,6 +4,7 @@ namespace ErkanTatilPlani.Core.EntityServices;
 
 public interface IGuideEntityService
 {
+    IQueryable<Guide> GetActiveGuides();
     IQueryable<Guide> GetByCompanyId(int companyId);
     Task<Guide?> GetByIdAsync(int id);
     Task<Guide?> GetByIdWithAssignmentsAsync(int id);

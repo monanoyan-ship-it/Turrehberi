@@ -99,6 +99,61 @@
             </div>
             <!-- /ko -->
 
+            <!-- Surdurulebilirlik & Erisilebilirlik (Faz 15.4 + 15.5) -->
+            <!-- ko if: isSustainable || isWheelchairAccessible || mobilityLevel > 0 -->
+            <div class="row mb-4">
+                <!-- ko if: isSustainable -->
+                <div class="col-md-6">
+                    <div class="card border-success h-100">
+                        <div class="card-header bg-success-subtle text-success">
+                            <h6 class="mb-0"><i class="bi bi-leaf"></i> <span data-t="Tour.Sustainable">Eko-Dostu Tur</span></h6>
+                        </div>
+                        <div class="card-body">
+                            <!-- ko if: sustainabilityScore > 0 -->
+                            <div class="mb-2">
+                                <small class="text-muted" data-t="Tour.SustainabilityScore">Surdurulebilirlik Puani</small>
+                                <div class="progress" style="height: 8px;">
+                                    <div class="progress-bar bg-success" data-bind="style: { width: sustainabilityScore + '%' }"></div>
+                                </div>
+                                <small class="text-success fw-bold" data-bind="text: sustainabilityScore + '/100'"></small>
+                            </div>
+                            <!-- /ko -->
+                            <!-- ko if: sustainabilityInfo -->
+                            <p class="mb-0 small text-muted" data-bind="text: sustainabilityInfo"></p>
+                            <!-- /ko -->
+                        </div>
+                    </div>
+                </div>
+                <!-- /ko -->
+                <!-- ko if: isWheelchairAccessible || mobilityLevel > 0 -->
+                <div class="col-md-6">
+                    <div class="card border-info h-100">
+                        <div class="card-header bg-info-subtle text-info">
+                            <h6 class="mb-0"><i class="bi bi-universal-access"></i> <span data-t="Tour.AccessibilityInfo">Erisilebilirlik</span></h6>
+                        </div>
+                        <div class="card-body">
+                            <!-- ko if: isWheelchairAccessible -->
+                            <p class="mb-1"><i class="bi bi-check-circle text-success me-1"></i> <span data-t="Tour.WheelchairAccessible">Tekerlekli Sandalye Erisimi</span></p>
+                            <!-- /ko -->
+                            <!-- ko if: mobilityLevel > 0 -->
+                            <p class="mb-1">
+                                <i class="bi bi-person-walking me-1"></i>
+                                <span data-t="Tour.MobilityLevel">Mobilite</span>:
+                                <!-- ko if: mobilityLevel === 1 --><span class="badge bg-success" data-t="Mobility.Easy">Kolay</span><!-- /ko -->
+                                <!-- ko if: mobilityLevel === 2 --><span class="badge bg-warning text-dark" data-t="Mobility.Moderate">Orta</span><!-- /ko -->
+                                <!-- ko if: mobilityLevel === 3 --><span class="badge bg-danger" data-t="Mobility.Difficult">Zor</span><!-- /ko -->
+                            </p>
+                            <!-- /ko -->
+                            <!-- ko if: accessibilityInfo -->
+                            <p class="mb-0 small text-muted" data-bind="text: accessibilityInfo"></p>
+                            <!-- /ko -->
+                        </div>
+                    </div>
+                </div>
+                <!-- /ko -->
+            </div>
+            <!-- /ko -->
+
             <!-- Harita -->
             <!-- ko if: latitude && longitude -->
             <div class="card mb-4">
