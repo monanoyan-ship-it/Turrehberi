@@ -1445,5 +1445,12 @@
   "TourDetail.ViewFullPage": "مشاهده صفحه کامل",
   "TourDetail.BookNow": "رزرو کنید",
   "TourDetail.AboutTour": "درباره تور",
-  "TourDetail.MeetingPoint": "نقطه ملاقات"
+  "TourDetail.MeetingPoint": "نقطه ملاقات",
+  "Menu.Faq": "FAQ",
+  "Faq.Title": "Soalat-e motadavel",
+  "Faq.Subtitle": "Pasokh be soalat-e rayej-e shoma",
+  "Faq.NoQuestions": "Hanooz soali ezafe nashode",
+  "Faq.StillHaveQuestions": "Hanooz soal darid?",
+  "Faq.ContactUs": "Az tariq-e safhe-ye tamas ba ma dar ertebat bashid.",
+  "Faq.ContactButton": "Tamas ba ma"
 }

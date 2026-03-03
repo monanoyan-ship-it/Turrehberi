@@ -1445,5 +1445,12 @@
   "TourDetail.ViewFullPage": "Ganze Seite anzeigen",
   "TourDetail.BookNow": "Jetzt buchen",
   "TourDetail.AboutTour": "Uber die Tour",
-  "TourDetail.MeetingPoint": "Treffpunkt"
+  "TourDetail.MeetingPoint": "Treffpunkt",
+  "Menu.Faq": "FAQ",
+  "Faq.Title": "Haufig gestellte Fragen",
+  "Faq.Subtitle": "Antworten auf Ihre haufigsten Fragen",
+  "Faq.NoQuestions": "Noch keine Fragen hinzugefugt",
+  "Faq.StillHaveQuestions": "Noch Fragen?",
+  "Faq.ContactUs": "Kontaktieren Sie uns uber unsere Kontaktseite.",
+  "Faq.ContactButton": "Kontakt aufnehmen"
 }

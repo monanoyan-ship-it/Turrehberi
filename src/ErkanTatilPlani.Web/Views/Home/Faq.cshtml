@@ -1,0 +1,60 @@
+@{
+    ViewData["Title"] = "SSS";
+}
+
+<div class="container py-5" id="faqApp">
+    <!-- Hero -->
+    <div class="text-center mb-5">
+        <h1 class="display-4 fw-bold text-primary">
+            <i class="bi bi-question-circle me-2"></i>
+            <span data-t="Faq.Title">Sikca Sorulan Sorular</span>
+        </h1>
+        <p class="lead text-muted" data-t="Faq.Subtitle">Merak ettiginiz sorularin cevaplari</p>
+    </div>
+
+    <!-- Category Filter -->
+    <div class="text-center mb-4">
+        <div class="btn-group flex-wrap" data-bind="foreach: categories">
+            <button class="btn btn-sm" data-bind="text: $data || 'Tumu', click: $parent.filterByCategory, css: $parent.selectedCategory() === $data ? 'btn-primary' : 'btn-outline-primary'"></button>
+        </div>
+    </div>
+
+    <!-- FAQ Accordion -->
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="accordion" id="faqAccordion" data-bind="foreach: filteredFaqs">
+                <div class="accordion-item">
+                    <h2 class="accordion-header">
+                        <button class="accordion-button collapsed" type="button"
+                                data-bs-toggle="collapse"
+                                data-bind="attr: { 'data-bs-target': '#faq-' + id }, text: question">
+                        </button>
+                    </h2>
+                    <div class="accordion-collapse collapse" data-bind="attr: { id: 'faq-' + id }" data-bs-parent="#faqAccordion">
+                        <div class="accordion-body text-muted" data-bind="text: answer"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Empty state -->
+            <div class="text-center py-5" data-bind="visible: filteredFaqs().length === 0">
+                <i class="bi bi-inbox text-muted" style="font-size: 3rem;"></i>
+                <p class="text-muted mt-2" data-t="Faq.NoQuestions">Henuz soru eklenmemis</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- CTA -->
+    <div class="text-center mt-5 bg-light rounded-4 p-5">
+        <h4 class="fw-bold mb-3" data-t="Faq.StillHaveQuestions">Sorunuz hala cevaplanmadi mi?</h4>
+        <p class="text-muted mb-4" data-t="Faq.ContactUs">Bize iletisim sayfasindan ulasabilirsiniz.</p>
+        <a href="/Home/Contact" class="btn btn-primary btn-lg px-5">
+            <i class="bi bi-envelope me-2"></i>
+            <span data-t="Faq.ContactButton">Iletisime Gec</span>
+        </a>
+    </div>
+</div>
+
+@section Scripts {
+<script src="~/js/Home/Faq.js" asp-append-version="true"></script>
+}

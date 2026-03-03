@@ -104,6 +104,13 @@ public class AdminController : Controller
         return View();
     }
 
+    // SSS yonetimi (Staff ve Admin)
+    public IActionResult Faqs()
+    {
+        SetCommonViewData("Faqs", "SSS Yonetimi");
+        return View();
+    }
+
     // Promosyon yonetimi (Staff ve Admin)
     public IActionResult Promotions()
     {

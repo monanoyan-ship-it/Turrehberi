@@ -77,6 +77,9 @@ public class AppDbContext : DbContext
     public DbSet<ScheduledEmail> ScheduledEmails => Set<ScheduledEmail>();
     public DbSet<AbandonedCart> AbandonedCarts => Set<AbandonedCart>();
 
+    // FAQ
+    public DbSet<Faq> Faqs => Set<Faq>();
+
     // Gezgin Kulubu - Social
     public DbSet<TravelerFollow> TravelerFollows => Set<TravelerFollow>();
     public DbSet<TripStory> TripStories => Set<TripStory>();

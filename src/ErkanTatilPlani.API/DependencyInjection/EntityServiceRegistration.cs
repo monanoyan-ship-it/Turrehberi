@@ -35,6 +35,7 @@ public static class EntityServiceRegistration
         services.AddScoped<ITravelerFollowEntityService, TravelerFollowEntityService>();
         services.AddScoped<ITripStoryEntityService, TripStoryEntityService>();
         services.AddScoped<ITripStoryPhotoEntityService, TripStoryPhotoEntityService>();
+        services.AddScoped<IFaqEntityService, FaqEntityService>();
         return services;
     }
 }

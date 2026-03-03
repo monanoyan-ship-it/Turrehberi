@@ -1439,5 +1439,12 @@
   "TourDetail.ViewFullPage": "Tam Sayfa Goruntule",
   "TourDetail.BookNow": "Rezervasyon Yap",
   "TourDetail.AboutTour": "Tur Hakkinda",
-  "TourDetail.MeetingPoint": "Bulusma Noktasi"
+  "TourDetail.MeetingPoint": "Bulusma Noktasi",
+  "Menu.Faq": "SSS",
+  "Faq.Title": "Sikca Sorulan Sorular",
+  "Faq.Subtitle": "Merak ettiginiz sorularin cevaplari",
+  "Faq.NoQuestions": "Henuz soru eklenmemis",
+  "Faq.StillHaveQuestions": "Sorunuz hala cevaplanmadi mi?",
+  "Faq.ContactUs": "Bize iletisim sayfasindan ulasabilirsiniz.",
+  "Faq.ContactButton": "Iletisime Gec"
 }

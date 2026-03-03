@@ -1445,5 +1445,12 @@
   "TourDetail.ViewFullPage": "عرض الصفحة الكاملة",
   "TourDetail.BookNow": "احجز الآن",
   "TourDetail.AboutTour": "عن الجولة",
-  "TourDetail.MeetingPoint": "نقطة الالتقاء"
+  "TourDetail.MeetingPoint": "نقطة الالتقاء",
+  "Menu.Faq": "FAQ",
+  "Faq.Title": "Al-as'ila al-sha'i'a",
+  "Faq.Subtitle": "Ijabat 'ala as'ilatikum al-aktar shuyu'an",
+  "Faq.NoQuestions": "Lam yutaf ay su'al ba'd",
+  "Faq.StillHaveQuestions": "Hal ladayk as'ila ukhra?",
+  "Faq.ContactUs": "Yumkinuk al-tawasul ma'ana 'abr safhat al-ittisal.",
+  "Faq.ContactButton": "Tawasul ma'ana"
 }

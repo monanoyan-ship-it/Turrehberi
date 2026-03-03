@@ -1445,5 +1445,12 @@
   "TourDetail.ViewFullPage": "Открыть полную страницу",
   "TourDetail.BookNow": "Забронировать",
   "TourDetail.AboutTour": "О туре",
-  "TourDetail.MeetingPoint": "Место встречи"
+  "TourDetail.MeetingPoint": "Место встречи",
+  "Menu.Faq": "FAQ",
+  "Faq.Title": "Chasto zadavaemye voprosy",
+  "Faq.Subtitle": "Otvety na naibolee chastye voprosy",
+  "Faq.NoQuestions": "Voprosy poka ne dobavleny",
+  "Faq.StillHaveQuestions": "Ostalis voprosy?",
+  "Faq.ContactUs": "Svyazhites s nami cherez stranicu kontaktov.",
+  "Faq.ContactButton": "Svyazatsya s nami"
 }
