@@ -213,11 +213,14 @@ builder.Services.AddHostedService<ErkanTatilPlani.API.BackgroundServices.Schedul
 
 var app = builder.Build();
 
-// Auto-migration on startup
-using (var scope = app.Services.CreateScope())
+// Auto-migration on startup (skip in Testing environment)
+if (!app.Environment.IsEnvironment("Testing"))
 {
-    var dbContext = scope.ServiceProvider.GetRequiredService<AppDbContext>();
-    dbContext.Database.Migrate();
+    using (var scope = app.Services.CreateScope())
+    {
+        var dbContext = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+        dbContext.Database.Migrate();
+    }
 }
 
 // Uploads klasorlerini olustur
@@ -256,3 +259,6 @@ app.UseAuthorization();
 app.MapControllers();
 
 app.Run();
+
+// WebApplicationFactory icin gerekli
+public partial class Program { }
