@@ -25,6 +25,11 @@
             Route="ReservationsPage" />
 
         <ShellContent
+            Title="Yakinimda"
+            ContentTemplate="{DataTemplate views:NearbyPage}"
+            Route="NearbyPage" />
+
+        <ShellContent
             Title="Profil"
             ContentTemplate="{DataTemplate views:ProfilePage}"
             Route="ProfilePage" />

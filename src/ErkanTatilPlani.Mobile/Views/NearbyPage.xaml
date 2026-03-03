@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:viewmodels="clr-namespace:ErkanTatilPlani.Mobile.ViewModels"
+             x:Class="ErkanTatilPlani.Mobile.Views.NearbyPage"
+             Title="Yakinimdaki Turlar">
+
+    <ContentPage.BindingContext>
+        <viewmodels:NearbyViewModel />
+    </ContentPage.BindingContext>
+
+    <VerticalStackLayout>
+        <!-- Location Status -->
+        <Frame Margin="10" Padding="10" CornerRadius="8" BackgroundColor="#E3F2FD">
+            <HorizontalStackLayout Spacing="8">
+                <Label Text="📍" FontSize="16" VerticalOptions="Center" />
+                <Label Text="{Binding LocationStatus}" VerticalOptions="Center" TextColor="#1565C0" />
+            </HorizontalStackLayout>
+        </Frame>
+
+        <RefreshView IsRefreshing="{Binding IsBusy}" Command="{Binding RefreshCommand}">
+            <CollectionView ItemsSource="{Binding NearbyTours}" EmptyView="Yakininizdaki turlar yuklenmiyor">
+                <CollectionView.ItemTemplate>
+                    <DataTemplate x:DataType="viewmodels:NearbyTourItem">
+                        <Frame Margin="10,5" Padding="15" CornerRadius="10" HasShadow="True">
+                            <Frame.GestureRecognizers>
+                                <TapGestureRecognizer
+                                    Command="{Binding Source={RelativeSource AncestorType={x:Type viewmodels:NearbyViewModel}}, Path=TourTappedCommand}"
+                                    CommandParameter="{Binding .}" />
+                            </Frame.GestureRecognizers>
+                            <Grid ColumnDefinitions="*,Auto">
+                                <VerticalStackLayout Spacing="4">
+                                    <Label Text="{Binding Name}" FontSize="16" FontAttributes="Bold" />
+                                    <Label Text="{Binding Destination}" TextColor="Gray" />
+                                    <Label Text="{Binding PriceDisplay}" TextColor="#388E3C" FontAttributes="Bold" />
+                                </VerticalStackLayout>
+                                <Frame Grid.Column="1" Padding="8,4" CornerRadius="12" BackgroundColor="#E8F5E9"
+                                       HasShadow="False" VerticalOptions="Center">
+                                    <Label Text="{Binding DistanceDisplay}" TextColor="#2E7D32" FontSize="13" FontAttributes="Bold" />
+                                </Frame>
+                            </Grid>
+                        </Frame>
+                    </DataTemplate>
+                </CollectionView.ItemTemplate>
+            </CollectionView>
+        </RefreshView>
+    </VerticalStackLayout>
+
+</ContentPage>
