@@ -43,6 +43,7 @@
                     <option value="4">Flash Sale</option>
                     <option value="5">Paket</option>
                     <option value="6">Dinamik Fiyat.</option>
+                    <option value="7">Toplu Alim</option>
                 </select>
             </div>
             <div class="col-md-3">
@@ -230,6 +231,7 @@
                                 <option value="4">Flash Sale</option>
                                 <option value="5">Paket</option>
                                 <option value="6">Dinamik Fiyatlandirma</option>
+                                <option value="7">Toplu Alim Indirimi</option>
                             </select>
                         </div>
                         <div class="col-md-6">
@@ -334,6 +336,17 @@
                             <div class="col-md-6">
                                 <label class="form-label" data-t="Promotion.FlashSaleStock">Stok Adedi</label>
                                 <input type="number" class="form-control" data-bind="value: formData().flashSaleStock" />
+                            </div>
+                        </div>
+
+                        <!-- Toplu Alim Indirimi Alanlari -->
+                        <div data-bind="visible: formData().promotionTypeId == '7'" class="col-12">
+                            <hr />
+                            <h6><i class="bi bi-cart-plus me-1"></i>Toplu Alim Indirimi Ayarlari</h6>
+                            <div class="col-12">
+                                <label class="form-label">Hacim Kurallari (JSON)</label>
+                                <textarea class="form-control" rows="3" data-bind="value: formData().volumeRules" placeholder='[{"minSold":10,"discountPercent":5},{"minSold":20,"discountPercent":10},{"minSold":50,"discountPercent":15}]'></textarea>
+                                <small class="text-muted">JSON formatinda kademeli indirim kurallari. minSold: minimum satis adedi, discountPercent: indirim yuzdesi.</small>
                             </div>
                         </div>
 

@@ -196,7 +196,7 @@ public class ReservationPaymentFactory : IReservationPaymentFactory
         resolvedStartDateTime = DateTime.SpecifyKind(resolvedStartDateTime, DateTimeKind.Utc);
 
         var priceResult = await _promotionCalculation.CalculatePriceAsync(
-            tourId, numberOfPeople, resolvedStartDateTime, couponCode, visitorId);
+            tourId, numberOfPeople, resolvedStartDateTime, couponCode, visitorId, resolvedScheduleId);
 
         var totalPrice = priceResult.FinalPrice;
         var depositAmount = priceResult.DepositAmount;

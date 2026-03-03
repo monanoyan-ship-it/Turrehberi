@@ -10,7 +10,7 @@ function AdminPromotionsViewModel() {
 
     // Helpers
     self.getTypeBadgeClass = function (typeId) {
-        var classes = { 0: 'bg-primary', 1: 'bg-info', 2: 'bg-warning text-dark', 3: 'bg-success', 4: 'bg-danger', 5: 'bg-dark', 6: 'bg-secondary' };
+        var classes = { 0: 'bg-primary', 1: 'bg-info', 2: 'bg-warning text-dark', 3: 'bg-success', 4: 'bg-danger', 5: 'bg-dark', 6: 'bg-secondary', 7: 'bg-info' };
         return classes[typeId] || 'bg-secondary';
     };
 

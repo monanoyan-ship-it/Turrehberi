@@ -49,6 +49,10 @@ public class Promotion : BaseEntity
     public decimal? HighDemandMultiplier { get; set; }
     public int? HighDemandThresholdPercent { get; set; }
 
+    // Toplu Alim Indirimi (10.8)
+    // VolumeRules JSON: [{"minSold":10,"discountPercent":5},{"minSold":20,"discountPercent":10},{"minSold":50,"discountPercent":15}]
+    public string? VolumeRules { get; set; }
+
     // Ortak
     public string? ApplicableTourIds { get; set; }
 

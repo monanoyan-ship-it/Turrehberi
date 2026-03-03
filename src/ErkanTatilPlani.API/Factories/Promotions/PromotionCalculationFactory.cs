@@ -12,21 +12,24 @@ public class PromotionCalculationFactory : IPromotionCalculationFactory
     private readonly IPromotionEntityService _promotionService;
     private readonly ITourEntityService _tourService;
     private readonly IVisitorEntityService _visitorService;
+    private readonly IReservationEntityService _reservationService;
     private const decimal MaxTotalDiscountPercent = 0.50m; // Max %50 indirim
 
     public PromotionCalculationFactory(
         IPromotionEntityService promotionService,
         ITourEntityService tourService,
-        IVisitorEntityService visitorService)
+        IVisitorEntityService visitorService,
+        IReservationEntityService reservationService)
     {
         _promotionService = promotionService;
         _tourService = tourService;
         _visitorService = visitorService;
+        _reservationService = reservationService;
     }
 
     public async Task<PriceCalculationResult> CalculatePriceAsync(
         int tourId, int numberOfPeople, DateTime? tourStartDate = null,
-        string? couponCode = null, int? visitorId = null)
+        string? couponCode = null, int? visitorId = null, int? scheduleId = null)
     {
         var tour = await _tourService.GetByIdWithCompanyAsync(tourId);
         if (tour == null || tour.Company == null)
@@ -121,6 +124,57 @@ public class PromotionCalculationFactory : IPromotionCalculationFactory
                     currentPrice -= discount.DiscountAmount;
                     appliedDiscounts.Add(discount);
                 }
+            }
+        }
+
+        // 4.5. Volume Discount (satisa gore kademeli indirim)
+        var volumeDiscounts = promotions.Where(p => p.PromotionTypeId == PromotionTypes.Ids.VolumeDiscount).ToList();
+        foreach (var vd in volumeDiscounts)
+        {
+            if (!string.IsNullOrEmpty(vd.VolumeRules))
+            {
+                try
+                {
+                    var rules = JsonSerializer.Deserialize<List<VolumeRule>>(vd.VolumeRules,
+                        new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
+                    if (rules != null && rules.Count > 0)
+                    {
+                        // Tur icin tamamlanan rezervasyon sayisini al
+                        var soldCount = await _reservationService.GetActiveReservations()
+                            .Where(r => r.TourId == tourId &&
+                                        r.Status != ReservationStatuses.Ids.Cancelled)
+                            .SumAsync(r => r.NumberOfPeople);
+
+                        // En yuksek esigi bul
+                        var applicableRule = rules
+                            .Where(r => soldCount >= r.MinSold)
+                            .OrderByDescending(r => r.MinSold)
+                            .FirstOrDefault();
+
+                        if (applicableRule != null && applicableRule.DiscountPercent > 0)
+                        {
+                            var volumeDiscountAmount = currentPrice * applicableRule.DiscountPercent / 100;
+                            if (vd.MaxDiscountAmount.HasValue && volumeDiscountAmount > vd.MaxDiscountAmount.Value)
+                                volumeDiscountAmount = vd.MaxDiscountAmount.Value;
+
+                            if (volumeDiscountAmount > 0 && volumeDiscountAmount <= currentPrice)
+                            {
+                                currentPrice -= volumeDiscountAmount;
+                                appliedDiscounts.Add(new AppliedDiscount
+                                {
+                                    PromotionId = vd.Id,
+                                    PromotionName = vd.Name,
+                                    PromotionType = "VolumeDiscount",
+                                    DiscountType = "Percentage",
+                                    DiscountValue = applicableRule.DiscountPercent,
+                                    DiscountAmount = Math.Round(volumeDiscountAmount, 2),
+                                    Rule = $"VolumeDiscount: {soldCount} sold >= {applicableRule.MinSold} -> %{applicableRule.DiscountPercent}"
+                                });
+                            }
+                        }
+                    }
+                }
+                catch { }
             }
         }
 
@@ -434,6 +488,10 @@ public class PromotionCalculationFactory : IPromotionCalculationFactory
                 if (p.FlashSaleStock == null || p.FlashSaleSoldCount < p.FlashSaleStock)
                     return new { type = type.SystemName, icon = type.Icon, cssClass = type.CssClass, label = $"%{p.DiscountValue}", nameKey = "Badge.FlashSale", endDate = p.EndDate };
                 break;
+            case 7: // VolumeDiscount
+                if (!string.IsNullOrEmpty(p.VolumeRules))
+                    return new { type = type.SystemName, icon = type.Icon, cssClass = type.CssClass, label = $"-%{p.DiscountValue}", nameKey = "Badge.VolumeDiscount" };
+                break;
         }
         return null;
     }
@@ -445,4 +503,10 @@ internal class SeasonRule
     public int EndMonth { get; set; }
     public decimal Multiplier { get; set; }
     public string? Name { get; set; }
+}
+
+internal class VolumeRule
+{
+    public int MinSold { get; set; }
+    public decimal DiscountPercent { get; set; }
 }

@@ -115,7 +115,7 @@ public class PromotionsController : ControllerBase
     {
         var visitorId = GetVisitorId();
         var result = await _calculationFactory.CalculatePriceAsync(
-            tourId, request.NumberOfPeople, request.StartDate, request.CouponCode, visitorId);
+            tourId, request.NumberOfPeople, request.StartDate, request.CouponCode, visitorId, request.ScheduleId);
         return Ok(result);
     }
 
@@ -174,6 +174,7 @@ public class CalculatePriceRequest
     public int NumberOfPeople { get; set; }
     public DateTime? StartDate { get; set; }
     public string? CouponCode { get; set; }
+    public int? ScheduleId { get; set; }
 }
 
 public class ValidateCouponRequest

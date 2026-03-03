@@ -30,6 +30,7 @@ function PromotionsViewModel() {
             minGroupSize: ko.observable(null),
             maxGroupSize: ko.observable(null),
             flashSaleStock: ko.observable(null),
+            volumeRules: ko.observable(''),
             applicableTourIds: ko.observable('')
         };
     };
@@ -38,7 +39,7 @@ function PromotionsViewModel() {
     self.formData = ko.observable(self.getEmptyForm());
 
     self.getTypeBadgeClass = function (typeId) {
-        var classes = { 0: 'bg-primary', 1: 'bg-info', 2: 'bg-warning text-dark', 3: 'bg-success', 4: 'bg-danger', 5: 'bg-dark', 6: 'bg-secondary' };
+        var classes = { 0: 'bg-primary', 1: 'bg-info', 2: 'bg-warning text-dark', 3: 'bg-success', 4: 'bg-danger', 5: 'bg-dark', 6: 'bg-secondary', 7: 'bg-info' };
         return classes[typeId] || 'bg-secondary';
     };
 
@@ -111,6 +112,7 @@ function PromotionsViewModel() {
         form.minGroupSize(promo.minGroupSize);
         form.maxGroupSize(promo.maxGroupSize);
         form.flashSaleStock(promo.flashSaleStock);
+        form.volumeRules(promo.volumeRules || '');
         form.applicableTourIds(promo.applicableTourIds || '');
         self.formData(form);
         formModal.show();
@@ -137,6 +139,7 @@ function PromotionsViewModel() {
             minGroupSize: f.minGroupSize() ? parseInt(f.minGroupSize()) : null,
             maxGroupSize: f.maxGroupSize() ? parseInt(f.maxGroupSize()) : null,
             flashSaleStock: f.flashSaleStock() ? parseInt(f.flashSaleStock()) : null,
+            volumeRules: f.volumeRules() || null,
             applicableTourIds: f.applicableTourIds() || null
         };
 

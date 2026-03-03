@@ -280,7 +280,11 @@ public static class PromotionTypes
         "Dinamik fiyatlandirma",
         "bi-graph-up-arrow", "bg-secondary", 7);
 
-    public static IEnumerable<TypeItem> All => new[] { Coupon, EarlyBird, LastMinute, GroupDiscount, FlashSale, Bundle, DynamicPricing };
+    public static readonly TypeItem VolumeDiscount = new(7, "VolumeDiscount", "PromotionType.VolumeDiscount",
+        "Toplu alim indirimi - satisa gore kademeli indirim",
+        "bi-cart-plus", "bg-info", 8);
+
+    public static IEnumerable<TypeItem> All => new[] { Coupon, EarlyBird, LastMinute, GroupDiscount, FlashSale, Bundle, DynamicPricing, VolumeDiscount };
     public static TypeItem? GetById(int id) => All.FirstOrDefault(x => x.Id == id);
     public static TypeItem? GetBySystemName(string systemName) => All.FirstOrDefault(x => x.SystemName == systemName);
 
@@ -293,6 +297,7 @@ public static class PromotionTypes
         public const int FlashSale = 4;
         public const int Bundle = 5;
         public const int DynamicPricing = 6;
+        public const int VolumeDiscount = 7;
     }
 }
 
