@@ -80,6 +80,9 @@ public class AppDbContext : DbContext
     // FAQ
     public DbSet<Faq> Faqs => Set<Faq>();
 
+    // Support
+    public DbSet<SupportTicket> SupportTickets => Set<SupportTicket>();
+
     // Gezgin Kulubu - Social
     public DbSet<TravelerFollow> TravelerFollows => Set<TravelerFollow>();
     public DbSet<TripStory> TripStories => Set<TripStory>();

@@ -1452,5 +1452,13 @@
   "Faq.NoQuestions": "Lam yutaf ay su'al ba'd",
   "Faq.StillHaveQuestions": "Hal ladayk as'ila ukhra?",
   "Faq.ContactUs": "Yumkinuk al-tawasul ma'ana 'abr safhat al-ittisal.",
-  "Faq.ContactButton": "Tawasul ma'ana"
+  "Faq.ContactButton": "Tawasul ma'ana",
+  "LiveChat.Title": "Da'm mubasher",
+  "LiveChat.Welcome": "Marhaba! Kayf yumkinuna musa'adatuk?",
+  "LiveChat.Placeholder": "Uktub risalatak...",
+  "LiveChat.Name": "Ismuk",
+  "LiveChat.Email": "Bariiduk al-iliktruuni",
+  "LiveChat.FillFields": "Yurja mala' al-ism wal-bariid",
+  "LiveChat.Received": "Tamma istilam risalatak.",
+  "LiveChat.Error": "Ta'adhar irsal al-risala."
 }

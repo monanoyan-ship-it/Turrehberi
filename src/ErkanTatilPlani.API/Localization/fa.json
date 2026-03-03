@@ -1452,5 +1452,13 @@
   "Faq.NoQuestions": "Hanooz soali ezafe nashode",
   "Faq.StillHaveQuestions": "Hanooz soal darid?",
   "Faq.ContactUs": "Az tariq-e safhe-ye tamas ba ma dar ertebat bashid.",
-  "Faq.ContactButton": "Tamas ba ma"
+  "Faq.ContactButton": "Tamas ba ma",
+  "LiveChat.Title": "Poshtibani-ye zende",
+  "LiveChat.Welcome": "Salam! Chetor mitavanim komak konim?",
+  "LiveChat.Placeholder": "Payam-e khod ra benevisid...",
+  "LiveChat.Name": "Nam-e shoma",
+  "LiveChat.Email": "Email-e shoma",
+  "LiveChat.FillFields": "Lotfan nam va email ra por konid",
+  "LiveChat.Received": "Payam daryaft shod.",
+  "LiveChat.Error": "Payam ersal nashod."
 }

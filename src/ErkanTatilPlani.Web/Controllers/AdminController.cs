@@ -104,6 +104,13 @@ public class AdminController : Controller
         return View();
     }
 
+    // Destek mesajlari (Staff ve Admin)
+    public IActionResult SupportTickets()
+    {
+        SetCommonViewData("SupportTickets", "Destek Mesajlari");
+        return View();
+    }
+
     // SSS yonetimi (Staff ve Admin)
     public IActionResult Faqs()
     {

@@ -1446,5 +1446,13 @@
   "Faq.NoQuestions": "Henuz soru eklenmemis",
   "Faq.StillHaveQuestions": "Sorunuz hala cevaplanmadi mi?",
   "Faq.ContactUs": "Bize iletisim sayfasindan ulasabilirsiniz.",
-  "Faq.ContactButton": "Iletisime Gec"
+  "Faq.ContactButton": "Iletisime Gec",
+  "LiveChat.Title": "Canli Destek",
+  "LiveChat.Welcome": "Merhaba! Size nasil yardimci olabiliriz?",
+  "LiveChat.Placeholder": "Mesajinizi yazin...",
+  "LiveChat.Name": "Adiniz",
+  "LiveChat.Email": "E-posta adresiniz",
+  "LiveChat.FillFields": "Lutfen ad ve e-posta alanlarini doldurun",
+  "LiveChat.Received": "Mesajiniz alindi. En kisa surede donus yapacagiz.",
+  "LiveChat.Error": "Mesaj gonderilemedi. Lutfen tekrar deneyin."
 }

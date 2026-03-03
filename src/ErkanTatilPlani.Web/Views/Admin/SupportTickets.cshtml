@@ -1,0 +1,109 @@
+@{
+    Layout = "_AdminLayout";
+}
+
+<div id="supportApp">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <p class="text-muted mb-0">Canli destek mesajlarini yonetin</p>
+        </div>
+        <div class="d-flex gap-2">
+            <span class="badge bg-danger fs-6" data-bind="text: 'Okunmamis: ' + unreadCount(), visible: unreadCount() > 0"></span>
+        </div>
+    </div>
+
+    <div class="card">
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-hover mb-0">
+                    <thead class="table-light">
+                        <tr>
+                            <th style="width:40px"></th>
+                            <th>Ad</th>
+                            <th>E-posta</th>
+                            <th>Mesaj</th>
+                            <th>Tarih</th>
+                            <th>Durum</th>
+                            <th style="width:140px">Islemler</th>
+                        </tr>
+                    </thead>
+                    <tbody data-bind="foreach: tickets">
+                        <tr data-bind="css: { 'table-warning': !isRead }">
+                            <td>
+                                <!-- ko ifnot: isRead -->
+                                <span class="badge bg-danger rounded-pill">!</span>
+                                <!-- /ko -->
+                            </td>
+                            <td class="fw-semibold" data-bind="text: name"></td>
+                            <td data-bind="text: email"></td>
+                            <td>
+                                <span class="text-truncate d-inline-block" style="max-width:200px" data-bind="text: message"></span>
+                            </td>
+                            <td>
+                                <small data-bind="text: new Date(createdAt).toLocaleDateString('tr-TR')"></small>
+                            </td>
+                            <td>
+                                <!-- ko if: adminReply -->
+                                <span class="badge bg-success">Yanitlandi</span>
+                                <!-- /ko -->
+                                <!-- ko ifnot: adminReply -->
+                                <span class="badge bg-warning text-dark">Bekliyor</span>
+                                <!-- /ko -->
+                            </td>
+                            <td>
+                                <button class="btn btn-sm btn-outline-primary me-1" data-bind="click: $parent.openReplyModal">
+                                    <i class="bi bi-reply"></i>
+                                </button>
+                                <button class="btn btn-sm btn-outline-danger" data-bind="click: $parent.deleteTicket">
+                                    <i class="bi bi-trash"></i>
+                                </button>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Reply Modal -->
+    <div class="modal fade" id="replyModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Destek Mesaji Yaniti</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">Gonderen</label>
+                        <p data-bind="text: selectedTicket() ? selectedTicket().name + ' (' + selectedTicket().email + ')' : ''"></p>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">Mesaj</label>
+                        <p class="bg-light p-3 rounded" data-bind="text: selectedTicket() ? selectedTicket().message : ''"></p>
+                    </div>
+                    <!-- ko if: selectedTicket() && selectedTicket().adminReply -->
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">Onceki Yanit</label>
+                        <p class="bg-success bg-opacity-10 p-3 rounded" data-bind="text: selectedTicket().adminReply"></p>
+                    </div>
+                    <!-- /ko -->
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">Yanitiniz</label>
+                        <textarea class="form-control" rows="4" data-bind="value: replyText" placeholder="Yanitinizi yazin..."></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Iptal</button>
+                    <button type="button" class="btn btn-primary" data-bind="click: sendReply">
+                        <i class="bi bi-send me-1"></i> Yanitla
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+<script src="~/js/Admin/SupportTickets.js" asp-append-version="true"></script>
+}

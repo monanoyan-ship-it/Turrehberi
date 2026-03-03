@@ -1452,5 +1452,13 @@
   "Faq.NoQuestions": "No questions added yet",
   "Faq.StillHaveQuestions": "Still have questions?",
   "Faq.ContactUs": "You can reach us through our contact page.",
-  "Faq.ContactButton": "Contact Us"
+  "Faq.ContactButton": "Contact Us",
+  "LiveChat.Title": "Live Support",
+  "LiveChat.Welcome": "Hello! How can we help you?",
+  "LiveChat.Placeholder": "Type your message...",
+  "LiveChat.Name": "Your name",
+  "LiveChat.Email": "Your email",
+  "LiveChat.FillFields": "Please fill in name and email fields",
+  "LiveChat.Received": "Message received. We will get back to you soon.",
+  "LiveChat.Error": "Message could not be sent. Please try again."
 }

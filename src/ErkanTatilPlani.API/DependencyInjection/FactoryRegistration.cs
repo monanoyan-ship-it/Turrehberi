@@ -24,6 +24,7 @@ using ErkanTatilPlani.API.Factories.ScheduledEmails;
 using ErkanTatilPlani.API.Factories.Travelers;
 using ErkanTatilPlani.API.Factories.TripStories;
 using ErkanTatilPlani.API.Factories.Faqs;
+using ErkanTatilPlani.API.Factories.Support;
 using ErkanTatilPlani.API.Factories.Weather;
 using ErkanTatilPlani.Core.Factories.AbandonedCarts;
 using ErkanTatilPlani.Core.Factories.Auth;
@@ -51,6 +52,7 @@ using ErkanTatilPlani.Core.Factories.Travelers;
 using ErkanTatilPlani.Core.Factories.TripStories;
 using ErkanTatilPlani.Core.Factories.Visitors;
 using ErkanTatilPlani.Core.Factories.Faqs;
+using ErkanTatilPlani.Core.Factories.Support;
 using ErkanTatilPlani.Core.Factories.Weather;
 
 namespace ErkanTatilPlani.API.DependencyInjection;
@@ -141,6 +143,9 @@ public static class FactoryRegistration
 
         // FAQ factories (1)
         services.AddScoped<IFaqFactory, FaqFactory>();
+
+        // Support factories (1)
+        services.AddScoped<ISupportTicketFactory, SupportTicketFactory>();
 
         // Gezgin Kulubu - Social factories (2)
         services.AddScoped<ITravelerProfileFactory, TravelerProfileFactory>();

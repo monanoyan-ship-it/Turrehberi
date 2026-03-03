@@ -1452,5 +1452,13 @@
   "Faq.NoQuestions": "Noch keine Fragen hinzugefugt",
   "Faq.StillHaveQuestions": "Noch Fragen?",
   "Faq.ContactUs": "Kontaktieren Sie uns uber unsere Kontaktseite.",
-  "Faq.ContactButton": "Kontakt aufnehmen"
+  "Faq.ContactButton": "Kontakt aufnehmen",
+  "LiveChat.Title": "Live-Support",
+  "LiveChat.Welcome": "Hallo! Wie konnen wir Ihnen helfen?",
+  "LiveChat.Placeholder": "Nachricht eingeben...",
+  "LiveChat.Name": "Ihr Name",
+  "LiveChat.Email": "Ihre E-Mail",
+  "LiveChat.FillFields": "Bitte fullen Sie Name und E-Mail aus",
+  "LiveChat.Received": "Nachricht erhalten. Wir melden uns bald.",
+  "LiveChat.Error": "Nachricht konnte nicht gesendet werden."
 }

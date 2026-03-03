@@ -1452,5 +1452,13 @@
   "Faq.NoQuestions": "Nenhuma pergunta adicionada ainda",
   "Faq.StillHaveQuestions": "Ainda tem perguntas?",
   "Faq.ContactUs": "Entre em contato conosco atraves da nossa pagina de contato.",
-  "Faq.ContactButton": "Entre em contato"
+  "Faq.ContactButton": "Entre em contato",
+  "LiveChat.Title": "Suporte ao Vivo",
+  "LiveChat.Welcome": "Ola! Como podemos ajudar?",
+  "LiveChat.Placeholder": "Digite sua mensagem...",
+  "LiveChat.Name": "Seu nome",
+  "LiveChat.Email": "Seu email",
+  "LiveChat.FillFields": "Preencha nome e email",
+  "LiveChat.Received": "Mensagem recebida. Retornaremos em breve.",
+  "LiveChat.Error": "Nao foi possivel enviar a mensagem."
 }

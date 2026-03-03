@@ -1452,5 +1452,13 @@
   "Faq.NoQuestions": "Voprosy poka ne dobavleny",
   "Faq.StillHaveQuestions": "Ostalis voprosy?",
   "Faq.ContactUs": "Svyazhites s nami cherez stranicu kontaktov.",
-  "Faq.ContactButton": "Svyazatsya s nami"
+  "Faq.ContactButton": "Svyazatsya s nami",
+  "LiveChat.Title": "Podderzhka",
+  "LiveChat.Welcome": "Zdravstvuyte! Chem mozhem pomoch?",
+  "LiveChat.Placeholder": "Vvedite soobshchenie...",
+  "LiveChat.Name": "Vashe imya",
+  "LiveChat.Email": "Vash email",
+  "LiveChat.FillFields": "Zapolnite imya i email",
+  "LiveChat.Received": "Soobshchenie polucheno. My svyazhemsya s vami.",
+  "LiveChat.Error": "Soobshchenie ne otpravleno."
 }
