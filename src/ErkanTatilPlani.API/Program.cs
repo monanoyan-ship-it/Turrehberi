@@ -195,6 +195,37 @@ builder.Services.AddSwaggerGen(options =>
     {
         options.IncludeXmlComments(xmlPath);
     }
+
+    // Endpoint gruplama - controller isimleri tag olarak kullanilir
+    options.TagActionsBy(api =>
+    {
+        var controller = api.ActionDescriptor.RouteValues["controller"] ?? "Other";
+        var group = controller switch
+        {
+            "Auth" => "1. Kimlik Dogrulama",
+            "Tours" or "TourDates" or "TourWatches" => "2. Turlar",
+            "Companies" or "CompanyPages" => "3. Firmalar",
+            "Reservations" or "Payments" => "4. Rezervasyon ve Odeme",
+            "Reviews" => "5. Yorumlar",
+            "Favorites" => "6. Favoriler",
+            "Blogs" => "7. Blog",
+            "Faqs" => "8. SSS",
+            "Support" => "9. Destek",
+            "Messages" or "MessageTemplates" => "10. Mesajlasma",
+            "Notifications" or "PushSubscriptions" => "11. Bildirimler",
+            "Promotions" => "12. Promosyonlar",
+            "Loyalty" or "Referrals" or "Recommendations" or "AbandonedCarts" => "13. Sadakat ve Pazarlama",
+            "Travelers" or "TripStories" => "14. Gezgin Kulubu",
+            "Guides" => "15. Rehberler",
+            "Languages" or "Localization" => "16. Dil ve Lokalizasyon",
+            "EmailAccounts" or "EmailTemplates" => "17. Email Yonetimi",
+            "Logs" or "Cache" or "TypeDefinitions" => "18. Sistem",
+            _ => "19. Diger"
+        };
+        return new[] { group };
+    });
+
+    options.OrderActionsBy(api => api.GroupName);
 });
 
 builder.Services.AddCors(options =>
