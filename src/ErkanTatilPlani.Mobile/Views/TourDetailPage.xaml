@@ -62,6 +62,39 @@
                 </VerticalStackLayout>
             </Frame>
 
+            <!-- Reservation Section -->
+            <Frame Padding="15" CornerRadius="10" HasShadow="True" BackgroundColor="#F5F5F5"
+                   IsVisible="{Binding IsBusy, Converter={StaticResource InvertedBoolConverter}}">
+                <VerticalStackLayout Spacing="10">
+                    <Label Text="Rezervasyon Yap" FontSize="18" FontAttributes="Bold" />
+
+                    <HorizontalStackLayout Spacing="10">
+                        <Label Text="Kisi Sayisi:" VerticalOptions="Center" FontAttributes="Bold" />
+                        <Button Text="-" WidthRequest="40" HeightRequest="40" Command="{Binding DecreasePersonCommand}"
+                                BackgroundColor="#D32F2F" TextColor="White" CornerRadius="20" />
+                        <Label Text="{Binding NumberOfPeople}" FontSize="20" FontAttributes="Bold"
+                               VerticalOptions="Center" WidthRequest="40" HorizontalTextAlignment="Center" />
+                        <Button Text="+" WidthRequest="40" HeightRequest="40" Command="{Binding IncreasePersonCommand}"
+                                BackgroundColor="#388E3C" TextColor="White" CornerRadius="20" />
+                    </HorizontalStackLayout>
+
+                    <Label Text="{Binding EstimatedPrice}" FontSize="16" TextColor="#388E3C" FontAttributes="Bold" />
+
+                    <Button Text="Rezervasyon Yap"
+                            Command="{Binding BookCommand}"
+                            BackgroundColor="#FF6F00"
+                            TextColor="White"
+                            FontAttributes="Bold"
+                            CornerRadius="10"
+                            HeightRequest="50" />
+
+                    <Label Text="{Binding BookingMessage}"
+                           TextColor="{Binding BookingMessageColor}"
+                           IsVisible="{Binding BookingMessage, Converter={StaticResource StringToBoolConverter}}"
+                           HorizontalTextAlignment="Center" />
+                </VerticalStackLayout>
+            </Frame>
+
         </VerticalStackLayout>
     </ScrollView>
 
