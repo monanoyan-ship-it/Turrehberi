@@ -381,9 +381,9 @@
                         <hr class="my-3">
 
                         <!-- CTA Buttons -->
-                        <a href="/Home/Contact" class="btn btn-primary w-100 mb-2">
-                            <i class="bi bi-envelope me-1"></i> Mesaj Gonder
-                        </a>
+                        <button class="btn btn-primary w-100 mb-2" data-bind="click: openContactModal">
+                            <i class="bi bi-envelope me-1"></i> <span data-t="CompanyContact.SendMessage">Mesaj Gonder</span>
+                        </button>
                         <!-- ko if: company().phone -->
                         <a class="btn btn-outline-success w-100 mb-3" data-bind="attr: { href: 'tel:' + company().phone }">
                             <i class="bi bi-telephone me-1"></i> Hemen Ara
@@ -402,6 +402,39 @@
 
         <!-- Schema.org JSON-LD (SEO) -->
         <script type="application/ld+json" data-bind="html: schemaOrgJson"></script>
+    </div>
+
+    <!-- Company Contact Modal -->
+    <div class="modal fade" id="companyContactModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header bg-primary text-white">
+                    <h5 class="modal-title"><i class="bi bi-envelope me-2"></i><span data-t="CompanyContact.Title">Firmaya Mesaj Gonder</span></h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <p class="text-muted small" data-bind="text: company() ? company().name + ' firmasina mesaj gonderin' : ''"></p>
+                    <div class="mb-3">
+                        <label class="form-label" data-t="CompanyContact.Name">Ad Soyad</label>
+                        <input type="text" class="form-control" data-bind="value: contactName">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label" data-t="CompanyContact.Email">E-posta</label>
+                        <input type="email" class="form-control" data-bind="value: contactEmail">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label" data-t="CompanyContact.Message">Mesajiniz</label>
+                        <textarea class="form-control" rows="4" data-bind="value: contactMessage" placeholder=""></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" data-t="Common.Cancel">Iptal</button>
+                    <button type="button" class="btn btn-primary" data-bind="click: sendContactMessage, enable: canSendContact">
+                        <i class="bi bi-send me-1"></i> <span data-t="CompanyContact.Send">Gonder</span>
+                    </button>
+                </div>
+            </div>
+        </div>
     </div>
 </div>
 

@@ -1460,5 +1460,15 @@
   "LiveChat.Email": "Votre email",
   "LiveChat.FillFields": "Veuillez remplir le nom et l'email",
   "LiveChat.Received": "Message recu. Nous vous repondrons bientot.",
-  "LiveChat.Error": "Le message n'a pas pu etre envoye."
+  "LiveChat.Error": "Le message n'a pas pu etre envoye.",
+  "CompanyContact.Title": "Envoyer un message a l'entreprise",
+  "CompanyContact.SendMessage": "Envoyer un message",
+  "CompanyContact.Name": "Nom complet",
+  "CompanyContact.Email": "Email",
+  "CompanyContact.Message": "Votre message",
+  "CompanyContact.Send": "Envoyer",
+  "CompanyContact.Success": "Votre message a ete envoye",
+  "CompanyContact.Error": "Le message n'a pas pu etre envoye",
+  "Contact.SuccessMessage": "Votre message a ete envoye. Nous vous repondrons bientot.",
+  "Contact.ErrorMessage": "Le message n'a pas pu etre envoye."
 }

@@ -1460,5 +1460,15 @@
   "LiveChat.Email": "Ihre E-Mail",
   "LiveChat.FillFields": "Bitte fullen Sie Name und E-Mail aus",
   "LiveChat.Received": "Nachricht erhalten. Wir melden uns bald.",
-  "LiveChat.Error": "Nachricht konnte nicht gesendet werden."
+  "LiveChat.Error": "Nachricht konnte nicht gesendet werden.",
+  "CompanyContact.Title": "Nachricht an Firma senden",
+  "CompanyContact.SendMessage": "Nachricht senden",
+  "CompanyContact.Name": "Vollstandiger Name",
+  "CompanyContact.Email": "E-Mail",
+  "CompanyContact.Message": "Ihre Nachricht",
+  "CompanyContact.Send": "Senden",
+  "CompanyContact.Success": "Ihre Nachricht wurde gesendet",
+  "CompanyContact.Error": "Nachricht konnte nicht gesendet werden",
+  "Contact.SuccessMessage": "Ihre Nachricht wurde gesendet. Wir melden uns bald.",
+  "Contact.ErrorMessage": "Nachricht konnte nicht gesendet werden."
 }

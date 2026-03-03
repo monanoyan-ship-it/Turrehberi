@@ -1460,5 +1460,15 @@
   "LiveChat.Email": "Email-e shoma",
   "LiveChat.FillFields": "Lotfan nam va email ra por konid",
   "LiveChat.Received": "Payam daryaft shod.",
-  "LiveChat.Error": "Payam ersal nashod."
+  "LiveChat.Error": "Payam ersal nashod.",
+  "CompanyContact.Title": "Ersal-e payam be sherkat",
+  "CompanyContact.SendMessage": "Ersal-e payam",
+  "CompanyContact.Name": "Nam-e kamel",
+  "CompanyContact.Email": "Email",
+  "CompanyContact.Message": "Payam-e shoma",
+  "CompanyContact.Send": "Ersal",
+  "CompanyContact.Success": "Payam-e shoma ersal shod",
+  "CompanyContact.Error": "Payam ersal nashod",
+  "Contact.SuccessMessage": "Payam-e shoma ersal shod.",
+  "Contact.ErrorMessage": "Payam ersal nashod."
 }

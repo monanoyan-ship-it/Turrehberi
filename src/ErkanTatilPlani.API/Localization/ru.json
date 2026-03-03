@@ -1460,5 +1460,15 @@
   "LiveChat.Email": "Vash email",
   "LiveChat.FillFields": "Zapolnite imya i email",
   "LiveChat.Received": "Soobshchenie polucheno. My svyazhemsya s vami.",
-  "LiveChat.Error": "Soobshchenie ne otpravleno."
+  "LiveChat.Error": "Soobshchenie ne otpravleno.",
+  "CompanyContact.Title": "Otpravit soobshchenie kompanii",
+  "CompanyContact.SendMessage": "Otpravit soobshchenie",
+  "CompanyContact.Name": "FIO",
+  "CompanyContact.Email": "Email",
+  "CompanyContact.Message": "Vashe soobshchenie",
+  "CompanyContact.Send": "Otpravit",
+  "CompanyContact.Success": "Soobshchenie uspeshno otpravleno",
+  "CompanyContact.Error": "Soobshchenie ne otpravleno",
+  "Contact.SuccessMessage": "Vashe soobshchenie otpravleno.",
+  "Contact.ErrorMessage": "Soobshchenie ne otpravleno."
 }

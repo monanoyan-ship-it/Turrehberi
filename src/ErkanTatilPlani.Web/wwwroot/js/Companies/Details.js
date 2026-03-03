@@ -145,6 +145,51 @@ function CompanyProfileViewModel() {
         });
     };
 
+    // Company Contact Form
+    self.contactName = ko.observable('');
+    self.contactEmail = ko.observable('');
+    self.contactMessage = ko.observable('');
+    var companyContactModal = null;
+
+    self.canSendContact = ko.computed(function () {
+        return self.contactName().trim() && self.contactEmail().trim() && self.contactMessage().trim();
+    });
+
+    self.openContactModal = function () {
+        var user = getUser();
+        if (user) {
+            self.contactName(user.firstName + ' ' + (user.lastName || ''));
+            self.contactEmail(user.email);
+        }
+        if (!companyContactModal) {
+            companyContactModal = new bootstrap.Modal(document.getElementById('companyContactModal'));
+        }
+        companyContactModal.show();
+    };
+
+    self.sendContactMessage = function () {
+        if (!self.canSendContact()) return;
+        var companyName = self.company() ? self.company().name : '';
+
+        $.ajax({
+            url: apiBaseUrl + '/api/support',
+            method: 'POST',
+            contentType: 'application/json',
+            data: JSON.stringify({
+                name: self.contactName(),
+                email: self.contactEmail(),
+                message: self.contactMessage(),
+                subject: 'CompanyContact: ' + companyName
+            })
+        }).done(function () {
+            toastr.success(T('CompanyContact.Success') || 'Mesajiniz gonderildi');
+            self.contactMessage('');
+            companyContactModal.hide();
+        }).fail(function () {
+            toastr.error(T('CompanyContact.Error') || 'Mesaj gonderilemedi');
+        });
+    };
+
     // Initialize
     $(document).ready(function() {
         if (slug) {

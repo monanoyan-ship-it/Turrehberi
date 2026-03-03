@@ -1460,5 +1460,15 @@
   "LiveChat.Email": "Bariiduk al-iliktruuni",
   "LiveChat.FillFields": "Yurja mala' al-ism wal-bariid",
   "LiveChat.Received": "Tamma istilam risalatak.",
-  "LiveChat.Error": "Ta'adhar irsal al-risala."
+  "LiveChat.Error": "Ta'adhar irsal al-risala.",
+  "CompanyContact.Title": "Irsal risala lil-sharika",
+  "CompanyContact.SendMessage": "Irsal risala",
+  "CompanyContact.Name": "Al-ism al-kamil",
+  "CompanyContact.Email": "Al-bariid",
+  "CompanyContact.Message": "Risalatuk",
+  "CompanyContact.Send": "Irsal",
+  "CompanyContact.Success": "Tamma irsal risalatuk",
+  "CompanyContact.Error": "Ta'adhar irsal al-risala",
+  "Contact.SuccessMessage": "Tamma irsal risalatuk binjah.",
+  "Contact.ErrorMessage": "Ta'adhar irsal al-risala."
 }

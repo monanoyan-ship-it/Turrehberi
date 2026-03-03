@@ -1460,5 +1460,15 @@
   "LiveChat.Email": "Your email",
   "LiveChat.FillFields": "Please fill in name and email fields",
   "LiveChat.Received": "Message received. We will get back to you soon.",
-  "LiveChat.Error": "Message could not be sent. Please try again."
+  "LiveChat.Error": "Message could not be sent. Please try again.",
+  "CompanyContact.Title": "Send Message to Company",
+  "CompanyContact.SendMessage": "Send Message",
+  "CompanyContact.Name": "Full Name",
+  "CompanyContact.Email": "Email",
+  "CompanyContact.Message": "Your Message",
+  "CompanyContact.Send": "Send",
+  "CompanyContact.Success": "Your message has been sent successfully",
+  "CompanyContact.Error": "Message could not be sent",
+  "Contact.SuccessMessage": "Your message has been sent. We will get back to you soon.",
+  "Contact.ErrorMessage": "Message could not be sent. Please try again."
 }

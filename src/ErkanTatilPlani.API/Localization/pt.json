@@ -1460,5 +1460,15 @@
   "LiveChat.Email": "Seu email",
   "LiveChat.FillFields": "Preencha nome e email",
   "LiveChat.Received": "Mensagem recebida. Retornaremos em breve.",
-  "LiveChat.Error": "Nao foi possivel enviar a mensagem."
+  "LiveChat.Error": "Nao foi possivel enviar a mensagem.",
+  "CompanyContact.Title": "Enviar mensagem para a empresa",
+  "CompanyContact.SendMessage": "Enviar mensagem",
+  "CompanyContact.Name": "Nome completo",
+  "CompanyContact.Email": "Email",
+  "CompanyContact.Message": "Sua mensagem",
+  "CompanyContact.Send": "Enviar",
+  "CompanyContact.Success": "Sua mensagem foi enviada",
+  "CompanyContact.Error": "Nao foi possivel enviar a mensagem",
+  "Contact.SuccessMessage": "Sua mensagem foi enviada. Retornaremos em breve.",
+  "Contact.ErrorMessage": "Nao foi possivel enviar a mensagem."
 }

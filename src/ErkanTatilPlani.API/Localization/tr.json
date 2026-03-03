@@ -1454,5 +1454,15 @@
   "LiveChat.Email": "E-posta adresiniz",
   "LiveChat.FillFields": "Lutfen ad ve e-posta alanlarini doldurun",
   "LiveChat.Received": "Mesajiniz alindi. En kisa surede donus yapacagiz.",
-  "LiveChat.Error": "Mesaj gonderilemedi. Lutfen tekrar deneyin."
+  "LiveChat.Error": "Mesaj gonderilemedi. Lutfen tekrar deneyin.",
+  "CompanyContact.Title": "Firmaya Mesaj Gonder",
+  "CompanyContact.SendMessage": "Mesaj Gonder",
+  "CompanyContact.Name": "Ad Soyad",
+  "CompanyContact.Email": "E-posta",
+  "CompanyContact.Message": "Mesajiniz",
+  "CompanyContact.Send": "Gonder",
+  "CompanyContact.Success": "Mesajiniz basariyla gonderildi",
+  "CompanyContact.Error": "Mesaj gonderilemedi",
+  "Contact.SuccessMessage": "Mesajiniz basariyla gonderildi. En kisa surede donus yapacagiz.",
+  "Contact.ErrorMessage": "Mesaj gonderilemedi. Lutfen tekrar deneyin."
 }
