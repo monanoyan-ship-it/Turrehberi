@@ -97,6 +97,13 @@ public class AppDbContext : DbContext
     public DbSet<TripStoryLike> TripStoryLikes => Set<TripStoryLike>();
     public DbSet<TripStoryComment> TripStoryComments => Set<TripStoryComment>();
 
+    // Marketplace Finance
+    public DbSet<PaymentTransaction> PaymentTransactions => Set<PaymentTransaction>();
+    public DbSet<PaymentLineItem> PaymentLineItems => Set<PaymentLineItem>();
+    public DbSet<MarketplaceLedgerEntry> MarketplaceLedgerEntries => Set<MarketplaceLedgerEntry>();
+    public DbSet<MarketplaceRefund> MarketplaceRefunds => Set<MarketplaceRefund>();
+    public DbSet<PayoutBatch> PayoutBatches => Set<PayoutBatch>();
+
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         base.OnModelCreating(modelBuilder);
@@ -111,9 +118,21 @@ public class AppDbContext : DbContext
             entity.Property(e => e.MetaDescription).HasMaxLength(300);
             entity.Property(e => e.Tagline).HasMaxLength(200);
             entity.Property(e => e.City).HasMaxLength(100);
+            entity.Property(e => e.PlatformCommissionRate).HasPrecision(5, 2);
+            entity.Property(e => e.LegalCompanyTitle).HasMaxLength(250);
+            entity.Property(e => e.TaxOffice).HasMaxLength(100);
+            entity.Property(e => e.Iban).HasMaxLength(34);
+            entity.Property(e => e.ContactName).HasMaxLength(100);
+            entity.Property(e => e.ContactSurname).HasMaxLength(100);
+            entity.Property(e => e.SubMerchantExternalId).HasMaxLength(100);
+            entity.Property(e => e.SubMerchantKey).HasMaxLength(100);
+            entity.Property(e => e.OnboardingErrorCode).HasMaxLength(50);
+            entity.Property(e => e.OnboardingErrorMessage).HasMaxLength(500);
             entity.HasIndex(e => e.Email).IsUnique();
             entity.HasIndex(e => e.TaxNumber).IsUnique();
             entity.HasIndex(e => e.Slug).IsUnique();
+            entity.HasIndex(e => e.SubMerchantExternalId);
+            entity.HasIndex(e => e.SubMerchantKey);
 
             // Onay yapan yetkili iliskisi
             entity.HasOne(e => e.ReviewedBy)
@@ -184,6 +203,204 @@ public class AppDbContext : DbContext
             entity.HasOne(e => e.Promotion)
                   .WithMany()
                   .HasForeignKey(e => e.PromotionId)
+                  .IsRequired(false)
+                  .OnDelete(DeleteBehavior.SetNull);
+        });
+
+        modelBuilder.Entity<PaymentTransaction>(entity =>
+        {
+            entity.HasKey(e => e.Id);
+            entity.Property(e => e.Provider).HasMaxLength(50);
+            entity.Property(e => e.Currency).HasMaxLength(3);
+            entity.Property(e => e.ConversationId).HasMaxLength(100);
+            entity.Property(e => e.PaymentId).HasMaxLength(100);
+            entity.Property(e => e.PaymentToken).HasMaxLength(200);
+            entity.Property(e => e.BuyerIp).HasMaxLength(45);
+            entity.Property(e => e.GrossAmount).HasPrecision(18, 2);
+            entity.Property(e => e.PaidAmount).HasPrecision(18, 2);
+            entity.Property(e => e.SellerReceivableAmount).HasPrecision(18, 2);
+            entity.Property(e => e.PlatformCommissionAmount).HasPrecision(18, 2);
+            entity.Property(e => e.PlatformCommissionRate).HasPrecision(5, 2);
+            entity.Property(e => e.IyziCommissionRateAmount).HasPrecision(18, 2);
+            entity.Property(e => e.IyziCommissionFee).HasPrecision(18, 2);
+            entity.Property(e => e.WithholdingTax).HasPrecision(18, 2);
+            entity.Property(e => e.RefundedAmount).HasPrecision(18, 2);
+            entity.Property(e => e.ErrorCode).HasMaxLength(50);
+            entity.Property(e => e.ErrorMessage).HasMaxLength(500);
+
+            entity.HasIndex(e => e.ReservationId);
+            entity.HasIndex(e => e.CompanyId);
+            entity.HasIndex(e => e.PaymentToken);
+            entity.HasIndex(e => e.PaymentId);
+            entity.HasIndex(e => e.ConversationId);
+
+            entity.HasOne(e => e.Reservation)
+                  .WithMany(r => r.PaymentTransactions)
+                  .HasForeignKey(e => e.ReservationId)
+                  .OnDelete(DeleteBehavior.Restrict);
+
+            entity.HasOne(e => e.Company)
+                  .WithMany(c => c.PaymentTransactions)
+                  .HasForeignKey(e => e.CompanyId)
+                  .OnDelete(DeleteBehavior.Restrict);
+
+            entity.HasOne(e => e.Visitor)
+                  .WithMany()
+                  .HasForeignKey(e => e.VisitorId)
+                  .OnDelete(DeleteBehavior.Restrict);
+        });
+
+        modelBuilder.Entity<PaymentLineItem>(entity =>
+        {
+            entity.HasKey(e => e.Id);
+            entity.Property(e => e.ItemId).HasMaxLength(100);
+            entity.Property(e => e.ItemName).HasMaxLength(250);
+            entity.Property(e => e.ProviderPaymentTransactionId).HasMaxLength(100);
+            entity.Property(e => e.SubMerchantKey).HasMaxLength(100);
+            entity.Property(e => e.ExternalSubMerchantId).HasMaxLength(100);
+            entity.Property(e => e.Price).HasPrecision(18, 2);
+            entity.Property(e => e.PaidPrice).HasPrecision(18, 2);
+            entity.Property(e => e.SubMerchantPrice).HasPrecision(18, 2);
+            entity.Property(e => e.SubMerchantPayoutRate).HasPrecision(5, 2);
+            entity.Property(e => e.SubMerchantPayoutAmount).HasPrecision(18, 2);
+            entity.Property(e => e.MerchantPayoutAmount).HasPrecision(18, 2);
+            entity.Property(e => e.PlatformCommissionAmount).HasPrecision(18, 2);
+            entity.Property(e => e.IyziCommissionRateAmount).HasPrecision(18, 2);
+            entity.Property(e => e.IyziCommissionFee).HasPrecision(18, 2);
+            entity.Property(e => e.BlockageRate).HasPrecision(5, 2);
+            entity.Property(e => e.BlockageRateAmountMerchant).HasPrecision(18, 2);
+            entity.Property(e => e.BlockageRateAmountSubMerchant).HasPrecision(18, 2);
+            entity.Property(e => e.WithholdingTax).HasPrecision(18, 2);
+
+            entity.HasIndex(e => e.PaymentTransactionId);
+            entity.HasIndex(e => e.ReservationId);
+            entity.HasIndex(e => e.CompanyId);
+            entity.HasIndex(e => e.ProviderPaymentTransactionId);
+
+            entity.HasOne(e => e.PaymentTransaction)
+                  .WithMany(t => t.LineItems)
+                  .HasForeignKey(e => e.PaymentTransactionId)
+                  .OnDelete(DeleteBehavior.Cascade);
+
+            entity.HasOne(e => e.Reservation)
+                  .WithMany()
+                  .HasForeignKey(e => e.ReservationId)
+                  .OnDelete(DeleteBehavior.Restrict);
+
+            entity.HasOne(e => e.Company)
+                  .WithMany()
+                  .HasForeignKey(e => e.CompanyId)
+                  .OnDelete(DeleteBehavior.Restrict);
+        });
+
+        modelBuilder.Entity<MarketplaceLedgerEntry>(entity =>
+        {
+            entity.HasKey(e => e.Id);
+            entity.Property(e => e.Amount).HasPrecision(18, 2);
+            entity.Property(e => e.Currency).HasMaxLength(3);
+            entity.Property(e => e.Reference).HasMaxLength(150);
+            entity.Property(e => e.Description).HasMaxLength(500);
+
+            entity.HasIndex(e => e.PaymentTransactionId);
+            entity.HasIndex(e => e.ReservationId);
+            entity.HasIndex(e => e.CompanyId);
+            entity.HasIndex(e => e.PayoutBatchId);
+            entity.HasIndex(e => e.StatusId);
+            entity.HasIndex(e => e.AvailableAt);
+
+            entity.HasOne(e => e.PaymentTransaction)
+                  .WithMany(t => t.LedgerEntries)
+                  .HasForeignKey(e => e.PaymentTransactionId)
+                  .IsRequired(false)
+                  .OnDelete(DeleteBehavior.SetNull);
+
+            entity.HasOne(e => e.Reservation)
+                  .WithMany(r => r.LedgerEntries)
+                  .HasForeignKey(e => e.ReservationId)
+                  .IsRequired(false)
+                  .OnDelete(DeleteBehavior.SetNull);
+
+            entity.HasOne(e => e.Company)
+                  .WithMany(c => c.LedgerEntries)
+                  .HasForeignKey(e => e.CompanyId)
+                  .IsRequired(false)
+                  .OnDelete(DeleteBehavior.SetNull);
+
+            entity.HasOne(e => e.PayoutBatch)
+                  .WithMany(p => p.LedgerEntries)
+                  .HasForeignKey(e => e.PayoutBatchId)
+                  .IsRequired(false)
+                  .OnDelete(DeleteBehavior.SetNull);
+        });
+
+        modelBuilder.Entity<MarketplaceRefund>(entity =>
+        {
+            entity.HasKey(e => e.Id);
+            entity.Property(e => e.Amount).HasPrecision(18, 2);
+            entity.Property(e => e.Currency).HasMaxLength(3);
+            entity.Property(e => e.Reason).HasMaxLength(500);
+            entity.Property(e => e.ProviderRefundId).HasMaxLength(100);
+            entity.Property(e => e.ProviderPaymentTransactionId).HasMaxLength(100);
+            entity.Property(e => e.ErrorCode).HasMaxLength(50);
+            entity.Property(e => e.ErrorMessage).HasMaxLength(500);
+
+            entity.HasIndex(e => e.PaymentTransactionId);
+            entity.HasIndex(e => e.ReservationId);
+            entity.HasIndex(e => e.CompanyId);
+            entity.HasIndex(e => e.StatusId);
+
+            entity.HasOne(e => e.PaymentTransaction)
+                  .WithMany(t => t.Refunds)
+                  .HasForeignKey(e => e.PaymentTransactionId)
+                  .OnDelete(DeleteBehavior.Restrict);
+
+            entity.HasOne(e => e.Reservation)
+                  .WithMany(r => r.MarketplaceRefunds)
+                  .HasForeignKey(e => e.ReservationId)
+                  .OnDelete(DeleteBehavior.Restrict);
+
+            entity.HasOne(e => e.Company)
+                  .WithMany(c => c.MarketplaceRefunds)
+                  .HasForeignKey(e => e.CompanyId)
+                  .OnDelete(DeleteBehavior.Restrict);
+
+            entity.HasOne(e => e.RequestedBy)
+                  .WithMany()
+                  .HasForeignKey(e => e.RequestedById)
+                  .IsRequired(false)
+                  .OnDelete(DeleteBehavior.SetNull);
+
+            entity.HasOne(e => e.ProcessedBy)
+                  .WithMany()
+                  .HasForeignKey(e => e.ProcessedById)
+                  .IsRequired(false)
+                  .OnDelete(DeleteBehavior.SetNull);
+        });
+
+        modelBuilder.Entity<PayoutBatch>(entity =>
+        {
+            entity.HasKey(e => e.Id);
+            entity.Property(e => e.BatchNumber).HasMaxLength(50);
+            entity.Property(e => e.Currency).HasMaxLength(3);
+            entity.Property(e => e.GrossAmount).HasPrecision(18, 2);
+            entity.Property(e => e.PlatformCommissionAmount).HasPrecision(18, 2);
+            entity.Property(e => e.RefundAmount).HasPrecision(18, 2);
+            entity.Property(e => e.NetAmount).HasPrecision(18, 2);
+            entity.Property(e => e.BankReference).HasMaxLength(150);
+            entity.Property(e => e.Notes).HasMaxLength(500);
+
+            entity.HasIndex(e => e.CompanyId);
+            entity.HasIndex(e => e.StatusId);
+            entity.HasIndex(e => e.BatchNumber).IsUnique();
+
+            entity.HasOne(e => e.Company)
+                  .WithMany(c => c.PayoutBatches)
+                  .HasForeignKey(e => e.CompanyId)
+                  .OnDelete(DeleteBehavior.Restrict);
+
+            entity.HasOne(e => e.ApprovedBy)
+                  .WithMany()
+                  .HasForeignKey(e => e.ApprovedById)
                   .IsRequired(false)
                   .OnDelete(DeleteBehavior.SetNull);
         });

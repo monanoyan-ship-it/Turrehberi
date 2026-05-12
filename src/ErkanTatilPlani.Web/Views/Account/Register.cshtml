@@ -48,11 +48,11 @@
                     <div class="row">
                         <div class="col-md-6 mb-3">
                             <label class="form-label"><span data-t="Register.FirstName">Ad</span> <span class="text-danger">*</span></label>
-                            <input type="text" class="form-control" data-t="Placeholder.FirstName" data-bind="value: firstName, attr: { placeholder: T('Placeholder.FirstName') }" />
+                            <input type="text" class="form-control" data-field="firstName" data-bind="value: firstName, valueUpdate: 'input', attr: { placeholder: T('Placeholder.FirstName') }" />
                         </div>
                         <div class="col-md-6 mb-3">
                             <label class="form-label"><span data-t="Register.LastName">Soyad</span> <span class="text-danger">*</span></label>
-                            <input type="text" class="form-control" data-bind="value: lastName, attr: { placeholder: T('Placeholder.LastName') }" />
+                            <input type="text" class="form-control" data-field="lastName" data-bind="value: lastName, valueUpdate: 'input', attr: { placeholder: T('Placeholder.LastName') }" />
                         </div>
                     </div>
 
@@ -60,7 +60,7 @@
                         <label class="form-label"><span data-t="Register.Email">E-posta</span> <span class="text-danger">*</span></label>
                         <div class="input-group">
                             <span class="input-group-text"><i class="bi bi-envelope"></i></span>
-                            <input type="email" class="form-control" data-bind="value: email, attr: { placeholder: T('Placeholder.Email') }" />
+                            <input type="email" class="form-control" data-field="email" data-bind="value: email, valueUpdate: 'input', attr: { placeholder: T('Placeholder.Email') }" />
                         </div>
                     </div>
 
@@ -68,7 +68,7 @@
                         <label class="form-label" data-t="Register.Phone">Telefon</label>
                         <div class="input-group">
                             <span class="input-group-text"><i class="bi bi-phone"></i></span>
-                            <input type="tel" class="form-control" data-bind="value: phone, attr: { placeholder: T('Placeholder.Phone') }" />
+                            <input type="tel" class="form-control" data-field="phone" data-bind="value: phone, valueUpdate: 'input', attr: { placeholder: T('Placeholder.Phone') }" />
                         </div>
                     </div>
 
@@ -77,14 +77,14 @@
                             <label class="form-label"><span data-t="Register.Password">Sifre</span> <span class="text-danger">*</span></label>
                             <div class="input-group">
                                 <span class="input-group-text"><i class="bi bi-lock"></i></span>
-                                <input type="password" class="form-control" data-bind="value: password, attr: { placeholder: T('Register.PasswordHint') }" />
+                                <input type="password" class="form-control" data-field="password" data-bind="value: password, valueUpdate: 'input', attr: { placeholder: T('Register.PasswordHint') }" />
                             </div>
                         </div>
                         <div class="col-md-6 mb-3">
                             <label class="form-label"><span data-t="Register.PasswordConfirm">Sifre Tekrar</span> <span class="text-danger">*</span></label>
                             <div class="input-group">
                                 <span class="input-group-text"><i class="bi bi-lock-fill"></i></span>
-                                <input type="password" class="form-control" data-bind="value: passwordConfirm, attr: { placeholder: T('Register.PasswordConfirmHint') }" />
+                                <input type="password" class="form-control" data-field="passwordConfirm" data-bind="value: passwordConfirm, valueUpdate: 'input', attr: { placeholder: T('Register.PasswordConfirmHint') }" />
                             </div>
                         </div>
                     </div>
@@ -97,11 +97,11 @@
                         <div class="row">
                             <div class="col-md-6 mb-3">
                                 <label class="form-label"><span data-t="Register.CompanyName">Firma Adi</span> <span class="text-danger">*</span></label>
-                                <input type="text" class="form-control" data-bind="value: companyName, attr: { placeholder: T('Placeholder.CompanyName') }" />
+                                <input type="text" class="form-control" data-field="companyName" data-bind="value: companyName, valueUpdate: 'input', attr: { placeholder: T('Placeholder.CompanyName') }" />
                             </div>
                             <div class="col-md-6 mb-3">
                                 <label class="form-label"><span data-t="Register.TaxNumber">Vergi Numarasi</span> <span class="text-danger">*</span></label>
-                                <input type="text" class="form-control" data-bind="value: companyTaxNumber, attr: { placeholder: T('Placeholder.TaxNumber') }" />
+                                <input type="text" class="form-control" data-field="companyTaxNumber" data-bind="value: companyTaxNumber, valueUpdate: 'input', attr: { placeholder: T('Placeholder.TaxNumber') }" />
                             </div>
                         </div>
 
@@ -110,14 +110,14 @@
                                 <label class="form-label" data-t="Register.CompanyEmail">Firma E-posta</label>
                                 <div class="input-group">
                                     <span class="input-group-text"><i class="bi bi-envelope"></i></span>
-                                    <input type="email" class="form-control" data-bind="value: companyEmail, attr: { placeholder: T('Placeholder.Email') }" />
+                                    <input type="email" class="form-control" data-field="companyEmail" data-bind="value: companyEmail, valueUpdate: 'input', attr: { placeholder: T('Placeholder.Email') }" />
                                 </div>
                             </div>
                             <div class="col-md-6 mb-3">
                                 <label class="form-label" data-t="Register.CompanyPhone">Firma Telefonu</label>
                                 <div class="input-group">
                                     <span class="input-group-text"><i class="bi bi-telephone"></i></span>
-                                    <input type="tel" class="form-control" data-bind="value: companyPhone, attr: { placeholder: T('Placeholder.CompanyPhone') }" />
+                                    <input type="tel" class="form-control" data-field="companyPhone" data-bind="value: companyPhone, valueUpdate: 'input', attr: { placeholder: T('Placeholder.CompanyPhone') }" />
                                 </div>
                             </div>
                         </div>
@@ -126,7 +126,7 @@
                             <label class="form-label" data-t="Register.CompanyAddress">Firma Adresi</label>
                             <div class="input-group">
                                 <span class="input-group-text"><i class="bi bi-geo-alt"></i></span>
-                                <input type="text" class="form-control" data-bind="value: companyAddress, attr: { placeholder: T('Placeholder.Address') }" />
+                                <input type="text" class="form-control" data-field="companyAddress" data-bind="value: companyAddress, valueUpdate: 'input', attr: { placeholder: T('Placeholder.Address') }" />
                             </div>
                         </div>
 
@@ -134,7 +134,7 @@
                             <label class="form-label" data-t="Register.Website">Website</label>
                             <div class="input-group">
                                 <span class="input-group-text"><i class="bi bi-globe"></i></span>
-                                <input type="url" class="form-control" data-bind="value: companyWebsite, attr: { placeholder: T('Placeholder.Website') }" />
+                                <input type="url" class="form-control" data-field="companyWebsite" data-bind="value: companyWebsite, valueUpdate: 'input', attr: { placeholder: T('Placeholder.Website') }" />
                             </div>
                         </div>
                     </div>
@@ -142,8 +142,9 @@
                     <div class="form-check mb-3">
                         <input class="form-check-input" type="checkbox" id="termsCheck" data-bind="checked: acceptTerms">
                         <label class="form-check-label small" for="termsCheck">
-                            <a href="#" class="text-decoration-none" data-t="Register.TermsOfUse">Kullanim Kosullari</a> ve
-                            <a href="#" class="text-decoration-none" data-t="Register.PrivacyPolicy">Gizlilik Politikasi</a>
+                            <a href="/Home/Terms" class="text-decoration-none" data-t="Register.TermsOfUse">Kullanim Kosullari</a>
+                            <span data-t="Common.And">ve</span>
+                            <a href="/Home/Privacy" class="text-decoration-none" data-t="Register.PrivacyPolicy">Gizlilik Politikasi</a>
                         </label>
                     </div>
 

@@ -1,0 +1,338 @@
+@{
+    Layout = "_AdminLayout";
+}
+
+<div id="adminMarketplaceFinanceApp">
+    <div class="row g-3 mb-4" data-bind="with: summary">
+        <div class="col-sm-6 col-xl-3">
+            <div class="card h-100">
+                <div class="card-body">
+                    <div class="text-muted small">Brut hacim</div>
+                    <div class="fs-4 fw-semibold" data-bind="text: $parent.formatMoney(grossVolume)"></div>
+                </div>
+            </div>
+        </div>
+        <div class="col-sm-6 col-xl-3">
+            <div class="card h-100">
+                <div class="card-body">
+                    <div class="text-muted small">Platform komisyonu</div>
+                    <div class="fs-4 fw-semibold" data-bind="text: $parent.formatMoney(platformCommission)"></div>
+                </div>
+            </div>
+        </div>
+        <div class="col-sm-6 col-xl-3">
+            <div class="card h-100">
+                <div class="card-body">
+                    <div class="text-muted small">Hak edise hazir</div>
+                    <div class="fs-4 fw-semibold" data-bind="text: $parent.formatMoney(availableForPayout)"></div>
+                </div>
+            </div>
+        </div>
+        <div class="col-sm-6 col-xl-3">
+            <div class="card h-100">
+                <div class="card-body">
+                    <div class="text-muted small">Aktif satici</div>
+                    <div class="fs-4 fw-semibold" data-bind="text: activeSellers"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <ul class="nav nav-tabs mb-3" role="tablist">
+        <li class="nav-item" role="presentation">
+            <button class="nav-link active" data-bs-toggle="tab" data-bs-target="#sellerTab" type="button">Saticilar</button>
+        </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link" data-bs-toggle="tab" data-bs-target="#transactionTab" type="button">Odemeler</button>
+        </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link" data-bs-toggle="tab" data-bs-target="#payoutTab" type="button">Hak edisler</button>
+        </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link" data-bs-toggle="tab" data-bs-target="#refundTab" type="button">Iadeler</button>
+        </li>
+    </ul>
+
+    <div class="tab-content">
+        <div class="tab-pane fade show active" id="sellerTab">
+            <div class="card">
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle mb-0">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Firma</th>
+                                <th>Onboarding</th>
+                                <th>Komisyon</th>
+                                <th>Hak edis</th>
+                                <th>Submerchant</th>
+                                <th class="text-end">Islemler</th>
+                            </tr>
+                        </thead>
+                        <tbody data-bind="foreach: sellers">
+                            <tr>
+                                <td>
+                                    <div class="fw-semibold" data-bind="text: name"></div>
+                                    <small class="text-muted" data-bind="text: email"></small>
+                                </td>
+                                <td>
+                                    <span class="badge" data-bind="css: $parent.onboardingBadge(sellerOnboardingStatusId), text: onboardingStatus"></span>
+                                    <div class="small text-danger" data-bind="visible: onboardingErrorMessage, text: onboardingErrorMessage"></div>
+                                </td>
+                                <td data-bind="text: platformCommissionRate + '%'"></td>
+                                <td>
+                                    <div data-bind="text: $parent.formatMoney(sellerReceivable)"></div>
+                                    <small class="text-muted" data-bind="text: payoutDelayDays + ' gun blokaj'"></small>
+                                </td>
+                                <td>
+                                    <span class="badge" data-bind="css: hasSubMerchantKey ? 'bg-success' : 'bg-secondary', text: hasSubMerchantKey ? 'Var' : 'Yok'"></span>
+                                </td>
+                                <td class="text-end">
+                                    <div class="btn-group btn-group-sm">
+                                        <button class="btn btn-outline-primary" title="Ayarlar" data-bind="click: $parent.openSellerModal"><i class="bi bi-sliders"></i></button>
+                                        <button class="btn btn-outline-success" title="Onboard et" data-bind="click: $parent.onboardSeller, enable: readyForOnboarding"><i class="bi bi-cloud-upload"></i></button>
+                                        <button class="btn btn-outline-dark" title="Hak edis olustur" data-bind="click: $parent.openPayoutModal"><i class="bi bi-bank"></i></button>
+                                    </div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <div class="tab-pane fade" id="transactionTab">
+            <div class="card">
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle mb-0">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Tarih</th>
+                                <th>Firma</th>
+                                <th>Tur</th>
+                                <th>Durum</th>
+                                <th>Brut</th>
+                                <th>Satici</th>
+                                <th>Komisyon</th>
+                                <th class="text-end">Islem</th>
+                            </tr>
+                        </thead>
+                        <tbody data-bind="foreach: transactions">
+                            <tr>
+                                <td data-bind="text: $parent.formatDate(createdAt)"></td>
+                                <td data-bind="text: companyName"></td>
+                                <td data-bind="text: tourName"></td>
+                                <td><span class="badge" data-bind="css: $parent.transactionBadge(statusId), text: status"></span></td>
+                                <td data-bind="text: $parent.formatMoney(paidAmount || grossAmount)"></td>
+                                <td data-bind="text: $parent.formatMoney(sellerReceivableAmount)"></td>
+                                <td data-bind="text: $parent.formatMoney(platformCommissionAmount)"></td>
+                                <td class="text-end">
+                                    <button class="btn btn-sm btn-outline-warning" data-bind="click: $parent.openRefundModal, enable: paidAmount > refundedAmount">
+                                        <i class="bi bi-arrow-counterclockwise"></i>
+                                    </button>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <div class="tab-pane fade" id="payoutTab">
+            <div class="card">
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle mb-0">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Batch</th>
+                                <th>Firma</th>
+                                <th>Donem</th>
+                                <th>Durum</th>
+                                <th>Net</th>
+                                <th>Banka Ref</th>
+                                <th class="text-end">Islem</th>
+                            </tr>
+                        </thead>
+                        <tbody data-bind="foreach: payouts">
+                            <tr>
+                                <td><code data-bind="text: batchNumber"></code></td>
+                                <td data-bind="text: companyName"></td>
+                                <td data-bind="text: $parent.formatDate(periodStart) + ' - ' + $parent.formatDate(periodEnd)"></td>
+                                <td><span class="badge" data-bind="css: $parent.payoutBadge(statusId), text: status"></span></td>
+                                <td data-bind="text: $parent.formatMoney(netAmount)"></td>
+                                <td data-bind="text: bankReference || '-'"></td>
+                                <td class="text-end">
+                                    <button class="btn btn-sm btn-outline-success" data-bind="click: $parent.openPaidModal, enable: statusId !== 2">
+                                        <i class="bi bi-check2-circle"></i>
+                                    </button>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <div class="tab-pane fade" id="refundTab">
+            <div class="card">
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle mb-0">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Tarih</th>
+                                <th>Firma</th>
+                                <th>Tur</th>
+                                <th>Durum</th>
+                                <th>Tutar</th>
+                                <th>Sebep</th>
+                            </tr>
+                        </thead>
+                        <tbody data-bind="foreach: refunds">
+                            <tr>
+                                <td data-bind="text: $parent.formatDate(requestedAt)"></td>
+                                <td data-bind="text: companyName"></td>
+                                <td data-bind="text: tourName"></td>
+                                <td><span class="badge" data-bind="css: $parent.refundBadge(statusId), text: status"></span></td>
+                                <td data-bind="text: $parent.formatMoney(amount)"></td>
+                                <td data-bind="text: reason || '-'"></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="sellerModal" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Satici odeme ayarlari</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label class="form-label">Ticari unvan</label>
+                            <input class="form-control" data-bind="value: sellerForm.legalCompanyTitle">
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label">Vergi dairesi</label>
+                            <input class="form-control" data-bind="value: sellerForm.taxOffice">
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label">Vergi no</label>
+                            <input class="form-control" data-bind="value: sellerForm.taxNumber">
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">IBAN</label>
+                            <input class="form-control" data-bind="value: sellerForm.iban">
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label">Yetkili adi</label>
+                            <input class="form-control" data-bind="value: sellerForm.contactName">
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label">Yetkili soyadi</label>
+                            <input class="form-control" data-bind="value: sellerForm.contactSurname">
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label">Komisyon %</label>
+                            <input type="number" class="form-control" data-bind="value: sellerForm.platformCommissionRate">
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label">Blokaj gunu</label>
+                            <input type="number" class="form-control" data-bind="value: sellerForm.payoutDelayDays">
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label">Satici tipi</label>
+                            <select class="form-select" data-bind="value: sellerForm.sellerLegalTypeId">
+                                <option value="1">Sahis</option>
+                                <option value="2">Limited/Anonim</option>
+                                <option value="3">Bireysel</option>
+                            </select>
+                        </div>
+                        <div class="col-md-3 d-flex align-items-end">
+                            <div class="form-check form-switch">
+                                <input class="form-check-input" type="checkbox" data-bind="checked: sellerForm.marketplaceEnabled">
+                                <label class="form-check-label">Marketplace aktif</label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Kapat</button>
+                    <button type="button" class="btn btn-primary" data-bind="click: saveSeller, disable: isSaving">Kaydet</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="refundModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Iade olustur</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <label class="form-label">Tutar</label>
+                    <input type="number" class="form-control mb-3" data-bind="value: refundForm.amount">
+                    <label class="form-label">Sebep</label>
+                    <textarea class="form-control" rows="3" data-bind="value: refundForm.reason"></textarea>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Kapat</button>
+                    <button type="button" class="btn btn-warning" data-bind="click: createRefund, disable: isSaving">Iade et</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="payoutModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Hak edis olustur</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <label class="form-label">Donem baslangic</label>
+                    <input type="date" class="form-control mb-3" data-bind="value: payoutForm.periodStart">
+                    <label class="form-label">Donem bitis</label>
+                    <input type="date" class="form-control mb-3" data-bind="value: payoutForm.periodEnd">
+                    <label class="form-label">Not</label>
+                    <textarea class="form-control" rows="2" data-bind="value: payoutForm.notes"></textarea>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Kapat</button>
+                    <button type="button" class="btn btn-dark" data-bind="click: createPayout, disable: isSaving">Olustur</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="paidModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Odendi isaretle</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <label class="form-label">Banka referansi</label>
+                    <input class="form-control mb-3" data-bind="value: paidForm.bankReference">
+                    <label class="form-label">Not</label>
+                    <textarea class="form-control" rows="2" data-bind="value: paidForm.notes"></textarea>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Kapat</button>
+                    <button type="button" class="btn btn-success" data-bind="click: markPayoutPaid, disable: isSaving">Kaydet</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+<script src="~/js/Admin/MarketplaceFinance.js"></script>
+}

@@ -1,7 +1,9 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace ErkanTatilPlani.Web.Controllers;
 
+[Authorize(Roles = "Admin,Staff")]
 public class AdminController : Controller
 {
     private readonly IConfiguration _configuration;
@@ -16,7 +18,7 @@ public class AdminController : Controller
         ViewData["ActiveMenu"] = activeMenu;
         ViewData["Title"] = title;
         ViewBag.ApiBaseUrl = _configuration["ApiBaseUrl"];
-        ViewBag.UserRole = "Admin";
+        ViewBag.UserRole = User.IsInRole("Staff") ? "Staff" : "Admin";
     }
 
     // Dashboard - Tum roller erisebilir
@@ -63,6 +65,7 @@ public class AdminController : Controller
     // ============================================
 
     // Sistem ayarlari (Sadece Admin)
+    [Authorize(Roles = "Admin")]
     public IActionResult Settings()
     {
         SetCommonViewData("Settings", "Sistem Ayarlari");
@@ -70,6 +73,7 @@ public class AdminController : Controller
     }
 
     // Dil yonetimi (Sadece Admin)
+    [Authorize(Roles = "Admin")]
     public IActionResult Languages()
     {
         SetCommonViewData("Languages", "Dil Yonetimi");
@@ -91,6 +95,7 @@ public class AdminController : Controller
     }
 
     // Email hesaplari yonetimi (Sadece Admin)
+    [Authorize(Roles = "Admin")]
     public IActionResult EmailAccounts()
     {
         SetCommonViewData("EmailAccounts", "Email Hesaplari");
@@ -98,6 +103,7 @@ public class AdminController : Controller
     }
 
     // Email sablonlari yonetimi (Sadece Admin)
+    [Authorize(Roles = "Admin")]
     public IActionResult EmailTemplates()
     {
         SetCommonViewData("EmailTemplates", "Email Sablonlari");
@@ -122,6 +128,13 @@ public class AdminController : Controller
     public IActionResult Promotions()
     {
         SetCommonViewData("Promotions", "Promosyon Yonetimi");
+        return View();
+    }
+
+    // Marketplace finans yonetimi (Staff ve Admin)
+    public IActionResult MarketplaceFinance()
+    {
+        SetCommonViewData("MarketplaceFinance", "Marketplace Finans");
         return View();
     }
 }

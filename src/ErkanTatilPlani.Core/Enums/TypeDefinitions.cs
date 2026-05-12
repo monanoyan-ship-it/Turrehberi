@@ -722,3 +722,302 @@ public static class MobilityLevels
         public const int Difficult = 3;
     }
 }
+
+// ============================================================
+// SELLER LEGAL TYPES (Marketplace satici tipleri)
+// ============================================================
+public static class SellerLegalTypes
+{
+    public static readonly TypeItem SoleProprietorship = new(1, "SoleProprietorship", "SellerLegalType.SoleProprietorship",
+        "Sahis sirketi",
+        "bi-person-vcard", "bg-info", 1);
+
+    public static readonly TypeItem LimitedOrJointStockCompany = new(2, "LimitedOrJointStockCompany", "SellerLegalType.LimitedOrJointStockCompany",
+        "Limited veya anonim sirket",
+        "bi-building-check", "bg-primary", 2, isDefault: true);
+
+    public static readonly TypeItem Individual = new(3, "Individual", "SellerLegalType.Individual",
+        "Bireysel satici",
+        "bi-person", "bg-secondary", 3);
+
+    public static IEnumerable<TypeItem> All => new[] { SoleProprietorship, LimitedOrJointStockCompany, Individual };
+    public static TypeItem Default => All.First(x => x.IsDefault);
+    public static TypeItem? GetById(int id) => All.FirstOrDefault(x => x.Id == id);
+    public static TypeItem? GetBySystemName(string systemName) => All.FirstOrDefault(x => x.SystemName == systemName);
+
+    public static class Ids
+    {
+        public const int SoleProprietorship = 1;
+        public const int LimitedOrJointStockCompany = 2;
+        public const int Individual = 3;
+    }
+}
+
+// ============================================================
+// SELLER ONBOARDING STATUSES (Marketplace satici onboarding)
+// ============================================================
+public static class SellerOnboardingStatuses
+{
+    public static readonly TypeItem MissingInfo = new(0, "MissingInfo", "SellerOnboardingStatus.MissingInfo",
+        "Eksik bilgi var",
+        "bi-exclamation-circle", "bg-warning text-dark", 1, isDefault: true);
+
+    public static readonly TypeItem ReadyForSubmission = new(1, "ReadyForSubmission", "SellerOnboardingStatus.ReadyForSubmission",
+        "Gonderime hazir",
+        "bi-send", "bg-info", 2);
+
+    public static readonly TypeItem Submitted = new(2, "Submitted", "SellerOnboardingStatus.Submitted",
+        "Servise gonderildi",
+        "bi-cloud-upload", "bg-primary", 3);
+
+    public static readonly TypeItem Active = new(3, "Active", "SellerOnboardingStatus.Active",
+        "Aktif",
+        "bi-check-circle", "bg-success", 4);
+
+    public static readonly TypeItem Failed = new(4, "Failed", "SellerOnboardingStatus.Failed",
+        "Basarisiz",
+        "bi-x-circle", "bg-danger", 5);
+
+    public static readonly TypeItem Suspended = new(5, "Suspended", "SellerOnboardingStatus.Suspended",
+        "Askida",
+        "bi-pause-circle", "bg-secondary", 6);
+
+    public static IEnumerable<TypeItem> All => new[] { MissingInfo, ReadyForSubmission, Submitted, Active, Failed, Suspended };
+    public static TypeItem Default => All.First(x => x.IsDefault);
+    public static TypeItem? GetById(int id) => All.FirstOrDefault(x => x.Id == id);
+    public static TypeItem? GetBySystemName(string systemName) => All.FirstOrDefault(x => x.SystemName == systemName);
+
+    public static class Ids
+    {
+        public const int MissingInfo = 0;
+        public const int ReadyForSubmission = 1;
+        public const int Submitted = 2;
+        public const int Active = 3;
+        public const int Failed = 4;
+        public const int Suspended = 5;
+    }
+}
+
+// ============================================================
+// PAYMENT TRANSACTION TYPES (Marketplace odeme tipleri)
+// ============================================================
+public static class PaymentTransactionTypes
+{
+    public static readonly TypeItem FullPayment = new(1, "FullPayment", "PaymentTransactionType.FullPayment",
+        "Tam odeme",
+        "bi-credit-card-2-front", "bg-success", 1, isDefault: true);
+
+    public static readonly TypeItem Deposit = new(2, "Deposit", "PaymentTransactionType.Deposit",
+        "On odeme",
+        "bi-cash-stack", "bg-info", 2);
+
+    public static readonly TypeItem RemainingBalance = new(3, "RemainingBalance", "PaymentTransactionType.RemainingBalance",
+        "Kalan odeme",
+        "bi-wallet2", "bg-primary", 3);
+
+    public static IEnumerable<TypeItem> All => new[] { FullPayment, Deposit, RemainingBalance };
+    public static TypeItem Default => All.First(x => x.IsDefault);
+    public static TypeItem? GetById(int id) => All.FirstOrDefault(x => x.Id == id);
+    public static TypeItem? GetBySystemName(string systemName) => All.FirstOrDefault(x => x.SystemName == systemName);
+
+    public static class Ids
+    {
+        public const int FullPayment = 1;
+        public const int Deposit = 2;
+        public const int RemainingBalance = 3;
+    }
+}
+
+// ============================================================
+// MARKETPLACE TRANSACTION STATUSES (Odeme islem durumlari)
+// ============================================================
+public static class MarketplaceTransactionStatuses
+{
+    public static readonly TypeItem Initialized = new(0, "Initialized", "MarketplaceTransactionStatus.Initialized",
+        "Baslatildi",
+        "bi-hourglass-split", "bg-secondary", 1, isDefault: true);
+
+    public static readonly TypeItem Paid = new(1, "Paid", "MarketplaceTransactionStatus.Paid",
+        "Odendi",
+        "bi-check-circle", "bg-success", 2);
+
+    public static readonly TypeItem Failed = new(2, "Failed", "MarketplaceTransactionStatus.Failed",
+        "Basarisiz",
+        "bi-x-circle", "bg-danger", 3);
+
+    public static readonly TypeItem Refunded = new(3, "Refunded", "MarketplaceTransactionStatus.Refunded",
+        "Iade edildi",
+        "bi-arrow-counterclockwise", "bg-warning text-dark", 4);
+
+    public static readonly TypeItem PartiallyRefunded = new(4, "PartiallyRefunded", "MarketplaceTransactionStatus.PartiallyRefunded",
+        "Kismi iade edildi",
+        "bi-arrow-return-left", "bg-info", 5);
+
+    public static IEnumerable<TypeItem> All => new[] { Initialized, Paid, Failed, Refunded, PartiallyRefunded };
+    public static TypeItem Default => All.First(x => x.IsDefault);
+    public static TypeItem? GetById(int id) => All.FirstOrDefault(x => x.Id == id);
+    public static TypeItem? GetBySystemName(string systemName) => All.FirstOrDefault(x => x.SystemName == systemName);
+
+    public static class Ids
+    {
+        public const int Initialized = 0;
+        public const int Paid = 1;
+        public const int Failed = 2;
+        public const int Refunded = 3;
+        public const int PartiallyRefunded = 4;
+    }
+}
+
+// ============================================================
+// LEDGER ENTRY TYPES (Marketplace muhasebe hareketleri)
+// ============================================================
+public static class LedgerEntryTypes
+{
+    public static readonly TypeItem CustomerCollection = new(1, "CustomerCollection", "LedgerEntryType.CustomerCollection",
+        "Musteriden tahsilat",
+        "bi-credit-card", "bg-success", 1);
+
+    public static readonly TypeItem SellerReceivable = new(2, "SellerReceivable", "LedgerEntryType.SellerReceivable",
+        "Satici alacagi",
+        "bi-bank", "bg-primary", 2);
+
+    public static readonly TypeItem PlatformCommission = new(3, "PlatformCommission", "LedgerEntryType.PlatformCommission",
+        "Platform komisyonu",
+        "bi-percent", "bg-info", 3);
+
+    public static readonly TypeItem ProviderFee = new(4, "ProviderFee", "LedgerEntryType.ProviderFee",
+        "Odeme saglayici kesintisi",
+        "bi-receipt-cutoff", "bg-warning text-dark", 4);
+
+    public static readonly TypeItem Refund = new(5, "Refund", "LedgerEntryType.Refund",
+        "Iade",
+        "bi-arrow-counterclockwise", "bg-danger", 5);
+
+    public static readonly TypeItem Payout = new(6, "Payout", "LedgerEntryType.Payout",
+        "Hak edis odemesi",
+        "bi-cash-coin", "bg-success", 6);
+
+    public static IEnumerable<TypeItem> All => new[] { CustomerCollection, SellerReceivable, PlatformCommission, ProviderFee, Refund, Payout };
+    public static TypeItem? GetById(int id) => All.FirstOrDefault(x => x.Id == id);
+    public static TypeItem? GetBySystemName(string systemName) => All.FirstOrDefault(x => x.SystemName == systemName);
+
+    public static class Ids
+    {
+        public const int CustomerCollection = 1;
+        public const int SellerReceivable = 2;
+        public const int PlatformCommission = 3;
+        public const int ProviderFee = 4;
+        public const int Refund = 5;
+        public const int Payout = 6;
+    }
+}
+
+// ============================================================
+// LEDGER ENTRY STATUSES (Marketplace muhasebe durumlari)
+// ============================================================
+public static class LedgerEntryStatuses
+{
+    public static readonly TypeItem Pending = new(0, "Pending", "LedgerEntryStatus.Pending",
+        "Beklemede",
+        "bi-hourglass", "bg-warning text-dark", 1, isDefault: true);
+
+    public static readonly TypeItem Available = new(1, "Available", "LedgerEntryStatus.Available",
+        "Hak edise hazir",
+        "bi-unlock", "bg-info", 2);
+
+    public static readonly TypeItem Settled = new(2, "Settled", "LedgerEntryStatus.Settled",
+        "Mutabakata alindi",
+        "bi-check2-circle", "bg-success", 3);
+
+    public static readonly TypeItem Cancelled = new(3, "Cancelled", "LedgerEntryStatus.Cancelled",
+        "Iptal edildi",
+        "bi-slash-circle", "bg-secondary", 4);
+
+    public static IEnumerable<TypeItem> All => new[] { Pending, Available, Settled, Cancelled };
+    public static TypeItem Default => All.First(x => x.IsDefault);
+    public static TypeItem? GetById(int id) => All.FirstOrDefault(x => x.Id == id);
+    public static TypeItem? GetBySystemName(string systemName) => All.FirstOrDefault(x => x.SystemName == systemName);
+
+    public static class Ids
+    {
+        public const int Pending = 0;
+        public const int Available = 1;
+        public const int Settled = 2;
+        public const int Cancelled = 3;
+    }
+}
+
+// ============================================================
+// PAYOUT STATUSES (Hak edis durumlari)
+// ============================================================
+public static class PayoutStatuses
+{
+    public static readonly TypeItem Draft = new(0, "Draft", "PayoutStatus.Draft",
+        "Taslak",
+        "bi-file-earmark", "bg-secondary", 1, isDefault: true);
+
+    public static readonly TypeItem Approved = new(1, "Approved", "PayoutStatus.Approved",
+        "Onaylandi",
+        "bi-check-circle", "bg-primary", 2);
+
+    public static readonly TypeItem Paid = new(2, "Paid", "PayoutStatus.Paid",
+        "Odendi",
+        "bi-cash-coin", "bg-success", 3);
+
+    public static readonly TypeItem Cancelled = new(3, "Cancelled", "PayoutStatus.Cancelled",
+        "Iptal edildi",
+        "bi-x-circle", "bg-danger", 4);
+
+    public static IEnumerable<TypeItem> All => new[] { Draft, Approved, Paid, Cancelled };
+    public static TypeItem Default => All.First(x => x.IsDefault);
+    public static TypeItem? GetById(int id) => All.FirstOrDefault(x => x.Id == id);
+    public static TypeItem? GetBySystemName(string systemName) => All.FirstOrDefault(x => x.SystemName == systemName);
+
+    public static class Ids
+    {
+        public const int Draft = 0;
+        public const int Approved = 1;
+        public const int Paid = 2;
+        public const int Cancelled = 3;
+    }
+}
+
+// ============================================================
+// MARKETPLACE REFUND STATUSES (Iade durumlari)
+// ============================================================
+public static class MarketplaceRefundStatuses
+{
+    public static readonly TypeItem Requested = new(0, "Requested", "MarketplaceRefundStatus.Requested",
+        "Talep edildi",
+        "bi-inbox", "bg-warning text-dark", 1, isDefault: true);
+
+    public static readonly TypeItem Approved = new(1, "Approved", "MarketplaceRefundStatus.Approved",
+        "Onaylandi",
+        "bi-check-circle", "bg-primary", 2);
+
+    public static readonly TypeItem Processed = new(2, "Processed", "MarketplaceRefundStatus.Processed",
+        "Islendi",
+        "bi-arrow-counterclockwise", "bg-success", 3);
+
+    public static readonly TypeItem Failed = new(3, "Failed", "MarketplaceRefundStatus.Failed",
+        "Basarisiz",
+        "bi-x-circle", "bg-danger", 4);
+
+    public static readonly TypeItem Rejected = new(4, "Rejected", "MarketplaceRefundStatus.Rejected",
+        "Reddedildi",
+        "bi-slash-circle", "bg-secondary", 5);
+
+    public static IEnumerable<TypeItem> All => new[] { Requested, Approved, Processed, Failed, Rejected };
+    public static TypeItem Default => All.First(x => x.IsDefault);
+    public static TypeItem? GetById(int id) => All.FirstOrDefault(x => x.Id == id);
+    public static TypeItem? GetBySystemName(string systemName) => All.FirstOrDefault(x => x.SystemName == systemName);
+
+    public static class Ids
+    {
+        public const int Requested = 0;
+        public const int Approved = 1;
+        public const int Processed = 2;
+        public const int Failed = 3;
+        public const int Rejected = 4;
+    }
+}

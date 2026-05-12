@@ -433,6 +433,16 @@ namespace ErkanTatilPlani.Data.Migrations
                         .HasMaxLength(100)
                         .HasColumnType("character varying(100)");
 
+                    b.Property<string>("ContactName")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<string>("ContactSurname")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
                     b.Property<string>("ContractFileUrl")
                         .IsRequired()
                         .HasColumnType("text");
@@ -474,12 +484,25 @@ namespace ErkanTatilPlani.Data.Migrations
                     b.Property<string>("GroupDiscountRules")
                         .HasColumnType("text");
 
+                    b.Property<string>("Iban")
+                        .IsRequired()
+                        .HasMaxLength(34)
+                        .HasColumnType("character varying(34)");
+
                     b.Property<bool>("IsActive")
                         .HasColumnType("boolean");
+
+                    b.Property<string>("LegalCompanyTitle")
+                        .IsRequired()
+                        .HasMaxLength(250)
+                        .HasColumnType("character varying(250)");
 
                     b.Property<string>("LogoUrl")
                         .IsRequired()
                         .HasColumnType("text");
+
+                    b.Property<bool>("MarketplaceEnabled")
+                        .HasColumnType("boolean");
 
                     b.Property<string>("MetaDescription")
                         .IsRequired()
@@ -496,9 +519,29 @@ namespace ErkanTatilPlani.Data.Migrations
                         .HasMaxLength(200)
                         .HasColumnType("character varying(200)");
 
+                    b.Property<DateTime?>("OnboardedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("OnboardingErrorCode")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("character varying(50)");
+
+                    b.Property<string>("OnboardingErrorMessage")
+                        .IsRequired()
+                        .HasMaxLength(500)
+                        .HasColumnType("character varying(500)");
+
+                    b.Property<int>("PayoutDelayDays")
+                        .HasColumnType("integer");
+
                     b.Property<string>("Phone")
                         .IsRequired()
                         .HasColumnType("text");
+
+                    b.Property<decimal>("PlatformCommissionRate")
+                        .HasPrecision(5, 2)
+                        .HasColumnType("numeric(5,2)");
 
                     b.Property<string>("RejectionReason")
                         .IsRequired()
@@ -514,6 +557,12 @@ namespace ErkanTatilPlani.Data.Migrations
                     b.Property<int?>("ReviewedById")
                         .HasColumnType("integer");
 
+                    b.Property<int>("SellerLegalTypeId")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("SellerOnboardingStatusId")
+                        .HasColumnType("integer");
+
                     b.Property<string>("Slug")
                         .IsRequired()
                         .HasMaxLength(200)
@@ -526,6 +575,16 @@ namespace ErkanTatilPlani.Data.Migrations
                     b.Property<int>("StatusId")
                         .HasColumnType("integer");
 
+                    b.Property<string>("SubMerchantExternalId")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<string>("SubMerchantKey")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
                     b.Property<string>("Tagline")
                         .IsRequired()
                         .HasMaxLength(200)
@@ -534,6 +593,11 @@ namespace ErkanTatilPlani.Data.Migrations
                     b.Property<string>("TaxNumber")
                         .IsRequired()
                         .HasColumnType("text");
+
+                    b.Property<string>("TaxOffice")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
 
                     b.Property<DateTime?>("UpdatedAt")
                         .HasColumnType("timestamp with time zone");
@@ -552,6 +616,10 @@ namespace ErkanTatilPlani.Data.Migrations
                     b.HasIndex("Slug")
                         .IsUnique();
 
+                    b.HasIndex("SubMerchantExternalId");
+
+                    b.HasIndex("SubMerchantKey");
+
                     b.HasIndex("TaxNumber")
                         .IsUnique();
 
@@ -565,6 +633,8 @@ namespace ErkanTatilPlani.Data.Migrations
                             ApplicationDate = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             ApplicationNotes = "",
                             City = "Izmir",
+                            ContactName = "",
+                            ContactSurname = "",
                             ContractFileUrl = "",
                             CoverImageUrl = "https://picsum.photos/seed/egetur-cover/1200/400",
                             CreatedAt = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
@@ -574,21 +644,33 @@ namespace ErkanTatilPlani.Data.Migrations
                             Email = "info@egetur.com",
                             FoundedYear = 2010,
                             GroupDiscountEnabled = false,
+                            Iban = "",
                             IsActive = true,
+                            LegalCompanyTitle = "",
                             LogoUrl = "https://picsum.photos/seed/egetur/200",
+                            MarketplaceEnabled = false,
                             MetaDescription = "Efes, Pamukkale, Cesme ve tum Ege turlarinda uzman acenta. Gunubirlik ve konaklamali turlar.",
                             MetaTitle = "Ege Tur - Izmir Cikisli Ege Turlari",
                             Name = "Ege Tur",
+                            OnboardingErrorCode = "",
+                            OnboardingErrorMessage = "",
+                            PayoutDelayDays = 7,
                             Phone = "0232 555 1234",
+                            PlatformCommissionRate = 12m,
                             RejectionReason = "",
                             ReviewNotes = "",
                             ReviewedAt = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             ReviewedById = 1,
+                            SellerLegalTypeId = 2,
+                            SellerOnboardingStatusId = 0,
                             Slug = "ege-tur",
                             SocialLinks = "",
                             StatusId = 1,
+                            SubMerchantExternalId = "",
+                            SubMerchantKey = "",
                             Tagline = "Ege'nin Guzelliklerini Kesfedin",
                             TaxNumber = "1234567890",
+                            TaxOffice = "",
                             Website = "www.egetur.com"
                         },
                         new
@@ -598,6 +680,8 @@ namespace ErkanTatilPlani.Data.Migrations
                             ApplicationDate = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             ApplicationNotes = "",
                             City = "Trabzon",
+                            ContactName = "",
+                            ContactSurname = "",
                             ContractFileUrl = "",
                             CoverImageUrl = "https://picsum.photos/seed/karadeniz-cover/1200/400",
                             CreatedAt = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
@@ -607,21 +691,33 @@ namespace ErkanTatilPlani.Data.Migrations
                             Email = "info@karadenizgezileri.com",
                             FoundedYear = 2015,
                             GroupDiscountEnabled = false,
+                            Iban = "",
                             IsActive = true,
+                            LegalCompanyTitle = "",
                             LogoUrl = "https://picsum.photos/seed/karadeniz/200",
+                            MarketplaceEnabled = false,
                             MetaDescription = "Uzungol, Ayder, Sumela ve tum Karadeniz yaylalarini kesfedin. Dogayla ic ice tatil firsatlari.",
                             MetaTitle = "Karadeniz Gezileri - Yayla ve Doga Turlari",
                             Name = "Karadeniz Gezileri",
+                            OnboardingErrorCode = "",
+                            OnboardingErrorMessage = "",
+                            PayoutDelayDays = 7,
                             Phone = "0462 555 5678",
+                            PlatformCommissionRate = 12m,
                             RejectionReason = "",
                             ReviewNotes = "",
                             ReviewedAt = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             ReviewedById = 1,
+                            SellerLegalTypeId = 2,
+                            SellerOnboardingStatusId = 0,
                             Slug = "karadeniz-gezileri",
                             SocialLinks = "",
                             StatusId = 1,
+                            SubMerchantExternalId = "",
+                            SubMerchantKey = "",
                             Tagline = "Yesil Cennetin Kapisi",
                             TaxNumber = "2345678901",
+                            TaxOffice = "",
                             Website = "www.karadenizgezileri.com"
                         },
                         new
@@ -631,6 +727,8 @@ namespace ErkanTatilPlani.Data.Migrations
                             ApplicationDate = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             ApplicationNotes = "",
                             City = "Antalya",
+                            ContactName = "",
+                            ContactSurname = "",
                             ContractFileUrl = "",
                             CoverImageUrl = "https://picsum.photos/seed/akdeniz-cover/1200/400",
                             CreatedAt = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
@@ -640,21 +738,33 @@ namespace ErkanTatilPlani.Data.Migrations
                             Email = "info@akdenizturizm.com",
                             FoundedYear = 2008,
                             GroupDiscountEnabled = false,
+                            Iban = "",
                             IsActive = true,
+                            LegalCompanyTitle = "",
                             LogoUrl = "https://picsum.photos/seed/akdeniz/200",
+                            MarketplaceEnabled = false,
                             MetaDescription = "Kemer, Kas, Kekova tekne turlari. Akdeniz'in en guzel koylarini ve antik kentleri kesfedin.",
                             MetaTitle = "Akdeniz Turizm - Antalya Tekne ve Kultur Turlari",
                             Name = "Akdeniz Turizm",
+                            OnboardingErrorCode = "",
+                            OnboardingErrorMessage = "",
+                            PayoutDelayDays = 7,
                             Phone = "0242 555 9012",
+                            PlatformCommissionRate = 12m,
                             RejectionReason = "",
                             ReviewNotes = "",
                             ReviewedAt = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             ReviewedById = 1,
+                            SellerLegalTypeId = 2,
+                            SellerOnboardingStatusId = 0,
                             Slug = "akdeniz-turizm",
                             SocialLinks = "",
                             StatusId = 1,
+                            SubMerchantExternalId = "",
+                            SubMerchantKey = "",
                             Tagline = "Akdeniz'in Mavisiyle Tanisin",
                             TaxNumber = "3456789012",
+                            TaxOffice = "",
                             Website = "www.akdenizturizm.com"
                         },
                         new
@@ -664,6 +774,8 @@ namespace ErkanTatilPlani.Data.Migrations
                             ApplicationDate = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             ApplicationNotes = "",
                             City = "Nevsehir",
+                            ContactName = "",
+                            ContactSurname = "",
                             ContractFileUrl = "",
                             CoverImageUrl = "https://picsum.photos/seed/kapadokya-cover/1200/400",
                             CreatedAt = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
@@ -673,21 +785,33 @@ namespace ErkanTatilPlani.Data.Migrations
                             Email = "info@kapadokyabalonlari.com",
                             FoundedYear = 2012,
                             GroupDiscountEnabled = false,
+                            Iban = "",
                             IsActive = true,
+                            LegalCompanyTitle = "",
                             LogoUrl = "https://picsum.photos/seed/kapadokya/200",
+                            MarketplaceEnabled = false,
                             MetaDescription = "Kapadokya balon turu, yeralti sehirleri, ATV safari. Peri bacalari uzerinde unutulmaz deneyim.",
                             MetaTitle = "Kapadokya Balonlari - Sicak Hava Balonu ve Tur",
                             Name = "Kapadokya Balonlari",
+                            OnboardingErrorCode = "",
+                            OnboardingErrorMessage = "",
+                            PayoutDelayDays = 7,
                             Phone = "0384 555 3456",
+                            PlatformCommissionRate = 12m,
                             RejectionReason = "",
                             ReviewNotes = "",
                             ReviewedAt = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             ReviewedById = 1,
+                            SellerLegalTypeId = 2,
+                            SellerOnboardingStatusId = 0,
                             Slug = "kapadokya-balonlari",
                             SocialLinks = "",
                             StatusId = 1,
+                            SubMerchantExternalId = "",
+                            SubMerchantKey = "",
                             Tagline = "Gokyuzunden Kapadokya",
                             TaxNumber = "4567890123",
+                            TaxOffice = "",
                             Website = "www.kapadokyabalonlari.com"
                         },
                         new
@@ -697,6 +821,8 @@ namespace ErkanTatilPlani.Data.Migrations
                             ApplicationDate = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             ApplicationNotes = "",
                             City = "Istanbul",
+                            ContactName = "",
+                            ContactSurname = "",
                             ContractFileUrl = "",
                             CoverImageUrl = "https://picsum.photos/seed/istanbul-cover/1200/400",
                             CreatedAt = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
@@ -706,21 +832,33 @@ namespace ErkanTatilPlani.Data.Migrations
                             Email = "info@istanbulturlari.com",
                             FoundedYear = 2005,
                             GroupDiscountEnabled = false,
+                            Iban = "",
                             IsActive = true,
+                            LegalCompanyTitle = "",
                             LogoUrl = "https://picsum.photos/seed/istanbul/200",
+                            MarketplaceEnabled = false,
                             MetaDescription = "Sultanahmet, Ayasofya, Topkapi Sarayi, Bogaz turu. Istanbul'un tum guzelliklerini kesfedin.",
                             MetaTitle = "Istanbul Turlari - Tarihi Yarimada ve Bogaz Turu",
                             Name = "Istanbul Turlari",
+                            OnboardingErrorCode = "",
+                            OnboardingErrorMessage = "",
+                            PayoutDelayDays = 7,
                             Phone = "0212 555 7890",
+                            PlatformCommissionRate = 12m,
                             RejectionReason = "",
                             ReviewNotes = "",
                             ReviewedAt = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             ReviewedById = 1,
+                            SellerLegalTypeId = 2,
+                            SellerOnboardingStatusId = 0,
                             Slug = "istanbul-turlari",
                             SocialLinks = "",
                             StatusId = 1,
+                            SubMerchantExternalId = "",
+                            SubMerchantKey = "",
                             Tagline = "Iki Kitanin Kesisim Noktasi",
                             TaxNumber = "5678901234",
+                            TaxOffice = "",
                             Website = "www.istanbulturlari.com"
                         });
                 });
@@ -1628,6 +1766,174 @@ namespace ErkanTatilPlani.Data.Migrations
                     b.ToTable("LoyaltyTierHistories");
                 });
 
+            modelBuilder.Entity("ErkanTatilPlani.Core.Entities.MarketplaceLedgerEntry", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<decimal>("Amount")
+                        .HasPrecision(18, 2)
+                        .HasColumnType("numeric(18,2)");
+
+                    b.Property<DateTime?>("AvailableAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<int?>("CompanyId")
+                        .HasColumnType("integer");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("Currency")
+                        .IsRequired()
+                        .HasMaxLength(3)
+                        .HasColumnType("character varying(3)");
+
+                    b.Property<string>("Description")
+                        .IsRequired()
+                        .HasMaxLength(500)
+                        .HasColumnType("character varying(500)");
+
+                    b.Property<int>("EntryTypeId")
+                        .HasColumnType("integer");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("boolean");
+
+                    b.Property<DateTime>("OccurredAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<int?>("PaymentTransactionId")
+                        .HasColumnType("integer");
+
+                    b.Property<int?>("PayoutBatchId")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("Reference")
+                        .IsRequired()
+                        .HasMaxLength(150)
+                        .HasColumnType("character varying(150)");
+
+                    b.Property<int?>("ReservationId")
+                        .HasColumnType("integer");
+
+                    b.Property<DateTime?>("SettledAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<int>("StatusId")
+                        .HasColumnType("integer");
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("AvailableAt");
+
+                    b.HasIndex("CompanyId");
+
+                    b.HasIndex("PaymentTransactionId");
+
+                    b.HasIndex("PayoutBatchId");
+
+                    b.HasIndex("ReservationId");
+
+                    b.HasIndex("StatusId");
+
+                    b.ToTable("MarketplaceLedgerEntries");
+                });
+
+            modelBuilder.Entity("ErkanTatilPlani.Core.Entities.MarketplaceRefund", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<decimal>("Amount")
+                        .HasPrecision(18, 2)
+                        .HasColumnType("numeric(18,2)");
+
+                    b.Property<int>("CompanyId")
+                        .HasColumnType("integer");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("Currency")
+                        .IsRequired()
+                        .HasMaxLength(3)
+                        .HasColumnType("character varying(3)");
+
+                    b.Property<string>("ErrorCode")
+                        .HasMaxLength(50)
+                        .HasColumnType("character varying(50)");
+
+                    b.Property<string>("ErrorMessage")
+                        .HasMaxLength(500)
+                        .HasColumnType("character varying(500)");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("boolean");
+
+                    b.Property<int>("PaymentTransactionId")
+                        .HasColumnType("integer");
+
+                    b.Property<DateTime?>("ProcessedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<int?>("ProcessedById")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("ProviderPaymentTransactionId")
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<string>("ProviderRefundId")
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<string>("Reason")
+                        .IsRequired()
+                        .HasMaxLength(500)
+                        .HasColumnType("character varying(500)");
+
+                    b.Property<DateTime>("RequestedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<int?>("RequestedById")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("ReservationId")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("StatusId")
+                        .HasColumnType("integer");
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CompanyId");
+
+                    b.HasIndex("PaymentTransactionId");
+
+                    b.HasIndex("ProcessedById");
+
+                    b.HasIndex("RequestedById");
+
+                    b.HasIndex("ReservationId");
+
+                    b.HasIndex("StatusId");
+
+                    b.ToTable("MarketplaceRefunds");
+                });
+
             modelBuilder.Entity("ErkanTatilPlani.Core.Entities.Message", b =>
                 {
                     b.Property<int>("Id")
@@ -1774,6 +2080,343 @@ namespace ErkanTatilPlani.Data.Migrations
                     b.HasIndex("VisitorId", "IsRead");
 
                     b.ToTable("Notifications");
+                });
+
+            modelBuilder.Entity("ErkanTatilPlani.Core.Entities.PaymentLineItem", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<decimal>("BlockageRate")
+                        .HasPrecision(5, 2)
+                        .HasColumnType("numeric(5,2)");
+
+                    b.Property<decimal>("BlockageRateAmountMerchant")
+                        .HasPrecision(18, 2)
+                        .HasColumnType("numeric(18,2)");
+
+                    b.Property<decimal>("BlockageRateAmountSubMerchant")
+                        .HasPrecision(18, 2)
+                        .HasColumnType("numeric(18,2)");
+
+                    b.Property<DateTime?>("BlockageResolvedDate")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<int>("CompanyId")
+                        .HasColumnType("integer");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("ExternalSubMerchantId")
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("boolean");
+
+                    b.Property<string>("ItemId")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<string>("ItemName")
+                        .IsRequired()
+                        .HasMaxLength(250)
+                        .HasColumnType("character varying(250)");
+
+                    b.Property<decimal>("IyziCommissionFee")
+                        .HasPrecision(18, 2)
+                        .HasColumnType("numeric(18,2)");
+
+                    b.Property<decimal>("IyziCommissionRateAmount")
+                        .HasPrecision(18, 2)
+                        .HasColumnType("numeric(18,2)");
+
+                    b.Property<decimal>("MerchantPayoutAmount")
+                        .HasPrecision(18, 2)
+                        .HasColumnType("numeric(18,2)");
+
+                    b.Property<decimal>("PaidPrice")
+                        .HasPrecision(18, 2)
+                        .HasColumnType("numeric(18,2)");
+
+                    b.Property<int>("PaymentTransactionId")
+                        .HasColumnType("integer");
+
+                    b.Property<decimal>("PlatformCommissionAmount")
+                        .HasPrecision(18, 2)
+                        .HasColumnType("numeric(18,2)");
+
+                    b.Property<decimal>("Price")
+                        .HasPrecision(18, 2)
+                        .HasColumnType("numeric(18,2)");
+
+                    b.Property<string>("ProviderPaymentTransactionId")
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<int>("ProviderTransactionStatus")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("ReservationId")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("SubMerchantKey")
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<decimal>("SubMerchantPayoutAmount")
+                        .HasPrecision(18, 2)
+                        .HasColumnType("numeric(18,2)");
+
+                    b.Property<decimal>("SubMerchantPayoutRate")
+                        .HasPrecision(5, 2)
+                        .HasColumnType("numeric(5,2)");
+
+                    b.Property<decimal>("SubMerchantPrice")
+                        .HasPrecision(18, 2)
+                        .HasColumnType("numeric(18,2)");
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<decimal>("WithholdingTax")
+                        .HasPrecision(18, 2)
+                        .HasColumnType("numeric(18,2)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CompanyId");
+
+                    b.HasIndex("PaymentTransactionId");
+
+                    b.HasIndex("ProviderPaymentTransactionId");
+
+                    b.HasIndex("ReservationId");
+
+                    b.ToTable("PaymentLineItems");
+                });
+
+            modelBuilder.Entity("ErkanTatilPlani.Core.Entities.PaymentTransaction", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("BuyerIp")
+                        .HasMaxLength(45)
+                        .HasColumnType("character varying(45)");
+
+                    b.Property<DateTime?>("CallbackReceivedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<int>("CompanyId")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("ConversationId")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("Currency")
+                        .IsRequired()
+                        .HasMaxLength(3)
+                        .HasColumnType("character varying(3)");
+
+                    b.Property<string>("ErrorCode")
+                        .HasMaxLength(50)
+                        .HasColumnType("character varying(50)");
+
+                    b.Property<string>("ErrorMessage")
+                        .HasMaxLength(500)
+                        .HasColumnType("character varying(500)");
+
+                    b.Property<DateTime?>("FailedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<decimal>("GrossAmount")
+                        .HasPrecision(18, 2)
+                        .HasColumnType("numeric(18,2)");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("boolean");
+
+                    b.Property<decimal>("IyziCommissionFee")
+                        .HasPrecision(18, 2)
+                        .HasColumnType("numeric(18,2)");
+
+                    b.Property<decimal>("IyziCommissionRateAmount")
+                        .HasPrecision(18, 2)
+                        .HasColumnType("numeric(18,2)");
+
+                    b.Property<decimal>("PaidAmount")
+                        .HasPrecision(18, 2)
+                        .HasColumnType("numeric(18,2)");
+
+                    b.Property<DateTime?>("PaidAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("PaymentId")
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<string>("PaymentToken")
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)");
+
+                    b.Property<decimal>("PlatformCommissionAmount")
+                        .HasPrecision(18, 2)
+                        .HasColumnType("numeric(18,2)");
+
+                    b.Property<decimal>("PlatformCommissionRate")
+                        .HasPrecision(5, 2)
+                        .HasColumnType("numeric(5,2)");
+
+                    b.Property<string>("Provider")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("character varying(50)");
+
+                    b.Property<decimal>("RefundedAmount")
+                        .HasPrecision(18, 2)
+                        .HasColumnType("numeric(18,2)");
+
+                    b.Property<DateTime?>("RefundedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<int>("ReservationId")
+                        .HasColumnType("integer");
+
+                    b.Property<decimal>("SellerReceivableAmount")
+                        .HasPrecision(18, 2)
+                        .HasColumnType("numeric(18,2)");
+
+                    b.Property<int>("StatusId")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("TypeId")
+                        .HasColumnType("integer");
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<int>("VisitorId")
+                        .HasColumnType("integer");
+
+                    b.Property<decimal>("WithholdingTax")
+                        .HasPrecision(18, 2)
+                        .HasColumnType("numeric(18,2)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CompanyId");
+
+                    b.HasIndex("ConversationId");
+
+                    b.HasIndex("PaymentId");
+
+                    b.HasIndex("PaymentToken");
+
+                    b.HasIndex("ReservationId");
+
+                    b.HasIndex("VisitorId");
+
+                    b.ToTable("PaymentTransactions");
+                });
+
+            modelBuilder.Entity("ErkanTatilPlani.Core.Entities.PayoutBatch", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime?>("ApprovedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<int?>("ApprovedById")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("BankReference")
+                        .HasMaxLength(150)
+                        .HasColumnType("character varying(150)");
+
+                    b.Property<string>("BatchNumber")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("character varying(50)");
+
+                    b.Property<int>("CompanyId")
+                        .HasColumnType("integer");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("Currency")
+                        .IsRequired()
+                        .HasMaxLength(3)
+                        .HasColumnType("character varying(3)");
+
+                    b.Property<decimal>("GrossAmount")
+                        .HasPrecision(18, 2)
+                        .HasColumnType("numeric(18,2)");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("boolean");
+
+                    b.Property<decimal>("NetAmount")
+                        .HasPrecision(18, 2)
+                        .HasColumnType("numeric(18,2)");
+
+                    b.Property<string>("Notes")
+                        .HasMaxLength(500)
+                        .HasColumnType("character varying(500)");
+
+                    b.Property<DateTime?>("PaidAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<DateTime>("PeriodEnd")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<DateTime>("PeriodStart")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<decimal>("PlatformCommissionAmount")
+                        .HasPrecision(18, 2)
+                        .HasColumnType("numeric(18,2)");
+
+                    b.Property<decimal>("RefundAmount")
+                        .HasPrecision(18, 2)
+                        .HasColumnType("numeric(18,2)");
+
+                    b.Property<int>("StatusId")
+                        .HasColumnType("integer");
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ApprovedById");
+
+                    b.HasIndex("BatchNumber")
+                        .IsUnique();
+
+                    b.HasIndex("CompanyId");
+
+                    b.HasIndex("StatusId");
+
+                    b.ToTable("PayoutBatches");
                 });
 
             modelBuilder.Entity("ErkanTatilPlani.Core.Entities.Promotion", b =>
@@ -4429,6 +5072,78 @@ namespace ErkanTatilPlani.Data.Migrations
                     b.Navigation("Visitor");
                 });
 
+            modelBuilder.Entity("ErkanTatilPlani.Core.Entities.MarketplaceLedgerEntry", b =>
+                {
+                    b.HasOne("ErkanTatilPlani.Core.Entities.Company", "Company")
+                        .WithMany("LedgerEntries")
+                        .HasForeignKey("CompanyId")
+                        .OnDelete(DeleteBehavior.SetNull);
+
+                    b.HasOne("ErkanTatilPlani.Core.Entities.PaymentTransaction", "PaymentTransaction")
+                        .WithMany("LedgerEntries")
+                        .HasForeignKey("PaymentTransactionId")
+                        .OnDelete(DeleteBehavior.SetNull);
+
+                    b.HasOne("ErkanTatilPlani.Core.Entities.PayoutBatch", "PayoutBatch")
+                        .WithMany("LedgerEntries")
+                        .HasForeignKey("PayoutBatchId")
+                        .OnDelete(DeleteBehavior.SetNull);
+
+                    b.HasOne("ErkanTatilPlani.Core.Entities.Reservation", "Reservation")
+                        .WithMany("LedgerEntries")
+                        .HasForeignKey("ReservationId")
+                        .OnDelete(DeleteBehavior.SetNull);
+
+                    b.Navigation("Company");
+
+                    b.Navigation("PaymentTransaction");
+
+                    b.Navigation("PayoutBatch");
+
+                    b.Navigation("Reservation");
+                });
+
+            modelBuilder.Entity("ErkanTatilPlani.Core.Entities.MarketplaceRefund", b =>
+                {
+                    b.HasOne("ErkanTatilPlani.Core.Entities.Company", "Company")
+                        .WithMany("MarketplaceRefunds")
+                        .HasForeignKey("CompanyId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("ErkanTatilPlani.Core.Entities.PaymentTransaction", "PaymentTransaction")
+                        .WithMany("Refunds")
+                        .HasForeignKey("PaymentTransactionId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("ErkanTatilPlani.Core.Entities.Visitor", "ProcessedBy")
+                        .WithMany()
+                        .HasForeignKey("ProcessedById")
+                        .OnDelete(DeleteBehavior.SetNull);
+
+                    b.HasOne("ErkanTatilPlani.Core.Entities.Visitor", "RequestedBy")
+                        .WithMany()
+                        .HasForeignKey("RequestedById")
+                        .OnDelete(DeleteBehavior.SetNull);
+
+                    b.HasOne("ErkanTatilPlani.Core.Entities.Reservation", "Reservation")
+                        .WithMany("MarketplaceRefunds")
+                        .HasForeignKey("ReservationId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Company");
+
+                    b.Navigation("PaymentTransaction");
+
+                    b.Navigation("ProcessedBy");
+
+                    b.Navigation("RequestedBy");
+
+                    b.Navigation("Reservation");
+                });
+
             modelBuilder.Entity("ErkanTatilPlani.Core.Entities.Message", b =>
                 {
                     b.HasOne("ErkanTatilPlani.Core.Entities.Conversation", "Conversation")
@@ -4468,6 +5183,78 @@ namespace ErkanTatilPlani.Data.Migrations
                         .IsRequired();
 
                     b.Navigation("Visitor");
+                });
+
+            modelBuilder.Entity("ErkanTatilPlani.Core.Entities.PaymentLineItem", b =>
+                {
+                    b.HasOne("ErkanTatilPlani.Core.Entities.Company", "Company")
+                        .WithMany()
+                        .HasForeignKey("CompanyId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("ErkanTatilPlani.Core.Entities.PaymentTransaction", "PaymentTransaction")
+                        .WithMany("LineItems")
+                        .HasForeignKey("PaymentTransactionId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("ErkanTatilPlani.Core.Entities.Reservation", "Reservation")
+                        .WithMany()
+                        .HasForeignKey("ReservationId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Company");
+
+                    b.Navigation("PaymentTransaction");
+
+                    b.Navigation("Reservation");
+                });
+
+            modelBuilder.Entity("ErkanTatilPlani.Core.Entities.PaymentTransaction", b =>
+                {
+                    b.HasOne("ErkanTatilPlani.Core.Entities.Company", "Company")
+                        .WithMany("PaymentTransactions")
+                        .HasForeignKey("CompanyId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("ErkanTatilPlani.Core.Entities.Reservation", "Reservation")
+                        .WithMany("PaymentTransactions")
+                        .HasForeignKey("ReservationId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("ErkanTatilPlani.Core.Entities.Visitor", "Visitor")
+                        .WithMany()
+                        .HasForeignKey("VisitorId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Company");
+
+                    b.Navigation("Reservation");
+
+                    b.Navigation("Visitor");
+                });
+
+            modelBuilder.Entity("ErkanTatilPlani.Core.Entities.PayoutBatch", b =>
+                {
+                    b.HasOne("ErkanTatilPlani.Core.Entities.Visitor", "ApprovedBy")
+                        .WithMany()
+                        .HasForeignKey("ApprovedById")
+                        .OnDelete(DeleteBehavior.SetNull);
+
+                    b.HasOne("ErkanTatilPlani.Core.Entities.Company", "Company")
+                        .WithMany("PayoutBatches")
+                        .HasForeignKey("CompanyId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("ApprovedBy");
+
+                    b.Navigation("Company");
                 });
 
             modelBuilder.Entity("ErkanTatilPlani.Core.Entities.Promotion", b =>
@@ -4997,9 +5784,17 @@ namespace ErkanTatilPlani.Data.Migrations
 
                     b.Navigation("Guides");
 
+                    b.Navigation("LedgerEntries");
+
+                    b.Navigation("MarketplaceRefunds");
+
                     b.Navigation("MessageTemplates");
 
                     b.Navigation("Pages");
+
+                    b.Navigation("PaymentTransactions");
+
+                    b.Navigation("PayoutBatches");
 
                     b.Navigation("Tours");
                 });
@@ -5024,9 +5819,32 @@ namespace ErkanTatilPlani.Data.Migrations
                     b.Navigation("Assignments");
                 });
 
+            modelBuilder.Entity("ErkanTatilPlani.Core.Entities.PaymentTransaction", b =>
+                {
+                    b.Navigation("LedgerEntries");
+
+                    b.Navigation("LineItems");
+
+                    b.Navigation("Refunds");
+                });
+
+            modelBuilder.Entity("ErkanTatilPlani.Core.Entities.PayoutBatch", b =>
+                {
+                    b.Navigation("LedgerEntries");
+                });
+
             modelBuilder.Entity("ErkanTatilPlani.Core.Entities.Promotion", b =>
                 {
                     b.Navigation("Usages");
+                });
+
+            modelBuilder.Entity("ErkanTatilPlani.Core.Entities.Reservation", b =>
+                {
+                    b.Navigation("LedgerEntries");
+
+                    b.Navigation("MarketplaceRefunds");
+
+                    b.Navigation("PaymentTransactions");
                 });
 
             modelBuilder.Entity("ErkanTatilPlani.Core.Entities.ReviewReply", b =>

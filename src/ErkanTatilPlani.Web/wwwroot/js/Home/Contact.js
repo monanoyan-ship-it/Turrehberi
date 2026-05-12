@@ -7,11 +7,20 @@ function ContactViewModel() {
     self.message = ko.observable('');
     self.sending = ko.observable(false);
 
+    self.syncFromDom = function() {
+        var root = $('#contactApp');
+        self.name((root.find('[data-field="name"]').val() || '').trim());
+        self.email((root.find('[data-field="email"]').val() || '').trim());
+        self.subject(root.find('[data-field="subject"]').val() || '');
+        self.message((root.find('[data-field="message"]').val() || '').trim());
+    };
+
     self.canSend = ko.computed(function() {
-        return self.name().trim() && self.email().trim() && self.subject() && self.message().trim() && !self.sending();
+        return !!(self.name().trim() && self.email().trim() && self.subject() && self.message().trim() && !self.sending());
     });
 
     self.send = function() {
+        self.syncFromDom();
         if (!self.canSend()) return;
         self.sending(true);
 
@@ -26,13 +35,13 @@ function ContactViewModel() {
                 message: self.message()
             })
         }).done(function() {
-            toastr.success(T('Contact.SuccessMessage') || 'Mesajiniz basariyla gonderildi. En kisa surede donus yapacagiz.');
+            toastr.success(TL('Contact.SuccessMessage', 'Mesajiniz basariyla gonderildi. En kisa surede donus yapacagiz.'));
             self.name('');
             self.email('');
             self.subject('');
             self.message('');
         }).fail(function() {
-            toastr.error(T('Contact.ErrorMessage') || 'Mesaj gonderilemedi. Lutfen tekrar deneyin.');
+            toastr.error(TL('Contact.ErrorMessage', 'Mesaj gonderilemedi. Lutfen tekrar deneyin.'));
         }).always(function() {
             self.sending(false);
         });

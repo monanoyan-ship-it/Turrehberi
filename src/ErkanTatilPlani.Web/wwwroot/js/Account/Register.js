@@ -24,7 +24,62 @@ function RegisterViewModel() {
     self.acceptTerms = ko.observable(false);
     self.isLoading = ko.observable(false);
 
+    self.syncFromDom = function() {
+        var root = $('#registerApp');
+        function field(name, trim) {
+            var value = root.find('[data-field="' + name + '"]').val() || '';
+            return trim === false ? value : value.trim();
+        }
+
+        self.userType(root.find('input[name="userType"]:checked').val() || self.userType());
+        self.firstName(field('firstName'));
+        self.lastName(field('lastName'));
+        self.email(field('email'));
+        self.phone(field('phone'));
+        self.password(field('password', false));
+        self.passwordConfirm(field('passwordConfirm', false));
+        self.companyName(field('companyName'));
+        self.companyTaxNumber(field('companyTaxNumber'));
+        self.companyEmail(field('companyEmail'));
+        self.companyPhone(field('companyPhone'));
+        self.companyAddress(field('companyAddress'));
+        self.companyWebsite(field('companyWebsite'));
+        self.acceptTerms($('#termsCheck').is(':checked'));
+    };
+
+    self.redirectAfterRegister = function(user) {
+        if (user.userTypeId === 1) {
+            window.location.href = '/MyCompany';
+        } else {
+            window.location.href = '/';
+        }
+    };
+
+    self.setWebAuthToken = function(response) {
+        $.ajax({
+            url: '/Account/SetAuthToken',
+            method: 'POST',
+            contentType: 'application/json',
+            data: JSON.stringify({ token: response.token })
+        }).done(function() {
+            toastr.success(T('Register.Success', response.user.firstName));
+            self.redirectAfterRegister(response.user);
+        }).fail(function(xhr) {
+            if (xhr.status === 404 || xhr.status === 405) {
+                toastr.success(T('Register.Success', response.user.firstName));
+                self.redirectAfterRegister(response.user);
+                return;
+            }
+            localStorage.removeItem('token');
+            localStorage.removeItem('user');
+            toastr.error(T('Register.Error.Failed'));
+            self.isLoading(false);
+        });
+    };
+
     self.register = function() {
+        self.syncFromDom();
+
         // Genel validasyonlar
         if (!self.firstName() || !self.lastName()) {
             toastr.error(T('Register.Error.NameRequired'));
@@ -102,14 +157,7 @@ function RegisterViewModel() {
             success: function(response) {
                 localStorage.setItem('token', response.token);
                 localStorage.setItem('user', JSON.stringify(response.user));
-                toastr.success(T('Register.Success', response.user.firstName));
-
-                // Kullanici tipine gore yonlendir
-                if (response.user.userTypeId === 1) {
-                    window.location.href = '/MyCompany';
-                } else {
-                    window.location.href = '/';
-                }
+                self.setWebAuthToken(response);
             },
             error: function(xhr) {
                 var msg = xhr.responseJSON?.error || T('Register.Error.Failed');

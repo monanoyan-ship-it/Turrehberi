@@ -6,7 +6,7 @@
     ViewData["OgType"] = "product";
 }
 
-<div id="tourDetailApp">
+<div id="tourDetailApp" data-tour-id="@ViewBag.TourId">
 
 <!-- Loading -->
 <div data-bind="visible: isLoading" class="text-center py-5">
@@ -159,8 +159,8 @@
             <div class="card mb-4">
                 <div class="card-body">
                     <h5><i class="bi bi-geo-alt"></i> <span data-t="TourDetail.MeetingPoint">Bulusma Noktasi</span></h5>
-                    <!-- ko if: meetingPoint -->
-                    <p class="text-muted mb-2" data-bind="text: meetingPoint"></p>
+                    <!-- ko if: meetingPointAddress -->
+                    <p class="text-muted mb-2" data-bind="text: meetingPointAddress"></p>
                     <!-- /ko -->
                     <div id="tourMap" style="height: 300px; border-radius: 8px;"></div>
                 </div>
@@ -989,8 +989,5 @@
 </style>
 
 @section Scripts {
-<script>
-    var tourId = @ViewBag.TourId;
-</script>
 <script src="~/js/Tours/Details.js" asp-append-version="true"></script>
 }

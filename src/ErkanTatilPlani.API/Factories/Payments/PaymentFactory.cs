@@ -12,6 +12,7 @@ namespace ErkanTatilPlani.API.Factories.Payments;
 public class PaymentFactory : IPaymentFactory
 {
     private readonly IReservationEntityService _reservationService;
+    private readonly IMarketplaceFinanceEntityService _marketplaceFinanceService;
     private readonly IPaymentService _paymentService;
     private readonly IEmailService _emailService;
     private readonly IUnitOfWork _unitOfWork;
@@ -20,6 +21,7 @@ public class PaymentFactory : IPaymentFactory
 
     public PaymentFactory(
         IReservationEntityService reservationService,
+        IMarketplaceFinanceEntityService marketplaceFinanceService,
         IPaymentService paymentService,
         IEmailService emailService,
         IUnitOfWork unitOfWork,
@@ -27,6 +29,7 @@ public class PaymentFactory : IPaymentFactory
         IConfiguration configuration)
     {
         _reservationService = reservationService;
+        _marketplaceFinanceService = marketplaceFinanceService;
         _paymentService = paymentService;
         _emailService = emailService;
         _unitOfWork = unitOfWork;
@@ -51,20 +54,12 @@ public class PaymentFactory : IPaymentFactory
             return (false, new { message = "Error.CannotPayCancelledReservation" }, 400);
 
         var callbackUrl = $"{scheme}://{host}/api/payments/callback";
-        var paymentRequest = new PaymentRequest
-        {
-            ReservationId = reservation.Id,
-            Amount = reservation.TotalPrice,
-            CustomerEmail = reservation.Visitor.Email,
-            CustomerName = reservation.Visitor.FirstName,
-            CustomerSurname = reservation.Visitor.LastName,
-            CustomerPhone = reservation.Visitor.Phone ?? "",
-            CustomerIp = "127.0.0.1",
-            CustomerAddress = reservation.Visitor.Address ?? "",
-            ProductName = reservation.Tour.Name,
-            ProductCategory = "Tur",
-            CallbackUrl = callbackUrl
-        };
+        var (transaction, paymentRequest) = await CreateMarketplacePaymentRequestAsync(
+            reservation,
+            reservation.TotalPrice,
+            PaymentTransactionTypes.Ids.FullPayment,
+            reservation.Tour.Name,
+            callbackUrl);
 
         var result = await _paymentService.InitializePaymentAsync(paymentRequest);
 
@@ -72,9 +67,18 @@ public class PaymentFactory : IPaymentFactory
         {
             reservation.PaymentToken = result.Token;
             reservation.UpdatedAt = DateTime.UtcNow;
+            transaction.PaymentToken = result.Token;
+            transaction.UpdatedAt = DateTime.UtcNow;
             await _unitOfWork.SaveChangesAsync();
             return (true, new { success = true, paymentPageUrl = result.PaymentPageUrl, token = result.Token }, 200);
         }
+
+        transaction.StatusId = MarketplaceTransactionStatuses.Ids.Failed;
+        transaction.ErrorCode = result.ErrorCode;
+        transaction.ErrorMessage = result.ErrorMessage;
+        transaction.FailedAt = DateTime.UtcNow;
+        transaction.UpdatedAt = DateTime.UtcNow;
+        await _unitOfWork.SaveChangesAsync();
 
         return (false, new { success = false, message = result.ErrorMessage, errorCode = result.ErrorCode }, 400);
     }
@@ -97,20 +101,12 @@ public class PaymentFactory : IPaymentFactory
             return (false, new { message = "Error.NoRemainingBalance" }, 400);
 
         var callbackUrl = $"{scheme}://{host}/api/payments/callback";
-        var paymentRequest = new PaymentRequest
-        {
-            ReservationId = reservation.Id,
-            Amount = remainingAmount,
-            CustomerEmail = reservation.Visitor.Email,
-            CustomerName = reservation.Visitor.FirstName,
-            CustomerSurname = reservation.Visitor.LastName,
-            CustomerPhone = reservation.Visitor.Phone ?? "",
-            CustomerIp = "127.0.0.1",
-            CustomerAddress = reservation.Visitor.Address ?? "",
-            ProductName = $"{reservation.Tour.Name} - Remaining Payment",
-            ProductCategory = "Tur",
-            CallbackUrl = callbackUrl
-        };
+        var (transaction, paymentRequest) = await CreateMarketplacePaymentRequestAsync(
+            reservation,
+            remainingAmount,
+            PaymentTransactionTypes.Ids.RemainingBalance,
+            $"{reservation.Tour.Name} - Remaining Payment",
+            callbackUrl);
 
         var result = await _paymentService.InitializePaymentAsync(paymentRequest);
 
@@ -118,9 +114,18 @@ public class PaymentFactory : IPaymentFactory
         {
             reservation.PaymentToken = result.Token;
             reservation.UpdatedAt = DateTime.UtcNow;
+            transaction.PaymentToken = result.Token;
+            transaction.UpdatedAt = DateTime.UtcNow;
             await _unitOfWork.SaveChangesAsync();
             return (true, new { success = true, paymentPageUrl = result.PaymentPageUrl, token = result.Token, remainingAmount }, 200);
         }
+
+        transaction.StatusId = MarketplaceTransactionStatuses.Ids.Failed;
+        transaction.ErrorCode = result.ErrorCode;
+        transaction.ErrorMessage = result.ErrorMessage;
+        transaction.FailedAt = DateTime.UtcNow;
+        transaction.UpdatedAt = DateTime.UtcNow;
+        await _unitOfWork.SaveChangesAsync();
 
         return (false, new { success = false, message = result.ErrorMessage, errorCode = result.ErrorCode }, 400);
     }
@@ -129,11 +134,13 @@ public class PaymentFactory : IPaymentFactory
     {
         _logger.LogInformation("Payment callback received for token: {Token}", token);
 
+        var transaction = await _marketplaceFinanceService.GetTransactionByTokenAsync(token);
         var result = await _paymentService.ProcessCallbackAsync(token);
+        var reservationId = result.ReservationId > 0 ? result.ReservationId : transaction?.ReservationId ?? 0;
 
         if (result.Success)
         {
-            var reservation = await _reservationService.GetByIdWithDetailsAsync(result.ReservationId);
+            var reservation = transaction?.Reservation ?? await _reservationService.GetByIdWithDetailsAsync(reservationId);
 
             if (reservation != null)
             {
@@ -147,6 +154,7 @@ public class PaymentFactory : IPaymentFactory
                     : PaymentStatuses.Ids.DepositPaid;
 
                 reservation.Status = ReservationStatuses.Ids.Confirmed;
+                UpdateSuccessfulMarketplaceTransaction(transaction, result, reservation);
                 await _unitOfWork.SaveChangesAsync();
 
                 var emailModel = new ReservationEmailModel
@@ -166,15 +174,25 @@ public class PaymentFactory : IPaymentFactory
                 };
                 await _emailService.SendReservationConfirmedEmailAsync(emailModel);
 
-                _logger.LogInformation("Payment successful for reservation {ReservationId}", result.ReservationId);
-                return (true, $"{_webBaseUrl}/Account/PaymentResult?status=success&reservationId={result.ReservationId}");
+                _logger.LogInformation("Payment successful for reservation {ReservationId}", reservation.Id);
+                return (true, $"{_webBaseUrl}/Account/PaymentResult?status=success&reservationId={reservation.Id}");
             }
         }
         else
         {
-            if (result.ReservationId > 0)
+            if (transaction != null)
             {
-                var reservation = await _reservationService.GetByIdAsync(result.ReservationId);
+                transaction.StatusId = MarketplaceTransactionStatuses.Ids.Failed;
+                transaction.ErrorCode = result.ErrorCode;
+                transaction.ErrorMessage = result.ErrorMessage;
+                transaction.FailedAt = DateTime.UtcNow;
+                transaction.CallbackReceivedAt = DateTime.UtcNow;
+                transaction.UpdatedAt = DateTime.UtcNow;
+            }
+
+            if (reservationId > 0)
+            {
+                var reservation = await _reservationService.GetByIdAsync(reservationId);
                 if (reservation != null)
                 {
                     reservation.PaymentStatus = PaymentStatuses.Ids.Failed;
@@ -183,8 +201,8 @@ public class PaymentFactory : IPaymentFactory
                 }
             }
 
-            _logger.LogWarning("Payment failed for reservation {ReservationId}: {ErrorMessage}", result.ReservationId, result.ErrorMessage);
-            return (false, $"{_webBaseUrl}/Account/PaymentResult?status=failed&reservationId={result.ReservationId}&error={Uri.EscapeDataString(result.ErrorMessage ?? "Error.PaymentFailed")}");
+            _logger.LogWarning("Payment failed for reservation {ReservationId}: {ErrorMessage}", reservationId, result.ErrorMessage);
+            return (false, $"{_webBaseUrl}/Account/PaymentResult?status=failed&reservationId={reservationId}&error={Uri.EscapeDataString(result.ErrorMessage ?? "Error.PaymentFailed")}");
         }
 
         return (false, $"{_webBaseUrl}/Account/Reservations");
@@ -223,5 +241,191 @@ public class PaymentFactory : IPaymentFactory
             .ToListAsync();
 
         return new { reservations };
+    }
+
+    private async Task<(PaymentTransaction transaction, PaymentRequest request)> CreateMarketplacePaymentRequestAsync(
+        Reservation reservation,
+        decimal amount,
+        int paymentTypeId,
+        string productName,
+        string callbackUrl)
+    {
+        var company = reservation.Tour.Company;
+        var commissionRate = company.PlatformCommissionRate > 0 ? company.PlatformCommissionRate : 12;
+        var platformCommission = Math.Round(amount * commissionRate / 100, 2);
+        var sellerReceivable = Math.Max(amount - platformCommission, 0);
+
+        var transaction = new PaymentTransaction
+        {
+            ReservationId = reservation.Id,
+            CompanyId = company.Id,
+            VisitorId = reservation.VisitorId,
+            TypeId = paymentTypeId,
+            StatusId = MarketplaceTransactionStatuses.Ids.Initialized,
+            Currency = "TRY",
+            BuyerIp = "127.0.0.1",
+            GrossAmount = amount,
+            SellerReceivableAmount = sellerReceivable,
+            PlatformCommissionAmount = platformCommission,
+            PlatformCommissionRate = commissionRate
+        };
+
+        _marketplaceFinanceService.AddTransaction(transaction);
+        await _unitOfWork.SaveChangesAsync();
+
+        transaction.ConversationId = $"MKT-{transaction.Id}-{reservation.Id}-{DateTime.UtcNow.Ticks}";
+
+        _marketplaceFinanceService.AddLineItem(new PaymentLineItem
+        {
+            PaymentTransactionId = transaction.Id,
+            ReservationId = reservation.Id,
+            CompanyId = company.Id,
+            ItemId = $"TOUR-{reservation.Id}",
+            ItemName = productName,
+            SubMerchantKey = company.SubMerchantKey,
+            ExternalSubMerchantId = company.SubMerchantExternalId,
+            Price = amount,
+            PaidPrice = amount,
+            SubMerchantPrice = sellerReceivable,
+            SubMerchantPayoutRate = 100 - commissionRate,
+            SubMerchantPayoutAmount = sellerReceivable,
+            MerchantPayoutAmount = platformCommission,
+            PlatformCommissionAmount = platformCommission
+        });
+
+        await _unitOfWork.SaveChangesAsync();
+
+        var splitEnabled = company.MarketplaceEnabled
+            && company.SellerOnboardingStatusId == SellerOnboardingStatuses.Ids.Active
+            && !string.IsNullOrWhiteSpace(company.SubMerchantKey);
+
+        var paymentRequest = new PaymentRequest
+        {
+            ReservationId = reservation.Id,
+            ConversationId = transaction.ConversationId,
+            Amount = amount,
+            PaymentTransactionTypeId = paymentTypeId,
+            CustomerEmail = reservation.Visitor.Email,
+            CustomerName = reservation.Visitor.FirstName,
+            CustomerSurname = reservation.Visitor.LastName,
+            CustomerPhone = reservation.Visitor.Phone ?? "",
+            CustomerIp = "127.0.0.1",
+            CustomerAddress = reservation.Visitor.Address ?? "",
+            ProductName = productName,
+            ProductCategory = "Tur",
+            BasketItemId = $"TOUR-{reservation.Id}",
+            SubMerchantKey = splitEnabled ? company.SubMerchantKey : null,
+            SubMerchantExternalId = splitEnabled ? company.SubMerchantExternalId : null,
+            SubMerchantPrice = splitEnabled ? sellerReceivable : null,
+            PlatformCommissionRate = commissionRate,
+            PlatformCommissionAmount = platformCommission,
+            CallbackUrl = callbackUrl
+        };
+
+        return (transaction, paymentRequest);
+    }
+
+    private void UpdateSuccessfulMarketplaceTransaction(PaymentTransaction? transaction, PaymentResult result, Reservation reservation)
+    {
+        if (transaction == null) return;
+
+        var paidAt = DateTime.UtcNow;
+        var paidAmount = result.PaidAmount ?? transaction.GrossAmount;
+
+        transaction.StatusId = MarketplaceTransactionStatuses.Ids.Paid;
+        transaction.PaymentId = result.PaymentId;
+        transaction.PaidAmount = paidAmount;
+        transaction.PaidAt = paidAt;
+        transaction.CallbackReceivedAt = paidAt;
+        transaction.UpdatedAt = paidAt;
+
+        var providerItem = result.Items.FirstOrDefault();
+        var lineItem = transaction.LineItems.FirstOrDefault();
+        if (providerItem != null && lineItem != null)
+        {
+            lineItem.ProviderPaymentTransactionId = providerItem.PaymentTransactionId;
+            lineItem.ProviderTransactionStatus = providerItem.TransactionStatus;
+            lineItem.Price = providerItem.Price > 0 ? providerItem.Price : lineItem.Price;
+            lineItem.PaidPrice = providerItem.PaidPrice > 0 ? providerItem.PaidPrice : lineItem.PaidPrice;
+            lineItem.MerchantPayoutAmount = providerItem.MerchantPayoutAmount;
+            lineItem.SubMerchantPayoutAmount = providerItem.SubMerchantPayoutAmount > 0 ? providerItem.SubMerchantPayoutAmount : lineItem.SubMerchantPayoutAmount;
+            lineItem.IyziCommissionRateAmount = providerItem.IyziCommissionRateAmount;
+            lineItem.IyziCommissionFee = providerItem.IyziCommissionFee;
+            lineItem.BlockageRateAmountMerchant = providerItem.BlockageRateAmountMerchant;
+            lineItem.BlockageRateAmountSubMerchant = providerItem.BlockageRateAmountSubMerchant;
+            lineItem.BlockageResolvedDate = providerItem.BlockageResolvedDate;
+            lineItem.UpdatedAt = paidAt;
+
+            transaction.IyziCommissionRateAmount = providerItem.IyziCommissionRateAmount;
+            transaction.IyziCommissionFee = providerItem.IyziCommissionFee;
+        }
+
+        if (transaction.LedgerEntries.Any(e => e.EntryTypeId == LedgerEntryTypes.Ids.CustomerCollection))
+            return;
+
+        var reference = string.IsNullOrWhiteSpace(result.PaymentId)
+            ? transaction.ConversationId
+            : result.PaymentId;
+        var availableAt = paidAt.AddDays(transaction.Company.PayoutDelayDays);
+
+        _marketplaceFinanceService.AddLedgerEntry(new MarketplaceLedgerEntry
+        {
+            PaymentTransactionId = transaction.Id,
+            ReservationId = reservation.Id,
+            CompanyId = transaction.CompanyId,
+            EntryTypeId = LedgerEntryTypes.Ids.CustomerCollection,
+            StatusId = LedgerEntryStatuses.Ids.Settled,
+            Amount = paidAmount,
+            Reference = reference,
+            Description = "Musteri odemesi",
+            OccurredAt = paidAt,
+            SettledAt = paidAt
+        });
+
+        _marketplaceFinanceService.AddLedgerEntry(new MarketplaceLedgerEntry
+        {
+            PaymentTransactionId = transaction.Id,
+            ReservationId = reservation.Id,
+            CompanyId = transaction.CompanyId,
+            EntryTypeId = LedgerEntryTypes.Ids.SellerReceivable,
+            StatusId = LedgerEntryStatuses.Ids.Pending,
+            Amount = transaction.SellerReceivableAmount,
+            Reference = reference,
+            Description = "Firma hak edisi",
+            OccurredAt = paidAt,
+            AvailableAt = availableAt
+        });
+
+        _marketplaceFinanceService.AddLedgerEntry(new MarketplaceLedgerEntry
+        {
+            PaymentTransactionId = transaction.Id,
+            ReservationId = reservation.Id,
+            CompanyId = transaction.CompanyId,
+            EntryTypeId = LedgerEntryTypes.Ids.PlatformCommission,
+            StatusId = LedgerEntryStatuses.Ids.Settled,
+            Amount = transaction.PlatformCommissionAmount,
+            Reference = reference,
+            Description = "Platform komisyonu",
+            OccurredAt = paidAt,
+            SettledAt = paidAt
+        });
+
+        var providerFee = transaction.IyziCommissionFee + transaction.IyziCommissionRateAmount;
+        if (providerFee > 0)
+        {
+            _marketplaceFinanceService.AddLedgerEntry(new MarketplaceLedgerEntry
+            {
+                PaymentTransactionId = transaction.Id,
+                ReservationId = reservation.Id,
+                CompanyId = transaction.CompanyId,
+                EntryTypeId = LedgerEntryTypes.Ids.ProviderFee,
+                StatusId = LedgerEntryStatuses.Ids.Settled,
+                Amount = -providerFee,
+                Reference = reference,
+                Description = "Iyzico hizmet bedeli",
+                OccurredAt = paidAt,
+                SettledAt = paidAt
+            });
+        }
     }
 }

@@ -122,6 +122,26 @@ public class Company : BaseEntity
     public int DepositPercentage { get; set; } = 30;
 
     // ===============================================
+    // MARKETPLACE VE ODEME AYARLARI
+    // ===============================================
+
+    public int SellerLegalTypeId { get; set; } = SellerLegalTypes.Ids.LimitedOrJointStockCompany;
+    public int SellerOnboardingStatusId { get; set; } = SellerOnboardingStatuses.Ids.MissingInfo;
+    public bool MarketplaceEnabled { get; set; }
+    public decimal PlatformCommissionRate { get; set; } = 12;
+    public int PayoutDelayDays { get; set; } = 7;
+    public string LegalCompanyTitle { get; set; } = string.Empty;
+    public string TaxOffice { get; set; } = string.Empty;
+    public string Iban { get; set; } = string.Empty;
+    public string ContactName { get; set; } = string.Empty;
+    public string ContactSurname { get; set; } = string.Empty;
+    public string SubMerchantExternalId { get; set; } = string.Empty;
+    public string SubMerchantKey { get; set; } = string.Empty;
+    public string OnboardingErrorCode { get; set; } = string.Empty;
+    public string OnboardingErrorMessage { get; set; } = string.Empty;
+    public DateTime? OnboardedAt { get; set; }
+
+    // ===============================================
     // PROMOSYON AYARLARI
     // ===============================================
 
@@ -138,4 +158,8 @@ public class Company : BaseEntity
     public virtual ICollection<Guide> Guides { get; set; } = new List<Guide>();
     public virtual ICollection<Conversation> Conversations { get; set; } = new List<Conversation>();
     public virtual ICollection<MessageTemplate> MessageTemplates { get; set; } = new List<MessageTemplate>();
+    public virtual ICollection<PaymentTransaction> PaymentTransactions { get; set; } = new List<PaymentTransaction>();
+    public virtual ICollection<MarketplaceLedgerEntry> LedgerEntries { get; set; } = new List<MarketplaceLedgerEntry>();
+    public virtual ICollection<MarketplaceRefund> MarketplaceRefunds { get; set; } = new List<MarketplaceRefund>();
+    public virtual ICollection<PayoutBatch> PayoutBatches { get; set; } = new List<PayoutBatch>();
 }

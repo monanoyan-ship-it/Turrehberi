@@ -11,9 +11,57 @@ function ToursViewModel() {
     self.map = null;
     self.markers = [];
 
+    self.destinationCoordinates = [
+        { terms: ['selcuk', 'efes'], latitude: 37.9490, longitude: 27.3689 },
+        { terms: ['cesme', 'alacati'], latitude: 38.3240, longitude: 26.3030 },
+        { terms: ['pamukkale', 'denizli'], latitude: 37.9137, longitude: 29.1187 },
+        { terms: ['uzungol'], latitude: 40.6200, longitude: 40.2900 },
+        { terms: ['ayder', 'rize'], latitude: 40.9530, longitude: 41.0920 },
+        { terms: ['sumela', 'macka'], latitude: 40.6890, longitude: 39.6580 },
+        { terms: ['trabzon'], latitude: 41.0027, longitude: 39.7168 },
+        { terms: ['kemer'], latitude: 36.6014, longitude: 30.5601 },
+        { terms: ['kas', 'kekova'], latitude: 36.1999, longitude: 29.6409 },
+        { terms: ['olimpos', 'yanaras'], latitude: 36.3965, longitude: 30.4730 },
+        { terms: ['goreme', 'kapadokya', 'nevsehir'], latitude: 38.6431, longitude: 34.8289 },
+        { terms: ['sultanahmet'], latitude: 41.0086, longitude: 28.9802 },
+        { terms: ['bogaz'], latitude: 41.0830, longitude: 29.0430 },
+        { terms: ['adalar', 'buyukada', 'heybeliada'], latitude: 40.8740, longitude: 29.1290 },
+        { terms: ['istanbul'], latitude: 41.0082, longitude: 28.9784 },
+        { terms: ['izmir'], latitude: 38.4237, longitude: 27.1428 },
+        { terms: ['antalya'], latitude: 36.8969, longitude: 30.7133 }
+    ];
+
+    self.normalizeDestination = function(destination) {
+        return (destination || '')
+            .toString()
+            .toLowerCase()
+            .normalize('NFD')
+            .replace(/[\u0300-\u036f]/g, '')
+            .replace(/ı/g, 'i')
+            .replace(/ğ/g, 'g')
+            .replace(/ü/g, 'u')
+            .replace(/ş/g, 's')
+            .replace(/ö/g, 'o')
+            .replace(/ç/g, 'c');
+    };
+
+    self.getTourCoordinates = function(tour) {
+        var lat = parseFloat(tour.latitude);
+        var lng = parseFloat(tour.longitude);
+        if (!isNaN(lat) && !isNaN(lng)) {
+            return { latitude: lat, longitude: lng };
+        }
+
+        var destination = self.normalizeDestination(tour.destination);
+        var match = self.destinationCoordinates.find(function(item) {
+            return item.terms.some(function(term) { return destination.indexOf(term) !== -1; });
+        });
+        return match ? { latitude: match.latitude, longitude: match.longitude } : null;
+    };
+
     // Koordinatli tur sayisi
     self.toursWithCoordinates = ko.computed(function() {
-        return self.tours().filter(function(t) { return t.latitude && t.longitude; }).length;
+        return self.tours().filter(function(t) { return self.getTourCoordinates(t); }).length;
     });
 
     // Filtreleme verileri
@@ -271,11 +319,19 @@ function ToursViewModel() {
             method: 'GET',
             data: params,
             success: function(response) {
-                self.tours(response.tours);
+                var tours = (response.tours || []).map(function(tour) {
+                    var coordinates = self.getTourCoordinates(tour);
+                    if (coordinates) {
+                        tour.latitude = coordinates.latitude;
+                        tour.longitude = coordinates.longitude;
+                    }
+                    return tour;
+                });
+                self.tours(tours);
                 self.totalCount(response.totalCount);
 
                 // Promosyon badge'lerini yukle
-                var tourIds = response.tours.map(function(t) { return t.id; });
+                var tourIds = tours.map(function(t) { return t.id; });
                 self.loadPromoBadges(tourIds);
 
                 // Filtre seceneklerini guncelle (ilk yuklemede)
@@ -390,7 +446,7 @@ function ToursViewModel() {
 
         // Koordinatli turlari filtrele
         var toursWithCoords = self.tours().filter(function(t) {
-            return t.latitude && t.longitude;
+            return self.getTourCoordinates(t);
         });
 
         if (toursWithCoords.length === 0) return;
@@ -398,7 +454,8 @@ function ToursViewModel() {
         var bounds = [];
 
         toursWithCoords.forEach(function(tour) {
-            var marker = L.marker([tour.latitude, tour.longitude]).addTo(self.map);
+            var coordinates = self.getTourCoordinates(tour);
+            var marker = L.marker([coordinates.latitude, coordinates.longitude]).addTo(self.map);
 
             // Popup icerigi
             var popupContent = '<div class="tour-popup">' +
@@ -413,7 +470,7 @@ function ToursViewModel() {
 
             marker.bindPopup(popupContent);
             self.markers.push(marker);
-            bounds.push([tour.latitude, tour.longitude]);
+            bounds.push([coordinates.latitude, coordinates.longitude]);
         });
 
         // Haritayi marker'lara sigdir
@@ -454,14 +511,14 @@ function ToursViewModel() {
 
     // Kategori ve Zorluk helper fonksiyonlari
     var difficultyMap = {
-        0: { name: T('TourDifficulty.Easy') || 'Kolay', css: 'bg-success', icon: 'bi-emoji-smile' },
-        1: { name: T('TourDifficulty.Moderate') || 'Orta', css: 'bg-info', icon: 'bi-emoji-neutral' },
-        2: { name: T('TourDifficulty.Challenging') || 'Zor', css: 'bg-warning text-dark', icon: 'bi-emoji-frown' },
-        3: { name: T('TourDifficulty.Expert') || 'Uzman', css: 'bg-danger', icon: 'bi-exclamation-triangle' }
+        0: { key: 'TourDifficulty.Easy', fallback: 'Kolay', css: 'bg-success', icon: 'bi-emoji-smile' },
+        1: { key: 'TourDifficulty.Moderate', fallback: 'Orta', css: 'bg-info', icon: 'bi-emoji-neutral' },
+        2: { key: 'TourDifficulty.Challenging', fallback: 'Zor', css: 'bg-warning text-dark', icon: 'bi-emoji-frown' },
+        3: { key: 'TourDifficulty.Expert', fallback: 'Uzman', css: 'bg-danger', icon: 'bi-exclamation-triangle' }
     };
 
     self.getDifficultyName = function(id) {
-        return difficultyMap[id] ? difficultyMap[id].name : '';
+        return difficultyMap[id] ? TL(difficultyMap[id].key, difficultyMap[id].fallback) : '';
     };
     self.getDifficultyBadgeClass = function(id) {
         return difficultyMap[id] ? difficultyMap[id].css : 'bg-secondary';
@@ -469,7 +526,7 @@ function ToursViewModel() {
 
     self.getCategoryName = function(id) {
         var cat = self.categories().find(function(c) { return c.id === id; });
-        return cat ? (T(cat.nameResourceKey) || cat.systemName) : '';
+        return cat ? TL(cat.nameResourceKey, cat.systemName) : '';
     };
     self.getCategoryIcon = function(id) {
         var cat = self.categories().find(function(c) { return c.id === id; });
@@ -497,6 +554,14 @@ function ToursViewModel() {
         self.loadData();
         self.loadCompanies();
         self.loadCategories();
+    });
+
+    $(document).on('languageChanged', function() {
+        self.tours.valueHasMutated();
+        self.categories.valueHasMutated();
+        if (self.viewMode() === 'map' && self.map) {
+            self.updateMarkers();
+        }
     });
 }
 

@@ -19,7 +19,7 @@
     </div>
 
     <!-- Company Profile -->
-    <div data-bind="visible: !isLoading() && !error() && company()">
+    <div data-bind="if: !isLoading() && !error() && company()">
         <!-- SEO Meta Tags (JavaScript ile dinamik) -->
 
         <!-- Cover Image & Header -->
@@ -416,15 +416,15 @@
                     <p class="text-muted small" data-bind="text: company() ? company().name + ' firmasina mesaj gonderin' : ''"></p>
                     <div class="mb-3">
                         <label class="form-label" data-t="CompanyContact.Name">Ad Soyad</label>
-                        <input type="text" class="form-control" data-bind="value: contactName">
+                        <input type="text" class="form-control" data-field="contactName" data-bind="value: contactName, valueUpdate: 'input'">
                     </div>
                     <div class="mb-3">
                         <label class="form-label" data-t="CompanyContact.Email">E-posta</label>
-                        <input type="email" class="form-control" data-bind="value: contactEmail">
+                        <input type="email" class="form-control" data-field="contactEmail" data-bind="value: contactEmail, valueUpdate: 'input'">
                     </div>
                     <div class="mb-3">
                         <label class="form-label" data-t="CompanyContact.Message">Mesajiniz</label>
-                        <textarea class="form-control" rows="4" data-bind="value: contactMessage" placeholder=""></textarea>
+                        <textarea class="form-control" rows="4" data-field="contactMessage" data-bind="value: contactMessage, valueUpdate: 'input'" data-t-placeholder="CompanyContact.MessagePlaceholder" placeholder=""></textarea>
                     </div>
                 </div>
                 <div class="modal-footer">

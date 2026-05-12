@@ -26,6 +26,11 @@ public class HomeController : Controller
         return View();
     }
 
+    public IActionResult Terms()
+    {
+        return View();
+    }
+
     public IActionResult About()
     {
         return View();

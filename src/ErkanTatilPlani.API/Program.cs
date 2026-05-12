@@ -31,6 +31,7 @@ builder.Services.AddScoped<IEmailService, EmailService>();
 // Payment Service (Iyzico)
 builder.Services.Configure<PaymentSettings>(builder.Configuration.GetSection("Payment"));
 builder.Services.AddScoped<IPaymentService, IyzicoPaymentService>();
+builder.Services.AddScoped<IMarketplacePaymentService, IyzicoMarketplacePaymentService>();
 
 // Cache Service
 builder.Services.AddMemoryCache();
@@ -206,6 +207,7 @@ builder.Services.AddSwaggerGen(options =>
             "Tours" or "TourDates" or "TourWatches" => "2. Turlar",
             "Companies" or "CompanyPages" => "3. Firmalar",
             "Reservations" or "Payments" => "4. Rezervasyon ve Odeme",
+            "Marketplace" => "4. Rezervasyon ve Odeme",
             "Reviews" => "5. Yorumlar",
             "Favorites" => "6. Favoriler",
             "Blogs" => "7. Blog",

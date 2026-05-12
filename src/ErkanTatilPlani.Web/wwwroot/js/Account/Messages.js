@@ -188,7 +188,7 @@ function MessagesViewModel() {
 
     self.loadCompanies = function () {
         $.ajax({
-            url: apiBaseUrl + '/api/companies?pageSize=100',
+            url: apiBaseUrl + '/api/companies/public',
             method: 'GET'
         }).done(function (data) {
             self.companies(data.companies || data || []);

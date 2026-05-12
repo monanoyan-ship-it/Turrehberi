@@ -18,6 +18,7 @@ using ErkanTatilPlani.API.Factories.Promotions;
 using ErkanTatilPlani.API.Factories.Visitors;
 using ErkanTatilPlani.API.Factories.AbandonedCarts;
 using ErkanTatilPlani.API.Factories.Loyalty;
+using ErkanTatilPlani.API.Factories.Marketplace;
 using ErkanTatilPlani.API.Factories.Recommendations;
 using ErkanTatilPlani.API.Factories.Referrals;
 using ErkanTatilPlani.API.Factories.ScheduledEmails;
@@ -45,6 +46,7 @@ using ErkanTatilPlani.Core.Factories.TourDates;
 using ErkanTatilPlani.Core.Factories.Tours;
 using ErkanTatilPlani.Core.Factories.TourWatches;
 using ErkanTatilPlani.Core.Factories.Loyalty;
+using ErkanTatilPlani.Core.Factories.Marketplace;
 using ErkanTatilPlani.Core.Factories.Recommendations;
 using ErkanTatilPlani.Core.Factories.Referrals;
 using ErkanTatilPlani.Core.Factories.ScheduledEmails;
@@ -76,6 +78,7 @@ public static class FactoryRegistration
 
         // Payment factories (1)
         services.AddScoped<IPaymentFactory, PaymentFactory>();
+        services.AddScoped<IMarketplaceFinanceFactory, MarketplaceFinanceFactory>();
 
         // EmailAccount factories (1)
         services.AddScoped<IEmailAccountFactory, EmailAccountFactory>();

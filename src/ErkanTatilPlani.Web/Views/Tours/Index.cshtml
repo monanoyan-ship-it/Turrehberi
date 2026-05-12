@@ -39,7 +39,7 @@
         <button class="btn rounded-pill" data-bind="click: function() { $parent.filterCategory(id.toString()); $parent.applyFilters(); },
             css: $parent.filterCategory() == id.toString() ? 'btn-' + (cssClass || 'secondary').replace('bg-', '').replace(' text-dark', '') + ' text-white' : 'btn-outline-secondary'">
             <i class="bi" data-bind="css: icon"></i>
-            <span data-bind="text: T(nameResourceKey) || systemName"></span>
+            <span data-bind="text: TL(nameResourceKey, systemName)"></span>
         </button>
         <!-- /ko -->
     </div>
@@ -99,7 +99,7 @@
                 <!-- Destinasyon -->
                 <div class="col-md-3">
                     <label class="form-label small fw-semibold"><i class="bi bi-geo-alt"></i> <span data-t="Tour.Destination">Destinasyon</span></label>
-                    <select class="form-select" data-bind="value: filterDestination, options: destinations, optionsCaption: T('Tours.AllDestinations')"></select>
+                    <select class="form-select" data-bind="value: filterDestination, options: destinations, optionsCaption: TL('Tours.AllDestinations', 'Tum Destinasyonlar')"></select>
                 </div>
 
                 <!-- Fiyat Araligi -->
@@ -127,7 +127,7 @@
                 <!-- Firma -->
                 <div class="col-md-2">
                     <label class="form-label small fw-semibold"><i class="bi bi-building"></i> <span data-t="Tour.Company">Firma</span></label>
-                    <select class="form-select" data-bind="value: filterCompanyId, options: companies, optionsText: 'name', optionsValue: 'id', optionsCaption: T('Tours.AllCompanies')"></select>
+                    <select class="form-select" data-bind="value: filterCompanyId, options: companies, optionsText: 'name', optionsValue: 'id', optionsCaption: TL('Tours.AllCompanies', 'Tum Firmalar')"></select>
                 </div>
 
                 <!-- One Cikanlar -->
@@ -161,7 +161,7 @@
                     <select class="form-select" data-bind="value: filterCategory">
                         <option value="" data-t="Tours.AllCategories">Tum Kategoriler</option>
                         <!-- ko foreach: categories -->
-                        <option data-bind="value: id, text: T(nameResourceKey) || systemName"></option>
+                        <option data-bind="value: id, text: TL(nameResourceKey, systemName)"></option>
                         <!-- /ko -->
                     </select>
                 </div>

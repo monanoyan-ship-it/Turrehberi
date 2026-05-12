@@ -1,7 +1,9 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace ErkanTatilPlani.Web.Controllers;
 
+[Authorize(Roles = "CompanyOwner,Staff,Admin")]
 public class MyCompanyController : Controller
 {
     private readonly IConfiguration _configuration;
@@ -92,6 +94,13 @@ public class MyCompanyController : Controller
     public IActionResult Analytics()
     {
         SetCommonViewData("Analytics", "Analitik");
+        return View();
+    }
+
+    // Finans ve hak edisler
+    public IActionResult Finance()
+    {
+        SetCommonViewData("Finance", "Finans");
         return View();
     }
 }

@@ -2,7 +2,17 @@ function TourCalendarViewModel() {
     var self = this;
 
     self.localizeDurationUnit = function(unit) {
-        return TypeDefinitions.DurationUnits.localize(unit);
+        if (window.TypeDefinitions && TypeDefinitions.DurationUnits) {
+            return TypeDefinitions.DurationUnits.localize(unit);
+        }
+        var fallback = {
+            Hour: T('TourDate.DurationHour') || 'Saat',
+            Day: T('TourDate.DurationDay') || 'Gun',
+            Week: T('TourDate.DurationWeek') || 'Hafta',
+            Month: T('TourDate.DurationMonth') || 'Ay'
+        };
+        if (fallback[unit] && fallback[unit].indexOf('TourDate.') !== 0) return fallback[unit];
+        return unit || '';
     };
 
     // Observables
@@ -32,6 +42,12 @@ function TourCalendarViewModel() {
         var firstDay = data.firstDayOfWeek;
         var daysInMonth = data.daysInMonth;
 
+        function attachWeekHelpers(week) {
+            week.getBadgeClass = self.getBadgeClass;
+            week.showTourDatePopover = self.showTourDatePopover;
+            return week;
+        }
+
         var currentWeek = [];
         // Ayin basindaki bos gunler
         for (var i = 0; i < firstDay; i++) {
@@ -46,7 +62,7 @@ function TourCalendarViewModel() {
                 tours: dayInfo.tours
             });
             if (currentWeek.length === 7) {
-                weeks.push(currentWeek);
+                weeks.push(attachWeekHelpers(currentWeek));
                 currentWeek = [];
             }
         }
@@ -55,7 +71,7 @@ function TourCalendarViewModel() {
         while (currentWeek.length > 0 && currentWeek.length < 7) {
             currentWeek.push({ day: null, tours: [], isPast: false });
         }
-        if (currentWeek.length > 0) weeks.push(currentWeek);
+        if (currentWeek.length > 0) weeks.push(attachWeekHelpers(currentWeek));
 
         return weeks;
     });
@@ -98,7 +114,7 @@ function TourCalendarViewModel() {
     // Show popover
     self.showTourDatePopover = function(tourDate) {
         self.selectedDateDetail(tourDate);
-        dateDetailModal.show();
+        if (dateDetailModal) dateDetailModal.show();
     };
 
     // Tour filter change
@@ -129,16 +145,25 @@ function TourCalendarViewModel() {
                     toastr.error(xhr.responseJSON?.message || T('Common.Error') || 'Bir hata olustu');
                 }
                 self.isLoading(false);
+            },
+            complete: function() {
+                self.isLoading(false);
             }
         });
     };
 
     // Init
-    $(document).ready(function() {
-        dateDetailModal = new bootstrap.Modal(document.getElementById('dateDetailModal'));
+    self.init = function() {
+        var modalElement = document.getElementById('dateDetailModal');
+        dateDetailModal = modalElement ? new bootstrap.Modal(modalElement) : null;
         initialized = true;
         self.loadCalendar();
-    });
+    };
 }
 
-ko.applyBindings(new TourCalendarViewModel(), document.getElementById('tourCalendarApp'));
+var tourCalendarRoot = document.getElementById('tourCalendarApp');
+if (tourCalendarRoot) {
+    var tourCalendarVM = new TourCalendarViewModel();
+    ko.applyBindings(tourCalendarVM, tourCalendarRoot);
+    tourCalendarVM.init();
+}

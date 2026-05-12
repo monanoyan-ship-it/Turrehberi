@@ -42,6 +42,11 @@ public class CompanyProfileFactory : ICompanyProfileFactory
                 t.MaxCapacity,
                 t.ImageUrl,
                 t.IsFeatured,
+                t.DifficultyId,
+                t.CategoryId,
+                t.Latitude,
+                t.Longitude,
+                t.MeetingPointAddress,
                 t.AverageRating,
                 t.ReviewCount
             })

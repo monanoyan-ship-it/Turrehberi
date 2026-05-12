@@ -12,9 +12,16 @@ public class CompaniesApiTests : IClassFixture<CustomWebApplicationFactory>
     }
 
     [Fact]
-    public async Task GetCompanies_ReturnsOk()
+    public async Task GetCompanies_WithoutAuth_ReturnsUnauthorized()
     {
         var response = await _client.GetAsync("/api/companies");
+        Assert.Equal(HttpStatusCode.Unauthorized, response.StatusCode);
+    }
+
+    [Fact]
+    public async Task GetPublicCompanies_ReturnsOk()
+    {
+        var response = await _client.GetAsync("/api/companies/public");
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
     }
 

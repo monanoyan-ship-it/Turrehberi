@@ -41,12 +41,20 @@
         var apiBaseUrl = '@Html.Raw(ViewBag.ApiBaseUrl ?? "https://localhost:7078")';
         var onLocaleReady = []; // Locale yuklendikten sonra cagrilacak callback'ler
         function T(key) {
+            if (window.ko && ko.observable) {
+                window.localeSignal = window.localeSignal || ko.observable(localeVersion);
+                window.localeSignal();
+            }
             var args = Array.prototype.slice.call(arguments, 1);
             var value = locale[key] || key;
             for (var i = 0; i < args.length; i++) {
                 value = value.replace('{' + i + '}', args[i]);
             }
             return value;
+        }
+        function TL(key, fallback) {
+            var value = T(key);
+            return value && value !== key ? value : (fallback || '');
         }
     </script>
     @await RenderSectionAsync("Head", required: false)
@@ -268,7 +276,7 @@
     <script src="~/lib/jquery/jquery.min.js"></script>
     <script src="~/lib/bootstrap/js/bootstrap.bundle.min.js"></script>
     <script src="~/lib/knockout/knockout-latest.min.js"></script>
-    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin="" defer></script>
     <script src="~/lib/toastr/toastr.min.js"></script>
     <script>
         // ===============================================
@@ -283,9 +291,14 @@
             $.ajax({
                 url: apiBaseUrl + '/api/localization/' + lang,
                 method: 'GET',
+                cache: false,
                 success: function(data) {
                     locale = data;
                     currentLang = lang;
+                    localeVersion++;
+                    if (window.localeSignal) {
+                        window.localeSignal(localeVersion);
+                    }
                     localStorage.setItem('lang', lang);
                     applyTranslations();
                     if (callback) callback();
@@ -302,6 +315,9 @@
             $('[data-t]').each(function() {
                 var key = $(this).data('t');
                 var translated = T(key);
+                if (translated === key) {
+                    return;
+                }
                 if ($(this).is('input')) {
                     $(this).attr('placeholder', translated);
                 } else {
@@ -309,10 +325,18 @@
                 }
             });
             $('[data-t-title]').each(function() {
-                $(this).attr('title', T($(this).data('t-title')));
+                var key = $(this).data('t-title');
+                var translated = T(key);
+                if (translated !== key) {
+                    $(this).attr('title', translated);
+                }
             });
             $('[data-t-placeholder]').each(function() {
-                $(this).attr('placeholder', T($(this).data('t-placeholder')));
+                var key = $(this).data('t-placeholder');
+                var translated = T(key);
+                if (translated !== key) {
+                    $(this).attr('placeholder', translated);
+                }
             });
             // Push butonunu guncelle (locale yuklendikten sonra)
             if (typeof PushNotificationManager !== 'undefined' && PushNotificationManager.updateUI) {
@@ -432,7 +456,7 @@
             localStorage.removeItem('token');
             localStorage.removeItem('user');
             toastr.info(T('Menu.Logout'));
-            window.location.href = '/';
+            window.location.href = '/Account/Logout';
         }
 
         function updateAuthUI() {

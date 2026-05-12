@@ -15,7 +15,7 @@
     <!-- Category Filter -->
     <div class="text-center mb-4">
         <div class="btn-group flex-wrap" data-bind="foreach: categories">
-            <button class="btn btn-sm" data-bind="text: $data || 'Tumu', click: $parent.filterByCategory, css: $parent.selectedCategory() === $data ? 'btn-primary' : 'btn-outline-primary'"></button>
+            <button class="btn btn-sm" data-bind="text: $data || TL('Common.All', 'Tumu'), click: $parent.filterByCategory, css: $parent.selectedCategory() === $data ? 'btn-primary' : 'btn-outline-primary'"></button>
         </div>
     </div>
 

@@ -324,6 +324,11 @@ function MyToursViewModel() {
     var dateManageModal = null;
     var photoModal = null;
 
+    function createModal(id) {
+        var element = document.getElementById(id);
+        return element ? new bootstrap.Modal(element) : null;
+    }
+
     // Helper functions
     self.formatCurrency = function(value) {
         if (!value) return '0 TL';
@@ -331,7 +336,17 @@ function MyToursViewModel() {
     };
 
     self.localizeDurationUnit = function(unit) {
-        return TypeDefinitions.DurationUnits.localize(unit);
+        if (window.TypeDefinitions && TypeDefinitions.DurationUnits) {
+            return TypeDefinitions.DurationUnits.localize(unit);
+        }
+        var fallback = {
+            Hour: T('TourDate.DurationHour') || 'Saat',
+            Day: T('TourDate.DurationDay') || 'Gun',
+            Week: T('TourDate.DurationWeek') || 'Hafta',
+            Month: T('TourDate.DurationMonth') || 'Ay'
+        };
+        if (fallback[unit] && fallback[unit].indexOf('TourDate.') !== 0) return fallback[unit];
+        return unit || '';
     };
 
     // Capacity helpers
@@ -347,6 +362,38 @@ function MyToursViewModel() {
         return 'bg-success';
     };
 
+    function normalizeTour(tour) {
+        tour = tour || {};
+        tour.id = tour.id || 0;
+        tour.name = tour.name || '';
+        tour.description = tour.description || '';
+        tour.destination = tour.destination || '';
+        tour.price = Number(tour.price) || 0;
+        tour.durationDays = Number(tour.durationDays) || 0;
+        tour.maxCapacity = Number(tour.maxCapacity) || 0;
+        tour.reservationCount = Number(tour.reservationCount) || 0;
+        tour.averageRating = Number(tour.averageRating) || 0;
+        tour.reviewCount = Number(tour.reviewCount) || 0;
+        tour.imageUrl = tour.imageUrl || '';
+        tour.isActive = tour.isActive !== false;
+        tour.isFeatured = !!tour.isFeatured;
+        tour.difficultyId = tour.difficultyId || 1;
+        tour.categoryId = tour.categoryId || 0;
+        tour.guideLanguages = tour.guideLanguages || '';
+        tour.inclusions = tour.inclusions || '';
+        tour.exclusions = tour.exclusions || '';
+        tour.isSustainable = !!tour.isSustainable;
+        tour.sustainabilityScore = Number(tour.sustainabilityScore) || 0;
+        tour.sustainabilityInfo = tour.sustainabilityInfo || '';
+        tour.isWheelchairAccessible = !!tour.isWheelchairAccessible;
+        tour.mobilityLevel = tour.mobilityLevel || 0;
+        tour.accessibilityInfo = tour.accessibilityInfo || '';
+        tour.meetingPointLat = tour.meetingPointLat || '';
+        tour.meetingPointLng = tour.meetingPointLng || '';
+        tour.meetingPointAddress = tour.meetingPointAddress || '';
+        return tour;
+    }
+
     // Turlari yukle
     self.loadTours = function() {
         self.isLoading(true);
@@ -356,7 +403,8 @@ function MyToursViewModel() {
             url: apiBaseUrl + '/api/tours/my',
             method: 'GET',
             success: function(data) {
-                self.tours(data.tours || []);
+                var tours = (data.tours || []).map(normalizeTour);
+                self.tours(tours);
                 self.canManageTours(data.canManageTours);
                 self.isLoading(false);
             },
@@ -369,6 +417,9 @@ function MyToursViewModel() {
                 } else {
                     toastr.error(T('Common.Error'));
                 }
+                self.isLoading(false);
+            },
+            complete: function() {
                 self.isLoading(false);
             }
         });
@@ -734,15 +785,18 @@ function MyToursViewModel() {
     });
 
     // Init
-    $(document).ready(function() {
-        tourModal = new bootstrap.Modal(document.getElementById('tourModal'));
-        deleteModal = new bootstrap.Modal(document.getElementById('deleteModal'));
-        dateManageModal = new bootstrap.Modal(document.getElementById('dateManageModal'));
-        photoModal = new bootstrap.Modal(document.getElementById('photoModal'));
+    self.init = function() {
+        tourModal = createModal('tourModal');
+        deleteModal = createModal('deleteModal');
+        dateManageModal = createModal('dateManageModal');
+        photoModal = createModal('photoModal');
         self.loadTours();
-    });
+    };
 }
 
-$(document).ready(function() {
-    ko.applyBindings(new MyToursViewModel(), document.getElementById('myToursApp'));
-});
+var myToursRoot = document.getElementById('myToursApp');
+if (myToursRoot) {
+    var myToursVM = new MyToursViewModel();
+    ko.applyBindings(myToursVM, myToursRoot);
+    myToursVM.init();
+}

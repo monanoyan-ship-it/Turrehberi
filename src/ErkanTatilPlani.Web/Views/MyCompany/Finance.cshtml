@@ -1,0 +1,204 @@
+@{
+    Layout = "_CompanyLayout";
+}
+
+<div id="companyFinanceApp">
+    <div class="row g-3 mb-4" data-bind="with: summary">
+        <div class="col-sm-6 col-xl-3">
+            <div class="card h-100">
+                <div class="card-body">
+                    <div class="text-muted small">Brut satis</div>
+                    <div class="fs-4 fw-semibold" data-bind="text: $parent.formatMoney(grossVolume)"></div>
+                </div>
+            </div>
+        </div>
+        <div class="col-sm-6 col-xl-3">
+            <div class="card h-100">
+                <div class="card-body">
+                    <div class="text-muted small">Firma hak edisi</div>
+                    <div class="fs-4 fw-semibold" data-bind="text: $parent.formatMoney(sellerReceivable)"></div>
+                </div>
+            </div>
+        </div>
+        <div class="col-sm-6 col-xl-3">
+            <div class="card h-100">
+                <div class="card-body">
+                    <div class="text-muted small">Cekilebilir</div>
+                    <div class="fs-4 fw-semibold" data-bind="text: $parent.formatMoney(availableForPayout)"></div>
+                </div>
+            </div>
+        </div>
+        <div class="col-sm-6 col-xl-3">
+            <div class="card h-100">
+                <div class="card-body">
+                    <div class="text-muted small">Iade</div>
+                    <div class="fs-4 fw-semibold" data-bind="text: $parent.formatMoney(refundedAmount)"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row g-4">
+        <div class="col-xl-4">
+            <div class="card">
+                <div class="card-header d-flex align-items-center justify-content-between">
+                    <span class="fw-semibold">Marketplace odeme profili</span>
+                    <span class="badge" data-bind="css: onboardingBadge((seller() || {}).sellerOnboardingStatusId), text: (seller() || {}).onboardingStatus"></span>
+                </div>
+                <div class="card-body">
+                    <div class="row g-3">
+                        <div class="col-12">
+                            <label class="form-label">Ticari unvan</label>
+                            <input class="form-control" data-bind="value: sellerForm.legalCompanyTitle">
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Vergi dairesi</label>
+                            <input class="form-control" data-bind="value: sellerForm.taxOffice">
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Vergi no</label>
+                            <input class="form-control" data-bind="value: sellerForm.taxNumber">
+                        </div>
+                        <div class="col-12">
+                            <label class="form-label">IBAN</label>
+                            <input class="form-control" data-bind="value: sellerForm.iban">
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Yetkili adi</label>
+                            <input class="form-control" data-bind="value: sellerForm.contactName">
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Yetkili soyadi</label>
+                            <input class="form-control" data-bind="value: sellerForm.contactSurname">
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Satici tipi</label>
+                            <select class="form-select" data-bind="value: sellerForm.sellerLegalTypeId">
+                                <option value="1">Sahis</option>
+                                <option value="2">Limited/Anonim</option>
+                                <option value="3">Bireysel</option>
+                            </select>
+                        </div>
+                        <div class="col-md-6 d-flex align-items-end">
+                            <div class="form-check form-switch">
+                                <input class="form-check-input" type="checkbox" data-bind="checked: sellerForm.marketplaceEnabled">
+                                <label class="form-check-label">Marketplace aktif</label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="d-grid gap-2 mt-4">
+                        <button class="btn btn-primary" data-bind="click: saveSettings, disable: isSaving">
+                            <i class="bi bi-save me-1"></i> Kaydet
+                        </button>
+                        <button class="btn btn-success" data-bind="click: onboard, disable: isSaving">
+                            <i class="bi bi-cloud-upload me-1"></i> Iyzico alt uye kaydini baslat
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-xl-8">
+            <ul class="nav nav-tabs mb-3" role="tablist">
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link active" data-bs-toggle="tab" data-bs-target="#myPaymentsTab" type="button">Odemeler</button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" data-bs-toggle="tab" data-bs-target="#myPayoutsTab" type="button">Hak edisler</button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" data-bs-toggle="tab" data-bs-target="#myRefundsTab" type="button">Iadeler</button>
+                </li>
+            </ul>
+
+            <div class="tab-content">
+                <div class="tab-pane fade show active" id="myPaymentsTab">
+                    <div class="card">
+                        <div class="table-responsive">
+                            <table class="table table-hover align-middle mb-0">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th>Tarih</th>
+                                        <th>Tur</th>
+                                        <th>Durum</th>
+                                        <th>Brut</th>
+                                        <th>Hak edis</th>
+                                        <th>Komisyon</th>
+                                    </tr>
+                                </thead>
+                                <tbody data-bind="foreach: transactions">
+                                    <tr>
+                                        <td data-bind="text: $parent.formatDate(createdAt)"></td>
+                                        <td data-bind="text: tourName"></td>
+                                        <td><span class="badge" data-bind="css: $parent.transactionBadge(statusId), text: status"></span></td>
+                                        <td data-bind="text: $parent.formatMoney(paidAmount || grossAmount)"></td>
+                                        <td data-bind="text: $parent.formatMoney(sellerReceivableAmount)"></td>
+                                        <td data-bind="text: $parent.formatMoney(platformCommissionAmount)"></td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="tab-pane fade" id="myPayoutsTab">
+                    <div class="card">
+                        <div class="table-responsive">
+                            <table class="table table-hover align-middle mb-0">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th>Batch</th>
+                                        <th>Donem</th>
+                                        <th>Durum</th>
+                                        <th>Net</th>
+                                        <th>Banka Ref</th>
+                                    </tr>
+                                </thead>
+                                <tbody data-bind="foreach: payouts">
+                                    <tr>
+                                        <td><code data-bind="text: batchNumber"></code></td>
+                                        <td data-bind="text: $parent.formatDate(periodStart) + ' - ' + $parent.formatDate(periodEnd)"></td>
+                                        <td><span class="badge" data-bind="css: $parent.payoutBadge(statusId), text: status"></span></td>
+                                        <td data-bind="text: $parent.formatMoney(netAmount)"></td>
+                                        <td data-bind="text: bankReference || '-'"></td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="tab-pane fade" id="myRefundsTab">
+                    <div class="card">
+                        <div class="table-responsive">
+                            <table class="table table-hover align-middle mb-0">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th>Tarih</th>
+                                        <th>Tur</th>
+                                        <th>Durum</th>
+                                        <th>Tutar</th>
+                                        <th>Sebep</th>
+                                    </tr>
+                                </thead>
+                                <tbody data-bind="foreach: refunds">
+                                    <tr>
+                                        <td data-bind="text: $parent.formatDate(requestedAt)"></td>
+                                        <td data-bind="text: tourName"></td>
+                                        <td><span class="badge" data-bind="css: $parent.refundBadge(statusId), text: status"></span></td>
+                                        <td data-bind="text: $parent.formatMoney(amount)"></td>
+                                        <td data-bind="text: reason || '-'"></td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+<script src="~/js/MyCompany/Finance.js"></script>
+}

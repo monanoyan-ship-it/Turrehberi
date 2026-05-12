@@ -10,14 +10,15 @@ function HomeViewModel() {
         $.when(
             $.ajax({ url: apiBaseUrl + '/api/tours/featured', method: 'GET' }),
             $.ajax({ url: apiBaseUrl + '/api/tours', method: 'GET' }),
-            $.ajax({ url: apiBaseUrl + '/api/companies', method: 'GET' }),
-            $.ajax({ url: apiBaseUrl + '/api/visitors', method: 'GET' })
-        ).done(function(featuredRes, toursRes, companiesRes, visitorsRes) {
-            self.featuredTours(featuredRes[0]);
+            $.ajax({ url: apiBaseUrl + '/api/companies/public', method: 'GET' })
+        ).done(function(featuredRes, toursRes, companiesRes) {
+            var tours = toursRes[0].tours || toursRes[0] || [];
+            var companies = companiesRes[0].companies || companiesRes[0] || [];
+            self.featuredTours(featuredRes[0] || []);
             self.stats({
-                tours: toursRes[0].length,
-                companies: companiesRes[0].length,
-                visitors: visitorsRes[0].length
+                tours: tours.length,
+                companies: companies.length,
+                visitors: 0
             });
             self.isLoading(false);
         }).fail(function() {

@@ -1,6 +1,8 @@
 function TourDetailViewModel() {
     var self = this;
     // apiBaseUrl is defined globally in _Layout.cshtml
+    var root = document.getElementById('tourDetailApp');
+    var tourId = root ? parseInt(root.getAttribute('data-tour-id'), 10) : NaN;
 
     // Tur verisi
     self.tour = ko.observable(null);
@@ -69,6 +71,59 @@ function TourDetailViewModel() {
     // Modal referanslari
     var writeReviewModal, replyModal, reportModal, reservationModal, watchModal;
 
+    function createModal(id) {
+        var element = document.getElementById(id);
+        return element ? new bootstrap.Modal(element) : null;
+    }
+
+    self.destinationCoordinates = [
+        { terms: ['selcuk', 'efes'], latitude: 37.9490, longitude: 27.3689 },
+        { terms: ['cesme', 'alacati'], latitude: 38.3240, longitude: 26.3030 },
+        { terms: ['pamukkale', 'denizli'], latitude: 37.9137, longitude: 29.1187 },
+        { terms: ['uzungol'], latitude: 40.6200, longitude: 40.2900 },
+        { terms: ['ayder', 'rize'], latitude: 40.9530, longitude: 41.0920 },
+        { terms: ['sumela', 'macka'], latitude: 40.6890, longitude: 39.6580 },
+        { terms: ['trabzon'], latitude: 41.0027, longitude: 39.7168 },
+        { terms: ['kemer'], latitude: 36.6014, longitude: 30.5601 },
+        { terms: ['kas', 'kekova'], latitude: 36.1999, longitude: 29.6409 },
+        { terms: ['olimpos', 'yanaras'], latitude: 36.3965, longitude: 30.4730 },
+        { terms: ['goreme', 'kapadokya', 'nevsehir'], latitude: 38.6431, longitude: 34.8289 },
+        { terms: ['sultanahmet'], latitude: 41.0086, longitude: 28.9802 },
+        { terms: ['bogaz'], latitude: 41.0830, longitude: 29.0430 },
+        { terms: ['adalar', 'buyukada', 'heybeliada'], latitude: 40.8740, longitude: 29.1290 },
+        { terms: ['istanbul'], latitude: 41.0082, longitude: 28.9784 },
+        { terms: ['izmir'], latitude: 38.4237, longitude: 27.1428 },
+        { terms: ['antalya'], latitude: 36.8969, longitude: 30.7133 }
+    ];
+
+    self.normalizeDestination = function(destination) {
+        return (destination || '')
+            .toString()
+            .toLowerCase()
+            .normalize('NFD')
+            .replace(/[\u0300-\u036f]/g, '')
+            .replace(/ı/g, 'i')
+            .replace(/ğ/g, 'g')
+            .replace(/ü/g, 'u')
+            .replace(/ş/g, 's')
+            .replace(/ö/g, 'o')
+            .replace(/ç/g, 'c');
+    };
+
+    self.getTourCoordinates = function(tour) {
+        var lat = parseFloat(tour.latitude);
+        var lng = parseFloat(tour.longitude);
+        if (!isNaN(lat) && !isNaN(lng)) {
+            return { latitude: lat, longitude: lng };
+        }
+
+        var destination = self.normalizeDestination(tour.destination);
+        var match = self.destinationCoordinates.find(function(item) {
+            return item.terms.some(function(term) { return destination.indexOf(term) !== -1; });
+        });
+        return match ? { latitude: match.latitude, longitude: match.longitude } : null;
+    };
+
     // ===== Tur Yukle =====
     self.loadTour = function(id) {
         self.isLoading(true);
@@ -76,6 +131,12 @@ function TourDetailViewModel() {
             url: apiBaseUrl + '/api/tours/' + id,
             method: 'GET',
             success: function(data) {
+                var coordinates = self.getTourCoordinates(data);
+                if (coordinates) {
+                    data.latitude = coordinates.latitude;
+                    data.longitude = coordinates.longitude;
+                }
+                data.meetingPoint = data.meetingPoint || data.meetingPointAddress || '';
                 self.tour(data);
                 self.isLoading(false);
                 self.loadReviews(id, false);
@@ -85,6 +146,9 @@ function TourDetailViewModel() {
             },
             error: function() {
                 self.tour(null);
+                self.isLoading(false);
+            },
+            complete: function() {
                 self.isLoading(false);
             }
         });
@@ -170,16 +234,16 @@ function TourDetailViewModel() {
 
     // ===== Difficulty / Category =====
     var difficultyMap = {
-        0: { name: T('TourDifficulty.Easy') || 'Kolay', css: 'bg-success' },
-        1: { name: T('TourDifficulty.Moderate') || 'Orta', css: 'bg-info' },
-        2: { name: T('TourDifficulty.Challenging') || 'Zor', css: 'bg-warning text-dark' },
-        3: { name: T('TourDifficulty.Expert') || 'Uzman', css: 'bg-danger' }
+        0: { key: 'TourDifficulty.Easy', fallback: 'Kolay', css: 'bg-success' },
+        1: { key: 'TourDifficulty.Moderate', fallback: 'Orta', css: 'bg-info' },
+        2: { key: 'TourDifficulty.Challenging', fallback: 'Zor', css: 'bg-warning text-dark' },
+        3: { key: 'TourDifficulty.Expert', fallback: 'Uzman', css: 'bg-danger' }
     };
-    self.getDifficultyName = function(id) { return difficultyMap[id] ? difficultyMap[id].name : ''; };
+    self.getDifficultyName = function(id) { return difficultyMap[id] ? TL(difficultyMap[id].key, difficultyMap[id].fallback) : ''; };
     self.getDifficultyBadgeClass = function(id) { return difficultyMap[id] ? difficultyMap[id].css : 'bg-secondary'; };
     self.getCategoryName = function(id) {
         var cat = self.categories().find(function(c) { return c.id === id; });
-        return cat ? (T(cat.nameResourceKey) || cat.systemName) : '';
+        return cat ? TL(cat.nameResourceKey, cat.systemName) : '';
     };
 
     // ===== Yorumlar =====
@@ -433,9 +497,10 @@ function TourDetailViewModel() {
     // ===== Harita =====
     self.initMap = function(tour) {
         if (!tour.latitude || !tour.longitude) return;
+        if (!window.L) return;
         setTimeout(function() {
             var mapEl = document.getElementById('tourMap');
-            if (!mapEl) return;
+            if (!mapEl || !window.L) return;
             var map = L.map('tourMap').setView([tour.latitude, tour.longitude], 14);
             L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
                 attribution: '&copy; OpenStreetMap'
@@ -643,18 +708,26 @@ function TourDetailViewModel() {
     };
 
     // ===== Init =====
-    $(document).ready(function() {
-        writeReviewModal = new bootstrap.Modal(document.getElementById('writeReviewModal'));
-        replyModal = new bootstrap.Modal(document.getElementById('replyModal'));
-        reportModal = new bootstrap.Modal(document.getElementById('reportModal'));
-        reservationModal = new bootstrap.Modal(document.getElementById('reservationModal'));
-        watchModal = new bootstrap.Modal(document.getElementById('watchModal'));
+    self.init = function() {
+        writeReviewModal = createModal('writeReviewModal');
+        replyModal = createModal('replyModal');
+        reportModal = createModal('reportModal');
+        reservationModal = createModal('reservationModal');
+        watchModal = createModal('watchModal');
         self.loadCategories();
         self.loadFavorites();
         self.loadWatches();
+        if (isNaN(tourId)) {
+            self.isLoading(false);
+            return;
+        }
         self.loadTour(tourId);
-    });
+    };
 }
 
-var detailVM = new TourDetailViewModel();
-ko.applyBindings(detailVM, document.getElementById('tourDetailApp'));
+var detailRoot = document.getElementById('tourDetailApp');
+if (detailRoot) {
+    var detailVM = new TourDetailViewModel();
+    ko.applyBindings(detailVM, detailRoot);
+    detailVM.init();
+}

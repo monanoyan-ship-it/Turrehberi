@@ -33,9 +33,11 @@ public class IyzicoPaymentService : IPaymentService
             var checkoutFormRequest = new CreateCheckoutFormInitializeRequest
             {
                 Locale = Locale.TR.ToString(),
-                ConversationId = $"RES-{request.ReservationId}-{DateTime.UtcNow.Ticks}",
-                Price = request.Amount.ToString("F2").Replace(",", "."),
-                PaidPrice = request.Amount.ToString("F2").Replace(",", "."),
+                ConversationId = string.IsNullOrWhiteSpace(request.ConversationId)
+                    ? $"RES-{request.ReservationId}-{DateTime.UtcNow.Ticks}"
+                    : request.ConversationId,
+                Price = FormatDecimal(request.Amount),
+                PaidPrice = FormatDecimal(request.Amount),
                 Currency = Currency.TRY.ToString(),
                 BasketId = $"B-{request.ReservationId}",
                 PaymentGroup = PaymentGroup.PRODUCT.ToString(),
@@ -71,16 +73,24 @@ public class IyzicoPaymentService : IPaymentService
             checkoutFormRequest.ShippingAddress = billingAddress;
 
             // Sepet Urunleri
+            var basketItem = new BasketItem
+            {
+                Id = string.IsNullOrWhiteSpace(request.BasketItemId) ? $"TOUR-{request.ReservationId}" : request.BasketItemId,
+                Name = request.ProductName,
+                Category1 = request.ProductCategory,
+                ItemType = BasketItemType.VIRTUAL.ToString(),
+                Price = FormatDecimal(request.Amount)
+            };
+
+            if (!string.IsNullOrWhiteSpace(request.SubMerchantKey) && request.SubMerchantPrice.HasValue)
+            {
+                SetPropertyIfExists(basketItem, "SubMerchantKey", request.SubMerchantKey);
+                SetPropertyIfExists(basketItem, "SubMerchantPrice", FormatDecimal(request.SubMerchantPrice.Value));
+            }
+
             var basketItems = new List<BasketItem>
             {
-                new BasketItem
-                {
-                    Id = $"TOUR-{request.ReservationId}",
-                    Name = request.ProductName,
-                    Category1 = request.ProductCategory,
-                    ItemType = BasketItemType.VIRTUAL.ToString(),
-                    Price = request.Amount.ToString("F2").Replace(",", ".")
-                }
+                basketItem
             };
             checkoutFormRequest.BasketItems = basketItems;
 
@@ -160,7 +170,8 @@ public class IyzicoPaymentService : IPaymentService
                     PaymentId = checkoutForm.PaymentId,
                     ConversationId = checkoutForm.ConversationId,
                     PaidAmount = decimal.TryParse(checkoutForm.PaidPrice, System.Globalization.NumberStyles.Any, System.Globalization.CultureInfo.InvariantCulture, out var paid) ? paid : 0,
-                    ReservationId = reservationId
+                    ReservationId = reservationId,
+                    Items = ExtractPaymentItems(checkoutForm)
                 };
             }
             else
@@ -263,5 +274,68 @@ public class IyzicoPaymentService : IPaymentService
         }
 
         return "+90" + digits;
+    }
+
+    private static string FormatDecimal(decimal value)
+        => value.ToString("F2", System.Globalization.CultureInfo.InvariantCulture);
+
+    private static void SetPropertyIfExists(object target, string propertyName, object? value)
+    {
+        var property = target.GetType().GetProperty(propertyName);
+        if (property?.CanWrite == true)
+        {
+            property.SetValue(target, value);
+        }
+    }
+
+    private static List<MarketplacePaymentItemResult> ExtractPaymentItems(object checkoutForm)
+    {
+        var items = new List<MarketplacePaymentItemResult>();
+        var itemTransactions = checkoutForm.GetType().GetProperty("ItemTransactions")?.GetValue(checkoutForm) as System.Collections.IEnumerable;
+        if (itemTransactions == null) return items;
+
+        foreach (var item in itemTransactions)
+        {
+            items.Add(new MarketplacePaymentItemResult
+            {
+                ItemId = ReadString(item, "ItemId"),
+                PaymentTransactionId = ReadString(item, "PaymentTransactionId"),
+                TransactionStatus = ReadInt(item, "TransactionStatus"),
+                Price = ReadDecimal(item, "Price"),
+                PaidPrice = ReadDecimal(item, "PaidPrice"),
+                MerchantPayoutAmount = ReadDecimal(item, "MerchantPayoutAmount"),
+                SubMerchantPayoutAmount = ReadDecimal(item, "SubMerchantPayoutAmount"),
+                IyziCommissionRateAmount = ReadDecimal(item, "IyziCommissionRateAmount"),
+                IyziCommissionFee = ReadDecimal(item, "IyziCommissionFee"),
+                BlockageRateAmountMerchant = ReadDecimal(item, "BlockageRateAmountMerchant"),
+                BlockageRateAmountSubMerchant = ReadDecimal(item, "BlockageRateAmountSubMerchant"),
+                BlockageResolvedDate = ReadDate(item, "BlockageResolvedDate")
+            });
+        }
+
+        return items;
+    }
+
+    private static string ReadString(object target, string propertyName)
+        => target.GetType().GetProperty(propertyName)?.GetValue(target)?.ToString() ?? string.Empty;
+
+    private static int ReadInt(object target, string propertyName)
+    {
+        var value = target.GetType().GetProperty(propertyName)?.GetValue(target)?.ToString();
+        return int.TryParse(value, out var number) ? number : 0;
+    }
+
+    private static decimal ReadDecimal(object target, string propertyName)
+    {
+        var value = target.GetType().GetProperty(propertyName)?.GetValue(target)?.ToString();
+        return decimal.TryParse(value, System.Globalization.NumberStyles.Any, System.Globalization.CultureInfo.InvariantCulture, out var number)
+            ? number
+            : 0;
+    }
+
+    private static DateTime? ReadDate(object target, string propertyName)
+    {
+        var value = target.GetType().GetProperty(propertyName)?.GetValue(target)?.ToString();
+        return DateTime.TryParse(value, out var date) ? date : null;
     }
 }

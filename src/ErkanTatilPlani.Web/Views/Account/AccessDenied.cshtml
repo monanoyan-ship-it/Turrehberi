@@ -1,0 +1,19 @@
+@{
+    ViewData["Title"] = "Yetkisiz Erisim";
+}
+
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-6">
+            <div class="card border-0 shadow-sm">
+                <div class="card-body text-center p-5">
+                    <i class="bi bi-shield-lock text-danger display-4"></i>
+                    <h1 class="h4 mt-3 mb-2" data-t="AccessDenied.Title">Yetkisiz erisim</h1>
+                    <p class="text-muted mb-4" data-t="AccessDenied.Message">Bu sayfayi goruntulemek icin uygun hesaba giris yapmaniz gerekiyor.</p>
+                    <a href="/Account/Login" class="btn btn-primary" data-t="Menu.Login">Giris Yap</a>
+                    <a href="/" class="btn btn-outline-secondary ms-2" data-t="Menu.Home">Ana Sayfa</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

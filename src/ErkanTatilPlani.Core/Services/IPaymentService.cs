@@ -10,8 +10,10 @@ public interface IPaymentService
 public class PaymentRequest
 {
     public int ReservationId { get; set; }
+    public string ConversationId { get; set; } = string.Empty;
     public decimal Amount { get; set; }
     public string Currency { get; set; } = "TRY";
+    public int PaymentTransactionTypeId { get; set; }
 
     // Musteri Bilgileri
     public string CustomerEmail { get; set; } = string.Empty;
@@ -26,6 +28,12 @@ public class PaymentRequest
     // Urun Bilgileri
     public string ProductName { get; set; } = string.Empty;
     public string ProductCategory { get; set; } = "Tur";
+    public string BasketItemId { get; set; } = string.Empty;
+    public string? SubMerchantKey { get; set; }
+    public string? SubMerchantExternalId { get; set; }
+    public decimal? SubMerchantPrice { get; set; }
+    public decimal PlatformCommissionRate { get; set; }
+    public decimal PlatformCommissionAmount { get; set; }
 
     // Callback URL'leri
     public string CallbackUrl { get; set; } = string.Empty;
@@ -49,6 +57,23 @@ public class PaymentResult
     public string? ErrorMessage { get; set; }
     public string? ErrorCode { get; set; }
     public int ReservationId { get; set; }
+    public List<MarketplacePaymentItemResult> Items { get; set; } = new();
+}
+
+public class MarketplacePaymentItemResult
+{
+    public string ItemId { get; set; } = string.Empty;
+    public string? PaymentTransactionId { get; set; }
+    public int TransactionStatus { get; set; }
+    public decimal Price { get; set; }
+    public decimal PaidPrice { get; set; }
+    public decimal MerchantPayoutAmount { get; set; }
+    public decimal SubMerchantPayoutAmount { get; set; }
+    public decimal IyziCommissionRateAmount { get; set; }
+    public decimal IyziCommissionFee { get; set; }
+    public decimal BlockageRateAmountMerchant { get; set; }
+    public decimal BlockageRateAmountSubMerchant { get; set; }
+    public DateTime? BlockageResolvedDate { get; set; }
 }
 
 public class PaymentStatus

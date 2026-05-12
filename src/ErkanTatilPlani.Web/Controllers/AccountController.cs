@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
+using System.Net.Http.Headers;
 using System.Text;
 using System.Text.Json;
 
@@ -26,7 +27,46 @@ public class AccountController : Controller
 
     public IActionResult Logout()
     {
+        Response.Cookies.Delete("ErkanTatilPlani.Jwt");
         return RedirectToAction("Index", "Home");
+    }
+
+    public IActionResult AccessDenied()
+    {
+        return View();
+    }
+
+    [HttpPost]
+    public async Task<IActionResult> SetAuthToken([FromBody] SetAuthTokenRequest request)
+    {
+        if (string.IsNullOrWhiteSpace(request.Token))
+            return Unauthorized(new { success = false });
+
+        var apiBaseUrl = _configuration["ApiBaseUrl"] ?? "https://localhost:7078";
+        var client = _httpClientFactory.CreateClient();
+        using var message = new HttpRequestMessage(HttpMethod.Get, $"{apiBaseUrl}/api/auth/me");
+        message.Headers.Authorization = new AuthenticationHeaderValue("Bearer", request.Token);
+
+        var response = await client.SendAsync(message);
+        if (!response.IsSuccessStatusCode)
+            return Unauthorized(new { success = false });
+
+        Response.Cookies.Append("ErkanTatilPlani.Jwt", request.Token, new CookieOptions
+        {
+            HttpOnly = true,
+            Secure = Request.IsHttps,
+            SameSite = SameSiteMode.Lax,
+            Expires = DateTimeOffset.UtcNow.AddHours(24)
+        });
+
+        return Ok(new { success = true });
+    }
+
+    [HttpPost]
+    public IActionResult ClearAuthToken()
+    {
+        Response.Cookies.Delete("ErkanTatilPlani.Jwt");
+        return Ok(new { success = true });
     }
 
     public IActionResult Profile()
@@ -170,4 +210,9 @@ public class PaymentCallbackResponse
     public string? Message { get; set; }
     public int ReservationId { get; set; }
     public string? PaymentId { get; set; }
+}
+
+public class SetAuthTokenRequest
+{
+    public string Token { get; set; } = string.Empty;
 }

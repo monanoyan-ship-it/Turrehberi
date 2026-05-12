@@ -40,12 +40,14 @@ public class CompaniesController : ControllerBase
     }
 
     [HttpGet]
+    [Authorize(Roles = "Admin,Staff")]
     public async Task<ActionResult<IEnumerable<Company>>> GetCompanies()
     {
         return Ok(await _crud.GetCompaniesAsync());
     }
 
     [HttpGet("{id}")]
+    [Authorize(Roles = "Admin,Staff")]
     public async Task<ActionResult<Company>> GetCompany(int id)
     {
         var company = await _crud.GetCompanyAsync(id);

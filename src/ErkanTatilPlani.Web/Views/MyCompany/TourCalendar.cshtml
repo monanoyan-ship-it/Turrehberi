@@ -62,9 +62,9 @@
                                 <!-- ko if: day -->
                                 <div class="small fw-bold mb-1" data-bind="text: day, css: { 'text-muted': isPast }"></div>
                                 <!-- ko foreach: tours.slice(0, 3) -->
-                                <div class="mb-1" data-bind="click: $parents[1].showTourDatePopover" style="cursor: pointer;">
+                                <div class="mb-1" data-bind="click: $parents[2].showTourDatePopover" style="cursor: pointer;">
                                     <span class="badge w-100 text-start" style="font-size: 0.7em; max-width: 100%; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;"
-                                          data-bind="css: $parents[1].getBadgeClass($data), attr: { title: tourName + (startTime ? ' ' + startTime : '') + ' (' + bookedCount + '/' + (maxCapacity || '∞') + ')' }">
+                                          data-bind="css: $parents[2].getBadgeClass($data), attr: { title: tourName + (startTime ? ' ' + startTime : '') + ' (' + bookedCount + '/' + (maxCapacity || '∞') + ')' }">
                                         <span data-bind="text: tourName + (startTime ? ' ' + startTime : '')"></span>
                                         <span class="float-end" data-bind="text: bookedCount + '/' + (maxCapacity || '∞')"></span>
                                     </span>

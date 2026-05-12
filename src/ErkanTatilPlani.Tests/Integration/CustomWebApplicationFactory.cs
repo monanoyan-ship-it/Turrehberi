@@ -13,6 +13,8 @@ public class CustomWebApplicationFactory : WebApplicationFactory<Program>
     {
         builder.ConfigureServices(services =>
         {
+            var databaseName = "TestDb_" + Guid.NewGuid().ToString("N");
+
             // Remove ALL EF Core related services to avoid provider conflicts
             services.RemoveAll(typeof(DbContextOptions<AppDbContext>));
             services.RemoveAll(typeof(DbContextOptions));
@@ -30,7 +32,7 @@ public class CustomWebApplicationFactory : WebApplicationFactory<Program>
             // Add fresh InMemory database
             services.AddDbContext<AppDbContext>(options =>
             {
-                options.UseInMemoryDatabase("TestDb_" + Guid.NewGuid().ToString("N"));
+                options.UseInMemoryDatabase(databaseName);
             });
         });
 

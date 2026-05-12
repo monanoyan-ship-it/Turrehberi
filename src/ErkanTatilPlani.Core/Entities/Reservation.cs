@@ -44,4 +44,7 @@ public class Reservation : BaseEntity
     public virtual Visitor Visitor { get; set; } = null!;
     public virtual TourSchedule? Schedule { get; set; }
     public virtual Promotion? Promotion { get; set; }
+    public virtual ICollection<PaymentTransaction> PaymentTransactions { get; set; } = new List<PaymentTransaction>();
+    public virtual ICollection<MarketplaceRefund> MarketplaceRefunds { get; set; } = new List<MarketplaceRefund>();
+    public virtual ICollection<MarketplaceLedgerEntry> LedgerEntries { get; set; } = new List<MarketplaceLedgerEntry>();
 }

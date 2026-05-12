@@ -46,6 +46,9 @@
                         <a class="nav-link" href="/MyCompany/MyReservations"><i class="bi bi-calendar-check me-1"></i>Rezervasyonlarim</a>
                     </li>
                     <li class="nav-item">
+                        <a class="nav-link" href="/MyCompany/Finance"><i class="bi bi-wallet2 me-1"></i>Finans</a>
+                    </li>
+                    <li class="nav-item">
                         <a class="nav-link" href="/MyCompany/Guides"><i class="bi bi-person-badge me-1"></i>Rehberler</a>
                     </li>
                     <li class="nav-item">
@@ -97,7 +100,7 @@
         (function() {
             var token = localStorage.getItem('token');
             if (!token) {
-                window.location.href = '/Account/Login';
+                window.location.href = '/Account/Login?returnUrl=' + encodeURIComponent(window.location.pathname + window.location.search);
                 return;
             }
             $.ajaxSetup({
@@ -109,14 +112,21 @@
                     window.currentUser = JSON.parse(userStr);
                 } catch(e) {}
             }
+            if (!window.currentUser || Number(window.currentUser.userTypeId) < 1) {
+                window.location.href = '/Account/AccessDenied';
+            }
         })();
 
-        // Global 401 handler - token suresi dolduysa login'e yonlendir
+        // Global 401/403 handler - token suresi dolduysa veya rol yetmezse yonlendir
         $(document).ajaxError(function(event, xhr) {
             if (xhr.status === 401) {
                 localStorage.removeItem('token');
+                localStorage.removeItem('user');
                 toastr.error(T('Error.SessionExpired') || 'Oturum suresi doldu, giris yapiniz');
-                setTimeout(function() { window.location.href = '/Account/Login'; }, 1500);
+                setTimeout(function() { window.location.href = '/Account/Logout'; }, 1500);
+            } else if (xhr.status === 403) {
+                toastr.error(T('Error.AccessDenied') || 'Bu islem icin yetkiniz yok');
+                setTimeout(function() { window.location.href = '/Account/AccessDenied'; }, 1000);
             }
         });
 
