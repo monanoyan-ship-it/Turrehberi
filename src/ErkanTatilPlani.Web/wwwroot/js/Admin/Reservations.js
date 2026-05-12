@@ -15,6 +15,13 @@ function AdminReservationsViewModel() {
     self.getPaymentBadge = function(s) { return ['bg-secondary', 'bg-warning text-dark', 'bg-success', 'bg-danger', 'bg-info'][s] || 'bg-secondary'; };
     var paymentKeys = ['Payment.Waiting', 'Payment.Partial', 'Payment.Full', 'Payment.Failed', 'Payment.Refund'];
     self.getPaymentText = function(s) { return paymentKeys[s] ? T(paymentKeys[s]) : T('Common.Unknown'); };
+    self.formatReservationDate = function(date, startTime) {
+        if (!date || date.indexOf('0001-01-01') === 0) {
+            return '-';
+        }
+
+        return startTime ? date + ' ' + startTime.toString().substring(0, 5) : date;
+    };
 
     self.filteredReservations = ko.computed(function() {
         var status = self.filterStatus();

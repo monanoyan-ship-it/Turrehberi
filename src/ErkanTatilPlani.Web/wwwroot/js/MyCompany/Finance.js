@@ -1,8 +1,17 @@
 function CompanyFinanceViewModel() {
     var self = this;
 
+    function createEmptySummary() {
+        return {
+            grossVolume: 0,
+            sellerReceivable: 0,
+            availableForPayout: 0,
+            refundedAmount: 0
+        };
+    }
+
     self.seller = ko.observable({});
-    self.summary = ko.observable({});
+    self.summary = ko.observable(createEmptySummary());
     self.transactions = ko.observableArray([]);
     self.payouts = ko.observableArray([]);
     self.refunds = ko.observableArray([]);
@@ -72,7 +81,7 @@ function CompanyFinanceViewModel() {
         $.get(apiBaseUrl + '/api/marketplace/my')
             .done(function(data) {
                 self.seller(data.seller || {});
-                self.summary(data.summary || {});
+                self.summary(data.summary || createEmptySummary());
                 self.transactions(data.transactions || []);
                 self.payouts(data.payouts || []);
                 self.refunds(data.refunds || []);

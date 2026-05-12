@@ -1,6 +1,33 @@
 function MyToursViewModel() {
     var self = this;
 
+    function createEmptyTourFormData() {
+        return {
+            name: '',
+            description: '',
+            destination: '',
+            price: 0,
+            durationDays: 1,
+            maxCapacity: 20,
+            imageUrl: '',
+            isFeatured: false,
+            difficultyId: '1',
+            categoryId: '0',
+            guideLanguages: '',
+            inclusions: '',
+            exclusions: '',
+            isSustainable: false,
+            sustainabilityScore: 0,
+            sustainabilityInfo: '',
+            isWheelchairAccessible: false,
+            mobilityLevel: '0',
+            accessibilityInfo: '',
+            meetingPointLat: '',
+            meetingPointLng: '',
+            meetingPointAddress: ''
+        };
+    }
+
     // Observables
     self.isLoading = ko.observable(true);
     self.isSaving = ko.observable(false);
@@ -12,30 +39,7 @@ function MyToursViewModel() {
     // Form
     self.isEditing = ko.observable(false);
     self.editingTourId = ko.observable(null);
-    self.formData = ko.observable({
-        name: '',
-        description: '',
-        destination: '',
-        price: 0,
-        durationDays: 1,
-        maxCapacity: 20,
-        imageUrl: '',
-        isFeatured: false,
-        difficultyId: '1',
-        categoryId: '0',
-        guideLanguages: '',
-        inclusions: '',
-        exclusions: '',
-        isSustainable: false,
-        sustainabilityScore: 0,
-        sustainabilityInfo: '',
-        isWheelchairAccessible: false,
-        mobilityLevel: '0',
-        accessibilityInfo: '',
-        meetingPointLat: '',
-        meetingPointLng: '',
-        meetingPointAddress: ''
-    });
+    self.formData = ko.observable(createEmptyTourFormData());
 
     // Delete
     self.deletingTour = ko.observable(null);
@@ -429,27 +433,7 @@ function MyToursViewModel() {
     self.openAddModal = function() {
         self.isEditing(false);
         self.editingTourId(null);
-        self.formData({
-            name: '',
-            description: '',
-            destination: '',
-            price: 0,
-            durationDays: 1,
-            maxCapacity: 20,
-            imageUrl: '',
-            isFeatured: false,
-            difficultyId: '1',
-            categoryId: '0',
-            guideLanguages: '',
-            inclusions: '',
-            exclusions: '',
-            isSustainable: false,
-            sustainabilityScore: 0,
-            sustainabilityInfo: '',
-            isWheelchairAccessible: false,
-            mobilityLevel: '0',
-            accessibilityInfo: ''
-        });
+        self.formData(createEmptyTourFormData());
         tourModal.show();
     };
 

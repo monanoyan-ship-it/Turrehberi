@@ -91,7 +91,7 @@
                                 <tr>
                                     <td data-bind="text: visitor ? visitor.firstName + ' ' + visitor.lastName : '-'"></td>
                                     <td data-bind="text: tour ? tour.name : '-'"></td>
-                                    <td data-bind="text: date"></td>
+                                    <td data-bind="text: $parent.formatReservationDate(date, startTime)"></td>
                                     <td data-bind="text: numberOfPeople"></td>
                                     <td>
                                         <span class="badge" data-bind="css: $parent.getStatusBadge(status), text: $parent.getStatusText(status)"></span>

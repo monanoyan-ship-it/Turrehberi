@@ -32,6 +32,14 @@ function DashboardViewModel() {
         return texts[status] || 'Bilinmiyor';
     };
 
+    self.formatReservationDate = function(date, startTime) {
+        if (!date || date.indexOf('0001-01-01') === 0) {
+            return '-';
+        }
+
+        return startTime ? date + ' ' + startTime.toString().substring(0, 5) : date;
+    };
+
     // Cache temizleme fonksiyonlari
     self.clearAllCache = function() {
         if (!confirm(T('Confirm.ClearAllCache'))) return;
