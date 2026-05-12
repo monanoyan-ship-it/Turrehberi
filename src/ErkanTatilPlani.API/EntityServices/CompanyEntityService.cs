@@ -27,6 +27,9 @@ public class CompanyEntityService : ICompanyEntityService
     public async Task<Company?> GetByTaxNumberAsync(string taxNumber)
         => await _context.Companies.FirstOrDefaultAsync(c => c.TaxNumber == taxNumber);
 
+    public async Task<bool> SlugExistsAsync(string slug, int? excludeId = null)
+        => await _context.Companies.AnyAsync(c => c.Slug == slug && (!excludeId.HasValue || c.Id != excludeId.Value));
+
     public IQueryable<Company> GetActiveApprovedCompanies()
         => _context.Companies.Where(c => c.IsActive && c.StatusId == CompanyStatuses.Ids.Approved);
 

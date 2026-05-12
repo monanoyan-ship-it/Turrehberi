@@ -474,7 +474,7 @@ function MyToursViewModel() {
 
         // Validasyon
         if (!data.name || !data.destination || !data.price || !data.durationDays || !data.maxCapacity) {
-            toastr.warning(T('Common.Required'));
+            toastr.warning(T('Validation.FillRequiredFields') || 'Zorunlu alanlari doldurun');
             return;
         }
 

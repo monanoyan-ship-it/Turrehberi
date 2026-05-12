@@ -43,7 +43,7 @@
             <div class="card">
                 <div class="card-header d-flex align-items-center justify-content-between">
                     <span class="fw-semibold">Marketplace odeme profili</span>
-                    <span class="badge" data-bind="css: onboardingBadge((seller() || {}).sellerOnboardingStatusId), text: (seller() || {}).onboardingStatus"></span>
+                    <span class="badge" data-bind="css: onboardingBadge((seller() || {}).sellerOnboardingStatusId), text: (seller() || {}).localizedOnboardingStatus || '-'"></span>
                 </div>
                 <div class="card-body">
                     <div class="row g-3">

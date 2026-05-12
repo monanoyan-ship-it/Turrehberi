@@ -8,6 +8,7 @@ public interface ICompanyEntityService
     Task<Company?> GetByIdAsync(int id);
     Task<Company?> GetBySlugAsync(string slug);
     Task<Company?> GetByTaxNumberAsync(string taxNumber);
+    Task<bool> SlugExistsAsync(string slug, int? excludeId = null);
     IQueryable<Company> GetActiveApprovedCompanies();
     Task<IEnumerable<Company>> GetPendingCompaniesAsync();
     void Add(Company company);

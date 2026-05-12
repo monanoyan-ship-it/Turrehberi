@@ -77,15 +77,46 @@ function CompanyFinanceViewModel() {
         }[statusId] || 'bg-secondary';
     };
 
+    self.localizeOnboardingStatus = function(status) {
+        if (!status) return '-';
+
+        var key = 'SellerOnboardingStatus.' + status;
+        var translated = T(key);
+        if (translated && translated !== key) return translated;
+
+        return {
+            MissingInfo: 'Eksik bilgi',
+            ReadyForSubmission: 'Gonderime hazir',
+            Submitted: 'Gonderildi',
+            Active: 'Aktif',
+            Failed: 'Basarisiz',
+            Suspended: 'Askida'
+        }[status] || status;
+    };
+
+    function enrichSeller(seller) {
+        seller = seller || {};
+        seller.localizedOnboardingStatus = self.localizeOnboardingStatus(seller.onboardingStatus);
+        return seller;
+    }
+
+    function refreshSellerLocalization() {
+        var seller = self.seller();
+        if (!seller) return;
+
+        self.seller(enrichSeller(seller));
+    }
+
     self.load = function() {
         $.get(apiBaseUrl + '/api/marketplace/my')
             .done(function(data) {
-                self.seller(data.seller || {});
+                var seller = enrichSeller(data.seller || {});
+                self.seller(seller);
                 self.summary(data.summary || createEmptySummary());
                 self.transactions(data.transactions || []);
                 self.payouts(data.payouts || []);
                 self.refunds(data.refunds || []);
-                fillSellerForm(data.seller || {});
+                fillSellerForm(seller);
             })
             .fail(function(xhr) {
                 toastr.error(T(xhr.responseJSON?.message) || T('Error.DataLoadFailed') || 'Veri yuklenemedi');
@@ -154,6 +185,10 @@ function CompanyFinanceViewModel() {
 
     $(document).ready(function() {
         self.load();
+    });
+
+    onLocaleReady.push(function() {
+        refreshSellerLocalization();
     });
 }
 

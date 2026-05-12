@@ -97,7 +97,7 @@
                 <div class="modal-header">
                     <h5 class="modal-title">
                         <i class="bi bi-person-badge me-2"></i>
-                        <span data-bind="text: isEditing() ? T('Guide.Edit') || 'Rehber Duzenle' : T('Guide.Add') || 'Rehber Ekle'"></span>
+                        <span data-bind="text: guideModalTitle"></span>
                     </h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                 </div>
@@ -105,19 +105,19 @@
                     <div class="row g-3">
                         <div class="col-md-6">
                             <label class="form-label" data-t="Guide.FirstName">Ad <span class="text-danger">*</span></label>
-                            <input type="text" class="form-control" data-bind="value: formData().firstName" required>
+                            <input type="text" class="form-control" data-bind="textInput: formData().firstName" required>
                         </div>
                         <div class="col-md-6">
                             <label class="form-label" data-t="Guide.LastName">Soyad <span class="text-danger">*</span></label>
-                            <input type="text" class="form-control" data-bind="value: formData().lastName" required>
+                            <input type="text" class="form-control" data-bind="textInput: formData().lastName" required>
                         </div>
                         <div class="col-md-6">
                             <label class="form-label" data-t="Guide.Phone">Telefon</label>
-                            <input type="tel" class="form-control" data-bind="value: formData().phone">
+                            <input type="tel" class="form-control" data-bind="textInput: formData().phone">
                         </div>
                         <div class="col-md-6">
                             <label class="form-label" data-t="Guide.Email">Email</label>
-                            <input type="email" class="form-control" data-bind="value: formData().email">
+                            <input type="email" class="form-control" data-bind="textInput: formData().email">
                         </div>
                         <div class="col-12">
                             <label class="form-label" data-t="Guide.Languages">Diller</label>
@@ -137,11 +137,11 @@
                         </div>
                         <div class="col-md-6">
                             <label class="form-label" data-t="Guide.ExperienceYears">Deneyim (Yil)</label>
-                            <input type="number" class="form-control" data-bind="value: formData().experienceYears" min="0">
+                            <input type="number" class="form-control" data-bind="textInput: formData().experienceYears" min="0">
                         </div>
                         <div class="col-12">
                             <label class="form-label" data-t="Guide.Bio">Biyografi</label>
-                            <textarea class="form-control" rows="3" data-bind="value: formData().bio"></textarea>
+                            <textarea class="form-control" rows="3" data-bind="textInput: formData().bio"></textarea>
                         </div>
                     </div>
                 </div>

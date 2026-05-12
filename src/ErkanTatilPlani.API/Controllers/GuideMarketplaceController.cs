@@ -7,7 +7,7 @@ namespace ErkanTatilPlani.API.Controllers;
 /// Rehber pazaryeri - herkese acik rehber katalogu (Faz 15.3)
 /// </summary>
 [ApiController]
-[Route("api/guides")]
+[Route("api/guide-marketplace")]
 [Tags("Guide Marketplace")]
 public class GuideMarketplaceController : ControllerBase
 {

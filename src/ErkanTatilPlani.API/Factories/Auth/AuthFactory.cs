@@ -5,6 +5,7 @@ using ErkanTatilPlani.Core.Factories.Auth;
 using ErkanTatilPlani.Core.Factories.Referrals;
 using ErkanTatilPlani.Core.Helpers;
 using ErkanTatilPlani.Core.Infrastructure;
+using System.Text.RegularExpressions;
 
 namespace ErkanTatilPlani.API.Factories.Auth;
 
@@ -122,6 +123,7 @@ public class AuthFactory : IAuthFactory
         var company = new Company
         {
             Name = companyName,
+            Slug = await GenerateUniqueCompanySlugAsync(companyName),
             TaxNumber = taxNumber,
             Email = companyEmail ?? string.Empty,
             Phone = companyPhone ?? string.Empty,
@@ -163,5 +165,39 @@ public class AuthFactory : IAuthFactory
 
         var token = _jwtService.GenerateToken(visitor);
         return (true, AuthUserInfoHelper.BuildLoginResponse(token, visitor), 200);
+    }
+
+    private async Task<string> GenerateUniqueCompanySlugAsync(string companyName)
+    {
+        var baseSlug = GenerateSlug(companyName);
+        if (string.IsNullOrWhiteSpace(baseSlug))
+            baseSlug = "company";
+
+        var slug = baseSlug;
+        var counter = 2;
+        while (await _companyService.SlugExistsAsync(slug))
+        {
+            slug = $"{baseSlug}-{counter}";
+            counter++;
+        }
+
+        return slug;
+    }
+
+    private static string GenerateSlug(string title)
+    {
+        var slug = title.ToLowerInvariant();
+
+        slug = slug.Replace("\u00e7", "c").Replace("\u011f", "g").Replace("\u0131", "i")
+                   .Replace("\u00f6", "o").Replace("\u015f", "s").Replace("\u00fc", "u")
+                   .Replace("\u00c7", "c").Replace("\u011e", "g").Replace("\u0130", "i")
+                   .Replace("\u00d6", "o").Replace("\u015e", "s").Replace("\u00dc", "u");
+
+        slug = Regex.Replace(slug, @"[^a-z0-9\s-]", "");
+        slug = Regex.Replace(slug, @"\s+", "-");
+        slug = Regex.Replace(slug, @"-+", "-");
+        slug = slug.Trim('-');
+
+        return slug;
     }
 }

@@ -128,37 +128,37 @@
                             <!-- Tur Adi -->
                             <div class="col-md-6">
                                 <label class="form-label" data-t="Tour.Name">Tur Adi <span class="text-danger">*</span></label>
-                                <input type="text" class="form-control" data-bind="value: formData().name" required>
+                                <input type="text" class="form-control" data-bind="textInput: formData().name" required>
                             </div>
 
                             <!-- Destinasyon -->
                             <div class="col-md-6">
                                 <label class="form-label" data-t="Tour.Destination">Destinasyon <span class="text-danger">*</span></label>
-                                <input type="text" class="form-control" data-bind="value: formData().destination" required>
+                                <input type="text" class="form-control" data-bind="textInput: formData().destination" required>
                             </div>
 
                             <!-- Aciklama -->
                             <div class="col-12">
                                 <label class="form-label" data-t="Tour.Description">Aciklama</label>
-                                <textarea class="form-control" rows="3" data-bind="value: formData().description"></textarea>
+                                <textarea class="form-control" rows="3" data-bind="textInput: formData().description"></textarea>
                             </div>
 
                             <!-- Fiyat -->
                             <div class="col-md-4">
                                 <label class="form-label" data-t="Tour.Price">Fiyat (TL) <span class="text-danger">*</span></label>
-                                <input type="number" class="form-control" data-bind="value: formData().price" min="0" step="0.01" required>
+                                <input type="number" class="form-control" data-bind="textInput: formData().price" min="0" step="0.01" required>
                             </div>
 
                             <!-- Sure -->
                             <div class="col-md-4">
                                 <label class="form-label" data-t="Tour.Duration">Sure (Gun) <span class="text-danger">*</span></label>
-                                <input type="number" class="form-control" data-bind="value: formData().durationDays" min="1" required>
+                                <input type="number" class="form-control" data-bind="textInput: formData().durationDays" min="1" required>
                             </div>
 
                             <!-- Kapasite -->
                             <div class="col-md-4">
                                 <label class="form-label" data-t="Tour.Capacity">Maksimum Kapasite <span class="text-danger">*</span></label>
-                                <input type="number" class="form-control" data-bind="value: formData().maxCapacity" min="1" required>
+                                <input type="number" class="form-control" data-bind="textInput: formData().maxCapacity" min="1" required>
                             </div>
 
                             <!-- Kapak Fotografi -->
@@ -216,18 +216,18 @@
                             </div>
                             <div class="col-md-4">
                                 <label class="form-label" data-t="Tour.GuideLanguages">Rehber Dilleri</label>
-                                <input type="text" class="form-control" data-bind="value: formData().guideLanguages" placeholder="tr,en,de">
+                                <input type="text" class="form-control" data-bind="textInput: formData().guideLanguages" placeholder="tr,en,de">
                                 <small class="text-muted">Virgullu ayrilmis (tr,en,de)</small>
                             </div>
 
                             <!-- Dahil Olan / Olmayan -->
                             <div class="col-md-6">
                                 <label class="form-label" data-t="Tour.Inclusions">Dahil Olan</label>
-                                <textarea class="form-control" rows="3" data-bind="value: formData().inclusions" placeholder="Her satira bir madde yazin"></textarea>
+                                <textarea class="form-control" rows="3" data-bind="textInput: formData().inclusions" placeholder="Her satira bir madde yazin"></textarea>
                             </div>
                             <div class="col-md-6">
                                 <label class="form-label" data-t="Tour.Exclusions">Dahil Olmayan</label>
-                                <textarea class="form-control" rows="3" data-bind="value: formData().exclusions" placeholder="Her satira bir madde yazin"></textarea>
+                                <textarea class="form-control" rows="3" data-bind="textInput: formData().exclusions" placeholder="Her satira bir madde yazin"></textarea>
                             </div>
 
                             <!-- Surdurulebilirlik (Faz 15.4) -->
@@ -243,11 +243,11 @@
                             </div>
                             <div class="col-md-4">
                                 <label class="form-label" data-t="Tour.SustainabilityScore">Surdurulebilirlik Puani (0-100)</label>
-                                <input type="number" class="form-control" data-bind="value: formData().sustainabilityScore" min="0" max="100">
+                                <input type="number" class="form-control" data-bind="textInput: formData().sustainabilityScore" min="0" max="100">
                             </div>
                             <div class="col-md-4">
                                 <label class="form-label" data-t="Tour.SustainabilityInfo">Surdurulebilirlik Detaylari</label>
-                                <input type="text" class="form-control" data-bind="value: formData().sustainabilityInfo" placeholder="Karbon notr, plastik yok...">
+                                <input type="text" class="form-control" data-bind="textInput: formData().sustainabilityInfo" placeholder="Karbon notr, plastik yok...">
                             </div>
 
                             <!-- Erisilebilirlik (Faz 15.5) -->
@@ -272,7 +272,7 @@
                             </div>
                             <div class="col-md-4">
                                 <label class="form-label" data-t="Tour.AccessibilityInfo">Erisilebilirlik Detaylari</label>
-                                <input type="text" class="form-control" data-bind="value: formData().accessibilityInfo" placeholder="Asansor, rampa, engelli WC...">
+                                <input type="text" class="form-control" data-bind="textInput: formData().accessibilityInfo" placeholder="Asansor, rampa, engelli WC...">
                             </div>
 
                             <!-- Bulusma Noktasi -->
@@ -282,15 +282,15 @@
                             </div>
                             <div class="col-md-4">
                                 <label class="form-label" data-t="MeetingPoint.Lat">Enlem</label>
-                                <input type="number" class="form-control" data-bind="value: formData().meetingPointLat" step="0.000001" placeholder="41.0082">
+                                <input type="number" class="form-control" data-bind="textInput: formData().meetingPointLat" step="0.000001" placeholder="41.0082">
                             </div>
                             <div class="col-md-4">
                                 <label class="form-label" data-t="MeetingPoint.Lng">Boylam</label>
-                                <input type="number" class="form-control" data-bind="value: formData().meetingPointLng" step="0.000001" placeholder="28.9784">
+                                <input type="number" class="form-control" data-bind="textInput: formData().meetingPointLng" step="0.000001" placeholder="28.9784">
                             </div>
                             <div class="col-md-4">
                                 <label class="form-label" data-t="MeetingPoint.Address">Adres</label>
-                                <input type="text" class="form-control" data-bind="value: formData().meetingPointAddress" placeholder="Sultanahmet Meydani">
+                                <input type="text" class="form-control" data-bind="textInput: formData().meetingPointAddress" placeholder="Sultanahmet Meydani">
                             </div>
 
                             <!-- One Cikan - sadece bilgi -->

@@ -6,6 +6,7 @@ function GuidesViewModel() {
     self.isSaving = ko.observable(false);
     self.isDeleting = ko.observable(false);
     self.guides = ko.observableArray([]);
+    self.localizationVersion = ko.observable(0);
 
     // Available languages (from API)
     self.availableLanguages = ko.observableArray([]);
@@ -47,6 +48,11 @@ function GuidesViewModel() {
     var assignModal = null;
 
     // Helper: parse languages JSON string to array
+    self.translate = function(key, fallback) {
+        var value = T(key);
+        return !value || value === key ? fallback : value;
+    };
+
     self.parseLanguages = function(langStr) {
         if (!langStr) return [];
         try {
@@ -86,6 +92,13 @@ function GuidesViewModel() {
     self.isLanguageSelected = function(code) {
         return self.selectedLanguages().indexOf(code) >= 0;
     };
+
+    self.guideModalTitle = ko.pureComputed(function() {
+        self.localizationVersion();
+        return self.isEditing()
+            ? self.translate('Guide.Edit', 'Rehber Duzenle')
+            : self.translate('Guide.Add', 'Rehber Ekle');
+    });
 
     // Load available languages
     self.loadLanguages = function() {
@@ -211,7 +224,7 @@ function GuidesViewModel() {
     self.saveGuide = function() {
         var data = self.formData();
         if (!data.firstName || !data.lastName) {
-            toastr.warning(T('Common.Required') || 'Ad ve soyad zorunlu');
+            toastr.warning(self.translate('Validation.FillRequiredFields', 'Zorunlu alanlari doldurun'));
             return;
         }
 
@@ -452,6 +465,13 @@ function GuidesViewModel() {
         deleteGuideModal = new bootstrap.Modal(document.getElementById('deleteGuideModal'));
         photoModal = new bootstrap.Modal(document.getElementById('photoModal'));
         assignModal = new bootstrap.Modal(document.getElementById('assignModal'));
+
+        if (Array.isArray(window.onLocaleReady)) {
+            window.onLocaleReady.push(function() {
+                self.localizationVersion(self.localizationVersion() + 1);
+            });
+        }
+
         self.loadLanguages();
         self.loadData();
     });

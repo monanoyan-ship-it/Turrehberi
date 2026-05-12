@@ -23,6 +23,7 @@ function ProfileViewModel() {
     self.avatarUrl = ko.observable('');
     self.emailVerified = ko.observable(false);
     self.userTypeId = ko.observable(0);
+    self.userTypeSystemName = ko.observable('');
     self.userTypeName = ko.observable('');
     self.companyId = ko.observable(null);
     self.companyName = ko.observable('');
@@ -70,6 +71,26 @@ function ProfileViewModel() {
         return url && url.startsWith('/uploads/avatars/');
     });
 
+    self.localizeUserType = function(systemName) {
+        if (!systemName) return '';
+
+        var normalizedName = systemName.indexOf('UserType.') === 0
+            ? systemName.substring('UserType.'.length)
+            : systemName;
+        var key = systemName.indexOf('UserType.') === 0
+            ? systemName
+            : 'UserType.' + systemName;
+        var translated = T(key);
+        if (translated && translated !== key) return translated;
+
+        return {
+            Visitor: 'Ziyaretci',
+            CompanyOwner: 'Firma Sahibi',
+            Staff: 'Personel',
+            Admin: 'Admin'
+        }[normalizedName] || normalizedName;
+    };
+
     // Password Fields
     self.currentPassword = ko.observable('');
     self.newPassword = ko.observable('');
@@ -100,7 +121,8 @@ function ProfileViewModel() {
                 self.avatarUrl(user.avatarUrl || defaultAvatarUrl);
                 self.emailVerified(user.emailVerified || false);
                 self.userTypeId(user.userTypeId);
-                self.userTypeName(T('UserType.' + user.userTypeName));
+                self.userTypeSystemName(user.userTypeName || '');
+                self.userTypeName(self.localizeUserType(user.userTypeName));
                 self.companyId(user.companyId);
                 self.companyName(user.companyName || '');
                 self.preferredLanguage(user.preferredLanguage || 'tr');
@@ -443,6 +465,10 @@ function ProfileViewModel() {
     };
 
     // Initialize
+    onLocaleReady.push(function() {
+        self.userTypeName(self.localizeUserType(self.userTypeSystemName()));
+    });
+
     self.loadUser();
 }
 
