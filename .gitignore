@@ -70,3 +70,4 @@ appsettings.Local.json
 temp_build/
 temp_build_final/
 nul
+.codex-runtime/

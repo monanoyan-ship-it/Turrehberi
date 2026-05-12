@@ -403,6 +403,12 @@ function ToursViewModel() {
 
     // Gorunum modu degistir
     self.setViewMode = function(mode) {
+        if (mode === 'map' && !window.L) {
+            toastr.warning(T('Error.DataLoadFailed') || 'Veriler yuklenemedi');
+            self.viewMode('grid');
+            return;
+        }
+
         self.viewMode(mode);
         if (mode === 'map') {
             // Haritayi baslatmak icin kucuk bir gecikme gerekli (DOM render)
@@ -415,7 +421,7 @@ function ToursViewModel() {
     // Haritayi baslat
     self.initMap = function() {
         var mapContainer = document.getElementById('toursMap');
-        if (!mapContainer) return;
+        if (!mapContainer || !window.L) return;
 
         // Harita zaten baslatilmissa sadece marker'lari guncelle
         if (self.map) {

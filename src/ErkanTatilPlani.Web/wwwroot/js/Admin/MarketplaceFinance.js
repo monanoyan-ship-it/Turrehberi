@@ -1,7 +1,19 @@
 function AdminMarketplaceFinanceViewModel() {
     var self = this;
 
-    self.summary = ko.observable({});
+    function createEmptySummary() {
+        return {
+            grossVolume: 0,
+            platformCommission: 0,
+            sellerReceivable: 0,
+            availableForPayout: 0,
+            refundedAmount: 0,
+            activeSellers: 0,
+            sellersWaitingOnboarding: 0
+        };
+    }
+
+    self.summary = ko.observable(createEmptySummary());
     self.sellers = ko.observableArray([]);
     self.transactions = ko.observableArray([]);
     self.payouts = ko.observableArray([]);
@@ -86,7 +98,7 @@ function AdminMarketplaceFinanceViewModel() {
             $.get(apiBaseUrl + '/api/marketplace/admin/payouts'),
             $.get(apiBaseUrl + '/api/marketplace/admin/refunds')
         ).done(function(overview, sellers, transactions, payouts, refunds) {
-            self.summary(overview[0].summary || {});
+            self.summary(overview[0].summary || createEmptySummary());
             self.sellers(sellers[0].sellers || []);
             self.transactions(transactions[0].transactions || []);
             self.payouts(payouts[0].payouts || []);

@@ -1,5 +1,6 @@
 function ProfileViewModel() {
     var self = this;
+    var defaultAvatarUrl = '/images/placeholders/avatar-placeholder.svg';
 
     // State
     self.isLoading = ko.observable(true);
@@ -96,7 +97,7 @@ function ProfileViewModel() {
                 self.phone(user.phone || '');
                 self.address(user.address || '');
                 self.birthDate(user.birthDate);
-                self.avatarUrl(user.avatarUrl || 'https://ui-avatars.com/api/?name=' + encodeURIComponent(user.firstName + '+' + user.lastName) + '&size=120&background=0d6efd&color=fff');
+                self.avatarUrl(user.avatarUrl || defaultAvatarUrl);
                 self.emailVerified(user.emailVerified || false);
                 self.userTypeId(user.userTypeId);
                 self.userTypeName(T('UserType.' + user.userTypeName));
@@ -185,7 +186,7 @@ function ProfileViewModel() {
                 localStorage.setItem('user', JSON.stringify(storedUser));
 
                 // Update avatar URL with new name
-                self.avatarUrl(user.avatarUrl || 'https://ui-avatars.com/api/?name=' + encodeURIComponent(user.firstName + '+' + user.lastName) + '&size=120&background=0d6efd&color=fff');
+                self.avatarUrl(user.avatarUrl || defaultAvatarUrl);
 
                 toastr.success(T('Profile.ProfileUpdated'));
                 self.isSavingProfile(false);
@@ -404,7 +405,7 @@ function ProfileViewModel() {
             headers: { 'Authorization': 'Bearer ' + localStorage.getItem('token') },
             success: function() {
                 // Varsayilan avatar'a don
-                self.avatarUrl('https://ui-avatars.com/api/?name=' + encodeURIComponent(self.firstName() + '+' + self.lastName()) + '&size=120&background=0d6efd&color=fff');
+                self.avatarUrl(defaultAvatarUrl);
                 self.isDeletingAvatar(false);
                 toastr.success(T('Avatar.DeleteSuccess'));
 

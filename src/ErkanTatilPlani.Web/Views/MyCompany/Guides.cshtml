@@ -32,7 +32,7 @@
                 <div class="card h-100">
                     <div class="card-body">
                         <div class="d-flex align-items-start">
-                            <img data-bind="attr: { src: photoUrl || 'https://picsum.photos/seed/guide-' + id + '/80/80' }"
+                            <img data-bind="attr: { src: photoUrl || '/images/placeholders/avatar-placeholder.svg' }"
                                  class="rounded-circle me-3" style="width: 60px; height: 60px; object-fit: cover;">
                             <div class="flex-grow-1">
                                 <h6 class="mb-1">
@@ -275,7 +275,7 @@
                 <div class="modal-body text-center">
                     <!-- Mevcut fotograf -->
                     <div class="mb-3">
-                        <img data-bind="attr: { src: photoGuideUrl() || 'https://picsum.photos/seed/guide-' + photoGuideId() + '/200/200' }"
+                        <img data-bind="attr: { src: photoGuideUrl() || '/images/placeholders/avatar-placeholder.svg' }"
                              class="rounded-circle" style="width: 120px; height: 120px; object-fit: cover;">
                     </div>
                     <!-- Upload -->

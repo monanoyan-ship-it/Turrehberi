@@ -20,7 +20,7 @@
                         <!-- Author -->
                         <div class="d-flex align-items-center mb-4">
                             <a data-bind="attr: { href: '/Travelers/Profile/' + authorId() }">
-                                <img data-bind="attr: { src: authorAvatarUrl() || 'https://ui-avatars.com/api/?name=U&size=48&background=0d6efd&color=fff' }"
+                                <img data-bind="attr: { src: authorAvatarUrl() || '/images/placeholders/avatar-placeholder.svg' }"
                                      class="rounded-circle me-3" style="width: 48px; height: 48px; object-fit: cover;" />
                             </a>
                             <div>
@@ -111,7 +111,7 @@
                         <div data-bind="foreach: comments">
                             <div class="d-flex mb-3">
                                 <a data-bind="attr: { href: '/Travelers/Profile/' + visitor.id }">
-                                    <img data-bind="attr: { src: visitor.avatarUrl || 'https://ui-avatars.com/api/?name=' + encodeURIComponent(visitor.firstName + '+' + visitor.lastName) + '&size=32&background=6c757d&color=fff' }"
+                                    <img data-bind="attr: { src: visitor.avatarUrl || '/images/placeholders/avatar-placeholder.svg' }"
                                          class="rounded-circle me-2" style="width: 32px; height: 32px; object-fit: cover;" />
                                 </a>
                                 <div class="flex-grow-1">
@@ -126,7 +126,7 @@
                                     <!-- ko if: replies && replies.length > 0 -->
                                     <div class="ms-4 mt-2" data-bind="foreach: replies">
                                         <div class="d-flex mb-2">
-                                            <img data-bind="attr: { src: visitor.avatarUrl || 'https://ui-avatars.com/api/?name=' + encodeURIComponent(visitor.firstName + '+' + visitor.lastName) + '&size=24&background=6c757d&color=fff' }"
+                                            <img data-bind="attr: { src: visitor.avatarUrl || '/images/placeholders/avatar-placeholder.svg' }"
                                                  class="rounded-circle me-2" style="width: 24px; height: 24px; object-fit: cover;" />
                                             <div>
                                                 <div class="bg-light rounded p-2">

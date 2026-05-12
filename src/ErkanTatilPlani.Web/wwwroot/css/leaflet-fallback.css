@@ -1,0 +1,29 @@
+.leaflet-fallback-map {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    background-color: #f8f9fa;
+    border: 1px dashed #ced4da;
+}
+
+.leaflet-fallback-stage {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    height: 100%;
+    padding: 1.5rem;
+}
+
+.leaflet-fallback-stage img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    opacity: 0.92;
+}
+
+.asset-fallback-applied {
+    background-color: #f8f9fa;
+}
