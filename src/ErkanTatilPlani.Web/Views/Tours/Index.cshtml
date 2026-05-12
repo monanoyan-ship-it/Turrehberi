@@ -68,7 +68,7 @@
                 <i class="bi bi-funnel"></i> <span data-t="Tours.AdvancedFilters">Gelismis Filtreler</span>
                 <span class="badge bg-primary ms-1" data-bind="visible: activeFilterCount() > 0, text: activeFilterCount()"></span>
             </button>
-            <div class="d-flex align-items-center gap-2">
+            <div class="d-flex flex-wrap align-items-center justify-content-end gap-2">
                 <!-- View Toggle -->
                 <div class="btn-group me-2" role="group">
                     <button type="button" class="btn btn-outline-primary btn-sm"
@@ -80,6 +80,24 @@
                         <i class="bi bi-map"></i> <span data-t="Tours.MapView">Harita</span>
                     </button>
                 </div>
+                <div class="input-group input-group-sm" style="width: min(100%, 320px);">
+                    <input type="text"
+                           class="form-control"
+                           data-bind="textInput: addressQuery, event: { keydown: handleAddressKeydown }"
+                           data-t-placeholder="Tours.AddressPlaceholder"
+                           placeholder="Mahalle, sokak veya sehir ara" />
+                    <button type="button"
+                            class="btn btn-outline-secondary"
+                            data-bind="click: searchAddress, disable: isSearchingAddress()">
+                        <i class="bi" data-bind="css: { 'bi-search': !isSearchingAddress(), 'bi-arrow-repeat spin-icon': isSearchingAddress() }"></i>
+                        <span data-t="Common.Search">Ara</span>
+                    </button>
+                </div>
+                <button type="button" class="btn btn-outline-success btn-sm me-2"
+                        data-bind="click: locateUser, disable: isLocating">
+                    <i class="bi" data-bind="css: { 'bi-crosshair': !isLocating(), 'bi-arrow-repeat spin-icon': isLocating() }"></i>
+                    <span data-bind="text: isLocating() ? T('Tours.Locating') : T('Tours.FindNearby')"></span>
+                </button>
                 <label class="text-muted small mb-0" data-t="Tours.SortBy">Sirala:</label>
                 <select class="form-select form-select-sm" style="width: auto;" data-bind="value: sortBy">
                     <option value="" data-t="Tours.SortDefault">Varsayilan</option>
@@ -92,6 +110,7 @@
                 </select>
             </div>
         </div>
+        <div class="small text-danger mt-n2 mb-3" data-bind="visible: locationError, text: locationError"></div>
 
         <!-- Filtre Paneli -->
         <div class="collapse" id="filterPanel">
@@ -217,6 +236,46 @@
 <!-- Harita Gorunumu -->
 <div data-bind="visible: !isLoading() && viewMode() === 'map'" class="mb-4">
     <div class="card shadow-sm">
+        <div class="card-header bg-white border-bottom-0">
+            <div class="d-flex flex-wrap justify-content-between align-items-start gap-3">
+                <div>
+                    <div class="fw-semibold" data-t="Tours.NearbyTitle">Yakin Turlar</div>
+                    <div class="small text-muted" data-bind="text: hasUserLocation() ? userLocationLabel() : T('Tours.NearbySubtitle')"></div>
+                    <div class="small text-danger mt-1" data-bind="visible: locationError, text: locationError"></div>
+                </div>
+                <div class="d-flex gap-2">
+                    <button type="button" class="btn btn-outline-success btn-sm"
+                            data-bind="click: locateUser, disable: isLocating">
+                        <i class="bi" data-bind="css: { 'bi-crosshair': !isLocating(), 'bi-arrow-repeat spin-icon': isLocating() }"></i>
+                        <span data-bind="text: isLocating() ? T('Tours.Locating') : T('Tours.FindNearby')"></span>
+                    </button>
+                    <button type="button" class="btn btn-outline-secondary btn-sm"
+                            data-bind="click: clearUserLocation, visible: hasUserLocation">
+                        <i class="bi bi-x-circle"></i> <span data-t="Tours.ClearLocation">Konumu Temizle</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+        <div class="px-3 pt-3" data-bind="visible: hasUserLocation()">
+            <div class="list-group list-group-flush border rounded overflow-hidden" data-bind="visible: hasNearbyTours, foreach: nearbyTours">
+                <a class="list-group-item list-group-item-action d-flex justify-content-between align-items-start gap-3"
+                   data-bind="attr: { href: '/Tours/Details/' + tour.id }">
+                    <div class="min-width-0">
+                        <div class="fw-semibold text-truncate" data-bind="text: tour.name"></div>
+                        <div class="small text-muted text-truncate">
+                            <i class="bi bi-geo-alt me-1"></i><span data-bind="text: tour.destination"></span>
+                        </div>
+                    </div>
+                    <div class="text-end flex-shrink-0">
+                        <div class="small text-primary fw-semibold" data-bind="text: distanceLabel"></div>
+                        <div class="small text-muted" data-bind="text: tour.price.toLocaleString('tr-TR', {style: 'currency', currency: 'TRY'})"></div>
+                    </div>
+                </a>
+            </div>
+            <div class="border rounded bg-light px-3 py-2 small text-muted" data-bind="visible: !hasNearbyTours()">
+                <i class="bi bi-signpost-split me-1"></i><span data-t="Tours.NoNearbyTours">Konumunuza yakin tur bulunamadi.</span>
+            </div>
+        </div>
         <div class="card-body p-0">
             <div id="toursMap" style="height: 500px; border-radius: 0.375rem;"></div>
         </div>
@@ -283,6 +342,11 @@
                 <p class="card-text text-muted">
                     <i class="bi bi-geo-alt"></i> <span data-bind="text: destination"></span>
                 </p>
+                <!-- ko if: $parent.hasUserLocation() && $parent.getDistanceText($data) -->
+                <p class="card-text mb-2">
+                    <small class="text-primary"><i class="bi bi-signpost me-1"></i><span data-bind="text: $parent.getDistanceText($data)"></span></small>
+                </p>
+                <!-- /ko -->
                 <!-- Puan ve Yorum Sayisi -->
                 <p class="card-text mb-2">
                     <!-- ko if: reviewCount > 0 -->
@@ -343,10 +407,15 @@
 <style>
 .cursor-pointer { cursor: pointer; }
 .star-rating i:hover { transform: scale(1.2); }
+.spin-icon { animation: toursSpin 1s linear infinite; }
 /* Harita popup stilleri */
 .tour-popup { min-width: 180px; }
 .tour-popup strong { font-size: 1rem; }
 #toursMap .leaflet-popup-content-wrapper { border-radius: 8px; }
+@@keyframes toursSpin {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+}
 </style>
 
 <!-- Takip Et Modal -->
