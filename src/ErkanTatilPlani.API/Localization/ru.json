@@ -709,6 +709,7 @@
   "TourDate.SessionFull": "Этот сеанс заполнен",
   "TourDate.SessionTime": "Время сеанса",
   "TourDate.NoSessions": "Нет доступных сеансов на эту дату",
+  "TourDate.NoUpcomingSessions": "Для этого тура нет доступных ближайших сеансов",
   "TourDate.OnlyWithReservations": "Только с бронированиями",
   "TourDate.SelectDate": "Выберите дату",
   "Tours.FilterDifficulty": "Уровень сложности",

@@ -22,6 +22,7 @@ public class ReservationPaymentFactory : IReservationPaymentFactory
     private readonly ITourScheduleEntityService _scheduleService;
     private readonly IVisitorEntityService _visitorService;
     private readonly IReservationEntityService _reservationService;
+    private readonly IPaymentMethodEntityService _paymentMethodService;
     private readonly IUnitOfWork _unitOfWork;
     private readonly IPaymentService _paymentService;
     private readonly IEmailService _emailService;
@@ -39,6 +40,7 @@ public class ReservationPaymentFactory : IReservationPaymentFactory
         ITourScheduleEntityService scheduleService,
         IVisitorEntityService visitorService,
         IReservationEntityService reservationService,
+        IPaymentMethodEntityService paymentMethodService,
         IUnitOfWork unitOfWork,
         IPaymentService paymentService,
         IEmailService emailService,
@@ -55,6 +57,7 @@ public class ReservationPaymentFactory : IReservationPaymentFactory
         _scheduleService = scheduleService;
         _visitorService = visitorService;
         _reservationService = reservationService;
+        _paymentMethodService = paymentMethodService;
         _unitOfWork = unitOfWork;
         _paymentService = paymentService;
         _emailService = emailService;
@@ -83,7 +86,8 @@ public class ReservationPaymentFactory : IReservationPaymentFactory
         string? couponCode = null,
         string? dateToken = null,
         bool payFullAmount = false,
-        decimal creditAmount = 0)
+        decimal creditAmount = 0,
+        string? paymentMethodSystemName = null)
     {
         // Tur kontrolu
         var tour = await _tourService.GetByIdWithCompanyAsync(tourId);
@@ -216,6 +220,10 @@ public class ReservationPaymentFactory : IReservationPaymentFactory
             }
         }
 
+        var (methodFound, paymentMethod, methodError, methodStatusCode) = await ResolveCheckoutMethodAsync(paymentMethodSystemName);
+        if (!methodFound || paymentMethod == null)
+            return (false, methodError, methodStatusCode);
+
         // Rezervasyon olustur
         var reservation = new Reservation
         {
@@ -237,6 +245,8 @@ public class ReservationPaymentFactory : IReservationPaymentFactory
                 : null,
             PromotionId = priceResult.AppliedDiscounts.FirstOrDefault(d => d.PromotionId > 0)?.PromotionId,
             CreditUsed = actualCreditUsed,
+            PaymentMethodSystemName = paymentMethod.SystemName,
+            PaymentProviderSystemName = paymentMethod.ProviderSystemName,
             PaidAmount = 0,
             Status = ReservationStatuses.Ids.Pending,
             PaymentStatus = PaymentStatuses.Ids.Pending,
@@ -303,6 +313,9 @@ public class ReservationPaymentFactory : IReservationPaymentFactory
         {
             ReservationId = reservation.Id,
             Amount = payFullAmount ? totalPrice : depositAmount,
+            PaymentMethodSystemName = paymentMethod.SystemName,
+            ProviderSystemName = paymentMethod.ProviderSystemName,
+            ProviderCredentials = BuildProviderCredentials(paymentMethod),
             CustomerEmail = email,
             CustomerName = nameParts2[0],
             CustomerSurname = nameParts2.Length > 1 ? nameParts2[1] : "",
@@ -348,18 +361,19 @@ public class ReservationPaymentFactory : IReservationPaymentFactory
 
     public async Task<(bool success, object result, int statusCode)> ProcessPaymentCallbackAsync(string token, int? reservationId)
     {
-        var paymentResult = await _paymentService.ProcessCallbackAsync(token);
-
         Reservation? reservation = null;
 
-        if (paymentResult.ReservationId > 0)
-            reservation = await _reservationService.GetByIdWithDetailsAsync(paymentResult.ReservationId);
-
-        if (reservation == null)
-            reservation = await _reservationService.GetByPaymentTokenAsync(token);
-
+        reservation = await _reservationService.GetByPaymentTokenAsync(token);
         if (reservation == null && reservationId.HasValue && reservationId.Value > 0)
             reservation = await _reservationService.GetByIdWithDetailsAsync(reservationId.Value);
+
+        var credentials = await ResolveProviderCredentialsAsync(
+            reservation?.PaymentMethodSystemName,
+            reservation?.PaymentProviderSystemName);
+        var paymentResult = await _paymentService.ProcessCallbackAsync(token, credentials);
+
+        if (reservation == null && paymentResult.ReservationId > 0)
+            reservation = await _reservationService.GetByIdWithDetailsAsync(paymentResult.ReservationId);
 
         if (reservation == null)
             return (false, new { message = "Error.ReservationNotFound", token = token.Substring(0, Math.Min(20, token.Length)) }, 404);
@@ -518,6 +532,104 @@ public class ReservationPaymentFactory : IReservationPaymentFactory
             tourName = reservation.Tour.Name
         };
     }
+
+    private async Task<(bool success, PaymentMethodSetting? method, object errorResult, int statusCode)> ResolveCheckoutMethodAsync(string? paymentMethodSystemName)
+    {
+        var requestedSystemName = (paymentMethodSystemName ?? string.Empty).Trim().ToLowerInvariant();
+        PaymentMethodSetting? method;
+
+        if (string.IsNullOrWhiteSpace(requestedSystemName))
+        {
+            method = await _paymentMethodService.GetDefaultMethodAsync()
+                ?? await _paymentMethodService.GetActiveMethods()
+                    .Where(x => x.IsEnabled)
+                    .OrderBy(x => x.DisplayOrder)
+                    .ThenBy(x => x.Id)
+                    .FirstOrDefaultAsync();
+        }
+        else
+        {
+            method = await _paymentMethodService.GetActiveMethods()
+                .FirstOrDefaultAsync(x => x.IsEnabled && x.SystemName == requestedSystemName);
+        }
+
+        if (method == null)
+        {
+            if (string.IsNullOrWhiteSpace(requestedSystemName) || requestedSystemName == "iyzico-card")
+            {
+                return (true, new PaymentMethodSetting
+                {
+                    SystemName = "iyzico-card",
+                    DisplayName = "Kredi/Banka Karti",
+                    ProviderSystemName = "iyzico",
+                    ProviderDisplayName = "Iyzico",
+                    IsEnabled = true,
+                    IsDefault = true,
+                    IsOnline = true,
+                    SupportsMarketplaceSplit = true,
+                    DisplayOrder = 1,
+                    IconClass = "bi bi-credit-card-2-front"
+                }, new { }, 200);
+            }
+
+            return (false, null, new
+            {
+                message = "Error.PaymentInitFailed",
+                detail = "No enabled payment method found for this request."
+            }, 400);
+        }
+
+        if (!method.IsOnline || !IsSupportedOnlineProvider(method.ProviderSystemName))
+        {
+            return (false, null, new
+            {
+                message = "Error.PaymentInitFailed",
+                detail = "Selected payment method is not available for online checkout."
+            }, 400);
+        }
+
+        return (true, method, new { }, 200);
+    }
+
+    private async Task<PaymentProviderCredentials?> ResolveProviderCredentialsAsync(string? paymentMethodSystemName, string? providerSystemName)
+    {
+        var method = !string.IsNullOrWhiteSpace(paymentMethodSystemName)
+            ? await _paymentMethodService.GetActiveMethods()
+                .FirstOrDefaultAsync(x => x.SystemName == paymentMethodSystemName)
+            : null;
+
+        if (method == null && !string.IsNullOrWhiteSpace(providerSystemName))
+        {
+            method = await _paymentMethodService.GetActiveMethods()
+                .Where(x => x.ProviderSystemName == providerSystemName && x.IsEnabled)
+                .OrderByDescending(x => x.IsDefault)
+                .ThenBy(x => x.DisplayOrder)
+                .FirstOrDefaultAsync();
+        }
+
+        return method == null ? null : BuildProviderCredentials(method);
+    }
+
+    private static PaymentProviderCredentials? BuildProviderCredentials(PaymentMethodSetting method)
+    {
+        if (string.IsNullOrWhiteSpace(method.ApiKey) ||
+            string.IsNullOrWhiteSpace(method.SecretKey) ||
+            string.IsNullOrWhiteSpace(method.BaseUrl))
+        {
+            return null;
+        }
+
+        return new PaymentProviderCredentials
+        {
+            ApiKey = method.ApiKey,
+            SecretKey = method.SecretKey,
+            BaseUrl = method.BaseUrl,
+            IsSandbox = method.IsSandbox
+        };
+    }
+
+    private static bool IsSupportedOnlineProvider(string providerSystemName)
+        => providerSystemName.Equals("iyzico", StringComparison.OrdinalIgnoreCase);
 
     private static List<int> ParseDaysOfWeek(string json)
     {

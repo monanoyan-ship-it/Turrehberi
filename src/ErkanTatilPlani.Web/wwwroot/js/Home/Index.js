@@ -4,6 +4,19 @@ function HomeViewModel() {
     self.featuredTours = ko.observableArray([]);
     self.isLoading = ko.observable(true);
     self.stats = ko.observable({ tours: 0, companies: 0, visitors: 0 });
+    self.userTypeId = ko.observable(null);
+
+    self.isTravelerUser = ko.computed(function() {
+        return self.userTypeId() === 0;
+    });
+
+    self.loadCurrentUser = function() {
+        var user = typeof getUser === 'function' ? getUser() : null;
+        var userTypeId = user && user.userTypeId !== undefined
+            ? parseInt(user.userTypeId, 10)
+            : NaN;
+        self.userTypeId(isNaN(userTypeId) ? null : userTypeId);
+    };
 
     self.loadData = function() {
         self.isLoading(true);
@@ -28,6 +41,7 @@ function HomeViewModel() {
     };
 
     $(document).ready(function() {
+        self.loadCurrentUser();
         self.loadData();
     });
 }

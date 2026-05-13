@@ -709,6 +709,7 @@
   "TourDate.SessionFull": "This session is full",
   "TourDate.SessionTime": "Session Time",
   "TourDate.NoSessions": "No sessions available for this date",
+  "TourDate.NoUpcomingSessions": "No upcoming sessions are available for this tour",
   "TourDate.OnlyWithReservations": "Only with reservations",
   "TourDate.SelectDate": "Select Date",
   "Tours.FilterDifficulty": "Difficulty Level",

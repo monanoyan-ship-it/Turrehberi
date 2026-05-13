@@ -10,6 +10,7 @@ public class PaymentTransaction : BaseEntity
     public int StatusId { get; set; }
 
     public string Provider { get; set; } = "Iyzico";
+    public string PaymentMethodSystemName { get; set; } = "iyzico-card";
     public string Currency { get; set; } = "TRY";
     public string ConversationId { get; set; } = string.Empty;
     public string? PaymentId { get; set; }

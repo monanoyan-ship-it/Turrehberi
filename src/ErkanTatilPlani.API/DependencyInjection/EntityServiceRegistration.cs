@@ -40,6 +40,7 @@ public static class EntityServiceRegistration
         services.AddScoped<ITourPackageEntityService, TourPackageEntityService>();
         services.AddScoped<ITourDigitalContentEntityService, TourDigitalContentEntityService>();
         services.AddScoped<IMarketplaceFinanceEntityService, MarketplaceFinanceEntityService>();
+        services.AddScoped<IPaymentMethodEntityService, PaymentMethodEntityService>();
         return services;
     }
 }

@@ -186,7 +186,8 @@ public class ReservationsController : ControllerBase
             request.CouponCode,
             request.DateToken,
             request.PayFullAmount,
-            request.CreditAmount);
+            request.CreditAmount,
+            request.PaymentMethodSystemName);
 
         return StatusCode(statusCode, result);
     }
@@ -257,6 +258,7 @@ public class CreateReservationRequest
     public string? DateToken { get; set; }
     public bool PayFullAmount { get; set; }
     public decimal CreditAmount { get; set; }
+    public string? PaymentMethodSystemName { get; set; }
 }
 
 public class ChangeDateRequest

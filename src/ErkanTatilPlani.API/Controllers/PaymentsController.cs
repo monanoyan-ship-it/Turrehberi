@@ -24,23 +24,33 @@ public class PaymentsController : ControllerBase
 
     [HttpPost("initialize/{reservationId}")]
     [Authorize]
-    public async Task<ActionResult<object>> InitializePayment(int reservationId)
+    public async Task<ActionResult<object>> InitializePayment(int reservationId, [FromBody] InitializePaymentRequest? request = null)
     {
         var visitorId = GetVisitorId();
         if (visitorId == null) return Unauthorized(new { message = "Error.LoginRequired" });
 
-        var (success, result, statusCode) = await _paymentFactory.InitializePaymentAsync(visitorId.Value, reservationId, Request.Scheme, Request.Host.ToString());
+        var (success, result, statusCode) = await _paymentFactory.InitializePaymentAsync(
+            visitorId.Value,
+            reservationId,
+            Request.Scheme,
+            Request.Host.ToString(),
+            request?.PaymentMethodSystemName);
         return StatusCode(statusCode, result);
     }
 
     [HttpPost("initialize-remaining/{reservationId}")]
     [Authorize]
-    public async Task<ActionResult<object>> InitializeRemainingPayment(int reservationId)
+    public async Task<ActionResult<object>> InitializeRemainingPayment(int reservationId, [FromBody] InitializePaymentRequest? request = null)
     {
         var visitorId = GetVisitorId();
         if (visitorId == null) return Unauthorized(new { message = "Error.LoginRequired" });
 
-        var (success, result, statusCode) = await _paymentFactory.InitializeRemainingPaymentAsync(visitorId.Value, reservationId, Request.Scheme, Request.Host.ToString());
+        var (success, result, statusCode) = await _paymentFactory.InitializeRemainingPaymentAsync(
+            visitorId.Value,
+            reservationId,
+            Request.Scheme,
+            Request.Host.ToString(),
+            request?.PaymentMethodSystemName);
         return StatusCode(statusCode, result);
     }
 
@@ -72,4 +82,9 @@ public class PaymentsController : ControllerBase
 
         return Ok(await _paymentFactory.GetPendingPaymentsAsync(visitorId.Value));
     }
+}
+
+public class InitializePaymentRequest
+{
+    public string? PaymentMethodSystemName { get; set; }
 }

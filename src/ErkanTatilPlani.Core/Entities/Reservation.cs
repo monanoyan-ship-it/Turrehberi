@@ -24,6 +24,8 @@ public class Reservation : BaseEntity
     public int PaymentStatus { get; set; } = PaymentStatuses.Ids.Pending;
     public DateTime? PaidAt { get; set; }
     public string? PaymentToken { get; set; }
+    public string PaymentMethodSystemName { get; set; } = "iyzico-card";
+    public string PaymentProviderSystemName { get; set; } = "iyzico";
 
     // Promosyon Bilgileri
     public decimal DiscountAmount { get; set; }

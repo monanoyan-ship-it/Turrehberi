@@ -709,6 +709,7 @@
   "TourDate.SessionFull": "Esta sessão está lotada",
   "TourDate.SessionTime": "Horário da sessão",
   "TourDate.NoSessions": "Nenhuma sessão disponível para esta data",
+  "TourDate.NoUpcomingSessions": "Nao ha sessoes futuras disponiveis para este tour",
   "TourDate.OnlyWithReservations": "Apenas com reservas",
   "TourDate.SelectDate": "Selecionar data",
   "Tours.FilterDifficulty": "Nível de dificuldade",

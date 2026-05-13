@@ -709,6 +709,7 @@
   "TourDate.SessionFull": "هذه الجلسة ممتلئة",
   "TourDate.SessionTime": "وقت الجلسة",
   "TourDate.NoSessions": "لا توجد جلسات متاحة لهذا التاريخ",
+  "TourDate.NoUpcomingSessions": "لا توجد جلسات قادمة متاحة لهذه الجولة",
   "TourDate.OnlyWithReservations": "فقط مع الحجوزات",
   "TourDate.SelectDate": "اختر التاريخ",
   "Tours.FilterDifficulty": "مستوى الصعوبة",

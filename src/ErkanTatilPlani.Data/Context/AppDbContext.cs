@@ -103,6 +103,7 @@ public class AppDbContext : DbContext
     public DbSet<MarketplaceLedgerEntry> MarketplaceLedgerEntries => Set<MarketplaceLedgerEntry>();
     public DbSet<MarketplaceRefund> MarketplaceRefunds => Set<MarketplaceRefund>();
     public DbSet<PayoutBatch> PayoutBatches => Set<PayoutBatch>();
+    public DbSet<PaymentMethodSetting> PaymentMethodSettings => Set<PaymentMethodSetting>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -189,6 +190,8 @@ public class AppDbContext : DbContext
             entity.Property(e => e.DiscountAmount).HasPrecision(18, 2);
             entity.Property(e => e.CreditUsed).HasPrecision(18, 2);
             entity.Property(e => e.CouponCode).HasMaxLength(50);
+            entity.Property(e => e.PaymentMethodSystemName).HasMaxLength(100);
+            entity.Property(e => e.PaymentProviderSystemName).HasMaxLength(100);
             entity.HasOne(e => e.Tour)
                   .WithMany(t => t.Reservations)
                   .HasForeignKey(e => e.TourId);
@@ -211,6 +214,7 @@ public class AppDbContext : DbContext
         {
             entity.HasKey(e => e.Id);
             entity.Property(e => e.Provider).HasMaxLength(50);
+            entity.Property(e => e.PaymentMethodSystemName).HasMaxLength(100);
             entity.Property(e => e.Currency).HasMaxLength(3);
             entity.Property(e => e.ConversationId).HasMaxLength(100);
             entity.Property(e => e.PaymentId).HasMaxLength(100);
@@ -403,6 +407,25 @@ public class AppDbContext : DbContext
                   .HasForeignKey(e => e.ApprovedById)
                   .IsRequired(false)
                   .OnDelete(DeleteBehavior.SetNull);
+        });
+
+        modelBuilder.Entity<PaymentMethodSetting>(entity =>
+        {
+            entity.HasKey(e => e.Id);
+            entity.Property(e => e.SystemName).IsRequired().HasMaxLength(100);
+            entity.Property(e => e.DisplayName).IsRequired().HasMaxLength(150);
+            entity.Property(e => e.Description).HasMaxLength(300);
+            entity.Property(e => e.ProviderSystemName).IsRequired().HasMaxLength(100);
+            entity.Property(e => e.ProviderDisplayName).HasMaxLength(150);
+            entity.Property(e => e.IconClass).HasMaxLength(100);
+            entity.Property(e => e.ApiKey).HasMaxLength(250);
+            entity.Property(e => e.SecretKey).HasMaxLength(250);
+            entity.Property(e => e.BaseUrl).HasMaxLength(250);
+            entity.Property(e => e.ExtraSettingsJson).HasMaxLength(2000);
+
+            entity.HasIndex(e => e.SystemName).IsUnique();
+            entity.HasIndex(e => new { e.IsActive, e.IsEnabled, e.IsDefault });
+            entity.HasIndex(e => new { e.IsActive, e.DisplayOrder });
         });
 
         modelBuilder.Entity<Language>(entity =>

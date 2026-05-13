@@ -79,6 +79,7 @@ public static class FactoryRegistration
         // Payment factories (1)
         services.AddScoped<IPaymentFactory, PaymentFactory>();
         services.AddScoped<IMarketplaceFinanceFactory, MarketplaceFinanceFactory>();
+        services.AddScoped<IPaymentMethodFactory, PaymentMethodFactory>();
 
         // EmailAccount factories (1)
         services.AddScoped<IEmailAccountFactory, EmailAccountFactory>();

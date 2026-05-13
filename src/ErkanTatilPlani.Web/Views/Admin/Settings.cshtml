@@ -73,6 +73,75 @@
         </div>
     </div>
 
+    <div class="card mt-4">
+        <div class="card-header d-flex justify-content-between align-items-center">
+            <span><i class="bi bi-credit-card me-2"></i>Odeme Yontemleri</span>
+            <button class="btn btn-sm btn-primary" data-bind="click: openCreatePaymentMethodModal">
+                <i class="bi bi-plus me-1"></i>Yontem Ekle
+            </button>
+        </div>
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-hover mb-0">
+                    <thead class="table-light">
+                        <tr>
+                            <th>Yontem</th>
+                            <th>Provider</th>
+                            <th>Durum</th>
+                            <th>Varsayilan</th>
+                            <th>Online</th>
+                            <th>Sandbox</th>
+                            <th>Siralama</th>
+                            <th>Islemler</th>
+                        </tr>
+                    </thead>
+                    <tbody data-bind="foreach: paymentMethods">
+                        <tr>
+                            <td>
+                                <div class="fw-semibold" data-bind="text: displayName"></div>
+                                <div class="small text-muted">
+                                    <span data-bind="text: systemName"></span>
+                                    <span class="mx-1">-</span>
+                                    <span data-bind="text: description || '-'"></span>
+                                </div>
+                            </td>
+                            <td>
+                                <span class="fw-semibold" data-bind="text: providerDisplayName || providerSystemName"></span>
+                                <div class="small text-muted" data-bind="text: providerSystemName"></div>
+                            </td>
+                            <td>
+                                <span class="badge" data-bind="css: $parent.getMethodStatusClass($data), text: $parent.getMethodStatusText($data)"></span>
+                            </td>
+                            <td>
+                                <span class="badge bg-primary" data-bind="visible: isDefault">Varsayilan</span>
+                                <span data-bind="visible: !isDefault">-</span>
+                            </td>
+                            <td>
+                                <span class="badge bg-success" data-bind="visible: isOnline">Online</span>
+                                <span class="badge bg-warning text-dark" data-bind="visible: !isOnline">Manual</span>
+                            </td>
+                            <td>
+                                <span class="badge bg-info text-dark" data-bind="visible: isSandbox">Sandbox</span>
+                                <span class="badge bg-dark" data-bind="visible: !isSandbox">Production</span>
+                            </td>
+                            <td data-bind="text: displayOrder"></td>
+                            <td>
+                                <div class="btn-group btn-group-sm">
+                                    <button class="btn btn-outline-primary" data-bind="click: $parent.openEditPaymentMethodModal" title="Duzenle">
+                                        <i class="bi bi-pencil"></i>
+                                    </button>
+                                    <button class="btn btn-outline-success" data-bind="click: $parent.setDefaultPaymentMethod, enable: isEnabled && !isDefault" title="Varsayilan Yap">
+                                        <i class="bi bi-check2-circle"></i>
+                                    </button>
+                                </div>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
     <!-- Mevcut Diller -->
     <div class="card mt-4">
         <div class="card-header d-flex justify-content-between align-items-center">
@@ -122,6 +191,104 @@
                         </tr>
                     </tbody>
                 </table>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="paymentMethodModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-lg modal-dialog-scrollable">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">
+                        <span data-bind="text: isEditingPaymentMethod() ? 'Odeme Yontemi Duzenle' : 'Odeme Yontemi Ekle'"></span>
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body" data-bind="with: paymentMethodFormData">
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label class="form-label">Yontem Kodu</label>
+                            <input class="form-control" data-bind="value: systemName" placeholder="iyzico-card" />
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Yontem Adi</label>
+                            <input class="form-control" data-bind="value: displayName" placeholder="Kredi/Banka Karti" />
+                        </div>
+                        <div class="col-md-12">
+                            <label class="form-label">Aciklama</label>
+                            <input class="form-control" data-bind="value: description" placeholder="iyzico ile guvenli odeme" />
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Provider Kodu</label>
+                            <input class="form-control" data-bind="value: providerSystemName" placeholder="iyzico" />
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Provider Adi</label>
+                            <input class="form-control" data-bind="value: providerDisplayName" placeholder="Iyzico" />
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label">Ikon Sinifi</label>
+                            <input class="form-control" data-bind="value: iconClass" placeholder="bi bi-credit-card-2-front" />
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label">Siralama</label>
+                            <input type="number" class="form-control" data-bind="value: displayOrder" min="1" />
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label">Base URL</label>
+                            <input class="form-control" data-bind="value: baseUrl" placeholder="https://sandbox-api.iyzipay.com" />
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Api Key</label>
+                            <input class="form-control" data-bind="value: apiKey" />
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Secret Key</label>
+                            <input class="form-control" data-bind="value: secretKey" />
+                        </div>
+                        <div class="col-md-12">
+                            <label class="form-label">Ek Ayarlar (JSON)</label>
+                            <textarea class="form-control" rows="3" data-bind="value: extraSettingsJson"></textarea>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="form-check form-switch">
+                                <input class="form-check-input" type="checkbox" data-bind="checked: isEnabled" id="paymentEnabled" />
+                                <label class="form-check-label" for="paymentEnabled">Aktif</label>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="form-check form-switch">
+                                <input class="form-check-input" type="checkbox" data-bind="checked: isDefault" id="paymentDefault" />
+                                <label class="form-check-label" for="paymentDefault">Varsayilan</label>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="form-check form-switch">
+                                <input class="form-check-input" type="checkbox" data-bind="checked: isOnline" id="paymentOnline" />
+                                <label class="form-check-label" for="paymentOnline">Online</label>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="form-check form-switch">
+                                <input class="form-check-input" type="checkbox" data-bind="checked: isSandbox" id="paymentSandbox" />
+                                <label class="form-check-label" for="paymentSandbox">Sandbox</label>
+                            </div>
+                        </div>
+                        <div class="col-md-12">
+                            <div class="form-check form-switch">
+                                <input class="form-check-input" type="checkbox" data-bind="checked: supportsMarketplaceSplit" id="paymentSplit" />
+                                <label class="form-check-label" for="paymentSplit">Marketplace bolusturme destekli</label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Iptal</button>
+                    <button type="button" class="btn btn-primary" data-bind="click: savePaymentMethod, disable: isSavingPaymentMethod">
+                        <span class="spinner-border spinner-border-sm me-1" data-bind="visible: isSavingPaymentMethod"></span>
+                        Kaydet
+                    </button>
+                </div>
             </div>
         </div>
     </div>

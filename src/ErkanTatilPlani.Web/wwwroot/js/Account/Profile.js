@@ -71,6 +71,10 @@ function ProfileViewModel() {
         return url && url.startsWith('/uploads/avatars/');
     });
 
+    self.isTravelerAccount = ko.computed(function() {
+        return self.userTypeId() === 0;
+    });
+
     self.localizeUserType = function(systemName) {
         if (!systemName) return '';
 

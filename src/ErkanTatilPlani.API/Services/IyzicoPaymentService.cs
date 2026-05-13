@@ -10,7 +10,6 @@ public class IyzicoPaymentService : IPaymentService
 {
     private readonly PaymentSettings _settings;
     private readonly ILogger<IyzicoPaymentService> _logger;
-    private readonly Iyzipay.Options _options;
 
     public IyzicoPaymentService(
         IOptions<PaymentSettings> settings,
@@ -18,18 +17,13 @@ public class IyzicoPaymentService : IPaymentService
     {
         _settings = settings.Value;
         _logger = logger;
-        _options = new Iyzipay.Options
-        {
-            ApiKey = _settings.ApiKey,
-            SecretKey = _settings.SecretKey,
-            BaseUrl = _settings.BaseUrl
-        };
     }
 
     public async Task<PaymentInitResult> InitializePaymentAsync(PaymentRequest request)
     {
         try
         {
+            var options = BuildOptions(request.ProviderCredentials);
             var checkoutFormRequest = new CreateCheckoutFormInitializeRequest
             {
                 Locale = Locale.TR.ToString(),
@@ -96,7 +90,7 @@ public class IyzicoPaymentService : IPaymentService
 
             // Iyzico API'yi cagir
             var checkoutFormInitialize = await Task.Run(() =>
-                CheckoutFormInitialize.Create(checkoutFormRequest, _options));
+                CheckoutFormInitialize.Create(checkoutFormRequest, options));
 
             if (checkoutFormInitialize.Status == "success")
             {
@@ -134,10 +128,11 @@ public class IyzicoPaymentService : IPaymentService
         }
     }
 
-    public async Task<PaymentResult> ProcessCallbackAsync(string token)
+    public async Task<PaymentResult> ProcessCallbackAsync(string token, PaymentProviderCredentials? credentials = null)
     {
         try
         {
+            var options = BuildOptions(credentials);
             var request = new RetrieveCheckoutFormRequest
             {
                 Locale = Locale.TR.ToString(),
@@ -145,7 +140,7 @@ public class IyzicoPaymentService : IPaymentService
             };
 
             var checkoutForm = await Task.Run(() =>
-                CheckoutForm.Retrieve(request, _options));
+                CheckoutForm.Retrieve(request, options));
 
             // ConversationId'den ReservationId'yi cikar
             var conversationId = checkoutForm.ConversationId ?? "";
@@ -199,10 +194,11 @@ public class IyzicoPaymentService : IPaymentService
         }
     }
 
-    public async Task<PaymentStatus> GetPaymentStatusAsync(string paymentId)
+    public async Task<PaymentStatus> GetPaymentStatusAsync(string paymentId, PaymentProviderCredentials? credentials = null)
     {
         try
         {
+            var options = BuildOptions(credentials);
             var request = new RetrievePaymentRequest
             {
                 Locale = Locale.TR.ToString(),
@@ -210,7 +206,7 @@ public class IyzicoPaymentService : IPaymentService
             };
 
             var payment = await Task.Run(() =>
-                Payment.Retrieve(request, _options));
+                Payment.Retrieve(request, options));
 
             if (payment.Status == "success")
             {
@@ -278,6 +274,16 @@ public class IyzicoPaymentService : IPaymentService
 
     private static string FormatDecimal(decimal value)
         => value.ToString("F2", System.Globalization.CultureInfo.InvariantCulture);
+
+    private Iyzipay.Options BuildOptions(PaymentProviderCredentials? credentials)
+    {
+        return new Iyzipay.Options
+        {
+            ApiKey = string.IsNullOrWhiteSpace(credentials?.ApiKey) ? _settings.ApiKey : credentials.ApiKey,
+            SecretKey = string.IsNullOrWhiteSpace(credentials?.SecretKey) ? _settings.SecretKey : credentials.SecretKey,
+            BaseUrl = string.IsNullOrWhiteSpace(credentials?.BaseUrl) ? _settings.BaseUrl : credentials.BaseUrl
+        };
+    }
 
     private static void SetPropertyIfExists(object target, string propertyName, object? value)
     {

@@ -15,8 +15,10 @@ function TourDetailViewModel() {
     self.reservationDateTo = ko.observable('');
     self.reservationSessions = ko.observableArray([]);
     self.selectedReservationSession = ko.observable(null);
+    self.reservationAvailabilityNotice = ko.observable('');
     self.showPaymentStep = ko.observable(false);
-    self.selectedPaymentMethod = ko.observable('iyzico');
+    self.paymentMethods = ko.observableArray([]);
+    self.selectedPaymentMethod = ko.observable('');
     self.paymentType = ko.observable('deposit');
     self.numberOfPeople = ko.observable(1);
     self.couponCode = ko.observable('');
@@ -159,30 +161,73 @@ function TourDetailViewModel() {
         var tour = self.tour();
         var fromStr = self.reservationDateFrom();
         if (!tour || !fromStr) {
-            self.reservationSessions([]);
+            self.reservationAvailabilityNotice('');
+            self.setReservationSessions([]);
             return;
         }
         var toStr = self.reservationDateTo() || fromStr;
         self.isLoadingDates(true);
-        self.selectedReservationSession(null);
+        self.reservationAvailabilityNotice('');
+        var previousToken = self.getReservationSessionToken(self.selectedReservationSession());
         $.ajax({
             url: apiBaseUrl + '/api/tours/' + tour.id + '/dates',
             method: 'GET',
             data: { from: fromStr, to: toStr },
             success: function(data) {
-                var available = data.filter(function(d) { return d.isAvailable; });
-                self.reservationSessions(available);
+                self.setReservationSessions(data, previousToken);
                 self.isLoadingDates(false);
             },
             error: function() {
-                self.reservationSessions([]);
+                self.setReservationSessions([]);
                 self.isLoadingDates(false);
             }
         });
     };
 
+    self.getReservationSessionToken = function(session) {
+        return session ? (session.token || ('d:' + session.id)) : null;
+    };
+
+    self.sortReservationSessions = function(sessions) {
+        return (sessions || []).slice().sort(function(left, right) {
+            var leftDate = (left.date || '').toString();
+            var rightDate = (right.date || '').toString();
+            if (leftDate !== rightDate) return leftDate.localeCompare(rightDate);
+            return (left.startTime || '').localeCompare(right.startTime || '');
+        });
+    };
+
+    self.setReservationSessions = function(sessions, preferredToken) {
+        var items = Array.isArray(sessions) ? sessions : [];
+        var normalized = self.sortReservationSessions(items.filter(function(item) {
+            return item && item.isAvailable;
+        }));
+
+        normalized.forEach(function(session) {
+            session.token = self.getReservationSessionToken(session);
+        });
+
+        self.reservationSessions(normalized);
+
+        var selected = null;
+        if (preferredToken) {
+            selected = normalized.find(function(session) {
+                return session.token === preferredToken;
+            }) || null;
+        }
+
+        if (!selected && normalized.length > 0) {
+            selected = normalized[0];
+        }
+
+        self.selectedReservationSession(selected);
+        if (normalized.length > 0) {
+            self.reservationAvailabilityNotice('');
+        }
+    };
+
     self.selectReservationSession = function(session) {
-        var tokenOrId = session.token || ('d:' + session.id);
+        var tokenOrId = self.getReservationSessionToken(session);
         if (self.selectedReservationSession() && self.selectedReservationSession().token === tokenOrId) {
             self.selectedReservationSession(null);
         } else {
@@ -213,6 +258,64 @@ function TourDetailViewModel() {
         return val + ' ' + unit;
     };
 
+    self.toIsoDate = function(date) {
+        var year = date.getFullYear();
+        var month = String(date.getMonth() + 1).padStart(2, '0');
+        var day = String(date.getDate()).padStart(2, '0');
+        return year + '-' + month + '-' + day;
+    };
+
+    self.preloadReservationSessions = function(tour) {
+        if (!tour) return;
+
+        var startDate = new Date();
+        startDate.setHours(0, 0, 0, 0);
+
+        var endDate = new Date(startDate.getTime());
+        endDate.setDate(endDate.getDate() + 45);
+
+        self.isLoadingDates(true);
+        self.reservationAvailabilityNotice('');
+        $.ajax({
+            url: apiBaseUrl + '/api/tours/' + tour.id + '/dates',
+            method: 'GET',
+            data: {
+                from: self.toIsoDate(startDate),
+                to: self.toIsoDate(endDate)
+            },
+            success: function(data) {
+                var items = Array.isArray(data) ? data : [];
+                var available = self.sortReservationSessions(items.filter(function(item) {
+                    return item && item.isAvailable;
+                }));
+
+                if (available.length === 0) {
+                    self.reservationDateFrom('');
+                    self.reservationDateTo('');
+                    self.setReservationSessions([]);
+                    self.reservationAvailabilityNotice(T('TourDate.NoUpcomingSessions') || 'Bu tur icin yakin tarihte musait seans bulunmuyor');
+                    self.isLoadingDates(false);
+                    return;
+                }
+
+                var firstSession = available[0];
+                var firstDate = firstSession.date;
+                var sameDaySessions = available.filter(function(session) {
+                    return session.date === firstDate;
+                });
+
+                self.reservationDateFrom(firstDate);
+                self.reservationDateTo(firstDate);
+                self.setReservationSessions(sameDaySessions, self.getReservationSessionToken(firstSession));
+                self.isLoadingDates(false);
+            },
+            error: function() {
+                self.setReservationSessions([]);
+                self.isLoadingDates(false);
+            }
+        });
+    };
+
     self.renderStars = function(rating) {
         var html = '';
         for (var i = 1; i <= 5; i++) {
@@ -228,6 +331,52 @@ function TourDetailViewModel() {
     self.hasMoreReviews = ko.computed(function() {
         return self.reviewPage() < self.reviewTotalPages();
     });
+
+    self.availablePaymentMethods = ko.computed(function() {
+        return self.paymentMethods().filter(function(method) {
+            return method && method.isAvailableForCheckout;
+        });
+    });
+
+    self.hasSinglePaymentMethod = ko.computed(function() {
+        return self.paymentMethods().length === 1;
+    });
+
+    self.hasMultiplePaymentMethods = ko.computed(function() {
+        return self.paymentMethods().length > 1;
+    });
+
+    self.selectedPaymentMethodDetails = ko.computed(function() {
+        var selectedSystemName = self.selectedPaymentMethod();
+        var methods = self.paymentMethods();
+        var selected = methods.find(function(method) {
+            return method && method.systemName === selectedSystemName;
+        });
+
+        if (selected) return selected;
+
+        var defaultMethod = methods.find(function(method) {
+            return method && method.isDefault;
+        });
+        if (defaultMethod) return defaultMethod;
+
+        var firstAvailable = methods.find(function(method) {
+            return method && method.isAvailableForCheckout;
+        });
+        if (firstAvailable) return firstAvailable;
+
+        return methods.length > 0 ? methods[0] : null;
+    });
+
+    self.getPaymentMethodMeta = function(method) {
+        if (!method) return '';
+
+        var provider = method.providerDisplayName || method.providerSystemName || '';
+        var description = method.description || '';
+
+        if (provider && description) return provider + ' - ' + description;
+        return provider || description || '';
+    };
 
     var travelTypeNames = { 0: 'Yalniz', 1: 'Cift', 2: 'Aile', 3: 'Arkadaslar', 4: 'Is Seyahati' };
     self.getTravelTypeName = function(id) { return travelTypeNames[id] || ''; };
@@ -511,6 +660,41 @@ function TourDetailViewModel() {
         }, 300);
     };
 
+    self.loadPaymentMethods = function() {
+        $.ajax({
+            url: apiBaseUrl + '/api/paymentmethods/public',
+            method: 'GET',
+            success: function(data) {
+                var methods = Array.isArray(data) ? data : [];
+                self.paymentMethods(methods);
+
+                var defaultMethod = methods.find(function(method) {
+                    return method.isDefault && method.isAvailableForCheckout;
+                });
+                var firstAvailable = methods.find(function(method) {
+                    return method.isAvailableForCheckout;
+                });
+                var selected = defaultMethod || firstAvailable;
+                self.selectedPaymentMethod(selected ? selected.systemName : '');
+            },
+            error: function() {
+                self.paymentMethods([
+                    {
+                        systemName: 'iyzico-card',
+                        displayName: T('Payment.CreditCard') || 'Kredi/Banka Karti',
+                        description: T('Payment.IyzicoSecure') || 'iyzico ile guvenli odeme',
+                        iconClass: 'bi bi-credit-card-2-front',
+                        isDefault: true,
+                        isOnline: true,
+                        isAvailableForCheckout: true,
+                        comingSoon: false
+                    }
+                ]);
+                self.selectedPaymentMethod('iyzico-card');
+            }
+        });
+    };
+
     // ===== Rezervasyon Modal =====
     self.openReservationModal = function(tour) {
         var user = getUser();
@@ -527,6 +711,14 @@ function TourDetailViewModel() {
         self.numberOfPeople(1);
         self.showPaymentStep(false);
         self.paymentType('deposit');
+        var defaultMethod = self.paymentMethods().find(function(method) {
+            return method.isDefault && method.isAvailableForCheckout;
+        });
+        var firstAvailable = self.paymentMethods().find(function(method) {
+            return method.isAvailableForCheckout;
+        });
+        var selected = defaultMethod || firstAvailable;
+        self.selectedPaymentMethod(selected ? selected.systemName : '');
         self.selectedReservationSession(null);
         self.couponCode('');
         self.couponDiscount(0);
@@ -550,6 +742,7 @@ function TourDetailViewModel() {
             self.reservationData({ fullName: '', email: '', phone: '', numberOfPeople: 1, notes: '' });
         }
         reservationModal.show();
+        self.preloadReservationSessions(tour);
     };
 
     // ===== Fiyat Hesaplama =====
@@ -601,7 +794,10 @@ function TourDetailViewModel() {
     });
 
     self.selectPaymentType = function(type) { self.paymentType(type); };
-    self.selectPaymentMethod = function(method) { self.selectedPaymentMethod(method); };
+    self.selectPaymentMethod = function(method) {
+        if (!method || !method.isAvailableForCheckout) return;
+        self.selectedPaymentMethod(method.systemName);
+    };
 
     self.applyCoupon = function() {
         var tour = self.tour();
@@ -636,6 +832,10 @@ function TourDetailViewModel() {
     self.goToPaymentStep = function() {
         if (!self.selectedReservationSession()) {
             toastr.warning(T('TourDate.NoSessionSelected') || 'Lutfen bir tarih ve saat secin');
+            return;
+        }
+        if (!self.selectedPaymentMethod()) {
+            toastr.warning('Lutfen bir odeme yontemi secin');
             return;
         }
         var form = document.getElementById('reservationForm');
@@ -676,7 +876,8 @@ function TourDetailViewModel() {
                 notes: data.notes || '',
                 couponCode: self.couponCode() || null,
                 participantInfo: participantInfo,
-                payFullAmount: self.paymentType() === 'full'
+                payFullAmount: self.paymentType() === 'full',
+                paymentMethodSystemName: self.selectedPaymentMethod()
             }),
             success: function(response) {
                 if (response.success && response.paymentPageUrl) {
@@ -714,6 +915,7 @@ function TourDetailViewModel() {
         reportModal = createModal('reportModal');
         reservationModal = createModal('reservationModal');
         watchModal = createModal('watchModal');
+        self.loadPaymentMethods();
         self.loadCategories();
         self.loadFavorites();
         self.loadWatches();

@@ -17,6 +17,10 @@ function ToursViewModel() {
     self.locationError = ko.observable('');
     self.isLocating = ko.observable(false);
     self.isSearchingAddress = ko.observable(false);
+    self.isNearbyPanelOpen = ko.observable(false);
+    self.defaultNearbyRadiusKm = 50;
+    self.maximumNearbyRadiusKm = 120;
+    self.nearbyRadiusBufferKm = 15;
 
     self.destinationCoordinates = [
         { terms: ['selcuk', 'efes'], latitude: 37.9490, longitude: 27.3689 },
@@ -81,7 +85,7 @@ function ToursViewModel() {
             return [];
         }
 
-        return self.tours()
+        var candidates = self.tours()
             .map(function(tour) {
                 var coordinates = self.getTourCoordinates(tour);
                 if (!coordinates) {
@@ -102,7 +106,20 @@ function ToursViewModel() {
                 };
             })
             .filter(function(item) { return item !== null; })
-            .sort(function(left, right) { return left.distanceKm - right.distanceKm; })
+            .sort(function(left, right) { return left.distanceKm - right.distanceKm; });
+
+        if (candidates.length === 0) {
+            return [];
+        }
+
+        var closestDistanceKm = candidates[0].distanceKm;
+        var nearbyRadiusKm = Math.min(
+            self.maximumNearbyRadiusKm,
+            Math.max(self.defaultNearbyRadiusKm, closestDistanceKm + self.nearbyRadiusBufferKm)
+        );
+
+        return candidates
+            .filter(function(item) { return item.distanceKm <= nearbyRadiusKm; })
             .slice(0, 5);
     });
 
@@ -395,10 +412,35 @@ function ToursViewModel() {
             .replace('{1}', location.longitude.toFixed(4));
     };
 
+    self.formatResolvedLocationLabel = function(label, fallbackLabel) {
+        if (!label) {
+            return fallbackLabel || '';
+        }
+
+        var parts = label
+            .split(',')
+            .map(function(part) { return part.trim(); })
+            .filter(function(part) { return part.length > 0; });
+
+        if (parts.length === 0) {
+            return fallbackLabel || label;
+        }
+
+        var uniqueParts = [];
+        parts.forEach(function(part) {
+            if (uniqueParts.indexOf(part) === -1) {
+                uniqueParts.push(part);
+            }
+        });
+
+        return uniqueParts.slice(0, 4).join(', ');
+    };
+
     self.setResolvedUserLocation = function(location, label) {
         self.userLocation(location);
         self.userLocationLabel(label || self.buildApproximateLocationLabel(location));
         self.locationError('');
+        self.isNearbyPanelOpen(true);
         self.focusMapOnUserLocation();
     };
 
@@ -435,7 +477,7 @@ function ToursViewModel() {
                 return;
             }
 
-            self.userLocationLabel(label);
+            self.userLocationLabel(self.formatResolvedLocationLabel(label, self.userLocationLabel()));
         });
     };
 
@@ -536,7 +578,7 @@ function ToursViewModel() {
             self.setResolvedUserLocation({
                 latitude: latitude,
                 longitude: longitude
-            }, match.display_name || query);
+            }, self.formatResolvedLocationLabel(match.display_name || query, query));
         }).fail(function() {
             var lookupFailedMessage = T('Tours.AddressLookupFailed');
             self.locationError(lookupFailedMessage);
@@ -550,6 +592,7 @@ function ToursViewModel() {
         self.userLocation(null);
         self.userLocationLabel('');
         self.locationError('');
+        self.isNearbyPanelOpen(false);
 
         if (self.map && self.userMarker) {
             self.map.removeLayer(self.userMarker);
@@ -560,6 +603,18 @@ function ToursViewModel() {
         if (self.viewMode() === 'map' && self.map) {
             self.updateMarkers();
         }
+    };
+
+    self.openNearbyPanel = function() {
+        if (!self.hasUserLocation()) {
+            return;
+        }
+
+        self.isNearbyPanelOpen(true);
+    };
+
+    self.closeNearbyPanel = function() {
+        self.isNearbyPanelOpen(false);
     };
 
     // Turlari yukle
@@ -722,9 +777,9 @@ function ToursViewModel() {
         }
 
         // Koordinatli turlari filtrele
-        var toursWithCoords = self.tours().filter(function(t) {
-            return self.getTourCoordinates(t);
-        });
+        var toursWithCoords = self.hasUserLocation()
+            ? self.nearbyTours().map(function(item) { return item.tour; })
+            : self.tours().filter(function(t) { return self.getTourCoordinates(t); });
 
         var bounds = [];
 
@@ -741,7 +796,7 @@ function ToursViewModel() {
 
         if (toursWithCoords.length === 0) {
             if (bounds.length === 1) {
-                self.map.setView(bounds[0], 11);
+                self.map.setView(bounds[0], 12);
             }
             return;
         }
@@ -771,9 +826,12 @@ function ToursViewModel() {
         // Haritayi marker'lara sigdir
         if (bounds.length > 0) {
             if (bounds.length === 1) {
-                self.map.setView(bounds[0], 11);
+                self.map.setView(bounds[0], 12);
             } else {
-                self.map.fitBounds(bounds, { padding: [20, 20] });
+                self.map.fitBounds(bounds, {
+                    padding: [20, 20],
+                    maxZoom: self.hasUserLocation() ? 12 : 10
+                });
             }
         }
     };

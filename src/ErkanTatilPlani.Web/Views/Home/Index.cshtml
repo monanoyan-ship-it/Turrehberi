@@ -160,8 +160,8 @@
                     <i class="bi bi-building fs-2"></i>
                 </div>
                 <h5 class="card-title">Firmalar</h5>
-                <p class="card-text text-muted small">Tur saglayici firmalari yonetin.</p>
-                <a asp-controller="Companies" asp-action="Index" class="btn btn-outline-primary">Firmalari Goruntule</a>
+                <p class="card-text text-muted small">Guvenilir tur saglayicilarini ve uzmanlik alanlarini kesfedin.</p>
+                <a asp-controller="Companies" asp-action="Index" class="btn btn-outline-primary">Firmalari Kesfet</a>
             </div>
         </div>
     </div>
@@ -172,32 +172,44 @@
                     <i class="bi bi-geo-alt fs-2"></i>
                 </div>
                 <h5 class="card-title">Turlar</h5>
-                <p class="card-text text-muted small">Mevcut turlari goruntuleyin ve yonetin.</p>
-                <a asp-controller="Tours" asp-action="Index" class="btn btn-outline-info">Turlari Goruntule</a>
+                <p class="card-text text-muted small">Destinasyon, tarih ve butcenize gore uygun turlari bulun.</p>
+                <a asp-controller="Tours" asp-action="Index" class="btn btn-outline-info">Turlari Kesfet</a>
             </div>
         </div>
     </div>
     <div class="col-md-3">
         <div class="card h-100 shadow-sm border-0 text-center hover-card">
             <div class="card-body py-4">
-                <div class="icon-circle bg-warning text-dark mx-auto mb-3">
-                    <i class="bi bi-people fs-2"></i>
+                <div class="icon-circle bg-warning text-dark mx-auto mb-3" data-bind="visible: !isTravelerUser()">
+                    <i class="bi bi-journal-text fs-2"></i>
                 </div>
-                <h5 class="card-title">Ziyaretciler</h5>
-                <p class="card-text text-muted small">Ziyaretci bilgilerini goruntuleyin.</p>
-                <a asp-controller="Visitors" asp-action="Index" class="btn btn-outline-warning">Ziyaretciler</a>
-            </div>
-        </div>
-    </div>
-    <div class="col-md-3">
-        <div class="card h-100 shadow-sm border-0 text-center hover-card">
-            <div class="card-body py-4">
-                <div class="icon-circle bg-success text-white mx-auto mb-3">
+                <div class="icon-circle bg-warning text-dark mx-auto mb-3" data-bind="visible: isTravelerUser">
                     <i class="bi bi-calendar-check fs-2"></i>
                 </div>
-                <h5 class="card-title">Rezervasyonlar</h5>
-                <p class="card-text text-muted small">Online sozlesmeli rezervasyonlari yonetin.</p>
-                <a asp-controller="Reservations" asp-action="Index" class="btn btn-outline-success">Rezervasyonlar</a>
+                <h5 class="card-title" data-bind="visible: !isTravelerUser()">Blog</h5>
+                <h5 class="card-title" data-bind="visible: isTravelerUser" data-t="Menu.MyReservations">Rezervasyonlarim</h5>
+                <p class="card-text text-muted small" data-bind="visible: !isTravelerUser()">Rotalar, ipuclari ve seyahat ilhami kesfedin.</p>
+                <p class="card-text text-muted small" data-bind="visible: isTravelerUser">Aktif, planlanan ve iptal edilen rezervasyonlarinizi takip edin.</p>
+                <a asp-controller="Blog" asp-action="Index" class="btn btn-outline-warning" data-bind="visible: !isTravelerUser()">Blogu Oku</a>
+                <a asp-controller="Account" asp-action="Reservations" class="btn btn-outline-warning" data-bind="visible: isTravelerUser">Rezervasyonlarima Git</a>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card h-100 shadow-sm border-0 text-center hover-card">
+            <div class="card-body py-4">
+                <div class="icon-circle bg-success text-white mx-auto mb-3" data-bind="visible: !isTravelerUser()">
+                    <i class="bi bi-envelope-paper fs-2"></i>
+                </div>
+                <div class="icon-circle bg-success text-white mx-auto mb-3" data-bind="visible: isTravelerUser">
+                    <i class="bi bi-heart fs-2"></i>
+                </div>
+                <h5 class="card-title" data-bind="visible: !isTravelerUser()">Iletisim</h5>
+                <h5 class="card-title" data-bind="visible: isTravelerUser">Favorilerim</h5>
+                <p class="card-text text-muted small" data-bind="visible: !isTravelerUser()">Sorulariniz icin bize hizlica ulasin.</p>
+                <p class="card-text text-muted small" data-bind="visible: isTravelerUser">Begendiginiz turlari kaybetmeden tek yerde saklayin.</p>
+                <a asp-controller="Home" asp-action="Contact" class="btn btn-outline-success" data-bind="visible: !isTravelerUser()">Bize Ulasin</a>
+                <a asp-controller="Account" asp-action="Favorites" class="btn btn-outline-success" data-bind="visible: isTravelerUser">Favorilerimi Ac</a>
             </div>
         </div>
     </div>

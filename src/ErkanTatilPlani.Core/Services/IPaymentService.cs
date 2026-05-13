@@ -3,8 +3,8 @@ namespace ErkanTatilPlani.Core.Services;
 public interface IPaymentService
 {
     Task<PaymentInitResult> InitializePaymentAsync(PaymentRequest request);
-    Task<PaymentResult> ProcessCallbackAsync(string token);
-    Task<PaymentStatus> GetPaymentStatusAsync(string paymentId);
+    Task<PaymentResult> ProcessCallbackAsync(string token, PaymentProviderCredentials? credentials = null);
+    Task<PaymentStatus> GetPaymentStatusAsync(string paymentId, PaymentProviderCredentials? credentials = null);
 }
 
 public class PaymentRequest
@@ -14,6 +14,9 @@ public class PaymentRequest
     public decimal Amount { get; set; }
     public string Currency { get; set; } = "TRY";
     public int PaymentTransactionTypeId { get; set; }
+    public string PaymentMethodSystemName { get; set; } = "iyzico-card";
+    public string ProviderSystemName { get; set; } = "iyzico";
+    public PaymentProviderCredentials? ProviderCredentials { get; set; }
 
     // Musteri Bilgileri
     public string CustomerEmail { get; set; } = string.Empty;
@@ -84,6 +87,14 @@ public class PaymentStatus
     public decimal? PaidAmount { get; set; }
     public DateTime? PaidAt { get; set; }
     public string? ErrorMessage { get; set; }
+}
+
+public class PaymentProviderCredentials
+{
+    public string ApiKey { get; set; } = string.Empty;
+    public string SecretKey { get; set; } = string.Empty;
+    public string BaseUrl { get; set; } = string.Empty;
+    public bool IsSandbox { get; set; } = true;
 }
 
 public class PaymentSettings

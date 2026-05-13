@@ -709,6 +709,7 @@
   "TourDate.SessionFull": "این جلسه پر است",
   "TourDate.SessionTime": "زمان جلسه",
   "TourDate.NoSessions": "هیچ جلسه‌ای برای این تاریخ در دسترس نیست",
+  "TourDate.NoUpcomingSessions": "هیچ نوبت آینده‌ای برای این تور در دسترس نیست",
   "TourDate.OnlyWithReservations": "فقط با رزرو",
   "TourDate.SelectDate": "تاریخ را انتخاب کنید",
   "Tours.FilterDifficulty": "سطح دشواری",

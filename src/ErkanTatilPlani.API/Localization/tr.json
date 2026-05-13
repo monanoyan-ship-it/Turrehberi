@@ -709,6 +709,7 @@
   "TourDate.SessionFull": "Bu seans dolu",
   "TourDate.SessionTime": "Seans Saati",
   "TourDate.NoSessions": "Bu tarihte musait seans yok",
+  "TourDate.NoUpcomingSessions": "Bu tur icin yakin tarihte musait seans bulunmuyor",
   "TourDate.OnlyWithReservations": "Sadece rezervasyonlu",
   "TourDate.SelectDate": "Tarih Secin",
   "Tours.FilterDifficulty": "Zorluk Seviyesi",
