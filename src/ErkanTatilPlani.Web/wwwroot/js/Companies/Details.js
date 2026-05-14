@@ -53,7 +53,7 @@ function CompanyProfileViewModel() {
         var description = c.description || c.tagline || c.name || '';
 
         // Title
-        document.title = (c.metaTitle || c.name) + ' - Erkan Tatil Plani';
+        document.title = (c.metaTitle || c.name) + ' - Tours';
 
         // Meta Description
         var metaDesc = document.querySelector('meta[name="description"]');
@@ -201,7 +201,7 @@ function CompanyProfileViewModel() {
 
             // Render share buttons
             var shareUrl = window.location.href;
-            var shareText = company.name + ' - ' + (company.tagline || 'Tur Firmasi') + ' | Erkan Tatil Plani';
+            var shareText = company.name + ' - ' + (company.tagline || 'Tur Firmasi') + ' | Tours';
             $('#companyShareButtons').html(SocialShare.renderButtons({
                 url: shareUrl,
                 text: shareText,

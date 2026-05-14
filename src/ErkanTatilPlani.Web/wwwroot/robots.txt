@@ -1,4 +1,4 @@
-# Erkan Tatil Plani - Robots.txt
+# Tours - Robots.txt
 User-agent: *
 Allow: /
 
@@ -13,4 +13,4 @@ Allow: /images/
 Allow: /lib/
 
 # Sitemap location
-Sitemap: https://erkantatilplani.com/sitemap.xml
+Sitemap: https://tours.corplynk.com/sitemap.xml

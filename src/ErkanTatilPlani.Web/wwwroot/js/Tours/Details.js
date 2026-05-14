@@ -634,7 +634,7 @@ function TourDetailViewModel() {
     // ===== Paylas Butonlari =====
     self.initShareButtons = function(tour) {
         var shareUrl = window.location.origin + '/Tours/Details/' + tour.id;
-        var shareText = tour.name + ' - ' + tour.destination + ' | Erkan Tatil Plani';
+        var shareText = tour.name + ' - ' + tour.destination + ' | Tours';
         $('#tourShareButtons').html(SocialShare.renderButtons({
             url: shareUrl,
             text: shareText,

@@ -186,7 +186,7 @@ public class EmailAccountFactory : IEmailAccountFactory
             var mailMessage = new MailMessage
             {
                 From = new MailAddress(account.FromEmail, account.FromName),
-                Subject = "Erkan Tatil Plani - Test Email",
+                Subject = "Tours - Test Email",
                 Body = $@"<html><body style='font-family: Arial, sans-serif; padding: 20px;'>
                     <h2>Test Email Basarili!</h2>
                     <p>Bu email, <strong>{account.Name}</strong> hesabindan gonderildi.</p>

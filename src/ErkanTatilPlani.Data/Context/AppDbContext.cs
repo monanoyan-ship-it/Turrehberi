@@ -1276,9 +1276,9 @@ public class AppDbContext : DbContext
         var visitors = new[]
         {
             // Sistem Admin
-            new Visitor { Id = 1, FirstName = "Sistem", LastName = "Admin", Email = "admin@erkantatilplani.com", Phone = "0532 111 1111", IdentityNumber = "11111111111", PasswordHash = passwordHash, UserTypeId = UserTypes.Ids.Admin, CompanyId = null, CreatedAt = now, IsActive = true },
+            new Visitor { Id = 1, FirstName = "Sistem", LastName = "Admin", Email = "admin@tours.corplynk.com", Phone = "0532 111 1111", IdentityNumber = "11111111111", PasswordHash = passwordHash, UserTypeId = UserTypes.Ids.Admin, CompanyId = null, CreatedAt = now, IsActive = true },
             // Personel
-            new Visitor { Id = 2, FirstName = "Personel", LastName = "Kullanici", Email = "staff@erkantatilplani.com", Phone = "0533 222 2222", IdentityNumber = "22222222222", PasswordHash = passwordHash, UserTypeId = UserTypes.Ids.Staff, CompanyId = null, CreatedAt = now, IsActive = true },
+            new Visitor { Id = 2, FirstName = "Personel", LastName = "Kullanici", Email = "staff@tours.corplynk.com", Phone = "0533 222 2222", IdentityNumber = "22222222222", PasswordHash = passwordHash, UserTypeId = UserTypes.Ids.Staff, CompanyId = null, CreatedAt = now, IsActive = true },
             // Firma sahipleri
             new Visitor { Id = 3, FirstName = "Ahmet", LastName = "Yilmaz", Email = "ahmet@egetur.com", Phone = "0534 333 3333", IdentityNumber = "33333333333", PasswordHash = passwordHash, UserTypeId = UserTypes.Ids.CompanyOwner, CompanyId = 1, CreatedAt = now, IsActive = true },
             new Visitor { Id = 4, FirstName = "Mehmet", LastName = "Kaya", Email = "mehmet@karadenizgezileri.com", Phone = "0535 444 4444", IdentityNumber = "44444444444", PasswordHash = passwordHash, UserTypeId = UserTypes.Ids.CompanyOwner, CompanyId = 2, CreatedAt = now, IsActive = true },
@@ -1331,10 +1331,10 @@ public class AppDbContext : DbContext
                 Description = "Varsayilan email hesabi",
                 SmtpHost = "smtp.gmail.com",
                 SmtpPort = 587,
-                SmtpUsername = "noreply@erkantatilplani.com",
+                SmtpUsername = "noreply@tours.corplynk.com",
                 SmtpPassword = "",
-                FromEmail = "noreply@erkantatilplani.com",
-                FromName = "Erkan Tatil Plani",
+                FromEmail = "noreply@tours.corplynk.com",
+                FromName = "Tours",
                 EnableSsl = true,
                 IsDefault = true,
                 DisplayOrder = 1,
@@ -1348,10 +1348,10 @@ public class AppDbContext : DbContext
                 Description = "Rezervasyon emailleri icin",
                 SmtpHost = "smtp.gmail.com",
                 SmtpPort = 587,
-                SmtpUsername = "reservations@erkantatilplani.com",
+                SmtpUsername = "reservations@tours.corplynk.com",
                 SmtpPassword = "",
-                FromEmail = "reservations@erkantatilplani.com",
-                FromName = "Erkan Tatil Plani - Rezervasyonlar",
+                FromEmail = "reservations@tours.corplynk.com",
+                FromName = "Tours - Rezervasyonlar",
                 EnableSsl = true,
                 IsDefault = false,
                 DisplayOrder = 2,
@@ -1531,7 +1531,7 @@ public class AppDbContext : DbContext
             Id = id++,
             EmailTemplateId = 1,
             LanguageCode = "tr",
-            Subject = "Sifre Sifirlama - Erkan Tatil Plani",
+            Subject = "Sifre Sifirlama - Tours",
             Body = GetPasswordResetTemplateBody("tr"),
             CreatedAt = now,
             IsActive = true
@@ -1543,7 +1543,7 @@ public class AppDbContext : DbContext
             Id = id++,
             EmailTemplateId = 1,
             LanguageCode = "en",
-            Subject = "Password Reset - Erkan Tatil Plani",
+            Subject = "Password Reset - Tours",
             Body = GetPasswordResetTemplateBody("en"),
             CreatedAt = now,
             IsActive = true
@@ -1555,7 +1555,7 @@ public class AppDbContext : DbContext
             Id = id++,
             EmailTemplateId = 2,
             LanguageCode = "tr",
-            Subject = "Email Dogrulama - Erkan Tatil Plani",
+            Subject = "Email Dogrulama - Tours",
             Body = GetEmailVerificationTemplateBody("tr"),
             CreatedAt = now,
             IsActive = true
@@ -1567,7 +1567,7 @@ public class AppDbContext : DbContext
             Id = id++,
             EmailTemplateId = 2,
             LanguageCode = "en",
-            Subject = "Email Verification - Erkan Tatil Plani",
+            Subject = "Email Verification - Tours",
             Body = GetEmailVerificationTemplateBody("en"),
             CreatedAt = now,
             IsActive = true
@@ -1579,7 +1579,7 @@ public class AppDbContext : DbContext
             Id = id++,
             EmailTemplateId = 3,
             LanguageCode = "tr",
-            Subject = "Rezervasyonunuz Onaylandi - Erkan Tatil Plani",
+            Subject = "Rezervasyonunuz Onaylandi - Tours",
             Body = GetReservationConfirmedTemplateBody("tr"),
             CreatedAt = now,
             IsActive = true
@@ -1591,7 +1591,7 @@ public class AppDbContext : DbContext
             Id = id++,
             EmailTemplateId = 3,
             LanguageCode = "en",
-            Subject = "Your Reservation is Confirmed - Erkan Tatil Plani",
+            Subject = "Your Reservation is Confirmed - Tours",
             Body = GetReservationConfirmedTemplateBody("en"),
             CreatedAt = now,
             IsActive = true
@@ -1603,7 +1603,7 @@ public class AppDbContext : DbContext
             Id = id++,
             EmailTemplateId = 4,
             LanguageCode = "tr",
-            Subject = "Rezervasyonunuz Iptal Edildi - Erkan Tatil Plani",
+            Subject = "Rezervasyonunuz Iptal Edildi - Tours",
             Body = GetReservationCancelledTemplateBody("tr"),
             CreatedAt = now,
             IsActive = true
@@ -1615,7 +1615,7 @@ public class AppDbContext : DbContext
             Id = id++,
             EmailTemplateId = 4,
             LanguageCode = "en",
-            Subject = "Your Reservation has been Cancelled - Erkan Tatil Plani",
+            Subject = "Your Reservation has been Cancelled - Tours",
             Body = GetReservationCancelledTemplateBody("en"),
             CreatedAt = now,
             IsActive = true
@@ -1627,7 +1627,7 @@ public class AppDbContext : DbContext
             Id = id++,
             EmailTemplateId = 5,
             LanguageCode = "tr",
-            Subject = "Rezervasyonunuz Reddedildi - Erkan Tatil Plani",
+            Subject = "Rezervasyonunuz Reddedildi - Tours",
             Body = GetReservationRejectedTemplateBody("tr"),
             CreatedAt = now,
             IsActive = true
@@ -1639,7 +1639,7 @@ public class AppDbContext : DbContext
             Id = id++,
             EmailTemplateId = 5,
             LanguageCode = "en",
-            Subject = "Your Reservation has been Rejected - Erkan Tatil Plani",
+            Subject = "Your Reservation has been Rejected - Tours",
             Body = GetReservationRejectedTemplateBody("en"),
             CreatedAt = now,
             IsActive = true
@@ -1670,8 +1670,8 @@ public class AppDbContext : DbContext
     <div class='container'>
         {content}
         <div class='footer'>
-            <p>Bu email Erkan Tatil Plani tarafindan otomatik olarak gonderilmistir.</p>
-            <p>&copy; 2026 Erkan Tatil Plani. Tum haklari saklidir.</p>
+            <p>Bu email Tours tarafindan otomatik olarak gonderilmistir.</p>
+            <p>&copy; 2026 Tours. Tum haklari saklidir.</p>
         </div>
     </div>
 </body>

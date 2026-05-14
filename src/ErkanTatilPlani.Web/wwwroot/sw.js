@@ -8,7 +8,7 @@ self.addEventListener('activate', function (event) {
 });
 
 self.addEventListener('push', function (event) {
-    var data = { title: 'Erkan Tatil Plani', body: 'Yeni bildiriminiz var', url: '/' };
+    var data = { title: 'Tours', body: 'Yeni bildiriminiz var', url: '/' };
 
     if (event.data) {
         try {
@@ -27,7 +27,7 @@ self.addEventListener('push', function (event) {
     };
 
     event.waitUntil(
-        self.registration.showNotification(data.title || 'Erkan Tatil Plani', options)
+        self.registration.showNotification(data.title || 'Tours', options)
     );
 });
 

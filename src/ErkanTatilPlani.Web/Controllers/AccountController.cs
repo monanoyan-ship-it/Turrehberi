@@ -27,6 +27,7 @@ public class AccountController : Controller
 
     public IActionResult Logout()
     {
+        Response.Cookies.Delete("Tours.Jwt");
         Response.Cookies.Delete("ErkanTatilPlani.Jwt");
         return RedirectToAction("Index", "Home");
     }
@@ -51,7 +52,7 @@ public class AccountController : Controller
         if (!response.IsSuccessStatusCode)
             return Unauthorized(new { success = false });
 
-        Response.Cookies.Append("ErkanTatilPlani.Jwt", request.Token, new CookieOptions
+        Response.Cookies.Append("Tours.Jwt", request.Token, new CookieOptions
         {
             HttpOnly = true,
             Secure = Request.IsHttps,
@@ -65,6 +66,7 @@ public class AccountController : Controller
     [HttpPost]
     public IActionResult ClearAuthToken()
     {
+        Response.Cookies.Delete("Tours.Jwt");
         Response.Cookies.Delete("ErkanTatilPlani.Jwt");
         return Ok(new { success = true });
     }

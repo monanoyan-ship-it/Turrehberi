@@ -272,7 +272,7 @@ function ToursViewModel() {
     // Tur paylas
     self.shareTour = function(tour, platform) {
         var shareUrl = window.location.origin + '/Tours/Details/' + tour.id;
-        var shareText = tour.name + ' - ' + tour.destination + ' | Erkan Tatil Plani';
+        var shareText = tour.name + ' - ' + tour.destination + ' | Tours';
 
         if (platform === 'copy') {
             SocialShare.copyLink(shareUrl);

@@ -276,8 +276,8 @@ public class EmailTemplateFactory : IEmailTemplateFactory
             return placeholder switch
             {
                 "customername" => "John Doe",
-                "reseturl" => "https://erkantatilplani.com/reset?token=xxx",
-                "verifyurl" => "https://erkantatilplani.com/verify?token=xxx",
+                "reseturl" => "https://tours.corplynk.com/reset?token=xxx",
+                "verifyurl" => "https://tours.corplynk.com/verify?token=xxx",
                 "tourname" => "Efes Antik Kent Turu",
                 "companyname" => "Ege Tur",
                 "destination" => "Selcuk, Izmir",

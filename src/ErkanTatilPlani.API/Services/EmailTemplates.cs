@@ -35,7 +35,7 @@ public static class EmailTemplates
                     <!-- Header -->
                     <tr>
                         <td style=""padding: 30px 40px; background: linear-gradient(135deg, {PrimaryColor}, #1d4ed8); border-radius: 12px 12px 0 0; text-align: center;"">
-                            <h1 style=""margin: 0; color: #ffffff; font-size: 28px; font-weight: 700;"">Erkan Tatil Plani</h1>
+                            <h1 style=""margin: 0; color: #ffffff; font-size: 28px; font-weight: 700;"">Tours</h1>
                         </td>
                     </tr>
                     <!-- Content -->
@@ -49,7 +49,7 @@ public static class EmailTemplates
                         <td style=""padding: 20px 40px; background-color: {LightGray}; border-radius: 0 0 12px 12px; text-align: center;"">
                             <p style=""margin: 0; color: {GrayColor}; font-size: 12px;"">{footerText}</p>
                             <p style=""margin: 10px 0 0; color: {GrayColor}; font-size: 12px;"">
-                                <a href=""https://erkantatilplani.com"" style=""color: {PrimaryColor}; text-decoration: none;"">erkantatilplani.com</a>
+                                <a href=""https://tours.corplynk.com"" style=""color: {PrimaryColor}; text-decoration: none;"">tours.corplynk.com</a>
                             </p>
                         </td>
                     </tr>

@@ -1,0 +1,16 @@
+.git/
+.vs/
+.claude/
+.codex-runtime/
+.github/
+bin/
+obj/
+temp_build/
+temp_build_final/
+src/ErkanTatilPlani.Mobile/
+src/ErkanTatilPlani.Tests/
+**/wwwroot/uploads/
+*.user
+*.suo
+*.md
+nul

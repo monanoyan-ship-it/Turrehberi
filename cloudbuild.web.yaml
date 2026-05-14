@@ -1,0 +1,11 @@
+steps:
+  - name: gcr.io/cloud-builders/docker
+    args:
+      - build
+      - -f
+      - src/ErkanTatilPlani.Web/Dockerfile
+      - -t
+      - europe-west1-docker.pkg.dev/$PROJECT_ID/cloud-run-source-deploy/tours-web:latest
+      - .
+images:
+  - europe-west1-docker.pkg.dev/$PROJECT_ID/cloud-run-source-deploy/tours-web:latest

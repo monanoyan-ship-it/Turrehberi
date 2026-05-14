@@ -10,11 +10,16 @@ using ErkanTatilPlani.Data.Context;
 using CacheService = ErkanTatilPlani.API.Services.CacheService;
 using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
+var forwardedHeadersEnabled = string.Equals(
+    Environment.GetEnvironmentVariable("ASPNETCORE_FORWARDEDHEADERS_ENABLED"),
+    "true",
+    StringComparison.OrdinalIgnoreCase);
 
 builder.Logging.ClearProviders();
 builder.Logging.AddConsole();
@@ -27,6 +32,18 @@ if (builder.Environment.IsDevelopment() || builder.Environment.IsEnvironment("Te
     builder.Services.AddDataProtection()
         .PersistKeysToFileSystem(new DirectoryInfo(dataProtectionKeysPath))
         .SetApplicationName("ErkanTatilPlani.API");
+}
+
+if (forwardedHeadersEnabled)
+{
+    builder.Services.Configure<ForwardedHeadersOptions>(options =>
+    {
+        options.ForwardedHeaders = ForwardedHeaders.XForwardedFor |
+                                   ForwardedHeaders.XForwardedProto |
+                                   ForwardedHeaders.XForwardedHost;
+        options.KnownNetworks.Clear();
+        options.KnownProxies.Clear();
+    });
 }
 
 // Service + Factory Katman DI
@@ -168,12 +185,12 @@ builder.Services.AddSwaggerGen(options =>
     options.SwaggerDoc("v1", new OpenApiInfo
     {
         Version = "v1",
-        Title = "Erkan Tatil Plani API",
+        Title = "Tours API",
         Description = "Tur kiralama ve rezervasyon sistemi API dokumantasyonu",
         Contact = new OpenApiContact
         {
-            Name = "Erkan Tatil Plani",
-            Email = "info@erkantatilplani.com"
+            Name = "Tours",
+            Email = "hello@tours.corplynk.com"
         }
     });
 
@@ -271,7 +288,18 @@ if (!app.Environment.IsEnvironment("Testing"))
 }
 
 // Uploads klasorlerini olustur
-var uploadsRoot = Path.Combine(app.Environment.WebRootPath, "uploads");
+var webRootPath = app.Environment.WebRootPath;
+if (string.IsNullOrWhiteSpace(webRootPath))
+{
+    webRootPath = Path.Combine(app.Environment.ContentRootPath, "wwwroot");
+}
+
+if (!Directory.Exists(webRootPath))
+{
+    Directory.CreateDirectory(webRootPath);
+}
+
+var uploadsRoot = Path.Combine(webRootPath, "uploads");
 var uploadFolders = new[] { "reviews", "galleries", "avatars", "contracts", "tours", "guides" };
 foreach (var folder in uploadFolders)
 {
@@ -283,15 +311,20 @@ foreach (var folder in uploadFolders)
 // Configure the HTTP request pipeline.
 app.UseExceptionHandling(); // Global exception handler - ilk sirada olmali
 
+if (forwardedHeadersEnabled)
+{
+    app.UseForwardedHeaders();
+}
+
 if (app.Environment.IsDevelopment())
 {
     app.MapOpenApi();
     app.UseSwagger();
     app.UseSwaggerUI(options =>
     {
-        options.SwaggerEndpoint("/swagger/v1/swagger.json", "Erkan Tatil Plani API v1");
+        options.SwaggerEndpoint("/swagger/v1/swagger.json", "Tours API v1");
         options.RoutePrefix = "swagger";
-        options.DocumentTitle = "Erkan Tatil Plani API";
+        options.DocumentTitle = "Tours API";
         options.DefaultModelsExpandDepth(-1); // Modelleri gizle
     });
 }

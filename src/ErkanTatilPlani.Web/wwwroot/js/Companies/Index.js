@@ -22,7 +22,7 @@ function CompaniesViewModel() {
     // Firma paylas
     self.shareCompany = function(company, platform) {
         var shareUrl = window.location.origin + '/' + company.slug;
-        var shareText = company.name + ' - ' + (company.tagline || 'Tur Firmasi') + ' | Erkan Tatil Plani';
+        var shareText = company.name + ' - ' + (company.tagline || 'Tur Firmasi') + ' | Tours';
 
         if (platform === 'copy') {
             SocialShare.copyLink(shareUrl);
